@@ -1,0 +1,11 @@
+//
+//  BaseConfig.xcconfig
+//  SnackOverflowApp
+//
+//  Created by タイン・グエン on 2023/01/08.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+PRODUCT_DISPLAY_NAME = Flashcard

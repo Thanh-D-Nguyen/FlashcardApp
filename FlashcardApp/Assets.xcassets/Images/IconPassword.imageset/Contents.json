@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "IconPassword.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

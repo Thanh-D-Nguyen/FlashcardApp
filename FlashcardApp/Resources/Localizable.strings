@@ -1,0 +1,31 @@
+/* 
+  Localizable.strings
+  SnackOverflowApp
+
+  Created by タイン・グエン on 2023/01/09.
+  
+*/
+"Hand-pickle high quality snacks." = "Hand-pickle high quality snacks.";
+"Shop global. Mind-blownly affordable." = "Shop global. Mind-blownly affordable.";
+"Deliver on the promise of time." = "Deliver on the promise of time.";
+"By clicking \"Create account\", I agree to SnackOverflow’s TOS and Privacy Policy." = "By clicking \"Create account\", I agree to SnackOverflow’s TOS and Privacy Policy.";
+"Go with your flow." = "Go with your flow.";
+"Welcome back!" = "Welcome back!";
+"Create account" = "Create account";
+"Login" = "Login";
+
+"Home" = "Home";
+"Market" = "Market";
+"Create" = "Create";
+"Wishlist" = "Wishlist";
+"Account" = "Account";
+"mr.donuts@gmail.com" = "mr.donuts@gmail.com";
+"password" = "password";
+// Home
+"Daily quests" = "Daily quests";
+"Popular items" = "Popular items";
+"Recommended for you" = "Recommended for you";
+"Seasonal bundles" = "Seasonal bundles";
+"Mystery bundles" = "Mystery bundles";
+// Market
+"Search" = "Search";

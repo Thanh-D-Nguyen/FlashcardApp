@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Slide Show View Controller-->
+        <scene sceneID="s0d-6b-0kx">
+            <objects>
+                <viewController storyboardIdentifier="SlideShowViewController" id="Y6W-OH-hqX" customClass="SlideShowViewController" customModule="SnackOverflowApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vEQ-SR-tlL" customClass="RoundCornerButton" customModule="SnackOverflowApp" customModuleProvider="target">
+                                <rect key="frame" x="16" y="746" width="361" height="56"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="56" id="jC8-Pt-JUr"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Get started">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundImageColor">
+                                        <color key="value" name="peachColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                        <color key="value" name="peachPressedColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="getStartedAction" destination="Y6W-OH-hqX" eventType="touchUpInside" id="8cs-DH-bJE"/>
+                                </connections>
+                            </button>
+                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="Yau-D8-kps">
+                                <rect key="frame" x="138.66666666666666" y="704" width="116" height="26"/>
+                                <color key="pageIndicatorTintColor" name="karlColor"/>
+                                <color key="currentPageIndicatorTintColor" name="clooneyColor"/>
+                            </pageControl>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v8u-vI-kIn">
+                                <rect key="frame" x="0.0" y="59" width="393" height="645"/>
+                            </containerView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="vEQ-SR-tlL" secondAttribute="trailing" constant="16" id="0vF-LS-CYw"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="vEQ-SR-tlL" secondAttribute="bottom" constant="16" id="46I-JQ-6cp"/>
+                            <constraint firstItem="Yau-D8-kps" firstAttribute="top" secondItem="v8u-vI-kIn" secondAttribute="bottom" id="6Fe-x5-Ovt"/>
+                            <constraint firstItem="Yau-D8-kps" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="Dcg-ja-HXd"/>
+                            <constraint firstItem="vEQ-SR-tlL" firstAttribute="top" secondItem="Yau-D8-kps" secondAttribute="bottom" constant="16" id="IHa-jC-MdF"/>
+                            <constraint firstItem="v8u-vI-kIn" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="QrB-1o-NrK"/>
+                            <constraint firstItem="v8u-vI-kIn" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" id="ohB-lR-OsG"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="v8u-vI-kIn" secondAttribute="trailing" id="pZN-9T-U9n"/>
+                            <constraint firstItem="vEQ-SR-tlL" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="qmF-Fa-KFL"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="containerView" destination="v8u-vI-kIn" id="KY6-SI-ogk"/>
+                        <outlet property="pageControl" destination="Yau-D8-kps" id="KYd-Mg-mxc"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="66" y="-2"/>
+        </scene>
+        <!--Slide Item View Controller-->
+        <scene sceneID="UfF-Js-Qx3">
+            <objects>
+                <viewController storyboardIdentifier="SlideItemViewController" id="i5Y-Vg-bWE" customClass="SlideItemViewController" customModule="SnackOverflowApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="jw3-QD-Rzx">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lJ3-yo-mHy">
+                                <rect key="frame" x="0.0" y="137" width="393" height="393"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="lJ3-yo-mHy" secondAttribute="height" id="des-FO-VQC"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hand-pickle high quality snacks." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hKW-Rk-YBy">
+                                <rect key="frame" x="16" y="546" width="361" height="81.333333333333371"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="34"/>
+                                <color key="textColor" name="peachColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Rpq-pI-W2L"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="lJ3-yo-mHy" firstAttribute="centerY" secondItem="jw3-QD-Rzx" secondAttribute="centerY" multiplier="0.783" id="E7T-3h-VjA"/>
+                            <constraint firstItem="lJ3-yo-mHy" firstAttribute="leading" secondItem="Rpq-pI-W2L" secondAttribute="leading" id="GZT-XJ-aj3"/>
+                            <constraint firstItem="Rpq-pI-W2L" firstAttribute="trailing" secondItem="lJ3-yo-mHy" secondAttribute="trailing" id="Wp9-Tn-Mam"/>
+                            <constraint firstItem="hKW-Rk-YBy" firstAttribute="leading" secondItem="jw3-QD-Rzx" secondAttribute="leading" constant="16" id="qE9-Tg-G9J"/>
+                            <constraint firstItem="hKW-Rk-YBy" firstAttribute="top" secondItem="lJ3-yo-mHy" secondAttribute="bottom" constant="16" id="xh2-SX-RDk"/>
+                            <constraint firstAttribute="trailing" secondItem="hKW-Rk-YBy" secondAttribute="trailing" constant="16" id="zj7-Vj-GEj"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="imageView" destination="lJ3-yo-mHy" id="suq-9x-zyX"/>
+                        <outlet property="titleLabel" destination="hKW-Rk-YBy" id="dG4-e9-TXe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Vhd-kO-OPm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="902" y="-2"/>
+        </scene>
+    </scenes>
+    <designables>
+        <designable name="vEQ-SR-tlL">
+            <size key="intrinsicContentSize" width="90" height="21"/>
+        </designable>
+    </designables>
+    <resources>
+        <namedColor name="clooneyColor">
+            <color red="0.75686274509803919" green="0.74509803921568629" blue="0.75686274509803919" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="karlColor">
+            <color red="0.92941176470588238" green="0.92549019607843142" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="peachColor">
+            <color red="0.93333333333333335" green="0.40392156862745099" blue="0.13725490196078433" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="peachPressedColor">
+            <color red="0.33333333333333331" green="0.30196078431372547" blue="0.33725490196078434" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

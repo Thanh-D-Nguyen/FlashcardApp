@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Main View Controller-->
+        <scene sceneID="XJ1-QA-Nrj">
+            <objects>
+                <viewController storyboardIdentifier="MainViewController" id="zIc-eW-6fX" customClass="MainViewController" customModule="SnackOverflowApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Z2g-4m-atm">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="edR-UX-2th">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="818"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </containerView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="edR-UX-2th" firstAttribute="top" secondItem="Z2g-4m-atm" secondAttribute="top" id="4rN-aD-ngT"/>
+                            <constraint firstItem="edR-UX-2th" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="DJo-UI-raG"/>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="edR-UX-2th" secondAttribute="trailing" id="aQN-wC-eDQ"/>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="bottom" secondItem="edR-UX-2th" secondAttribute="bottom" id="kBw-m7-VAj"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tabBarContainerView" destination="edR-UX-2th" id="6FD-rO-yyJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rle-ol-2Ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="304.58015267175574" y="302.81690140845075"/>
+        </scene>
+    </scenes>
+</document>

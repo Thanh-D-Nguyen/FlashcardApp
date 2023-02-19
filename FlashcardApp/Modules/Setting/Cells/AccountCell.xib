@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="174" id="KGk-i7-Jjw" customClass="AccountCell" customModule="FlashcardApp" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="174"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="174"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="fUs-Dj-rKr">
+                        <rect key="frame" x="8" y="8" width="304" height="158"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P2P-LT-yth">
+                                <rect key="frame" x="0.0" y="0.0" width="304" height="76"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DSCF6520" translatesAutoresizingMaskIntoConstraints="NO" id="ZwR-2d-gGX" customClass="RoundedImageView" customModule="FlashcardApp" customModuleProvider="target">
+                                        <rect key="frame" x="122" y="16" width="60" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="ZwR-2d-gGX" secondAttribute="height" id="08t-ar-6kr"/>
+                                            <constraint firstAttribute="width" constant="60" id="TaU-x8-uUC"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="radiusRatio">
+                                                <real key="value" value="0.5"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="whiteyColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="2"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="ZwR-2d-gGX" secondAttribute="bottom" id="OkJ-iD-zlM"/>
+                                    <constraint firstItem="ZwR-2d-gGX" firstAttribute="top" secondItem="P2P-LT-yth" secondAttribute="top" constant="16" id="PgO-PV-Ph3"/>
+                                    <constraint firstItem="ZwR-2d-gGX" firstAttribute="centerX" secondItem="P2P-LT-yth" secondAttribute="centerX" id="Sqr-uH-V7e"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3F9-VG-49G">
+                                <rect key="frame" x="0.0" y="76" width="304" height="82"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Nguyễn Văn Thành" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kih-9A-krG">
+                                        <rect key="frame" x="77.333333333333329" y="15.999999999999998" width="149.66666666666669" height="20.333333333333329"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="thanhnv.ip@gmail.com" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f8Y-eu-i2f">
+                                        <rect key="frame" x="79.333333333333329" y="40.333333333333329" width="145.66666666666669" height="17"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="f8Y-eu-i2f" firstAttribute="top" secondItem="Kih-9A-krG" secondAttribute="bottom" constant="4" id="2ZH-Z8-0R4"/>
+                                    <constraint firstItem="f8Y-eu-i2f" firstAttribute="centerX" secondItem="3F9-VG-49G" secondAttribute="centerX" id="AvF-Fd-E7L"/>
+                                    <constraint firstItem="Kih-9A-krG" firstAttribute="centerX" secondItem="3F9-VG-49G" secondAttribute="centerX" id="OAA-2E-KBl"/>
+                                    <constraint firstAttribute="bottom" secondItem="f8Y-eu-i2f" secondAttribute="bottom" priority="250" constant="30" id="Yhq-f5-Dkz"/>
+                                    <constraint firstItem="Kih-9A-krG" firstAttribute="top" secondItem="3F9-VG-49G" secondAttribute="top" constant="16" id="tpU-qL-0tn"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                    </stackView>
+                </subviews>
+                <color key="backgroundColor" name="whiteyColor"/>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="fUs-Dj-rKr" secondAttribute="trailing" constant="8" id="8pG-Xl-1Iw"/>
+                    <constraint firstItem="fUs-Dj-rKr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="NV2-90-3RO"/>
+                    <constraint firstAttribute="bottom" secondItem="fUs-Dj-rKr" secondAttribute="bottom" constant="8" id="ezD-6l-L0D"/>
+                    <constraint firstItem="fUs-Dj-rKr" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="uMt-Jj-DLu"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="accountImageView" destination="ZwR-2d-gGX" id="69n-zt-cdW"/>
+            </connections>
+            <point key="canvasLocation" x="103.81679389312977" y="64.788732394366207"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="DSCF6520" width="1920" height="1280"/>
+        <namedColor name="whiteyColor">
+            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

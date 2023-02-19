@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Welcome Main View Controller-->
+        <scene sceneID="s0d-6b-0kx">
+            <objects>
+                <viewController storyboardIdentifier="WelcomeMainViewController" id="Y6W-OH-hqX" customClass="WelcomeMainViewController" customModule="FlashcardApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DSCF6562" translatesAutoresizingMaskIntoConstraints="NO" id="QK1-Bs-9qb">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="71q-9o-un0" userLabel="OverlayView">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <color key="backgroundColor" name="blackA30Color"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="66B-XO-cYv">
+                                <rect key="frame" x="0.0" y="59" width="393" height="407"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="App logo" translatesAutoresizingMaskIntoConstraints="NO" id="swz-Zd-kBP">
+                                        <rect key="frame" x="0.0" y="3.6666666666666572" width="393" height="400"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="swz-Zd-kBP" firstAttribute="leading" secondItem="66B-XO-cYv" secondAttribute="leading" id="7k0-VE-G5Y"/>
+                                    <constraint firstAttribute="trailing" secondItem="swz-Zd-kBP" secondAttribute="trailing" id="IBC-UQ-T7b"/>
+                                    <constraint firstItem="swz-Zd-kBP" firstAttribute="centerY" secondItem="66B-XO-cYv" secondAttribute="centerY" id="qkL-T6-iyH"/>
+                                </constraints>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="pv9-NB-odv">
+                                <rect key="frame" x="0.0" y="466" width="393" height="352"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SZb-fn-7aQ">
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="238"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="yM3-PY-8v4">
+                                                <rect key="frame" x="16" y="16" width="361" height="206"/>
+                                                <subviews>
+                                                    <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E4h-ox-t8K" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                                        <rect key="frame" x="0.0" y="0.0" width="361" height="58"/>
+                                                        <color key="backgroundColor" name="deepSkyBlueColor"/>
+                                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                                        <inset key="contentEdgeInsets" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                        <inset key="titleEdgeInsets" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                        <state key="normal" title="Sign In with Facebook" image="Facebook Logo">
+                                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </state>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundImageColor">
+                                                                <color key="value" name="deepSkyBlueColor"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="8"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                                                <color key="value" name="peachPressedColor"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
+                                                        <connections>
+                                                            <action selector="signInAction:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="15q-zz-CQa"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SRi-0s-Rtp" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                                        <rect key="frame" x="0.0" y="74" width="361" height="58"/>
+                                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="58" id="WA1-d0-cFZ"/>
+                                                        </constraints>
+                                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                                        <inset key="contentEdgeInsets" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                        <inset key="titleEdgeInsets" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                        <state key="normal" title="Sign In with Google" image="Google Logo">
+                                                            <color key="titleColor" name="blackA54Color"/>
+                                                        </state>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="8"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundImageColor">
+                                                                <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                                                <color key="value" name="peachPressedColor"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
+                                                        <connections>
+                                                            <action selector="signInAction:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="CAw-d9-WqH"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8iU-Lz-jL6" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                                        <rect key="frame" x="0.0" y="148" width="361" height="58"/>
+                                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                                        <inset key="contentEdgeInsets" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                        <inset key="titleEdgeInsets" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                        <state key="normal" title="Sign In with Apple" image="Apple Logo">
+                                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </state>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="8"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundImageColor">
+                                                                <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                                                <color key="value" name="peachPressedColor"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
+                                                        <connections>
+                                                            <action selector="signInAction:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="tGO-Cz-cRZ"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="yM3-PY-8v4" firstAttribute="top" secondItem="SZb-fn-7aQ" secondAttribute="top" constant="16" id="1uD-Sh-H6A"/>
+                                            <constraint firstItem="yM3-PY-8v4" firstAttribute="leading" secondItem="SZb-fn-7aQ" secondAttribute="leading" constant="16" id="K6W-Lf-MTv"/>
+                                            <constraint firstAttribute="bottom" secondItem="yM3-PY-8v4" secondAttribute="bottom" constant="16" id="Rxe-Ju-tze"/>
+                                            <constraint firstAttribute="trailing" secondItem="yM3-PY-8v4" secondAttribute="trailing" constant="16" id="hy4-G5-cTg"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WkJ-bz-Egu">
+                                        <rect key="frame" x="0.0" y="250" width="393" height="2"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2uz-Qf-b8T">
+                                                <rect key="frame" x="80" y="0.0" width="233" height="2"/>
+                                                <color key="backgroundColor" name="whiteA30Color"/>
+                                            </view>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="2uz-Qf-b8T" secondAttribute="bottom" id="1b8-h4-vRX"/>
+                                            <constraint firstItem="2uz-Qf-b8T" firstAttribute="top" secondItem="WkJ-bz-Egu" secondAttribute="top" id="1cj-GT-I3x"/>
+                                            <constraint firstItem="2uz-Qf-b8T" firstAttribute="centerX" secondItem="WkJ-bz-Egu" secondAttribute="centerX" id="JHQ-J2-62o"/>
+                                            <constraint firstAttribute="height" constant="2" id="PlD-mv-d3n"/>
+                                            <constraint firstAttribute="trailing" secondItem="2uz-Qf-b8T" secondAttribute="trailing" constant="80" id="gCu-J5-bvF"/>
+                                            <constraint firstItem="2uz-Qf-b8T" firstAttribute="leading" secondItem="WkJ-bz-Egu" secondAttribute="leading" constant="80" id="sSN-0P-lgB"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4i4-xX-lil">
+                                        <rect key="frame" x="0.0" y="264" width="393" height="88"/>
+                                        <subviews>
+                                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M3A-B8-JM3" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                                <rect key="frame" x="16" y="16" width="361" height="56"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="56" id="rxg-Gb-lrp"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                <state key="normal" title="Sign up with Email">
+                                                    <color key="titleColor" name="peachColor"/>
+                                                </state>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundImageColor">
+                                                        <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                                        <color key="value" name="peachPressedColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                        <real key="value" value="8"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="signInAction:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="UDh-aw-smO"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="M3A-B8-JM3" secondAttribute="trailing" constant="16" id="9z7-KT-g71"/>
+                                            <constraint firstAttribute="bottom" secondItem="M3A-B8-JM3" secondAttribute="bottom" constant="16" id="Knn-ja-7jI"/>
+                                            <constraint firstItem="M3A-B8-JM3" firstAttribute="top" secondItem="4i4-xX-lil" secondAttribute="top" constant="16" id="jFR-6p-ocQ"/>
+                                            <constraint firstItem="M3A-B8-JM3" firstAttribute="leading" secondItem="4i4-xX-lil" secondAttribute="leading" constant="16" id="pk1-gP-Xuk"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="71q-9o-un0" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="21h-0L-1Wk"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="71q-9o-un0" secondAttribute="trailing" id="2OK-h8-m5j"/>
+                            <constraint firstAttribute="bottom" secondItem="QK1-Bs-9qb" secondAttribute="bottom" id="6iS-wH-Ifj"/>
+                            <constraint firstItem="66B-XO-cYv" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" id="9cb-bP-NFn"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="pv9-NB-odv" secondAttribute="trailing" id="A2d-N1-vMS"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="QK1-Bs-9qb" secondAttribute="trailing" id="Aw6-dX-gaW"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="pv9-NB-odv" secondAttribute="bottom" id="HFb-9a-Cad"/>
+                            <constraint firstAttribute="bottom" secondItem="71q-9o-un0" secondAttribute="bottom" id="HxQ-fn-mhT"/>
+                            <constraint firstItem="QK1-Bs-9qb" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="L0x-1Z-4R5"/>
+                            <constraint firstItem="pv9-NB-odv" firstAttribute="top" secondItem="66B-XO-cYv" secondAttribute="bottom" id="YO6-qT-dEJ"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="66B-XO-cYv" secondAttribute="trailing" id="Yb8-rf-Fgd"/>
+                            <constraint firstItem="pv9-NB-odv" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="g9w-Q7-AO6"/>
+                            <constraint firstItem="66B-XO-cYv" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="lNQ-zc-Ahp"/>
+                            <constraint firstItem="QK1-Bs-9qb" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="lWC-Na-LSc"/>
+                            <constraint firstItem="71q-9o-un0" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="njU-RD-c9c"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="signInFBButton" destination="E4h-ox-t8K" id="Pdh-TS-k9E"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="64.885496183206101" y="-2.1126760563380285"/>
+        </scene>
+    </scenes>
+    <designables>
+        <designable name="8iU-Lz-jL6">
+            <size key="intrinsicContentSize" width="208" height="24"/>
+        </designable>
+        <designable name="E4h-ox-t8K">
+            <size key="intrinsicContentSize" width="227" height="24"/>
+        </designable>
+        <designable name="M3A-B8-JM3">
+            <size key="intrinsicContentSize" width="172" height="24"/>
+        </designable>
+        <designable name="SRi-0s-Rtp">
+            <size key="intrinsicContentSize" width="220" height="24"/>
+        </designable>
+    </designables>
+    <resources>
+        <image name="App logo" width="1200" height="400"/>
+        <image name="Apple Logo" width="24" height="24"/>
+        <image name="DSCF6562" width="1920" height="1280"/>
+        <image name="Facebook Logo" width="24" height="24"/>
+        <image name="Google Logo" width="24" height="24"/>
+        <namedColor name="blackA30Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="blackA54Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.54000002145767212" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="deepSkyBlueColor">
+            <color red="0.093999996781349182" green="0.46700000762939453" blue="0.94900000095367432" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="peachColor">
+            <color red="0.93300002813339233" green="0.40400001406669617" blue="0.13699999451637268" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="peachPressedColor">
+            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="whiteA30Color">
+            <color red="1" green="1" blue="1" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>
