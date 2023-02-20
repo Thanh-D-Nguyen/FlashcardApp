@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -13,12 +12,77 @@
         <!--Dictionary View Controller-->
         <scene sceneID="XJ1-QA-Nrj">
             <objects>
-                <viewController storyboardIdentifier="DictionaryViewController" id="zIc-eW-6fX" customClass="DictionaryViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DictionaryViewController" id="zIc-eW-6fX" customClass="DictionaryViewController" customModule="FlashcardApp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Z2g-4m-atm">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hUj-PT-uA6">
+                                <rect key="frame" x="0.0" y="48" width="414" height="50"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="2fn-wd-GRT">
+                                        <rect key="frame" x="8" y="4" width="398" height="42"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4J0-PA-yDq" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="352" height="42"/>
+                                                <subviews>
+                                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Search" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="LDY-r8-mXC">
+                                                        <rect key="frame" x="8" y="0.0" width="336" height="42"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <textInputTraits key="textInputTraits"/>
+                                                    </textField>
+                                                </subviews>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstItem="LDY-r8-mXC" firstAttribute="leading" secondItem="4J0-PA-yDq" secondAttribute="leading" constant="8" id="DGL-Xg-7fm"/>
+                                                    <constraint firstItem="LDY-r8-mXC" firstAttribute="top" secondItem="4J0-PA-yDq" secondAttribute="top" id="IgH-PS-vem"/>
+                                                    <constraint firstAttribute="bottom" secondItem="LDY-r8-mXC" secondAttribute="bottom" id="Ule-Np-ROq"/>
+                                                    <constraint firstAttribute="trailing" secondItem="LDY-r8-mXC" secondAttribute="trailing" constant="8" id="lYY-2L-pPc"/>
+                                                </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="radiusCorner">
+                                                        <real key="value" value="4"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="stroke">
+                                                        <real key="value" value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="strokeColor">
+                                                        <color key="value" red="0.76470589639999997" green="0.42745098469999998" blue="0.20784312490000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
+                                                        <color key="value" name="whiteyColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </view>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sfn-JS-ibr">
+                                                <rect key="frame" x="356" y="0.0" width="42" height="42"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" secondItem="Sfn-JS-ibr" secondAttribute="height" id="0IJ-KF-E1Q"/>
+                                                </constraints>
+                                                <color key="tintColor" name="peachColor"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" image="magnifyingglass" catalog="system"/>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <color key="backgroundColor" name="blackA30Color"/>
+                                <constraints>
+                                    <constraint firstItem="2fn-wd-GRT" firstAttribute="leading" secondItem="hUj-PT-uA6" secondAttribute="leading" constant="8" id="1PZ-7s-aXK"/>
+                                    <constraint firstItem="2fn-wd-GRT" firstAttribute="top" secondItem="hUj-PT-uA6" secondAttribute="top" constant="4" id="8Ul-2t-KNu"/>
+                                    <constraint firstAttribute="height" constant="50" id="9r9-FU-WO4"/>
+                                    <constraint firstAttribute="trailing" secondItem="2fn-wd-GRT" secondAttribute="trailing" constant="8" id="fGA-UM-cme"/>
+                                    <constraint firstAttribute="bottom" secondItem="2fn-wd-GRT" secondAttribute="bottom" constant="4" id="sZp-jc-zJg"/>
+                                </constraints>
+                            </view>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="hUj-PT-uA6" secondAttribute="trailing" id="AHm-FE-oGs"/>
+                            <constraint firstItem="hUj-PT-uA6" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="Khf-6e-Lez"/>
+                            <constraint firstItem="hUj-PT-uA6" firstAttribute="top" secondItem="3pi-N7-nbV" secondAttribute="top" id="lGz-nJ-eNp"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rle-ol-2Ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -26,4 +90,16 @@
             <point key="canvasLocation" x="306" y="303"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="magnifyingglass" catalog="system" width="128" height="117"/>
+        <namedColor name="blackA30Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="peachColor">
+            <color red="0.93300002813339233" green="0.40400001406669617" blue="0.13699999451637268" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="whiteyColor">
+            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
 </document>

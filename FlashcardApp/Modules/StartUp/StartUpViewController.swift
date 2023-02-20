@@ -12,14 +12,27 @@ import UIKit
 final class StartUpViewController: BaseViewController {
     var presenter: StartUpPresenterInterface!
     
+    @IBOutlet private weak var percentLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         subscribe()
-        presenter.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        presenter.viewWillApprear()
     }
     
     func setupUI() { }
     
-    func subscribe() { }
+    func subscribe() {
+        subscribe(presenter.progressTextRelay) { [weak self] progressText in
+            guard let self else { return }
+            print("progressPercentage", progressText)
+
+            self.percentLabel.text = progressText
+        }
+    }
 }

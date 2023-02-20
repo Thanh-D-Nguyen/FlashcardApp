@@ -139,6 +139,19 @@
 		9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */; };
 		9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */; };
 		9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */; };
+		9288BADA29A3B54E00F9AC9F /* flash_card.realm in Resources */ = {isa = PBXBuildFile; fileRef = 9288BAD929A3B54E00F9AC9F /* flash_card.realm */; };
+		92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EB429A258CB00CE7E70 /* RExample.swift */; };
+		92A93EB829A25A1B00CE7E70 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 92A93EB729A25A1B00CE7E70 /* Realm */; };
+		92A93EBA29A25A1B00CE7E70 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 92A93EB929A25A1B00CE7E70 /* RealmSwift */; };
+		92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EBB29A25B5000CE7E70 /* RGrammar.swift */; };
+		92A93EBE29A25C1900CE7E70 /* RJaVi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EBD29A25C1900CE7E70 /* RJaVi.swift */; };
+		92A93EC029A25DBF00CE7E70 /* RKanji.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EBF29A25DBF00CE7E70 /* RKanji.swift */; };
+		92A93EC229A25F3300CE7E70 /* RViJa.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC129A25F3300CE7E70 /* RViJa.swift */; };
+		92A93EC529A2602800CE7E70 /* ExampleManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC429A2602800CE7E70 /* ExampleManagement.swift */; };
+		92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC629A260B800CE7E70 /* GrammarManagement.swift */; };
+		92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC829A260D700CE7E70 /* JaViManagement.swift */; };
+		92A93ECB29A260F700CE7E70 /* KanjiManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */; };
+		92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -282,6 +295,17 @@
 		9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewController.swift; sourceTree = "<group>"; };
 		9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryInteractor.swift; sourceTree = "<group>"; };
 		9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryWireframe.swift; sourceTree = "<group>"; };
+		9288BAD929A3B54E00F9AC9F /* flash_card.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = flash_card.realm; sourceTree = "<group>"; };
+		92A93EB429A258CB00CE7E70 /* RExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RExample.swift; sourceTree = "<group>"; };
+		92A93EBB29A25B5000CE7E70 /* RGrammar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGrammar.swift; sourceTree = "<group>"; };
+		92A93EBD29A25C1900CE7E70 /* RJaVi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RJaVi.swift; sourceTree = "<group>"; };
+		92A93EBF29A25DBF00CE7E70 /* RKanji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKanji.swift; sourceTree = "<group>"; };
+		92A93EC129A25F3300CE7E70 /* RViJa.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RViJa.swift; sourceTree = "<group>"; };
+		92A93EC429A2602800CE7E70 /* ExampleManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleManagement.swift; sourceTree = "<group>"; };
+		92A93EC629A260B800CE7E70 /* GrammarManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarManagement.swift; sourceTree = "<group>"; };
+		92A93EC829A260D700CE7E70 /* JaViManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaViManagement.swift; sourceTree = "<group>"; };
+		92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiManagement.swift; sourceTree = "<group>"; };
+		92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaManagement.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +315,7 @@
 			files = (
 				9251ED0629A1ED9C006C1D1C /* FacebookLogin in Frameworks */,
 				9251ED0129A1ED54006C1D1C /* FirebaseMessaging in Frameworks */,
+				92A93EBA29A25A1B00CE7E70 /* RealmSwift in Frameworks */,
 				9251ECF929A1ED54006C1D1C /* FirebaseAnalyticsSwift in Frameworks */,
 				9251ECFB29A1ED54006C1D1C /* FirebaseAuth in Frameworks */,
 				9251ECF629A1EC62006C1D1C /* Alamofire in Frameworks */,
@@ -300,6 +325,7 @@
 				9251ED0829A1ED9C006C1D1C /* FacebookShare in Frameworks */,
 				9251ECFF29A1ED54006C1D1C /* FirebaseDynamicLinks in Frameworks */,
 				9251ED0429A1ED9C006C1D1C /* FacebookCore in Frameworks */,
+				92A93EB829A25A1B00CE7E70 /* Realm in Frameworks */,
 				9251ECEF29A1EC4A006C1D1C /* RxCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -346,6 +372,7 @@
 		9251EBCB29A1E9A6006C1D1C /* FlashcardApp */ = {
 			isa = PBXGroup;
 			children = (
+				92A93EA529A2540D00CE7E70 /* Storage */,
 				9251ED0C29A1EE5E006C1D1C /* FlashcardApp.entitlements */,
 				9251ED0D29A1F198006C1D1C /* GoogleService-Info.plist */,
 				9251EC1129A1EAA5006C1D1C /* Commons */,
@@ -700,6 +727,48 @@
 			path = Dictionary;
 			sourceTree = "<group>";
 		};
+		92A93EA529A2540D00CE7E70 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				92A93EC329A2600C00CE7E70 /* Managements */,
+				92A93EA929A2588900CE7E70 /* Data */,
+				92A93EA829A2586E00CE7E70 /* Models */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		92A93EA829A2586E00CE7E70 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				92A93EB429A258CB00CE7E70 /* RExample.swift */,
+				92A93EBB29A25B5000CE7E70 /* RGrammar.swift */,
+				92A93EBD29A25C1900CE7E70 /* RJaVi.swift */,
+				92A93EBF29A25DBF00CE7E70 /* RKanji.swift */,
+				92A93EC129A25F3300CE7E70 /* RViJa.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		92A93EA929A2588900CE7E70 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				9288BAD929A3B54E00F9AC9F /* flash_card.realm */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		92A93EC329A2600C00CE7E70 /* Managements */ = {
+			isa = PBXGroup;
+			children = (
+				92A93EC429A2602800CE7E70 /* ExampleManagement.swift */,
+				92A93EC629A260B800CE7E70 /* GrammarManagement.swift */,
+				92A93EC829A260D700CE7E70 /* JaViManagement.swift */,
+				92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */,
+				92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */,
+			);
+			path = Managements;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -729,6 +798,8 @@
 				9251ED0529A1ED9C006C1D1C /* FacebookLogin */,
 				9251ED0729A1ED9C006C1D1C /* FacebookShare */,
 				9251ED0A29A1EDD0006C1D1C /* GoogleSignIn */,
+				92A93EB729A25A1B00CE7E70 /* Realm */,
+				92A93EB929A25A1B00CE7E70 /* RealmSwift */,
 			);
 			productName = FlashcardApp;
 			productReference = 9251EBC929A1E9A6006C1D1C /* FlashcardApp.app */;
@@ -812,6 +883,7 @@
 				9251ECF729A1ED54006C1D1C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				9251ED0229A1ED9C006C1D1C /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 				9251ED0929A1EDD0006C1D1C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				92A93EB629A25A1B00CE7E70 /* XCRemoteSwiftPackageReference "realm-swift" */,
 			);
 			productRefGroup = 9251EBCA29A1E9A6006C1D1C /* Products */;
 			projectDirPath = "";
@@ -847,6 +919,7 @@
 				9251ECE029A1EAA5006C1D1C /* Localizable.strings in Resources */,
 				9251ECBA29A1EAA5006C1D1C /* WelcomeMain.storyboard in Resources */,
 				9251ECAD29A1EAA5006C1D1C /* HomeSubSectionCell.xib in Resources */,
+				9288BADA29A3B54E00F9AC9F /* flash_card.realm in Resources */,
 				9251ECA129A1EAA5006C1D1C /* AdvanceCardCell.xib in Resources */,
 				9251ECA329A1EAA5006C1D1C /* SnackBoxesCell.xib in Resources */,
 				9251ECE329A1EAA5006C1D1C /* BaseConfig.xcconfig in Resources */,
@@ -882,10 +955,12 @@
 				9251ECD629A1EAA5006C1D1C /* SlideShowWireframe.swift in Sources */,
 				9251ECD129A1EAA5006C1D1C /* MainWireframe.swift in Sources */,
 				9251ED2129A2074D006C1D1C /* CommonCell.swift in Sources */,
+				92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */,
 				9251ECA929A1EAA5006C1D1C /* HomeCardCell.swift in Sources */,
 				9251EC9F29A1EAA5006C1D1C /* AdvanceCardCell.swift in Sources */,
 				9251EC8329A1EAA5006C1D1C /* DefaultRefreshView.swift in Sources */,
 				9251ECA229A1EAA5006C1D1C /* SnackBoxesCell.swift in Sources */,
+				92A93EC229A25F3300CE7E70 /* RViJa.swift in Sources */,
 				9251EC9229A1EAA5006C1D1C /* APIErrorFilter.swift in Sources */,
 				9251ECCA29A1EAA5006C1D1C /* StartUpViewController.swift in Sources */,
 				9251ED1D29A20341006C1D1C /* AccountCell.swift in Sources */,
@@ -904,6 +979,7 @@
 				9251EC9D29A1EAA5006C1D1C /* Color.swift in Sources */,
 				9251ECEA29A1EAA5006C1D1C /* Enums.swift in Sources */,
 				9251ECB729A1EAA5006C1D1C /* WelcomeMainInteractor.swift in Sources */,
+				92A93EBE29A25C1900CE7E70 /* RJaVi.swift in Sources */,
 				9251EC8929A1EAA5006C1D1C /* SocialSignInInteractor.swift in Sources */,
 				9251ED1829A20040006C1D1C /* SettingInteractor.swift in Sources */,
 				9251EC8829A1EAA5006C1D1C /* RefreshViewAnimator.swift in Sources */,
@@ -913,9 +989,12 @@
 				9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */,
 				9251ED2D29A212B5006C1D1C /* QuizViewController.swift in Sources */,
 				9251ED2C29A212B5006C1D1C /* QuizPresenter.swift in Sources */,
+				92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */,
 				9251EC9629A1EAA5006C1D1C /* BaseWireframe.swift in Sources */,
 				9251ECAB29A1EAA5006C1D1C /* HomeSubSectionCell.swift in Sources */,
+				92A93ECB29A260F700CE7E70 /* KanjiManagement.swift in Sources */,
 				9251EBCD29A1E9A6006C1D1C /* AppDelegate.swift in Sources */,
+				92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */,
 				9251EC8629A1EAA5006C1D1C /* DefaultViewAnimator.swift in Sources */,
 				9251EC9A29A1EAA5006C1D1C /* StackView.swift in Sources */,
 				9251ECE929A1EAA5006C1D1C /* Constants.swift in Sources */,
@@ -929,6 +1008,7 @@
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
 				9251EC8E29A1EAA5006C1D1C /* MarketInteractor.swift in Sources */,
 				9251ECD829A1EAA5006C1D1C /* SlideItemViewController.swift in Sources */,
+				92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */,
 				9251ECAE29A1EAA5006C1D1C /* HomeCarouselCell.swift in Sources */,
 				9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */,
 				9251ED4329A2133A006C1D1C /* DictionaryPresenter.swift in Sources */,
@@ -946,6 +1026,7 @@
 				9251ECA629A1EAA5006C1D1C /* CarouselView.swift in Sources */,
 				9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */,
 				9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */,
+				92A93EC529A2602800CE7E70 /* ExampleManagement.swift in Sources */,
 				9251EBCF29A1E9A6006C1D1C /* SceneDelegate.swift in Sources */,
 				9251ECB229A1EAA5006C1D1C /* HomePresenter.swift in Sources */,
 				9251ECE729A1EAA5006C1D1C /* PushNotificationService.swift in Sources */,
@@ -958,9 +1039,11 @@
 				9251EC8729A1EAA5006C1D1C /* UIScrollView+PullToRefresh.swift in Sources */,
 				9251ED3829A212E9006C1D1C /* CardInteractor.swift in Sources */,
 				9251EC9029A1EAA5006C1D1C /* WishlistInteractor.swift in Sources */,
+				92A93EC029A25DBF00CE7E70 /* RKanji.swift in Sources */,
 				9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */,
 				9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */,
 				9251EC9329A1EAA5006C1D1C /* BaseApi.swift in Sources */,
+				92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */,
 				9251EC9E29A1EAA5006C1D1C /* BaseNavigationController.swift in Sources */,
 				9251ED3929A212E9006C1D1C /* CardWireframe.swift in Sources */,
 				9251ECBB29A1EAA5006C1D1C /* WelcomeMainWireframe.swift in Sources */,
@@ -1349,6 +1432,14 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		92A93EB629A25A1B00CE7E70 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1421,6 +1512,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9251ED0929A1EDD0006C1D1C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignIn;
+		};
+		92A93EB729A25A1B00CE7E70 /* Realm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92A93EB629A25A1B00CE7E70 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = Realm;
+		};
+		92A93EB929A25A1B00CE7E70 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92A93EB629A25A1B00CE7E70 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

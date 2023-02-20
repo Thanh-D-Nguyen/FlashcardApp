@@ -6,17 +6,20 @@
 //  Copyright (c) 2023 ___ORGANIZATIONNAME___. All rights reserved.
 //
 //
-
 import Foundation
+import RxRelay
 
 protocol StartUpPresenterInterface: AnyObject {
-    func viewDidLoad()
+    var progressTextRelay: PublishRelay<String> { get }
+    func viewWillApprear()
 }
 
 final class StartUpPresenter {
     
     private let interactor: StartUpInteractorInterface
     private let wireframe: StartUpWireframeInterface
+    
+    let progressTextRelay = PublishRelay<String>()
 
     init(interactor: StartUpInteractorInterface,
          wireframe: StartUpWireframeInterface) {
@@ -27,10 +30,17 @@ final class StartUpPresenter {
 
 // MARK: - Extensions -
 extension StartUpPresenter: StartUpPresenterInterface {
-    func viewDidLoad() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: { [weak self] in
+    func viewWillApprear() {
+        RealmService.shared.configuration()
+        RealmService.shared.copyProgress = { [weak self] progress in
             guard let self else { return }
-            self.wireframe.navigateToWelcomeSlideShow()
-        })
+            let progressTextFormat = NSLocalizedString("Preparing Data...", comment: "")
+            let progressFomated = String(format: "%.1f", progress)
+            let progressText = String(format: progressTextFormat, "\(progressFomated)/100.0")
+            self.progressTextRelay.accept(progressText)
+            if progress >= 100.0 {
+                self.wireframe.navigateToWelcomeSlideShow()
+            }
+        }
     }
 }
