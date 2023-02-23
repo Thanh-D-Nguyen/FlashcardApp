@@ -9,45 +9,68 @@ import UIKit
 @IBDesignable
 class RoundCornerView: UIView {
     @IBInspectable
-    var radiusCorner: CGFloat = 0
-    @IBInspectable
-    var stroke: CGFloat = 0
-    @IBInspectable
-    var strokeColor: UIColor = .blue
-    @IBInspectable
-    var fillColor: UIColor = .darkGray
-    
-    private var roundCornerPath: UIBezierPath!
-    
-    override func prepareForInterfaceBuilder() {
-        super.prepareForInterfaceBuilder()
-        self.setValue(UIColor.clear, forKeyPath: "self.backgroundColor")
-        self.setValue(UIColor.clear, forKeyPath: "self.tintColor")
-        self.layoutSubviews()
-    }
-    
-    override func draw(_ rect: CGRect) {
-        guard UIGraphicsGetCurrentContext() != nil else {
-            return
+    var dashed: Bool = false {
+        didSet {
+            if dashed {
+                border.lineDashPattern = [6, 4]
+            } else {
+                border.lineDashPattern = nil
+            }
         }
-        self.backgroundColor = UIColor.clear
-        self.tintColor = UIColor.clear
-        create()
-        modify()
-        
+    }
+    @IBInspectable
+    var borderColor: UIColor = .clear {
+        didSet {
+            border.strokeColor = borderColor.cgColor
+        }
     }
     
-    private func create() {
-        roundCornerPath = UIBezierPath(roundedRect: self.bounds, cornerRadius: self.radiusCorner)
-        roundCornerPath.addClip()
+    @IBInspectable
+    var cornerRadius: CGFloat = 0 {
+        didSet {
+            updatePath()
+            layer.cornerRadius = cornerRadius
+        }
     }
     
-    private func modify() {
-        self.fillColor.setFill()
-        roundCornerPath.fill()
-        self.strokeColor.setStroke()
-        roundCornerPath.lineWidth = self.stroke
-        roundCornerPath.stroke()
-        
+    @IBInspectable
+    var lineWidth: CGFloat = 0 {
+        didSet {
+            updatePath()
+            border.lineWidth = lineWidth
+        }
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setup()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setup()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updatePath()
+    }
+    
+    private let border = CAShapeLayer()
+    
+    private func setup() {
+        border.strokeColor = borderColor.cgColor
+        border.fillColor = nil
+        border.lineJoin = .round
+        border.lineWidth = lineWidth
+        updatePath()
+        layer.addSublayer(border)
+        layer.masksToBounds = true
+        layer.cornerRadius = cornerRadius
+    }
+    
+    private func updatePath() {
+        border.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
+        border.frame = bounds
     }
 }

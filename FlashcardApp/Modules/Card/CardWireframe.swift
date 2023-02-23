@@ -9,7 +9,7 @@
 import UIKit
 
 protocol CardWireframeInterface: AnyObject {
-
+    func showDeskWithEntity(_ entity: DeskEntity?)
 }
 
 final class CardWireframe: BaseWireframe<CardViewController> {
@@ -28,5 +28,8 @@ final class CardWireframe: BaseWireframe<CardViewController> {
 }
 
 extension CardWireframe: CardWireframeInterface {
-
+    func showDeskWithEntity(_ entity: DeskEntity?) {
+        let deskWireFrame = DeskWireframe(entity)
+        navigationController?.presentWireframe(deskWireFrame)
+    }
 }

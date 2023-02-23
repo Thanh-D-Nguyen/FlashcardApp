@@ -33,9 +33,13 @@ extension UITableView {
 }
 
 extension UICollectionView {
-    func register<T: UICollectionViewCell>(cellClass: T.Type) {
+    func registerNib<T: UICollectionViewCell>(cellClass: T.Type) {
         let nib = UINib(nibName: T.reuseIdentifier, bundle: nil)
         register(nib, forCellWithReuseIdentifier: T.reuseIdentifier)
+    }
+    
+    func registerClass<T: UICollectionViewCell>(_ cellType: T.Type, reuseIdentifier: String = T.reuseIdentifier) {
+        register(cellType, forCellWithReuseIdentifier: reuseIdentifier)
     }
     
     func dequeueResuableCell<T: UICollectionViewCell>(forIndexPath indexPath: IndexPath) -> T {

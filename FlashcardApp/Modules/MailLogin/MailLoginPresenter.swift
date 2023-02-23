@@ -49,13 +49,13 @@ class MailLoginPresenter {
     var mailPlaceHolderAttributedText: NSAttributedString {
         NSAttributedString(
             string: NSLocalizedString("mr.donuts@gmail.com", comment: ""),
-            attributes: [.foregroundColor: UIColor(named: "clooneyColor") ?? UIColor.white])
+            attributes: [.foregroundColor: AppColor.clooney ?? UIColor.white])
     }
     
     var passPlaceHolderAttributedText: NSAttributedString {
         NSAttributedString(
             string: NSLocalizedString("password", comment: ""),
-            attributes: [.foregroundColor: UIColor(named: "clooneyColor") ?? UIColor.white])
+            attributes: [.foregroundColor: AppColor.clooney ?? UIColor.white])
     }
     
     var titleText: String {

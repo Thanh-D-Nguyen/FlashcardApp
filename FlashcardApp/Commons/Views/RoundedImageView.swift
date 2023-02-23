@@ -10,51 +10,68 @@ import UIKit
 @IBDesignable
 class RoundedImageView: UIImageView {
     @IBInspectable
-    var radiusRatio: CGFloat = 0.0 {
+    var dashed: Bool = false {
         didSet {
-            self.layer.cornerRadius = self.bounds.size.width * radiusRatio
+            if dashed {
+                border.lineDashPattern = [6, 4]
+            } else {
+                border.lineDashPattern = nil
+            }
         }
     }
     @IBInspectable
-    public var borderWidth: CGFloat = 0.0 {
+    var borderColor: UIColor = .clear {
         didSet {
-            self.layer.borderWidth = borderWidth
+            border.strokeColor = borderColor.cgColor
         }
-    }
-    @IBInspectable
-    public var borderColor: UIColor = .black {
-        didSet {
-            self.layer.borderColor = borderColor.cgColor
-        }
-    }
-
-    required public init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)!
-        setup()
     }
     
-    override public init(frame: CGRect) {
+    @IBInspectable
+    var cornerRadius: CGFloat = 0 {
+        didSet {
+            updatePath()
+            layer.cornerRadius = cornerRadius
+        }
+    }
+    
+    @IBInspectable
+    var lineWidth: CGFloat = 0 {
+        didSet {
+            updatePath()
+            border.lineWidth = lineWidth
+        }
+    }
+    
+    override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
     
-    override public init(image: UIImage!) {
-        super.init(image: image)
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
         setup()
     }
     
-    override public init(image: UIImage!, highlightedImage: UIImage?) {
-        super.init(image: image, highlightedImage: highlightedImage)
-        setup()
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updatePath()
     }
     
+    private let border = CAShapeLayer()
     
-    // MARK: - Support Methods
-    func setup() {
-        self.layer.masksToBounds = true
+    private func setup() {
+        border.strokeColor = borderColor.cgColor
+        border.fillColor = nil
+        border.lineJoin = .round
+        border.lineWidth = lineWidth
+        updatePath()
+        layer.addSublayer(border)
+        layer.masksToBounds = true
+        layer.cornerRadius = cornerRadius
     }
     
-    override public func prepareForInterfaceBuilder() {
-        setup()
+    private func updatePath() {
+        border.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
+        border.frame = bounds
     }
 }

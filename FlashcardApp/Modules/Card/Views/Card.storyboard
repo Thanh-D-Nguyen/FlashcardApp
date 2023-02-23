@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Card View Controller-->
+        <scene sceneID="XJ1-QA-Nrj">
+            <objects>
+                <viewController storyboardIdentifier="CardViewController" id="zIc-eW-6fX" customClass="CardViewController" customModule="FlashcardApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Z2g-4m-atm">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aPJ-MS-3Q4">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Hb-ly-Gqq" userLabel="TopBar" customClass="TopBarView" customModule="FlashcardApp" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="Card"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DjR-2u-jil" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                        <rect key="frame" x="307" y="4" width="60" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="DjR-2u-jil" secondAttribute="height" id="hOF-Sj-HkJ"/>
+                                        </constraints>
+                                        <color key="tintColor" name="teflonColor"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="plus.square.fill" catalog="system"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="blackA30Color"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="DjR-2u-jil" secondAttribute="trailing" constant="8" id="2f1-v9-Pz6"/>
+                                    <constraint firstAttribute="bottom" secondItem="DjR-2u-jil" secondAttribute="bottom" constant="4" id="8ma-JB-9Od"/>
+                                    <constraint firstItem="2Hb-ly-Gqq" firstAttribute="top" secondItem="aPJ-MS-3Q4" secondAttribute="top" id="Neo-rG-c6j"/>
+                                    <constraint firstAttribute="height" constant="68" id="YpK-j3-rKR"/>
+                                    <constraint firstAttribute="bottom" secondItem="2Hb-ly-Gqq" secondAttribute="bottom" id="eg5-cX-gTE"/>
+                                    <constraint firstAttribute="trailing" secondItem="2Hb-ly-Gqq" secondAttribute="trailing" id="khS-x2-CsC"/>
+                                    <constraint firstItem="2Hb-ly-Gqq" firstAttribute="leading" secondItem="aPJ-MS-3Q4" secondAttribute="leading" id="oKO-Z2-sDA"/>
+                                    <constraint firstItem="DjR-2u-jil" firstAttribute="top" secondItem="aPJ-MS-3Q4" secondAttribute="top" constant="4" id="xUW-8n-yUF"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rIe-wG-YgS" userLabel="TopView">
+                                <rect key="frame" x="0.0" y="68" width="375" height="66"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g45-jZ-ttQ" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                        <rect key="frame" x="8" y="8" width="359" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="H24-6k-EeZ"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                        <inset key="titleEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="Chạm để tạo Desk...">
+                                            <color key="titleColor" name="teflonColor"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundImageColor">
+                                                <color key="value" name="karlColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="8"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="blackA54Color"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="selectDeskAction" destination="zIc-eW-6fX" eventType="touchUpInside" id="E5o-G0-HNu"/>
+                                        </connections>
+                                    </button>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.down.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="6oL-ZS-M4v">
+                                        <rect key="frame" x="331" y="11.5" width="20" height="43"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="tintColor" name="gandalfColor"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="g45-jZ-ttQ" firstAttribute="top" secondItem="rIe-wG-YgS" secondAttribute="top" constant="8" id="4Vc-eU-7A4"/>
+                                    <constraint firstAttribute="bottom" secondItem="g45-jZ-ttQ" secondAttribute="bottom" constant="8" id="5En-pb-a19"/>
+                                    <constraint firstItem="6oL-ZS-M4v" firstAttribute="height" secondItem="g45-jZ-ttQ" secondAttribute="height" multiplier="0.88" id="IVT-LP-tlU"/>
+                                    <constraint firstItem="g45-jZ-ttQ" firstAttribute="leading" secondItem="rIe-wG-YgS" secondAttribute="leading" constant="8" id="X25-t9-HhU"/>
+                                    <constraint firstItem="6oL-ZS-M4v" firstAttribute="trailing" secondItem="g45-jZ-ttQ" secondAttribute="trailing" constant="-16" id="hDm-gR-HT0"/>
+                                    <constraint firstItem="6oL-ZS-M4v" firstAttribute="centerY" secondItem="g45-jZ-ttQ" secondAttribute="centerY" id="mmp-BQ-wlj"/>
+                                    <constraint firstAttribute="trailing" secondItem="g45-jZ-ttQ" secondAttribute="trailing" constant="8" id="tDy-X5-ibg"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xun-cF-FCZ" userLabel="ContentView">
+                                <rect key="frame" x="0.0" y="134" width="375" height="533"/>
+                                <subviews>
+                                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Dz9-Ys-Sge">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="533"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="RmT-Tf-VFi">
+                                            <size key="itemSize" width="128" height="128"/>
+                                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        </collectionViewFlowLayout>
+                                        <cells/>
+                                        <connections>
+                                            <outlet property="dataSource" destination="zIc-eW-6fX" id="5cv-8k-VSd"/>
+                                            <outlet property="delegate" destination="zIc-eW-6fX" id="XBZ-or-MHt"/>
+                                        </connections>
+                                    </collectionView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="Dz9-Ys-Sge" secondAttribute="trailing" id="6Jg-ZE-5f8"/>
+                                    <constraint firstItem="Dz9-Ys-Sge" firstAttribute="top" secondItem="xun-cF-FCZ" secondAttribute="top" id="RQb-pW-LYs"/>
+                                    <constraint firstItem="Dz9-Ys-Sge" firstAttribute="leading" secondItem="xun-cF-FCZ" secondAttribute="leading" id="Uh8-Uj-24T"/>
+                                    <constraint firstAttribute="bottom" secondItem="Dz9-Ys-Sge" secondAttribute="bottom" id="o3j-yw-TWU"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="aPJ-MS-3Q4" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="FWr-E9-MXh"/>
+                            <constraint firstItem="rIe-wG-YgS" firstAttribute="top" secondItem="aPJ-MS-3Q4" secondAttribute="bottom" id="TFa-GC-U6c"/>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="xun-cF-FCZ" secondAttribute="trailing" id="Usr-hN-ujh"/>
+                            <constraint firstItem="aPJ-MS-3Q4" firstAttribute="trailing" secondItem="3pi-N7-nbV" secondAttribute="trailing" id="VxK-U5-5Js"/>
+                            <constraint firstItem="xun-cF-FCZ" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="bbe-mZ-kQz"/>
+                            <constraint firstItem="rIe-wG-YgS" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="ja9-zt-hSa"/>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="bottom" secondItem="xun-cF-FCZ" secondAttribute="bottom" id="mI2-Cl-qSB"/>
+                            <constraint firstItem="aPJ-MS-3Q4" firstAttribute="top" secondItem="3pi-N7-nbV" secondAttribute="top" id="r7i-UU-5Fa"/>
+                            <constraint firstItem="xun-cF-FCZ" firstAttribute="top" secondItem="rIe-wG-YgS" secondAttribute="bottom" id="tXx-vo-THg"/>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="rIe-wG-YgS" secondAttribute="trailing" id="ubA-Pt-Hob"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="cardCollectionView" destination="Dz9-Ys-Sge" id="uHn-GV-6os"/>
+                        <outlet property="deskButton" destination="g45-jZ-ttQ" id="qOb-Lz-nfe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rle-ol-2Ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="304.80000000000001" y="302.6986506746627"/>
+        </scene>
+    </scenes>
+    <designables>
+        <designable name="DjR-2u-jil">
+            <size key="intrinsicContentSize" width="25" height="24"/>
+        </designable>
+        <designable name="g45-jZ-ttQ">
+            <size key="intrinsicContentSize" width="153" height="32"/>
+        </designable>
+    </designables>
+    <resources>
+        <image name="chevron.down.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="plus.square.fill" catalog="system" width="128" height="114"/>
+        <namedColor name="blackA30Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="blackA54Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.54000002145767212" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="gandalfColor">
+            <color red="0.59200000762939453" green="0.5690000057220459" blue="0.59200000762939453" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="karlColor">
+            <color red="0.92900002002716064" green="0.92500001192092896" blue="0.92900002002716064" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="teflonColor">
+            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

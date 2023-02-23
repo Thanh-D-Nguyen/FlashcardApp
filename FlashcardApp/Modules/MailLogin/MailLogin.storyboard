@@ -12,7 +12,7 @@
         <!--Mail Login View Controller-->
         <scene sceneID="XJ1-QA-Nrj">
             <objects>
-                <viewController storyboardIdentifier="MailLoginViewController" id="zIc-eW-6fX" customClass="MailLoginViewController" customModule="SnackOverflowApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MailLoginViewController" id="zIc-eW-6fX" customClass="MailLoginViewController" customModule="FlashcardApp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Z2g-4m-atm">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -62,7 +62,7 @@
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="FrX-Kp-l30">
                                                 <rect key="frame" x="16" y="16" width="361" height="128"/>
                                                 <subviews>
-                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4EA-Hy-5fC" customClass="RoundCornerView" customModule="SnackOverflowApp" customModuleProvider="target">
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4EA-Hy-5fC" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                         <subviews>
                                                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="simit.donuts@gmail.com" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="h2i-H0-Wgy">
@@ -84,7 +84,7 @@
                                                                 </connections>
                                                             </button>
                                                         </subviews>
-                                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <color key="backgroundColor" name="whiteyColor"/>
                                                         <constraints>
                                                             <constraint firstAttribute="trailing" secondItem="h2i-H0-Wgy" secondAttribute="trailing" constant="16" id="0II-Ee-cxi"/>
                                                             <constraint firstItem="h2i-H0-Wgy" firstAttribute="leading" secondItem="wNM-au-l7b" secondAttribute="trailing" id="20Q-ij-Qnx"/>
@@ -96,15 +96,12 @@
                                                             <constraint firstAttribute="bottom" secondItem="wNM-au-l7b" secondAttribute="bottom" id="xEw-bo-RXf"/>
                                                         </constraints>
                                                         <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="number" keyPath="radiusCorner">
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                 <real key="value" value="8"/>
-                                                            </userDefinedRuntimeAttribute>
-                                                            <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
-                                                                <color key="value" name="whiteyColor"/>
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </view>
-                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HaZ-Cf-G2J" customClass="RoundCornerView" customModule="SnackOverflowApp" customModuleProvider="target">
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HaZ-Cf-G2J" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="72" width="361" height="56"/>
                                                         <subviews>
                                                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="password" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="dzz-gX-W2q">
@@ -123,7 +120,7 @@
                                                                 </connections>
                                                             </button>
                                                         </subviews>
-                                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <color key="backgroundColor" name="whiteyColor"/>
                                                         <constraints>
                                                             <constraint firstAttribute="bottom" secondItem="dzz-gX-W2q" secondAttribute="bottom" id="IyK-WV-tek"/>
                                                             <constraint firstAttribute="trailing" secondItem="dzz-gX-W2q" secondAttribute="trailing" constant="16" id="JMQ-aV-tXS"/>
@@ -141,6 +138,9 @@
                                                             </userDefinedRuntimeAttribute>
                                                             <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
                                                                 <color key="value" name="whiteyColor"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="8"/>
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </view>
@@ -177,7 +177,7 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iFd-rF-M2l">
                                         <rect key="frame" x="0.0" y="436.66666666666669" width="393" height="88.000000000000057"/>
                                         <subviews>
-                                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Trd-pR-IIa" customClass="RoundCornerButton" customModule="SnackOverflowApp" customModuleProvider="target">
+                                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Trd-pR-IIa" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
                                                 <rect key="frame" x="16" y="16" width="361" height="56"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
@@ -256,7 +256,7 @@
     </scenes>
     <designables>
         <designable name="Trd-pR-IIa">
-            <size key="intrinsicContentSize" width="172" height="24"/>
+            <size key="intrinsicContentSize" width="172" height="36"/>
         </designable>
     </designables>
     <resources>
@@ -264,22 +264,22 @@
         <image name="IconPassword" width="24" height="24"/>
         <image name="Illustration" width="390" height="123"/>
         <namedColor name="gandalfColor">
-            <color red="0.59215686274509804" green="0.56862745098039214" blue="0.59215686274509804" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.59200000762939453" green="0.5690000057220459" blue="0.59200000762939453" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="karlColor">
-            <color red="0.92941176470588238" green="0.92549019607843142" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.92900002002716064" green="0.92500001192092896" blue="0.92900002002716064" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="peachColor">
-            <color red="0.93333333333333335" green="0.40392156862745099" blue="0.13725490196078433" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.93300002813339233" green="0.40400001406669617" blue="0.13699999451637268" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="peachPressedColor">
-            <color red="0.33333333333333331" green="0.30196078431372547" blue="0.33725490196078434" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="teflonColor">
-            <color red="0.33333333333333331" green="0.30196078431372547" blue="0.33725490196078434" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="whiteyColor">
-            <color red="0.96862745098039216" green="0.96862745098039216" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

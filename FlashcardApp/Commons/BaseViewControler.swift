@@ -18,7 +18,7 @@ typealias BaseViewController = BaseVC & BaseViewControllerProtocol & ViewInterfa
 
 class BaseVC: UIViewController {
     let disposeBag = DisposeBag()
-    
+        
     override var preferredStatusBarStyle: UIStatusBarStyle {
         Constants.currentBarStyle
     }

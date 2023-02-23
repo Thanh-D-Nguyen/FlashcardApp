@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Desk View Controller-->
+        <scene sceneID="XJ1-QA-Nrj">
+            <objects>
+                <viewController storyboardIdentifier="DeskViewController" modalTransitionStyle="crossDissolve" modalPresentationStyle="overFullScreen" id="zIc-eW-6fX" customClass="DeskViewController" customModule="FlashcardApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Z2g-4m-atm">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cTy-BH-38H" userLabel="RootContentView" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="16" y="196.5" width="343" height="274"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zRo-6Y-Ray" userLabel="TopView">
+                                        <rect key="frame" x="0.0" y="0.0" width="343" height="55"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jh3-jc-PdJ" customClass="TopBarView" customModule="FlashcardApp" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="343" height="55"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="string" keyPath="title" value="Add New Desk"/>
+                                                </userDefinedRuntimeAttributes>
+                                            </view>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lVd-1J-2x3" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                                <rect key="frame" x="296" y="8" width="39" height="39"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" secondItem="lVd-1J-2x3" secondAttribute="height" id="2Yr-Tc-gGW"/>
+                                                </constraints>
+                                                <color key="tintColor" name="blackA80Color"/>
+                                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                <state key="normal" image="plus.rectangle.on.folder" catalog="system"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                        <color key="value" name="teflonColor"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                        <real key="value" value="4"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                        <real key="value" value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                                        <color key="value" name="blackA30Color"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="addDeskAction" destination="zIc-eW-6fX" eventType="touchUpInside" id="N9U-qA-yus"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" name="whiteyColor"/>
+                                        <constraints>
+                                            <constraint firstItem="Jh3-jc-PdJ" firstAttribute="top" secondItem="zRo-6Y-Ray" secondAttribute="top" id="38Y-JX-K4c"/>
+                                            <constraint firstAttribute="bottom" secondItem="lVd-1J-2x3" secondAttribute="bottom" constant="8" id="9w9-0A-WQf"/>
+                                            <constraint firstAttribute="bottom" secondItem="Jh3-jc-PdJ" secondAttribute="bottom" id="KQg-67-5vH"/>
+                                            <constraint firstAttribute="height" constant="55" id="VTe-d5-1ok"/>
+                                            <constraint firstAttribute="trailing" secondItem="Jh3-jc-PdJ" secondAttribute="trailing" id="VVU-hQ-tFL"/>
+                                            <constraint firstAttribute="trailing" secondItem="lVd-1J-2x3" secondAttribute="trailing" constant="8" id="Vld-aO-uLs"/>
+                                            <constraint firstItem="lVd-1J-2x3" firstAttribute="centerY" secondItem="zRo-6Y-Ray" secondAttribute="centerY" id="dM3-Ud-tUv"/>
+                                            <constraint firstItem="Jh3-jc-PdJ" firstAttribute="leading" secondItem="zRo-6Y-Ray" secondAttribute="leading" id="puU-gK-sUA"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IzF-iH-oXe" userLabel="ContentView">
+                                        <rect key="frame" x="0.0" y="55" width="343" height="219"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="fhL-ZH-7cM">
+                                                <rect key="frame" x="16" y="16" width="311" height="187"/>
+                                                <subviews>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fXG-HC-oGb" userLabel="NameTextView" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
+                                                        <rect key="frame" x="0.0" y="0.0" width="311" height="50"/>
+                                                        <subviews>
+                                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Tên Desk" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="DnA-lq-ImW">
+                                                                <rect key="frame" x="16" y="8" width="279" height="34"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                <textInputTraits key="textInputTraits"/>
+                                                            </textField>
+                                                        </subviews>
+                                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <constraints>
+                                                            <constraint firstItem="DnA-lq-ImW" firstAttribute="top" secondItem="fXG-HC-oGb" secondAttribute="top" constant="8" id="Xb0-R4-Kvu"/>
+                                                            <constraint firstAttribute="trailing" secondItem="DnA-lq-ImW" secondAttribute="trailing" constant="16" id="cxa-pB-ec1"/>
+                                                            <constraint firstAttribute="bottom" secondItem="DnA-lq-ImW" secondAttribute="bottom" constant="8" id="eHI-Jf-xth"/>
+                                                            <constraint firstItem="DnA-lq-ImW" firstAttribute="leading" secondItem="fXG-HC-oGb" secondAttribute="leading" constant="16" id="jfM-zD-nOb"/>
+                                                            <constraint firstAttribute="height" constant="50" id="pmi-fh-2jc"/>
+                                                        </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="8"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                                <real key="value" value="1"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                                <color key="value" name="teflonColor"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
+                                                    </view>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="256-xJ-ixx" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
+                                                        <rect key="frame" x="0.0" y="66" width="311" height="121"/>
+                                                        <subviews>
+                                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QHR-rm-2iM">
+                                                                <rect key="frame" x="8" y="8" width="295" height="105"/>
+                                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                                <color key="textColor" systemColor="labelColor"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                            </textView>
+                                                        </subviews>
+                                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="bottom" secondItem="QHR-rm-2iM" secondAttribute="bottom" constant="8" id="Get-fk-vJr"/>
+                                                            <constraint firstItem="QHR-rm-2iM" firstAttribute="leading" secondItem="256-xJ-ixx" secondAttribute="leading" constant="8" id="gzk-PH-W9X"/>
+                                                            <constraint firstAttribute="trailing" secondItem="QHR-rm-2iM" secondAttribute="trailing" constant="8" id="qg3-c8-21j"/>
+                                                            <constraint firstItem="QHR-rm-2iM" firstAttribute="top" secondItem="256-xJ-ixx" secondAttribute="top" constant="8" id="tSC-PA-k8f"/>
+                                                        </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                <real key="value" value="16"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                                <real key="value" value="1"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                                <color key="value" name="blackberry"/>
+                                                            </userDefinedRuntimeAttribute>
+                                                        </userDefinedRuntimeAttributes>
+                                                    </view>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="fhL-ZH-7cM" secondAttribute="bottom" constant="16" id="8b8-B5-TNh"/>
+                                            <constraint firstItem="fhL-ZH-7cM" firstAttribute="top" secondItem="IzF-iH-oXe" secondAttribute="top" constant="16" id="Ho0-S1-vhY"/>
+                                            <constraint firstItem="fhL-ZH-7cM" firstAttribute="leading" secondItem="IzF-iH-oXe" secondAttribute="leading" constant="16" id="hU7-WM-DSC"/>
+                                            <constraint firstAttribute="trailing" secondItem="fhL-ZH-7cM" secondAttribute="trailing" constant="16" id="kPd-78-QqJ"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="IzF-iH-oXe" firstAttribute="leading" secondItem="cTy-BH-38H" secondAttribute="leading" id="6mf-XE-5Tp"/>
+                                    <constraint firstItem="IzF-iH-oXe" firstAttribute="top" secondItem="zRo-6Y-Ray" secondAttribute="bottom" id="CVh-LT-GQI"/>
+                                    <constraint firstAttribute="trailing" secondItem="zRo-6Y-Ray" secondAttribute="trailing" id="GvL-su-GIR"/>
+                                    <constraint firstItem="zRo-6Y-Ray" firstAttribute="leading" secondItem="cTy-BH-38H" secondAttribute="leading" id="aLH-pH-Nvr"/>
+                                    <constraint firstAttribute="trailing" secondItem="IzF-iH-oXe" secondAttribute="trailing" id="dML-9Y-tvP"/>
+                                    <constraint firstItem="zRo-6Y-Ray" firstAttribute="top" secondItem="cTy-BH-38H" secondAttribute="top" id="fvs-8l-CPD"/>
+                                    <constraint firstAttribute="bottom" secondItem="IzF-iH-oXe" secondAttribute="bottom" id="gun-N5-tVP"/>
+                                    <constraint firstAttribute="width" secondItem="cTy-BH-38H" secondAttribute="height" multiplier="1:0.8" id="ieX-Up-6at"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="16"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
+                        <color key="backgroundColor" name="blackA30Color"/>
+                        <constraints>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="cTy-BH-38H" secondAttribute="trailing" constant="16" id="PL6-lz-shh"/>
+                            <constraint firstItem="cTy-BH-38H" firstAttribute="centerY" secondItem="Z2g-4m-atm" secondAttribute="centerY" id="aiu-Tm-AwQ"/>
+                            <constraint firstItem="cTy-BH-38H" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" constant="16" id="xRq-8z-ajO"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="descTextView" destination="QHR-rm-2iM" id="q5h-ZA-wTn"/>
+                        <outlet property="nameTextField" destination="DnA-lq-ImW" id="uE4-EF-7m8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rle-ol-2Ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="304.80000000000001" y="302.6986506746627"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="plus.rectangle.on.folder" catalog="system" width="128" height="95"/>
+        <namedColor name="blackA30Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="blackA80Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="blackberry">
+            <color red="0.32941176470588235" green="0.23137254901960785" blue="0.32941176470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="teflonColor">
+            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="whiteyColor">
+            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="labelColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

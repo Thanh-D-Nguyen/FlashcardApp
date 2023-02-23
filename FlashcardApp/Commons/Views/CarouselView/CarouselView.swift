@@ -27,9 +27,9 @@ class CarouselView: UIView {
     
     private func setupView() {
         instantiate()
-        collectionView.register(cellClass: SimpleCardCell.self)
-        collectionView.register(cellClass: AdvanceCardCell.self)
-        collectionView.register(cellClass: SnackBoxesCell.self)
+        collectionView.registerNib(cellClass: SimpleCardCell.self)
+        collectionView.registerNib(cellClass: AdvanceCardCell.self)
+        collectionView.registerNib(cellClass: SnackBoxesCell.self)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.contentInset = .zero
