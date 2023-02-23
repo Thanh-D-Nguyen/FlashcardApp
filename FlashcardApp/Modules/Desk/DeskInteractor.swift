@@ -30,7 +30,12 @@ class DeskInteractor {
 extension DeskInteractor: DeskInteractorInterface {
     func addDeskName(_ name: String?, description: String?) {
         let newId = deskCount + 1
-        let choiceName = name ?? "Desk \(newId)"
+        let choiceName: String
+        if let name = name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
+            choiceName = name
+        } else {
+            choiceName = "Desk \(newId)"
+        }
         var desk = DeskEntity(name: choiceName, description: description ?? "", imageNamed: "")
         desk.id = newId
         try! DeskManagement.shared.add(desk)

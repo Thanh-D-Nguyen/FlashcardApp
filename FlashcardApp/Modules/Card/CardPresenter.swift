@@ -29,6 +29,7 @@ class CardPresenter {
     var cards: [CardEntity] {
         return selectingDesk?.cards ?? []
     }
+    
     private var selectingDesk: DeskEntity? {
         return deskInteractor.desks.last
     }
