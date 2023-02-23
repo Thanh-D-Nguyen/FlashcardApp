@@ -18,3 +18,14 @@ class RCard: Object {
     @Persisted var videoUrl: String
     @Persisted(originProperty: "cards") var assignee: LinkingObjects<RDesk>
 }
+
+extension RCard {
+    func toEntity() -> CardEntity {
+        CardEntity(frontText: frontText,
+                   frontExtraText: frontExtraText,
+                   backText: backText,
+                   backExtraText: backExtraText,
+                   imageUrl: imageUrl,
+                   videoUrl: videoUrl)
+    }
+}

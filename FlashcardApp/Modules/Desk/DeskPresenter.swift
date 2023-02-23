@@ -7,12 +7,15 @@
 //
 
 import Foundation
+import RxRelay
 
 enum DeskScreenType {
     case create, update
 }
 
 protocol DeskPresenterInterface: AnyObject {
+    var deskRelay: BehaviorRelay<DeskEntity?> { get }
+    
     func viewDidLoad()
     func addDeskName(_ name: String?, description: String?)
     func dismiss()
@@ -21,9 +24,11 @@ protocol DeskPresenterInterface: AnyObject {
 class DeskPresenter {
     private let interactor: DeskInteractorInterface
     private let wireframe: DeskWireframeInterface
-    
+
     private var entity: DeskEntity?
     private var screenType: DeskScreenType = .create
+    
+    let deskRelay = BehaviorRelay<DeskEntity?>(value: nil)
 
     init(interactor: DeskInteractorInterface, 
         wireframe: DeskWireframeInterface) {
@@ -35,18 +40,29 @@ class DeskPresenter {
         self.entity = entity
         self.screenType = entity == nil ? .create : .update
     }
+    
+    func notifyDeskChanged() {
+        deskRelay.accept(self.entity)
+    }
 }
 
 extension DeskPresenter: DeskPresenterInterface {
     func viewDidLoad() {
-        
+        notifyDeskChanged()
     }
     
     func addDeskName(_ name: String?, description: String?) {
-        let defaultName = name ?? "Desk 1"
+        if screenType == .create {
+            interactor.addDeskName(name, description: description)
+        } else {
+            if let desk = entity {
+                interactor.updateDesk(desk)
+            }
+        }
+        wireframe.dismiss(notifyDataChanged: true)
     }
     
     func dismiss() {
-        wireframe.dismiss()
+        wireframe.dismiss(notifyDataChanged: false)
     }
 }

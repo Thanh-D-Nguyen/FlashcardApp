@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		9209760D29A787C100ECF29C /* RDesk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760C29A787C100ECF29C /* RDesk.swift */; };
 		9209760F29A7887800ECF29C /* RCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760E29A7887800ECF29C /* RCard.swift */; };
+		9209761129A7AC4C00ECF29C /* DeskManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761029A7AC4C00ECF29C /* DeskManagement.swift */; };
+		9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761229A7B2AC00ECF29C /* CardManagement.swift */; };
 		9251EBCD29A1E9A6006C1D1C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EBCC29A1E9A6006C1D1C /* AppDelegate.swift */; };
 		9251EBCF29A1E9A6006C1D1C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EBCE29A1E9A6006C1D1C /* SceneDelegate.swift */; };
 		9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9251EBD529A1E9A7006C1D1C /* Assets.xcassets */; };
@@ -192,6 +194,8 @@
 /* Begin PBXFileReference section */
 		9209760C29A787C100ECF29C /* RDesk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDesk.swift; sourceTree = "<group>"; };
 		9209760E29A7887800ECF29C /* RCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCard.swift; sourceTree = "<group>"; };
+		9209761029A7AC4C00ECF29C /* DeskManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskManagement.swift; sourceTree = "<group>"; };
+		9209761229A7B2AC00ECF29C /* CardManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardManagement.swift; sourceTree = "<group>"; };
 		9251EBC929A1E9A6006C1D1C /* FlashcardApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlashcardApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9251EBCC29A1E9A6006C1D1C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9251EBCE29A1E9A6006C1D1C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -833,6 +837,8 @@
 				92A93EC829A260D700CE7E70 /* JaViManagement.swift */,
 				92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */,
 				92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */,
+				9209761029A7AC4C00ECF29C /* DeskManagement.swift */,
+				9209761229A7B2AC00ECF29C /* CardManagement.swift */,
 			);
 			path = Managements;
 			sourceTree = "<group>";
@@ -1053,6 +1059,7 @@
 				9251ECBE29A1EAA5006C1D1C /* MailLoginPresenter.swift in Sources */,
 				9251ECDB29A1EAA5006C1D1C /* SlideShowInteractor.swift in Sources */,
 				9251ECA429A1EAA5006C1D1C /* SimpleCardCell.swift in Sources */,
+				9209761129A7AC4C00ECF29C /* DeskManagement.swift in Sources */,
 				9251ED1629A20040006C1D1C /* SettingPresenter.swift in Sources */,
 				9251ED1929A20040006C1D1C /* SettingWireframe.swift in Sources */,
 				9251ED2F29A212B5006C1D1C /* QuizWireframe.swift in Sources */,
@@ -1094,6 +1101,7 @@
 				92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */,
 				9251ECAE29A1EAA5006C1D1C /* HomeCarouselCell.swift in Sources */,
 				9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */,
+				9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */,
 				9251ED4329A2133A006C1D1C /* DictionaryPresenter.swift in Sources */,
 				9251ECCC29A1EAA5006C1D1C /* StartUpPresenter.swift in Sources */,
 				9209760D29A787C100ECF29C /* RDesk.swift in Sources */,

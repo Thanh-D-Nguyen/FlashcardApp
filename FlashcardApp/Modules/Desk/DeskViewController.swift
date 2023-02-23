@@ -25,7 +25,11 @@ final class DeskViewController: BaseViewController {
     }
 
     func subscribe() {
-
+        subscribe(presenter.deskRelay) { [weak self] value in
+            guard let self else { return }
+            self.nameTextField.text = value?.name
+            self.descTextView.text = value?.description
+        }
     }
     
     @objc private func dismissView() {

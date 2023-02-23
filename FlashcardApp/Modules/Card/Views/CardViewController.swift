@@ -19,7 +19,7 @@ final class CardViewController: BaseViewController {
         super.viewDidLoad()
         setupUI()
         subscribe()
-        presenter.viewDidLoad()
+        presenter.notifyDeskChanged()
     }
 
     func setupUI() {
@@ -38,8 +38,14 @@ final class CardViewController: BaseViewController {
     func subscribe() {
         subscribe(presenter.deskDataRelay, { [weak self] _ in
             guard let self else { return }
+            self.updateDesks()
             self.cardCollectionView.reloadData()
         })
+    }
+    
+    private func updateDesks() {
+        let desk = presenter.deskDataRelay.value.first
+        deskButton.setTitle(desk?.name, for: .normal)
     }
 }
 

@@ -9,13 +9,14 @@
 import UIKit
 
 protocol DeskWireframeInterface: AnyObject {
-    func dismiss()
+    func dismiss(notifyDataChanged: Bool)
 }
 
 final class DeskWireframe: BaseWireframe<DeskViewController> {
 
     private let storyboard = UIStoryboard(name: "Desk", bundle: nil)
-
+    var didDeskChange: (() -> Void)?
+    
     init(_ deskEntity: DeskEntity?) {
         let moduleViewController = storyboard.instantiateViewController(ofType: DeskViewController.self)
         super.init(viewController: moduleViewController)
@@ -27,7 +28,10 @@ final class DeskWireframe: BaseWireframe<DeskViewController> {
 }
 
 extension DeskWireframe: DeskWireframeInterface {
-    func dismiss() {
+    func dismiss(notifyDataChanged: Bool) {
+        if notifyDataChanged {
+            didDeskChange?()
+        }
         self.viewController.dismiss(animated: true)
     }
 }

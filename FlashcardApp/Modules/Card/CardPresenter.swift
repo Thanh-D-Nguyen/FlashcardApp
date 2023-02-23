@@ -13,12 +13,15 @@ protocol CardPresenterInterface: AnyObject {
     var deskDataRelay: BehaviorRelay<[DeskEntity]> { get }
     
     var cards: [CardEntity] { get }
-    func viewDidLoad()
+    func notifyDeskChanged()
     func showDesk()
+    
+    
 }
 
 class CardPresenter {
     private let interactor: CardInteractorInterface
+    private let deskInteractor: DeskInteractorInterface
     private let wireframe: CardWireframeInterface
     
     let deskDataRelay = BehaviorRelay<[DeskEntity]>(value: [])
@@ -27,19 +30,21 @@ class CardPresenter {
         return selectingDesk?.cards ?? []
     }
     private var selectingDesk: DeskEntity? {
-        return deskDataRelay.value.last
+        return deskInteractor.desks.last
     }
 
     init(interactor: CardInteractorInterface, 
         wireframe: CardWireframeInterface) {
         self.interactor = interactor
         self.wireframe = wireframe
+        self.deskInteractor = DeskInteractor()
     }
 }
 
 extension CardPresenter: CardPresenterInterface {
-    func viewDidLoad() {
-        deskDataRelay.accept([])
+    func notifyDeskChanged() {
+        let desks = deskInteractor.desks
+        deskDataRelay.accept(desks)
     }
     
     func showDesk() {

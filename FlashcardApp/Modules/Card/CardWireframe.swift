@@ -30,6 +30,9 @@ final class CardWireframe: BaseWireframe<CardViewController> {
 extension CardWireframe: CardWireframeInterface {
     func showDeskWithEntity(_ entity: DeskEntity?) {
         let deskWireFrame = DeskWireframe(entity)
+        deskWireFrame.didDeskChange = { [weak self] in
+            self?.viewController.presenter.notifyDeskChanged()
+        }
         navigationController?.presentWireframe(deskWireFrame)
     }
 }
