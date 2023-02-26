@@ -12,10 +12,13 @@ import RxRelay
 protocol CardPresenterInterface: AnyObject {
     var deskDataRelay: BehaviorRelay<[DeskEntity]> { get }
     
+    var selectingDesk: DeskEntity? { get }
     var cards: [CardEntity] { get }
-    func notifyDeskChanged()
-    func showDesk()
     
+    func loadDesks()
+    func didSelectDeskAtIndex(_ index: Int)
+    func createNewCard()
+    func showDesk(byAddNew: Bool)
     
 }
 
@@ -26,12 +29,9 @@ class CardPresenter {
     
     let deskDataRelay = BehaviorRelay<[DeskEntity]>(value: [])
     
+    var selectingDesk: DeskEntity?
     var cards: [CardEntity] {
         return selectingDesk?.cards ?? []
-    }
-    
-    private var selectingDesk: DeskEntity? {
-        return deskInteractor.desks.last
     }
 
     init(interactor: CardInteractorInterface, 
@@ -43,12 +43,35 @@ class CardPresenter {
 }
 
 extension CardPresenter: CardPresenterInterface {
-    func notifyDeskChanged() {
+    
+    func loadDesks() {
         let desks = deskInteractor.desks
+        if selectingDesk == nil {
+            selectingDesk = desks.first
+        }
         deskDataRelay.accept(desks)
     }
     
-    func showDesk() {
-        wireframe.showDeskWithEntity(selectingDesk)
+    func didSelectDeskAtIndex(_ index: Int) {
+        if deskDataRelay.value.indices.contains(index) {
+            self.selectingDesk = deskDataRelay.value[index]
+        }
+        loadDesks()
+    }
+    
+    func showDesk(byAddNew: Bool) {
+        if byAddNew == true {
+            wireframe.showDeskWithEntity(nil)
+        } else {
+            if deskDataRelay.value.isEmpty {
+                wireframe.showDeskWithEntity(selectingDesk)
+            } else {
+                wireframe.showDeskList(deskDataRelay.value)
+            }
+        }
+    }
+    
+    func createNewCard() {
+        wireframe.showCreateNewCard()
     }
 }

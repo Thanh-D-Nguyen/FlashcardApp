@@ -52,17 +52,19 @@ extension DeskPresenter: DeskPresenterInterface {
     }
     
     func addDeskName(_ name: String?, description: String?) {
+        var changeIndex = 0
         if screenType == .create {
             interactor.addDeskName(name, description: description)
         } else {
             if let desk = entity {
+                changeIndex = desk.selectIndex
                 interactor.updateDesk(desk)
             }
         }
-        wireframe.dismiss(notifyDataChanged: true)
+        wireframe.dismiss(notifyDataChangedAtIndex: changeIndex)
     }
     
     func dismiss() {
-        wireframe.dismiss(notifyDataChanged: false)
+        wireframe.dismiss(notifyDataChangedAtIndex: nil)
     }
 }

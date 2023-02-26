@@ -36,8 +36,7 @@ extension DeskInteractor: DeskInteractorInterface {
         } else {
             choiceName = "Desk \(newId)"
         }
-        var desk = DeskEntity(name: choiceName, description: description ?? "", imageNamed: "")
-        desk.id = newId
+        let desk = DeskEntity(id: newId, name: choiceName, description: description ?? "", imageNamed: "", date: Date())
         try! DeskManagement.shared.add(desk)
     }
     

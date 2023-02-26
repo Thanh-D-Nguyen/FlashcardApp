@@ -14,13 +14,17 @@ class RDesk: Object {
     @Persisted var desc: String
     @Persisted var imageNamed: String
     @Persisted var cards: List<RCard>
+    
+    @Persisted var date: Date
 }
 
 extension RDesk {
     func toEntity() -> DeskEntity {
-        DeskEntity(name: name,
+        DeskEntity(id: id,
+                   name: name,
                    description: desc,
                    imageNamed: imageNamed,
-                   cards: cards.map({ $0.toEntity() }))
+                   cards: cards.map({ $0.toEntity() }),
+                   date: date)
     }
 }

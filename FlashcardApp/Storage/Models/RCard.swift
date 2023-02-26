@@ -21,7 +21,8 @@ class RCard: Object {
 
 extension RCard {
     func toEntity() -> CardEntity {
-        CardEntity(frontText: frontText,
+        CardEntity(id: id,
+                   frontText: frontText,
                    frontExtraText: frontExtraText,
                    backText: backText,
                    backExtraText: backExtraText,

@@ -9,11 +9,14 @@ import Foundation
 import RealmSwift
 
 struct DeskEntity {
-    var id: Int = -1
+    var id: Int
     var name: String
     var description: String
     var imageNamed: String
-    var cards: [CardEntity] = [CardEntity(frontText: "楽しい", frontExtraText: "たのしい", backText: "Vui vẻ", backExtraText: "", imageUrl: "https://vancouverjapaneselesson.files.wordpress.com/2010/12/tanoshii.jpg", videoUrl: "")]
+    var cards: [CardEntity] = []
+    var date: Date
+    
+    var selectIndex = Constants.unknowSelectIndex
 }
 
 extension DeskEntity {
@@ -27,6 +30,7 @@ extension DeskEntity {
         let list = List<RCard>()
         list.append(objectsIn: cards)
         desk.cards = list
+        desk.date = date
         return desk
     }
 }

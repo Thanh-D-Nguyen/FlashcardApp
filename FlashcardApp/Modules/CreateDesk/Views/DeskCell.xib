@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="180" id="KGk-i7-Jjw" customClass="DeskCell" customModule="FlashcardApp" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="180"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="180"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="9gL-Uk-cJf">
+                        <rect key="frame" x="16" y="8" width="288" height="142"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vsb-jM-jZy" userLabel="DeskNameView" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="288" height="42"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Tên Desk" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="w9n-HX-ATg">
+                                        <rect key="frame" x="16" y="0.0" width="256" height="42"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="KGk-i7-Jjw" id="aL5-sb-638"/>
+                                        </connections>
+                                    </textField>
+                                </subviews>
+                                <color key="backgroundColor" name="whiteyColor"/>
+                                <constraints>
+                                    <constraint firstItem="w9n-HX-ATg" firstAttribute="top" secondItem="vsb-jM-jZy" secondAttribute="top" id="BSa-Rz-aiq"/>
+                                    <constraint firstAttribute="bottom" secondItem="w9n-HX-ATg" secondAttribute="bottom" id="Fbk-QV-lW9"/>
+                                    <constraint firstItem="w9n-HX-ATg" firstAttribute="leading" secondItem="vsb-jM-jZy" secondAttribute="leading" constant="16" id="gd0-SZ-TD5"/>
+                                    <constraint firstAttribute="height" constant="42" id="gr0-Cp-YJw"/>
+                                    <constraint firstAttribute="trailing" secondItem="w9n-HX-ATg" secondAttribute="trailing" constant="16" id="jYV-sk-6qS"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" name="blackA80Color"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0er-cB-diL">
+                                <rect key="frame" x="0.0" y="50" width="288" height="42"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1fk-P0-gpE" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                        <rect key="frame" x="222" y="6.0000000000000018" width="66" height="25.666666666666671"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <color key="tintColor" name="blackA80Color"/>
+                                        <inset key="contentEdgeInsets" minX="8" minY="4" maxX="8" maxY="4"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="Mô tả" image="plus" catalog="system">
+                                            <color key="titleColor" name="blackA80Color"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="blackA80Color"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="addDescriptionAction" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Dh8-1u-40S"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" name="whiteyColor"/>
+                                <constraints>
+                                    <constraint firstItem="1fk-P0-gpE" firstAttribute="top" secondItem="0er-cB-diL" secondAttribute="top" constant="6" id="rde-2j-xRM"/>
+                                    <constraint firstAttribute="trailing" secondItem="1fk-P0-gpE" secondAttribute="trailing" id="rpn-vF-CrI"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PmV-ef-Xnd" userLabel="DeskDescView" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="100" width="288" height="42"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Mô tả Desk" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ElN-0P-yKF">
+                                        <rect key="frame" x="16" y="0.0" width="256" height="42"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="KGk-i7-Jjw" id="I9k-pm-sQr"/>
+                                        </connections>
+                                    </textField>
+                                </subviews>
+                                <color key="backgroundColor" name="whiteyColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="ElN-0P-yKF" secondAttribute="bottom" id="Vrq-kv-aaV"/>
+                                    <constraint firstItem="ElN-0P-yKF" firstAttribute="top" secondItem="PmV-ef-Xnd" secondAttribute="top" id="v4w-q1-jXp"/>
+                                    <constraint firstAttribute="trailing" secondItem="ElN-0P-yKF" secondAttribute="trailing" constant="16" id="vPM-o1-Hrw"/>
+                                    <constraint firstItem="ElN-0P-yKF" firstAttribute="leading" secondItem="PmV-ef-Xnd" secondAttribute="leading" constant="16" id="vWp-g7-XQ6"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" name="blackA80Color"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                        </subviews>
+                    </stackView>
+                </subviews>
+                <color key="backgroundColor" name="whiteyColor"/>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="9gL-Uk-cJf" secondAttribute="bottom" priority="250" constant="8" id="5yL-lc-W8M"/>
+                    <constraint firstAttribute="trailing" secondItem="9gL-Uk-cJf" secondAttribute="trailing" constant="16" id="7LF-GM-XDI"/>
+                    <constraint firstItem="9gL-Uk-cJf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="q6v-nm-qpk"/>
+                    <constraint firstItem="9gL-Uk-cJf" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="sm9-Tq-rHb"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="deskButtonContainerView" destination="0er-cB-diL" id="bty-gk-XhT"/>
+                <outlet property="deskDescContainerView" destination="PmV-ef-Xnd" id="Hnj-xr-m3J"/>
+                <outlet property="deskDescTextField" destination="ElN-0P-yKF" id="mmg-zS-K5v"/>
+                <outlet property="deskNameTextField" destination="w9n-HX-ATg" id="L6B-3i-hqa"/>
+            </connections>
+            <point key="canvasLocation" x="-61.068702290076331" y="66.901408450704224"/>
+        </tableViewCell>
+    </objects>
+    <designables>
+        <designable name="1fk-P0-gpE">
+            <size key="intrinsicContentSize" width="66" height="25.666666666666668"/>
+        </designable>
+    </designables>
+    <resources>
+        <image name="plus" catalog="system" width="128" height="113"/>
+        <namedColor name="blackA80Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="whiteyColor">
+            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

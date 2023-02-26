@@ -15,6 +15,7 @@ class RealmService {
         let bundlePathString = Bundle.main.path(forResource: databaseName, ofType: nil)!
         let sourcePath = URL(fileURLWithPath: bundlePathString)
         let destinationUrl = inLibrarayFolder(fileName: databaseName)
+        print(destinationUrl)
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: destinationUrl.path) {
             completion(destinationUrl)
@@ -64,6 +65,7 @@ class RealmService {
     }
     
     func configuration() {
+        print("configuration-----")
         copyBundleData(completion: { [unowned self] url in
             let configuration = Realm.Configuration(fileURL: url,
                                                     schemaVersion: databaseVersion,

@@ -186,6 +186,11 @@
             <point key="canvasLocation" x="304.80000000000001" y="302.6986506746627"/>
         </scene>
     </scenes>
+    <designables>
+        <designable name="lVd-1J-2x3">
+            <size key="intrinsicContentSize" width="24.5" height="22"/>
+        </designable>
+    </designables>
     <resources>
         <image name="plus.rectangle.on.folder" catalog="system" width="128" height="95"/>
         <namedColor name="blackA30Color">

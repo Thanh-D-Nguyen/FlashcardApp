@@ -9,7 +9,7 @@ import Kingfisher
 import UIKit
 
 struct CardEntity: Codable {
-    var id: Int = -1
+    var id: Int
     var frontText: String
     var frontExtraText: String
     var backText: String

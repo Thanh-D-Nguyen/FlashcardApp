@@ -32,7 +32,7 @@
                                 <constraint firstAttribute="width" secondItem="CJo-C9-KoX" secondAttribute="height" multiplier="9:10" id="Fht-Sn-jUc"/>
                             </constraints>
                         </imageView>
-                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Rh-ZN-DTw" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                        <button opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Rh-ZN-DTw" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
                             <rect key="frame" x="85" y="135" width="85" height="85"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="1Rh-ZN-DTw" secondAttribute="height" id="cuI-Tf-GOO"/>

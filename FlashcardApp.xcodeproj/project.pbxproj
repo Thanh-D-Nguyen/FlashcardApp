@@ -11,6 +11,20 @@
 		9209760F29A7887800ECF29C /* RCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760E29A7887800ECF29C /* RCard.swift */; };
 		9209761129A7AC4C00ECF29C /* DeskManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761029A7AC4C00ECF29C /* DeskManagement.swift */; };
 		9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761229A7B2AC00ECF29C /* CardManagement.swift */; };
+		924052C629A9D06300B47E09 /* DeskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052C529A9D06300B47E09 /* DeskListView.swift */; };
+		924052C829A9D07600B47E09 /* DeskListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924052C729A9D07600B47E09 /* DeskListView.xib */; };
+		924052CB29A9D20C00B47E09 /* DeskListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052C929A9D20C00B47E09 /* DeskListCell.swift */; };
+		924052CC29A9D20C00B47E09 /* DeskListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924052CA29A9D20C00B47E09 /* DeskListCell.xib */; };
+		924052DE29AB398C00B47E09 /* CreateDesk.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 924052D929AB398C00B47E09 /* CreateDesk.storyboard */; };
+		924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */; };
+		924052E029AB398C00B47E09 /* CreateDeskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */; };
+		924052E129AB398C00B47E09 /* CreateDeskInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */; };
+		924052E229AB398C00B47E09 /* CreateDeskWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DD29AB398C00B47E09 /* CreateDeskWireframe.swift */; };
+		924052E629AB3ADD00B47E09 /* DeskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052E429AB3ADD00B47E09 /* DeskCell.swift */; };
+		924052E729AB3ADD00B47E09 /* DeskCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924052E529AB3ADD00B47E09 /* DeskCell.xib */; };
+		924052EA29AB3AFC00B47E09 /* NewCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052E829AB3AFC00B47E09 /* NewCardCell.swift */; };
+		924052EB29AB3AFC00B47E09 /* NewCardCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924052E929AB3AFC00B47E09 /* NewCardCell.xib */; };
+		924052ED29AB3D7200B47E09 /* DeskCardHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052EC29AB3D7200B47E09 /* DeskCardHeaderView.swift */; };
 		9251EBCD29A1E9A6006C1D1C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EBCC29A1E9A6006C1D1C /* AppDelegate.swift */; };
 		9251EBCF29A1E9A6006C1D1C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EBCE29A1E9A6006C1D1C /* SceneDelegate.swift */; };
 		9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9251EBD529A1E9A7006C1D1C /* Assets.xcassets */; };
@@ -143,7 +157,14 @@
 		9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */; };
 		9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */; };
 		92720AE329A72E2B00A7C80B /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 92720AE229A72E2B00A7C80B /* CollectionViewPagingLayout */; };
+		92777FB029AB4415002891DB /* DeskCardHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92777FAF29AB4415002891DB /* DeskCardHeaderView.xib */; };
 		9288BADA29A3B54E00F9AC9F /* flash_card.realm in Resources */ = {isa = PBXBuildFile; fileRef = 9288BAD929A3B54E00F9AC9F /* flash_card.realm */; };
+		9291705229AB5DB700894551 /* CommonKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291704E29AB5DB700894551 /* CommonKeyboard.swift */; };
+		9291705329AB5DB700894551 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291704F29AB5DB700894551 /* Extensions.swift */; };
+		9291705429AB5DB700894551 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705029AB5DB700894551 /* Utility.swift */; };
+		9291705529AB5DB700894551 /* CommonKeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705129AB5DB700894551 /* CommonKeyboardObserver.swift */; };
+		9291705829AB64E400894551 /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9291705729AB64E400894551 /* SwipeCellKit */; };
+		9291705A29AB672800894551 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705929AB672800894551 /* AppImage.swift */; };
 		929C4DB729A7332D007651E9 /* Card.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 929C4DB629A7332D007651E9 /* Card.storyboard */; };
 		929C4DBA29A73358007651E9 /* CardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DB829A73358007651E9 /* CardCell.swift */; };
 		929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DBC29A733A2007651E9 /* CardEntity.swift */; };
@@ -172,6 +193,8 @@
 		92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC829A260D700CE7E70 /* JaViManagement.swift */; };
 		92A93ECB29A260F700CE7E70 /* KanjiManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */; };
 		92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */; };
+		92B2EBED29AB5A58008833D4 /* AddDeskBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B2EBEC29AB5A58008833D4 /* AddDeskBottomView.swift */; };
+		92B2EBEF29AB5A63008833D4 /* AddDeskBottomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92B2EBEE29AB5A63008833D4 /* AddDeskBottomView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -196,6 +219,20 @@
 		9209760E29A7887800ECF29C /* RCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCard.swift; sourceTree = "<group>"; };
 		9209761029A7AC4C00ECF29C /* DeskManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskManagement.swift; sourceTree = "<group>"; };
 		9209761229A7B2AC00ECF29C /* CardManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardManagement.swift; sourceTree = "<group>"; };
+		924052C529A9D06300B47E09 /* DeskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListView.swift; sourceTree = "<group>"; };
+		924052C729A9D07600B47E09 /* DeskListView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskListView.xib; sourceTree = "<group>"; };
+		924052C929A9D20C00B47E09 /* DeskListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListCell.swift; sourceTree = "<group>"; };
+		924052CA29A9D20C00B47E09 /* DeskListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskListCell.xib; sourceTree = "<group>"; };
+		924052D929AB398C00B47E09 /* CreateDesk.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CreateDesk.storyboard; sourceTree = "<group>"; };
+		924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskPresenter.swift; sourceTree = "<group>"; };
+		924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskViewController.swift; sourceTree = "<group>"; };
+		924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskInteractor.swift; sourceTree = "<group>"; };
+		924052DD29AB398C00B47E09 /* CreateDeskWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskWireframe.swift; sourceTree = "<group>"; };
+		924052E429AB3ADD00B47E09 /* DeskCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskCell.swift; sourceTree = "<group>"; };
+		924052E529AB3ADD00B47E09 /* DeskCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskCell.xib; sourceTree = "<group>"; };
+		924052E829AB3AFC00B47E09 /* NewCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCardCell.swift; sourceTree = "<group>"; };
+		924052E929AB3AFC00B47E09 /* NewCardCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewCardCell.xib; sourceTree = "<group>"; };
+		924052EC29AB3D7200B47E09 /* DeskCardHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskCardHeaderView.swift; sourceTree = "<group>"; };
 		9251EBC929A1E9A6006C1D1C /* FlashcardApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlashcardApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9251EBCC29A1E9A6006C1D1C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9251EBCE29A1E9A6006C1D1C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -318,7 +355,13 @@
 		9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewController.swift; sourceTree = "<group>"; };
 		9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryInteractor.swift; sourceTree = "<group>"; };
 		9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryWireframe.swift; sourceTree = "<group>"; };
+		92777FAF29AB4415002891DB /* DeskCardHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskCardHeaderView.xib; sourceTree = "<group>"; };
 		9288BAD929A3B54E00F9AC9F /* flash_card.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = flash_card.realm; sourceTree = "<group>"; };
+		9291704E29AB5DB700894551 /* CommonKeyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonKeyboard.swift; sourceTree = "<group>"; };
+		9291704F29AB5DB700894551 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		9291705029AB5DB700894551 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		9291705129AB5DB700894551 /* CommonKeyboardObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonKeyboardObserver.swift; sourceTree = "<group>"; };
+		9291705929AB672800894551 /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
 		929C4DB629A7332D007651E9 /* Card.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Card.storyboard; sourceTree = "<group>"; };
 		929C4DB829A73358007651E9 /* CardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCell.swift; sourceTree = "<group>"; };
 		929C4DBC29A733A2007651E9 /* CardEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardEntity.swift; sourceTree = "<group>"; };
@@ -344,6 +387,8 @@
 		92A93EC829A260D700CE7E70 /* JaViManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaViManagement.swift; sourceTree = "<group>"; };
 		92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiManagement.swift; sourceTree = "<group>"; };
 		92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaManagement.swift; sourceTree = "<group>"; };
+		92B2EBEC29AB5A58008833D4 /* AddDeskBottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDeskBottomView.swift; sourceTree = "<group>"; };
+		92B2EBEE29AB5A63008833D4 /* AddDeskBottomView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddDeskBottomView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -356,6 +401,7 @@
 				92A93EBA29A25A1B00CE7E70 /* RealmSwift in Frameworks */,
 				9251ECF929A1ED54006C1D1C /* FirebaseAnalyticsSwift in Frameworks */,
 				9251ECFB29A1ED54006C1D1C /* FirebaseAuth in Frameworks */,
+				9291705829AB64E400894551 /* SwipeCellKit in Frameworks */,
 				9251ECF629A1EC62006C1D1C /* Alamofire in Frameworks */,
 				9251ED0B29A1EDD0006C1D1C /* GoogleSignIn in Frameworks */,
 				9251ECFD29A1ED54006C1D1C /* FirebaseCrashlytics in Frameworks */,
@@ -389,6 +435,43 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		924052C429A9CE4600B47E09 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				929C4DCF29A76442007651E9 /* Desk.storyboard */,
+				929C4DD129A76442007651E9 /* DeskViewController.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		924052D829AB397400B47E09 /* CreateDesk */ = {
+			isa = PBXGroup;
+			children = (
+				924052E329AB3AB600B47E09 /* Views */,
+				924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */,
+				924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */,
+				924052DD29AB398C00B47E09 /* CreateDeskWireframe.swift */,
+			);
+			path = CreateDesk;
+			sourceTree = "<group>";
+		};
+		924052E329AB3AB600B47E09 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				924052D929AB398C00B47E09 /* CreateDesk.storyboard */,
+				924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */,
+				924052E429AB3ADD00B47E09 /* DeskCell.swift */,
+				924052E529AB3ADD00B47E09 /* DeskCell.xib */,
+				924052E829AB3AFC00B47E09 /* NewCardCell.swift */,
+				924052E929AB3AFC00B47E09 /* NewCardCell.xib */,
+				924052EC29AB3D7200B47E09 /* DeskCardHeaderView.swift */,
+				92777FAF29AB4415002891DB /* DeskCardHeaderView.xib */,
+				92B2EBEC29AB5A58008833D4 /* AddDeskBottomView.swift */,
+				92B2EBEE29AB5A63008833D4 /* AddDeskBottomView.xib */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		9251EBC029A1E9A6006C1D1C = {
 			isa = PBXGroup;
 			children = (
@@ -464,6 +547,7 @@
 		9251EBFF29A1EAA5006C1D1C /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				9291704D29AB5DB700894551 /* CommonKeyboard */,
 				9251EC0029A1EAA5006C1D1C /* PullToRefresh */,
 			);
 			path = Vendors;
@@ -494,6 +578,11 @@
 				9251EC0E29A1EAA5006C1D1C /* MarketSearchInteractor.swift */,
 				9251EC0F29A1EAA5006C1D1C /* WishlistInteractor.swift */,
 				9251EC1029A1EAA5006C1D1C /* MailLoginInteractor.swift */,
+				929C4DD229A76442007651E9 /* DeskInteractor.swift */,
+				9251ED3329A212E9006C1D1C /* CardInteractor.swift */,
+				9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */,
+				9251ED2929A212B5006C1D1C /* QuizInteractor.swift */,
+				9251ED1329A20040006C1D1C /* SettingInteractor.swift */,
 			);
 			path = Interactors;
 			sourceTree = "<group>";
@@ -575,6 +664,7 @@
 		9251EC2E29A1EAA5006C1D1C /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				924052D829AB397400B47E09 /* CreateDesk */,
 				929C4DCE29A7642B007651E9 /* Desk */,
 				9251ED3C29A21323006C1D1C /* Dictionary */,
 				9251ED3B29A212FC006C1D1C /* Card */,
@@ -710,6 +800,7 @@
 				9251EC7F29A1EAA5006C1D1C /* Constants.swift */,
 				9251EC8029A1EAA5006C1D1C /* Enums.swift */,
 				929C4DC429A74806007651E9 /* AppColor.swift */,
+				9291705929AB672800894551 /* AppImage.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -721,7 +812,6 @@
 				9251ED1029A20040006C1D1C /* Setting.storyboard */,
 				9251ED1129A20040006C1D1C /* SettingPresenter.swift */,
 				9251ED1229A20040006C1D1C /* SettingViewController.swift */,
-				9251ED1329A20040006C1D1C /* SettingInteractor.swift */,
 				9251ED1429A20040006C1D1C /* SettingWireframe.swift */,
 			);
 			path = Setting;
@@ -744,7 +834,6 @@
 				9251ED2629A212B5006C1D1C /* Quiz.storyboard */,
 				9251ED2729A212B5006C1D1C /* QuizPresenter.swift */,
 				9251ED2829A212B5006C1D1C /* QuizViewController.swift */,
-				9251ED2929A212B5006C1D1C /* QuizInteractor.swift */,
 				9251ED2A29A212B5006C1D1C /* QuizWireframe.swift */,
 			);
 			path = Quiz;
@@ -754,7 +843,6 @@
 			isa = PBXGroup;
 			children = (
 				9251ED3129A212E9006C1D1C /* CardPresenter.swift */,
-				9251ED3329A212E9006C1D1C /* CardInteractor.swift */,
 				9251ED3429A212E9006C1D1C /* CardWireframe.swift */,
 				92720AE729A732ED00A7C80B /* Views */,
 			);
@@ -767,7 +855,6 @@
 				9251ED3D29A2133A006C1D1C /* Dictionary.storyboard */,
 				9251ED3E29A2133A006C1D1C /* DictionaryPresenter.swift */,
 				9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */,
-				9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */,
 				9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */,
 			);
 			path = Dictionary;
@@ -781,17 +868,30 @@
 				929C4DB829A73358007651E9 /* CardCell.swift */,
 				929C4DBE29A73404007651E9 /* CardView.swift */,
 				929C4DC029A73412007651E9 /* CardView.xib */,
+				924052C529A9D06300B47E09 /* DeskListView.swift */,
+				924052C729A9D07600B47E09 /* DeskListView.xib */,
+				924052C929A9D20C00B47E09 /* DeskListCell.swift */,
+				924052CA29A9D20C00B47E09 /* DeskListCell.xib */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		9291704D29AB5DB700894551 /* CommonKeyboard */ = {
+			isa = PBXGroup;
+			children = (
+				9291704E29AB5DB700894551 /* CommonKeyboard.swift */,
+				9291704F29AB5DB700894551 /* Extensions.swift */,
+				9291705029AB5DB700894551 /* Utility.swift */,
+				9291705129AB5DB700894551 /* CommonKeyboardObserver.swift */,
+			);
+			path = CommonKeyboard;
 			sourceTree = "<group>";
 		};
 		929C4DCE29A7642B007651E9 /* Desk */ = {
 			isa = PBXGroup;
 			children = (
-				929C4DCF29A76442007651E9 /* Desk.storyboard */,
+				924052C429A9CE4600B47E09 /* Views */,
 				929C4DD029A76442007651E9 /* DeskPresenter.swift */,
-				929C4DD129A76442007651E9 /* DeskViewController.swift */,
-				929C4DD229A76442007651E9 /* DeskInteractor.swift */,
 				929C4DD329A76442007651E9 /* DeskWireframe.swift */,
 			);
 			path = Desk;
@@ -876,6 +976,7 @@
 				92A93EB929A25A1B00CE7E70 /* RealmSwift */,
 				92720AE229A72E2B00A7C80B /* CollectionViewPagingLayout */,
 				929C4DC729A74CAE007651E9 /* Kingfisher */,
+				9291705729AB64E400894551 /* SwipeCellKit */,
 			);
 			productName = FlashcardApp;
 			productReference = 9251EBC929A1E9A6006C1D1C /* FlashcardApp.app */;
@@ -962,6 +1063,7 @@
 				92A93EB629A25A1B00CE7E70 /* XCRemoteSwiftPackageReference "realm-swift" */,
 				92720AE129A72E2B00A7C80B /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */,
 				929C4DC629A74CAE007651E9 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				9291705629AB64E400894551 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 			);
 			productRefGroup = 9251EBCA29A1E9A6006C1D1C /* Products */;
 			projectDirPath = "";
@@ -982,18 +1084,25 @@
 				9251ECE529A1EAA5006C1D1C /* StubConfig.xcconfig in Resources */,
 				929C4DC129A73412007651E9 /* CardView.xib in Resources */,
 				9251EBD929A1E9A7006C1D1C /* LaunchScreen.storyboard in Resources */,
+				924052DE29AB398C00B47E09 /* CreateDesk.storyboard in Resources */,
 				9251ED1E29A20341006C1D1C /* AccountCell.xib in Resources */,
+				924052CC29A9D20C00B47E09 /* DeskListCell.xib in Resources */,
 				9251ECE129A1EAA5006C1D1C /* ReleaseConfig.xcconfig in Resources */,
 				9251ECBD29A1EAA5006C1D1C /* MailLogin.storyboard in Resources */,
+				924052E729AB3ADD00B47E09 /* DeskCell.xib in Resources */,
 				9251ECAF29A1EAA5006C1D1C /* Home.storyboard in Resources */,
 				929C4DD429A76442007651E9 /* Desk.storyboard in Resources */,
 				9251ED2B29A212B5006C1D1C /* Quiz.storyboard in Resources */,
+				924052EB29AB3AFC00B47E09 /* NewCardCell.xib in Resources */,
+				924052C829A9D07600B47E09 /* DeskListView.xib in Resources */,
 				9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */,
+				92B2EBEF29AB5A63008833D4 /* AddDeskBottomView.xib in Resources */,
 				929C4DB729A7332D007651E9 /* Card.storyboard in Resources */,
 				9251ECDA29A1EAA5006C1D1C /* SlideShow.storyboard in Resources */,
 				9251ECA529A1EAA5006C1D1C /* SimpleCardCell.xib in Resources */,
 				9251ED2229A2074D006C1D1C /* CommonCell.xib in Resources */,
 				9251ED4229A2133A006C1D1C /* Dictionary.storyboard in Resources */,
+				92777FB029AB4415002891DB /* DeskCardHeaderView.xib in Resources */,
 				9251ED0E29A1F198006C1D1C /* GoogleService-Info.plist in Resources */,
 				9251ECA029A1EAA5006C1D1C /* CarouselView.xib in Resources */,
 				9251ECAA29A1EAA5006C1D1C /* HomeCarouselCell.xib in Resources */,
@@ -1053,13 +1162,16 @@
 				9251ECB929A1EAA5006C1D1C /* WelcomeMainPresenter.swift in Sources */,
 				9209760F29A7887800ECF29C /* RCard.swift in Sources */,
 				9251EC9929A1EAA5006C1D1C /* CollectionView.swift in Sources */,
+				924052ED29AB3D7200B47E09 /* DeskCardHeaderView.swift in Sources */,
 				9251EC9729A1EAA5006C1D1C /* ViewInterface.swift in Sources */,
 				9251ECE229A1EAA5006C1D1C /* EvironmentConfig.swift in Sources */,
 				9251EC9529A1EAA5006C1D1C /* MainScheduleSubscribler.swift in Sources */,
 				9251ECBE29A1EAA5006C1D1C /* MailLoginPresenter.swift in Sources */,
 				9251ECDB29A1EAA5006C1D1C /* SlideShowInteractor.swift in Sources */,
+				924052E129AB398C00B47E09 /* CreateDeskInteractor.swift in Sources */,
 				9251ECA429A1EAA5006C1D1C /* SimpleCardCell.swift in Sources */,
 				9209761129A7AC4C00ECF29C /* DeskManagement.swift in Sources */,
+				9291705A29AB672800894551 /* AppImage.swift in Sources */,
 				9251ED1629A20040006C1D1C /* SettingPresenter.swift in Sources */,
 				9251ED1929A20040006C1D1C /* SettingWireframe.swift in Sources */,
 				9251ED2F29A212B5006C1D1C /* QuizWireframe.swift in Sources */,
@@ -1076,6 +1188,7 @@
 				9251ED1729A20040006C1D1C /* SettingViewController.swift in Sources */,
 				9251ECD929A1EAA5006C1D1C /* SlideShowPresenter.swift in Sources */,
 				9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */,
+				9291705429AB5DB700894551 /* Utility.swift in Sources */,
 				9251ED2D29A212B5006C1D1C /* QuizViewController.swift in Sources */,
 				9251ED2C29A212B5006C1D1C /* QuizPresenter.swift in Sources */,
 				92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */,
@@ -1086,9 +1199,11 @@
 				92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */,
 				9251EC8629A1EAA5006C1D1C /* DefaultViewAnimator.swift in Sources */,
 				9251EC9A29A1EAA5006C1D1C /* StackView.swift in Sources */,
+				9291705329AB5DB700894551 /* Extensions.swift in Sources */,
 				9251ECE929A1EAA5006C1D1C /* Constants.swift in Sources */,
 				9251ECB029A1EAA5006C1D1C /* HomeViewController.swift in Sources */,
 				9251ECBC29A1EAA5006C1D1C /* MailLoginWireframe.swift in Sources */,
+				9291705229AB5DB700894551 /* CommonKeyboard.swift in Sources */,
 				9251ECE829A1EAA5006C1D1C /* AppService.swift in Sources */,
 				9251EC9129A1EAA5006C1D1C /* MailLoginInteractor.swift in Sources */,
 				9251ECC829A1EAA5006C1D1C /* StartUpInteractor.swift in Sources */,
@@ -1105,6 +1220,7 @@
 				9251ED4329A2133A006C1D1C /* DictionaryPresenter.swift in Sources */,
 				9251ECCC29A1EAA5006C1D1C /* StartUpPresenter.swift in Sources */,
 				9209760D29A787C100ECF29C /* RDesk.swift in Sources */,
+				924052CB29A9D20C00B47E09 /* DeskListCell.swift in Sources */,
 				9251EC8A29A1EAA5006C1D1C /* HomeInteractor.swift in Sources */,
 				9251ECC929A1EAA5006C1D1C /* StartUpWireframe.swift in Sources */,
 				9251EC9B29A1EAA5006C1D1C /* Storyboard.swift in Sources */,
@@ -1112,10 +1228,15 @@
 				9251EC8C29A1EAA5006C1D1C /* MainInteractor.swift in Sources */,
 				9251ECCE29A1EAA5006C1D1C /* MainPresenter.swift in Sources */,
 				9251ECCD29A1EAA5006C1D1C /* MainViewController.swift in Sources */,
+				92B2EBED29AB5A58008833D4 /* AddDeskBottomView.swift in Sources */,
+				924052C629A9D06300B47E09 /* DeskListView.swift in Sources */,
 				9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */,
 				9251EC8B29A1EAA5006C1D1C /* CreateInteractor.swift in Sources */,
+				9291705529AB5DB700894551 /* CommonKeyboardObserver.swift in Sources */,
 				9251EC8D29A1EAA5006C1D1C /* AccountInteractor.swift in Sources */,
 				9251ECA629A1EAA5006C1D1C /* CarouselView.swift in Sources */,
+				924052E029AB398C00B47E09 /* CreateDeskViewController.swift in Sources */,
+				924052E629AB3ADD00B47E09 /* DeskCell.swift in Sources */,
 				9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */,
 				9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */,
 				92A93EC529A2602800CE7E70 /* ExampleManagement.swift in Sources */,
@@ -1128,16 +1249,19 @@
 				9251EC8129A1EAA5006C1D1C /* WelcomeEntity.swift in Sources */,
 				9251ECBF29A1EAA5006C1D1C /* MailLoginViewController.swift in Sources */,
 				929C4DD829A76442007651E9 /* DeskWireframe.swift in Sources */,
+				924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */,
 				9251ECE629A1EAA5006C1D1C /* RealmService.swift in Sources */,
 				9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */,
 				9251EC8729A1EAA5006C1D1C /* UIScrollView+PullToRefresh.swift in Sources */,
 				9251ED3829A212E9006C1D1C /* CardInteractor.swift in Sources */,
 				9251EC9029A1EAA5006C1D1C /* WishlistInteractor.swift in Sources */,
+				924052E229AB398C00B47E09 /* CreateDeskWireframe.swift in Sources */,
 				92A93EC029A25DBF00CE7E70 /* RKanji.swift in Sources */,
 				9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */,
 				9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */,
 				9251EC9329A1EAA5006C1D1C /* BaseApi.swift in Sources */,
 				92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */,
+				924052EA29AB3AFC00B47E09 /* NewCardCell.swift in Sources */,
 				9251EC9E29A1EAA5006C1D1C /* BaseNavigationController.swift in Sources */,
 				9251ED3929A212E9006C1D1C /* CardWireframe.swift in Sources */,
 				9251ECBB29A1EAA5006C1D1C /* WelcomeMainWireframe.swift in Sources */,
@@ -1536,6 +1660,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		9291705629AB64E400894551 /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwipeCellKit/SwipeCellKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		929C4DC629A74CAE007651E9 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -1629,6 +1761,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 92720AE129A72E2B00A7C80B /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */;
 			productName = CollectionViewPagingLayout;
+		};
+		9291705729AB64E400894551 /* SwipeCellKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9291705629AB64E400894551 /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
+			productName = SwipeCellKit;
 		};
 		929C4DC729A74CAE007651E9 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;

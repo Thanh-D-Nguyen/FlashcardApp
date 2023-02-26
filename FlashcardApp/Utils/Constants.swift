@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 
 class Constants {
+    static let unknowSelectIndex = -1
     static var currentBarStyle: UIStatusBarStyle = .darkContent
     
     static var mainView: UIViewController? {

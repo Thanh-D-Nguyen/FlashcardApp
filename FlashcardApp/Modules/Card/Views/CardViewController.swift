@@ -19,7 +19,7 @@ final class CardViewController: BaseViewController {
         super.viewDidLoad()
         setupUI()
         subscribe()
-        presenter.notifyDeskChanged()
+        presenter.loadDesks()
     }
 
     func setupUI() {
@@ -38,13 +38,13 @@ final class CardViewController: BaseViewController {
     func subscribe() {
         subscribe(presenter.deskDataRelay, { [weak self] _ in
             guard let self else { return }
-            self.updateDesks()
+            self.updateCurrentDesk()
             self.cardCollectionView.reloadData()
         })
     }
     
-    private func updateDesks() {
-        let desk = presenter.deskDataRelay.value.first
+    private func updateCurrentDesk() {
+        let desk = presenter.selectingDesk
         deskButton.setTitle(desk?.name, for: .normal)
     }
 }
@@ -67,7 +67,10 @@ extension CardViewController: UICollectionViewDataSource {
 
 extension CardViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("selected indexPath:", indexPath)
+        // If select empty entity cell, it mean add new card
+        if !presenter.cards.indices.contains(indexPath.row) {
+            presenter.createNewCard()
+        }
     }
 }
 
@@ -81,6 +84,11 @@ extension CardViewController: CollectionViewPagingLayoutDelegate {
 extension CardViewController {
     @IBAction
     private func selectDeskAction() {
-        presenter.showDesk()
+        presenter.showDesk(byAddNew: false)
+    }
+    
+    @IBAction
+    private func addNewDeskAction() {
+        presenter.showDesk(byAddNew: true)
     }
 }

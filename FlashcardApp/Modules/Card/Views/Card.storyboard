@@ -28,42 +28,21 @@
                                             <userDefinedRuntimeAttribute type="string" keyPath="title" value="Card"/>
                                         </userDefinedRuntimeAttributes>
                                     </view>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DjR-2u-jil" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="307" y="4" width="60" height="60"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" secondItem="DjR-2u-jil" secondAttribute="height" id="hOF-Sj-HkJ"/>
-                                        </constraints>
-                                        <color key="tintColor" name="teflonColor"/>
-                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                        <state key="normal" image="plus.square.fill" catalog="system"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
-                                                <real key="value" value="1"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                <color key="value" name="blackA30Color"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="DjR-2u-jil" secondAttribute="trailing" constant="8" id="2f1-v9-Pz6"/>
-                                    <constraint firstAttribute="bottom" secondItem="DjR-2u-jil" secondAttribute="bottom" constant="4" id="8ma-JB-9Od"/>
                                     <constraint firstItem="2Hb-ly-Gqq" firstAttribute="top" secondItem="aPJ-MS-3Q4" secondAttribute="top" id="Neo-rG-c6j"/>
                                     <constraint firstAttribute="height" constant="68" id="YpK-j3-rKR"/>
                                     <constraint firstAttribute="bottom" secondItem="2Hb-ly-Gqq" secondAttribute="bottom" id="eg5-cX-gTE"/>
                                     <constraint firstAttribute="trailing" secondItem="2Hb-ly-Gqq" secondAttribute="trailing" id="khS-x2-CsC"/>
                                     <constraint firstItem="2Hb-ly-Gqq" firstAttribute="leading" secondItem="aPJ-MS-3Q4" secondAttribute="leading" id="oKO-Z2-sDA"/>
-                                    <constraint firstItem="DjR-2u-jil" firstAttribute="top" secondItem="aPJ-MS-3Q4" secondAttribute="top" constant="4" id="xUW-8n-yUF"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rIe-wG-YgS" userLabel="TopView">
                                 <rect key="frame" x="0.0" y="68" width="375" height="66"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g45-jZ-ttQ" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="8" y="8" width="359" height="50"/>
+                                        <rect key="frame" x="8" y="8" width="301" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="H24-6k-EeZ"/>
                                         </constraints>
@@ -93,20 +72,45 @@
                                         </connections>
                                     </button>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.down.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="6oL-ZS-M4v">
-                                        <rect key="frame" x="331" y="11.5" width="20" height="43"/>
+                                        <rect key="frame" x="273" y="11.5" width="20" height="43"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <color key="tintColor" name="gandalfColor"/>
                                     </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vSx-MY-MSi" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                        <rect key="frame" x="317" y="8" width="50" height="50"/>
+                                        <color key="tintColor" name="teflonColor"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="plus.square.fill" catalog="system"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                <color key="value" name="blackA30Color"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="addNewDeskAction" destination="zIc-eW-6fX" eventType="touchUpInside" id="w2X-SY-pXG"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="g45-jZ-ttQ" firstAttribute="top" secondItem="rIe-wG-YgS" secondAttribute="top" constant="8" id="4Vc-eU-7A4"/>
                                     <constraint firstAttribute="bottom" secondItem="g45-jZ-ttQ" secondAttribute="bottom" constant="8" id="5En-pb-a19"/>
+                                    <constraint firstItem="vSx-MY-MSi" firstAttribute="leading" secondItem="g45-jZ-ttQ" secondAttribute="trailing" constant="8" id="6nn-yx-5eS"/>
+                                    <constraint firstAttribute="trailing" secondItem="vSx-MY-MSi" secondAttribute="trailing" constant="8" id="Dfo-J8-f4o"/>
                                     <constraint firstItem="6oL-ZS-M4v" firstAttribute="height" secondItem="g45-jZ-ttQ" secondAttribute="height" multiplier="0.88" id="IVT-LP-tlU"/>
                                     <constraint firstItem="g45-jZ-ttQ" firstAttribute="leading" secondItem="rIe-wG-YgS" secondAttribute="leading" constant="8" id="X25-t9-HhU"/>
+                                    <constraint firstItem="vSx-MY-MSi" firstAttribute="centerY" secondItem="rIe-wG-YgS" secondAttribute="centerY" id="avZ-k8-q7i"/>
                                     <constraint firstItem="6oL-ZS-M4v" firstAttribute="trailing" secondItem="g45-jZ-ttQ" secondAttribute="trailing" constant="-16" id="hDm-gR-HT0"/>
                                     <constraint firstItem="6oL-ZS-M4v" firstAttribute="centerY" secondItem="g45-jZ-ttQ" secondAttribute="centerY" id="mmp-BQ-wlj"/>
-                                    <constraint firstAttribute="trailing" secondItem="g45-jZ-ttQ" secondAttribute="trailing" constant="8" id="tDy-X5-ibg"/>
+                                    <constraint firstItem="vSx-MY-MSi" firstAttribute="width" secondItem="vSx-MY-MSi" secondAttribute="height" id="wJO-1V-0cA"/>
+                                    <constraint firstAttribute="bottom" secondItem="vSx-MY-MSi" secondAttribute="bottom" constant="8" id="zRM-nM-6G9"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xun-cF-FCZ" userLabel="ContentView">
@@ -163,11 +167,11 @@
         </scene>
     </scenes>
     <designables>
-        <designable name="DjR-2u-jil">
-            <size key="intrinsicContentSize" width="25" height="24"/>
-        </designable>
         <designable name="g45-jZ-ttQ">
             <size key="intrinsicContentSize" width="153" height="32"/>
+        </designable>
+        <designable name="vSx-MY-MSi">
+            <size key="intrinsicContentSize" width="25" height="24"/>
         </designable>
     </designables>
     <resources>
