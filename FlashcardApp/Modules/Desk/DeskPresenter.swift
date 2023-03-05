@@ -17,7 +17,7 @@ protocol DeskPresenterInterface: AnyObject {
     var deskRelay: BehaviorRelay<DeskEntity?> { get }
     
     func viewDidLoad()
-    func addDeskName(_ name: String?, description: String?)
+    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int)
     func dismiss()
 }
 
@@ -51,10 +51,10 @@ extension DeskPresenter: DeskPresenterInterface {
         notifyDeskChanged()
     }
     
-    func addDeskName(_ name: String?, description: String?) {
+    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int) {
         var changeIndex = 0
         if screenType == .create {
-            interactor.addDeskName(name, description: description)
+            interactor.addDeskName(name, description: description, sortingLanguage: sortingLanguage)
         } else {
             if let desk = entity {
                 changeIndex = desk.selectIndex

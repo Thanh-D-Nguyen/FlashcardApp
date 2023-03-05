@@ -6,11 +6,14 @@
 //
 
 import UIKit
+import GrowingTextView
 
 protocol FocusTextFieldCellProtocol: AnyObject {
+    var indexPath: IndexPath? { get set }
     var isFocusedField: Bool { get }
-    var nextCellResponder: (() -> Void)? { get set }
-    func becomeNextResponder()
+    
+    func becomeNextResponder(_ completion: ((DeskChangedEvent) -> Void)?)
+    func resignFirstResponder()
 }
 
 class DeskCell: UITableViewCell {
@@ -18,17 +21,18 @@ class DeskCell: UITableViewCell {
     @IBOutlet private weak var deskButtonContainerView: UIView!
     @IBOutlet private weak var deskDescContainerView: UIView!
     
-    @IBOutlet private weak var deskNameTextField: UITextField!
-    @IBOutlet private weak var deskDescTextField: UITextField!
+    @IBOutlet private weak var deskNameTextField: GrowingTextView!
+    @IBOutlet private weak var deskDescTextField: GrowingTextView!
     
-    var isFocusedField: Bool = false
-    var nextCellResponder: (() -> Void)?
+    var indexPath: IndexPath?
+    var isFocusedField: Bool = true
+    weak var tableView: UITableView?
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
         deskButtonContainerView.isHidden = false
-        deskDescContainerView.isHidden = true
+        deskDescContainerView.isHidden = true        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -42,27 +46,43 @@ class DeskCell: UITableViewCell {
         deskDescContainerView.isHidden = false
     }
    
+    func updateName(_ name: String, description: String) {
+        deskNameTextField.text = name
+        deskDescTextField.text = description
+    }
 }
 
 extension DeskCell: FocusTextFieldCellProtocol {
-    func becomeNextResponder() {
-        if deskNameTextField.isFirstResponder {
-            deskDescTextField.becomeFirstResponder()
-        } else {
+    func becomeNextResponder(_ completion: ((DeskChangedEvent) -> Void)?) {
+        let needStartResponder = !deskNameTextField.isFirstResponder && !deskDescTextField.isFirstResponder
+        if needStartResponder {
             deskNameTextField.becomeFirstResponder()
+            return
         }
-        if deskDescTextField.isFirstResponder {
-            nextCellResponder?()
+        if deskDescContainerView.isHidden {
+            if deskNameTextField.isFirstResponder, let indexPath = indexPath {
+                completion?(.focusNextFrom(indexPath))
+            }
+        } else {
+            if deskNameTextField.isFirstResponder {
+                deskDescTextField.becomeFirstResponder()
+            } else if deskDescTextField.isFirstResponder, let indexPath = indexPath {
+                completion?(.focusNextFrom(indexPath))
+            }
         }
+    }
+    
+    func resignFirstResponder() {
+        self.endEditing(true)
     }
 }
 
-extension DeskCell: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
+extension DeskCell: UITextViewDelegate {
+    func textViewDidBeginEditing(_ textView: UITextView) {
         isFocusedField = true
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
+    func textViewDidEndEditing(_ textView: UITextView) {
         isFocusedField = false
     }
 }

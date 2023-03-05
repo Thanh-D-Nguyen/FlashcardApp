@@ -10,4 +10,6 @@ import UIKit
 class AppImage {
     static let upImage = UIImage(systemName: "arrow.up")
     static let downImage = UIImage(systemName: "arrow.down")
+    static let viFlag = UIImage(named: "VN")
+    static let jaFlag = UIImage(named: "JP")
 }

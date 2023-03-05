@@ -16,8 +16,19 @@ struct CardEntity: Codable {
     var backExtraText: String
     var imageUrl: String
     var videoUrl: String
-        
+    
+    // At card list, to store card display state (back or front)
     var displayingFront: Bool = true
+    
+    static func empty() -> CardEntity {
+        CardEntity(id: -1,
+                   frontText: "",
+                   frontExtraText: "",
+                   backText: "",
+                   backExtraText: "",
+                   imageUrl: "",
+                   videoUrl: "")
+    }
 }
 
 extension CardEntity {

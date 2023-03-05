@@ -41,6 +41,14 @@ class RoundCornerView: UIView {
         }
     }
     
+    @IBInspectable
+    var shadowColor: UIColor = .clear {
+        didSet {
+            updateShadowPath()
+            layer.shadowColor = shadowColor.cgColor
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -54,6 +62,7 @@ class RoundCornerView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         updatePath()
+        updateShadowPath()
     }
     
     private let border = CAShapeLayer()
@@ -64,13 +73,23 @@ class RoundCornerView: UIView {
         border.lineJoin = .round
         border.lineWidth = lineWidth
         updatePath()
+        updateShadowPath()
         layer.addSublayer(border)
+        layer.shadowOffset = .zero
+        layer.shadowOpacity = 1.0
+        layer.shadowRadius = 3.0
         layer.masksToBounds = true
+        layer.shadowColor = UIColor.clear.cgColor
         layer.cornerRadius = cornerRadius
+    
     }
     
     private func updatePath() {
         border.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
         border.frame = bounds
+    }
+    
+    private func updateShadowPath() {
+        layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
     }
 }

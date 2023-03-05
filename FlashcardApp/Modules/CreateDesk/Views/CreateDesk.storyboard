@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
@@ -15,11 +15,11 @@
             <objects>
                 <viewController storyboardIdentifier="CreateDeskViewController" modalTransitionStyle="crossDissolve" modalPresentationStyle="overFullScreen" id="zIc-eW-6fX" customClass="CreateDeskViewController" customModule="FlashcardApp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Z2g-4m-atm">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RXZ-cm-D1Q">
-                                <rect key="frame" x="0.0" y="68" width="375" height="531"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="interactive" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RXZ-cm-D1Q">
+                                <rect key="frame" x="0.0" y="115" width="375" height="563"/>
                                 <color key="backgroundColor" name="whiteColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="zIc-eW-6fX" id="tEK-H5-3Nk"/>
@@ -27,7 +27,7 @@
                                 </connections>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SRs-Wo-cpA">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
+                                <rect key="frame" x="0.0" y="47" width="375" height="68"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nc2-lm-v2K" userLabel="TopBar" customClass="TopBarView" customModule="FlashcardApp" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
@@ -47,21 +47,22 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sdP-dJ-39N" userLabel="BottomView">
-                                <rect key="frame" x="0.0" y="599" width="375" height="68"/>
+                                <rect key="frame" x="0.0" y="678" width="375" height="100"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eH9-iY-dbt" customClass="AddDeskBottomView" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="8" y="8" width="359" height="52"/>
+                                        <rect key="frame" x="8" y="8" width="359" height="84"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <connections>
                                             <action selector="bottomTapAction:" destination="zIc-eW-6fX" eventType="touchUpInside" id="xyL-dL-6OJ"/>
                                         </connections>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" name="whiteColor"/>
+                                <color key="backgroundColor" name="whiteyColor"/>
                                 <constraints>
                                     <constraint firstItem="eH9-iY-dbt" firstAttribute="leading" secondItem="sdP-dJ-39N" secondAttribute="leading" constant="8" id="Jhb-v1-hC3"/>
                                     <constraint firstAttribute="trailing" secondItem="eH9-iY-dbt" secondAttribute="trailing" constant="8" id="N9N-Fo-ra0"/>
                                     <constraint firstItem="eH9-iY-dbt" firstAttribute="top" secondItem="sdP-dJ-39N" secondAttribute="top" constant="8" id="O8L-Rn-vwH"/>
+                                    <constraint firstAttribute="height" constant="100" placeholder="YES" id="qKp-vg-vOe"/>
                                     <constraint firstAttribute="bottom" secondItem="eH9-iY-dbt" secondAttribute="bottom" constant="8" id="teu-pf-rAB"/>
                                 </constraints>
                             </view>
@@ -73,9 +74,8 @@
                             <constraint firstAttribute="trailing" secondItem="SRs-Wo-cpA" secondAttribute="trailing" id="6jw-oF-OVw"/>
                             <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="sdP-dJ-39N" secondAttribute="trailing" id="7Ws-jO-Y0W"/>
                             <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="RXZ-cm-D1Q" secondAttribute="trailing" id="LX7-7q-meC"/>
-                            <constraint firstItem="sdP-dJ-39N" firstAttribute="bottom" secondItem="3pi-N7-nbV" secondAttribute="bottom" id="Mw7-Sj-ceC"/>
                             <constraint firstItem="SRs-Wo-cpA" firstAttribute="top" secondItem="3pi-N7-nbV" secondAttribute="top" id="UKk-P3-ne6"/>
-                            <constraint firstItem="sdP-dJ-39N" firstAttribute="height" secondItem="SRs-Wo-cpA" secondAttribute="height" id="g1J-4B-YcV"/>
+                            <constraint firstItem="sdP-dJ-39N" firstAttribute="bottom" secondItem="3pi-N7-nbV" secondAttribute="bottom" id="Wkt-0K-K9R"/>
                             <constraint firstItem="sdP-dJ-39N" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="q2Q-sm-zDr"/>
                             <constraint firstItem="SRs-Wo-cpA" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="r9C-wK-atq"/>
                             <constraint firstItem="sdP-dJ-39N" firstAttribute="top" secondItem="RXZ-cm-D1Q" secondAttribute="bottom" id="yCj-z1-Vi8"/>
@@ -83,7 +83,8 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="bottomConstraint" destination="Mw7-Sj-ceC" id="Own-eH-hdC"/>
+                        <outlet property="bottomConstraint" destination="Wkt-0K-K9R" id="4PO-eV-gzN"/>
+                        <outlet property="bottomView" destination="eH9-iY-dbt" id="3MH-sO-ITu"/>
                         <outlet property="deskTableView" destination="RXZ-cm-D1Q" id="x6T-YM-jxf"/>
                     </connections>
                 </viewController>
@@ -95,6 +96,9 @@
     <resources>
         <namedColor name="whiteColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="whiteyColor">
+            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

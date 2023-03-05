@@ -159,12 +159,11 @@
 		92720AE329A72E2B00A7C80B /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 92720AE229A72E2B00A7C80B /* CollectionViewPagingLayout */; };
 		92777FB029AB4415002891DB /* DeskCardHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92777FAF29AB4415002891DB /* DeskCardHeaderView.xib */; };
 		9288BADA29A3B54E00F9AC9F /* flash_card.realm in Resources */ = {isa = PBXBuildFile; fileRef = 9288BAD929A3B54E00F9AC9F /* flash_card.realm */; };
-		9291705229AB5DB700894551 /* CommonKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291704E29AB5DB700894551 /* CommonKeyboard.swift */; };
-		9291705329AB5DB700894551 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291704F29AB5DB700894551 /* Extensions.swift */; };
-		9291705429AB5DB700894551 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705029AB5DB700894551 /* Utility.swift */; };
-		9291705529AB5DB700894551 /* CommonKeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705129AB5DB700894551 /* CommonKeyboardObserver.swift */; };
 		9291705829AB64E400894551 /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9291705729AB64E400894551 /* SwipeCellKit */; };
 		9291705A29AB672800894551 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705929AB672800894551 /* AppImage.swift */; };
+		9291706029B30E5000894551 /* Typist in Frameworks */ = {isa = PBXBuildFile; productRef = 9291705F29B30E5000894551 /* Typist */; };
+		9291706629B36CD800894551 /* GrowingTextView in Frameworks */ = {isa = PBXBuildFile; productRef = 9291706529B36CD800894551 /* GrowingTextView */; };
+		9291706929B45FB700894551 /* SwipeCellSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291706829B45FB700894551 /* SwipeCellSupport.swift */; };
 		929C4DB729A7332D007651E9 /* Card.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 929C4DB629A7332D007651E9 /* Card.storyboard */; };
 		929C4DBA29A73358007651E9 /* CardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DB829A73358007651E9 /* CardCell.swift */; };
 		929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DBC29A733A2007651E9 /* CardEntity.swift */; };
@@ -357,11 +356,8 @@
 		9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryWireframe.swift; sourceTree = "<group>"; };
 		92777FAF29AB4415002891DB /* DeskCardHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskCardHeaderView.xib; sourceTree = "<group>"; };
 		9288BAD929A3B54E00F9AC9F /* flash_card.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = flash_card.realm; sourceTree = "<group>"; };
-		9291704E29AB5DB700894551 /* CommonKeyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonKeyboard.swift; sourceTree = "<group>"; };
-		9291704F29AB5DB700894551 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		9291705029AB5DB700894551 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
-		9291705129AB5DB700894551 /* CommonKeyboardObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonKeyboardObserver.swift; sourceTree = "<group>"; };
 		9291705929AB672800894551 /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
+		9291706829B45FB700894551 /* SwipeCellSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellSupport.swift; sourceTree = "<group>"; };
 		929C4DB629A7332D007651E9 /* Card.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Card.storyboard; sourceTree = "<group>"; };
 		929C4DB829A73358007651E9 /* CardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCell.swift; sourceTree = "<group>"; };
 		929C4DBC29A733A2007651E9 /* CardEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardEntity.swift; sourceTree = "<group>"; };
@@ -409,10 +405,12 @@
 				9251ECF129A1EC4A006C1D1C /* RxSwift in Frameworks */,
 				9251ED0829A1ED9C006C1D1C /* FacebookShare in Frameworks */,
 				9251ECFF29A1ED54006C1D1C /* FirebaseDynamicLinks in Frameworks */,
+				9291706629B36CD800894551 /* GrowingTextView in Frameworks */,
 				9251ED0429A1ED9C006C1D1C /* FacebookCore in Frameworks */,
 				929C4DC829A74CAE007651E9 /* Kingfisher in Frameworks */,
 				92A93EB829A25A1B00CE7E70 /* Realm in Frameworks */,
 				9251ECEF29A1EC4A006C1D1C /* RxCocoa in Frameworks */,
+				9291706029B30E5000894551 /* Typist in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,7 +545,6 @@
 		9251EBFF29A1EAA5006C1D1C /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
-				9291704D29AB5DB700894551 /* CommonKeyboard */,
 				9251EC0029A1EAA5006C1D1C /* PullToRefresh */,
 			);
 			path = Vendors;
@@ -801,6 +798,7 @@
 				9251EC8029A1EAA5006C1D1C /* Enums.swift */,
 				929C4DC429A74806007651E9 /* AppColor.swift */,
 				9291705929AB672800894551 /* AppImage.swift */,
+				9291706829B45FB700894551 /* SwipeCellSupport.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -874,17 +872,6 @@
 				924052CA29A9D20C00B47E09 /* DeskListCell.xib */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		9291704D29AB5DB700894551 /* CommonKeyboard */ = {
-			isa = PBXGroup;
-			children = (
-				9291704E29AB5DB700894551 /* CommonKeyboard.swift */,
-				9291704F29AB5DB700894551 /* Extensions.swift */,
-				9291705029AB5DB700894551 /* Utility.swift */,
-				9291705129AB5DB700894551 /* CommonKeyboardObserver.swift */,
-			);
-			path = CommonKeyboard;
 			sourceTree = "<group>";
 		};
 		929C4DCE29A7642B007651E9 /* Desk */ = {
@@ -977,6 +964,8 @@
 				92720AE229A72E2B00A7C80B /* CollectionViewPagingLayout */,
 				929C4DC729A74CAE007651E9 /* Kingfisher */,
 				9291705729AB64E400894551 /* SwipeCellKit */,
+				9291705F29B30E5000894551 /* Typist */,
+				9291706529B36CD800894551 /* GrowingTextView */,
 			);
 			productName = FlashcardApp;
 			productReference = 9251EBC929A1E9A6006C1D1C /* FlashcardApp.app */;
@@ -1064,6 +1053,8 @@
 				92720AE129A72E2B00A7C80B /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */,
 				929C4DC629A74CAE007651E9 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				9291705629AB64E400894551 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
+				9291705E29B30E5000894551 /* XCRemoteSwiftPackageReference "Typist" */,
+				9291706429B36CD800894551 /* XCRemoteSwiftPackageReference "GrowingTextView" */,
 			);
 			productRefGroup = 9251EBCA29A1E9A6006C1D1C /* Products */;
 			projectDirPath = "";
@@ -1188,7 +1179,6 @@
 				9251ED1729A20040006C1D1C /* SettingViewController.swift in Sources */,
 				9251ECD929A1EAA5006C1D1C /* SlideShowPresenter.swift in Sources */,
 				9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */,
-				9291705429AB5DB700894551 /* Utility.swift in Sources */,
 				9251ED2D29A212B5006C1D1C /* QuizViewController.swift in Sources */,
 				9251ED2C29A212B5006C1D1C /* QuizPresenter.swift in Sources */,
 				92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */,
@@ -1199,11 +1189,10 @@
 				92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */,
 				9251EC8629A1EAA5006C1D1C /* DefaultViewAnimator.swift in Sources */,
 				9251EC9A29A1EAA5006C1D1C /* StackView.swift in Sources */,
-				9291705329AB5DB700894551 /* Extensions.swift in Sources */,
 				9251ECE929A1EAA5006C1D1C /* Constants.swift in Sources */,
 				9251ECB029A1EAA5006C1D1C /* HomeViewController.swift in Sources */,
+				9291706929B45FB700894551 /* SwipeCellSupport.swift in Sources */,
 				9251ECBC29A1EAA5006C1D1C /* MailLoginWireframe.swift in Sources */,
-				9291705229AB5DB700894551 /* CommonKeyboard.swift in Sources */,
 				9251ECE829A1EAA5006C1D1C /* AppService.swift in Sources */,
 				9251EC9129A1EAA5006C1D1C /* MailLoginInteractor.swift in Sources */,
 				9251ECC829A1EAA5006C1D1C /* StartUpInteractor.swift in Sources */,
@@ -1232,7 +1221,6 @@
 				924052C629A9D06300B47E09 /* DeskListView.swift in Sources */,
 				9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */,
 				9251EC8B29A1EAA5006C1D1C /* CreateInteractor.swift in Sources */,
-				9291705529AB5DB700894551 /* CommonKeyboardObserver.swift in Sources */,
 				9251EC8D29A1EAA5006C1D1C /* AccountInteractor.swift in Sources */,
 				9251ECA629A1EAA5006C1D1C /* CarouselView.swift in Sources */,
 				924052E029AB398C00B47E09 /* CreateDeskViewController.swift in Sources */,
@@ -1668,6 +1656,22 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		9291705E29B30E5000894551 /* XCRemoteSwiftPackageReference "Typist" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/totocaster/Typist.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		9291706429B36CD800894551 /* XCRemoteSwiftPackageReference "GrowingTextView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/KennethTsang/GrowingTextView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.7.2;
+			};
+		};
 		929C4DC629A74CAE007651E9 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -1766,6 +1770,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9291705629AB64E400894551 /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
 			productName = SwipeCellKit;
+		};
+		9291705F29B30E5000894551 /* Typist */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9291705E29B30E5000894551 /* XCRemoteSwiftPackageReference "Typist" */;
+			productName = Typist;
+		};
+		9291706529B36CD800894551 /* GrowingTextView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9291706429B36CD800894551 /* XCRemoteSwiftPackageReference "GrowingTextView" */;
+			productName = GrowingTextView;
 		};
 		929C4DC729A74CAE007651E9 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;

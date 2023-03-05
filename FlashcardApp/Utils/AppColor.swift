@@ -22,4 +22,5 @@ class AppColor {
     static let teflon = UIColor(named: "teflonColor")
     static let whiteA30 = UIColor(named: "whiteA30Color")
     static let whitey = UIColor(named: "whiteyColor")
+    static let white = UIColor(named: "whiteColor")
 }

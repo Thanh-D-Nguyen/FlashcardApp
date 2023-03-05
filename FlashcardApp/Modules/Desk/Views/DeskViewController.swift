@@ -42,6 +42,6 @@ final class DeskViewController: BaseViewController {
     
     @IBAction
     private func addDeskAction() {
-        presenter.addDeskName(nameTextField.text, description: descTextView.text)
+        presenter.addDeskName(nameTextField.text, description: descTextView.text, sortingLanguage: LanguageSortingType.normal.rawValue)
     }
 }

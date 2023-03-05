@@ -62,6 +62,9 @@
                 <constraint firstItem="Lma-QQ-A2m" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="mOD-Rn-XCR"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="languageSegmented" destination="Lma-QQ-A2m" id="02b-Nb-PCs"/>
+            </connections>
             <point key="canvasLocation" x="-63.358778625954194" y="181.69014084507043"/>
         </view>
     </objects>

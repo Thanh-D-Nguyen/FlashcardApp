@@ -100,6 +100,15 @@
       }
     },
     {
+      "identity" : "growingtextview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/KennethTsang/GrowingTextView.git",
+      "state" : {
+        "revision" : "0cda2caf03bf6cb2ec6dc006873c3c865933be09",
+        "version" : "0.7.2"
+      }
+    },
+    {
       "identity" : "grpc-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/grpc/grpc-ios.git",
@@ -205,6 +214,15 @@
       "state" : {
         "revision" : "7219cad3098637176ace311510d11467dbfb9bb0",
         "version" : "2.7.1"
+      }
+    },
+    {
+      "identity" : "typist",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/totocaster/Typist.git",
+      "state" : {
+        "revision" : "c3de439044e5eec80fc88512c89436030f42a556",
+        "version" : "1.4.3"
       }
     }
   ],

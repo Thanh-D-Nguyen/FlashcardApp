@@ -12,6 +12,7 @@ class RDesk: Object {
     @Persisted(primaryKey: true) var id: Int
     @Persisted var name: String
     @Persisted var desc: String
+    @Persisted var sortingLanguage: Int
     @Persisted var imageNamed: String
     @Persisted var cards: List<RCard>
     
@@ -24,6 +25,7 @@ extension RDesk {
                    name: name,
                    description: desc,
                    imageNamed: imageNamed,
+                   sortingLanguage: LanguageSortingType(rawValue: sortingLanguage) ?? .normal,
                    cards: cards.map({ $0.toEntity() }),
                    date: date)
     }

@@ -14,6 +14,7 @@ enum AddDeskBottomViewAction {
 @IBDesignable
 class AddDeskBottomView: UIControl {
     @IBOutlet private weak var numOfItemLabel: UILabel!
+    @IBOutlet private weak var collectionView: UICollectionView!
     
     private(set) var action: AddDeskBottomViewAction = .next
     
@@ -41,6 +42,10 @@ class AddDeskBottomView: UIControl {
     private func insertCardAction(_ sender: UIButton) {
         action = .insert
         sendActions(for: .touchUpInside)
+    }
+    
+    func updateNumOfItems(_ text: String) {
+        numOfItemLabel.text = text
     }
 }
 

@@ -12,7 +12,7 @@ protocol DeskInteractorInterface: AnyObject {
     
     var desks: [DeskEntity] { get }
     
-    func addDeskName(_ name: String?, description: String?)
+    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int)
     func updateDesk(_ desk: DeskEntity)
 }
 
@@ -28,7 +28,7 @@ class DeskInteractor {
 }
 
 extension DeskInteractor: DeskInteractorInterface {
-    func addDeskName(_ name: String?, description: String?) {
+    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int) {
         let newId = deskCount + 1
         let choiceName: String
         if let name = name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
@@ -36,7 +36,7 @@ extension DeskInteractor: DeskInteractorInterface {
         } else {
             choiceName = "Desk \(newId)"
         }
-        let desk = DeskEntity(id: newId, name: choiceName, description: description ?? "", imageNamed: "", date: Date())
+        let desk = DeskEntity(id: newId, name: choiceName, description: description ?? "", imageNamed: "", sortingLanguage: LanguageSortingType(rawValue: sortingLanguage) ?? .normal, date: Date())
         try! DeskManagement.shared.add(desk)
     }
     
