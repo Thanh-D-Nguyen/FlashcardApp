@@ -25,7 +25,6 @@ class NewCardCell: SwipeTableViewCell {
     
     @IBOutlet private weak var stackView: UIStackView!
     @IBOutlet private weak var wordViewContainer: UIView!
-    @IBOutlet private weak var readingViewContainer: UIView!
     @IBOutlet private weak var seperateViewContainer: UIView!
     @IBOutlet private weak var meanViewContainer: UIView!
     
@@ -33,18 +32,16 @@ class NewCardCell: SwipeTableViewCell {
     @IBOutlet private weak var frontImageView: UIImageView!
 
     @IBOutlet private weak var wordTextField: GrowingTextView!
-    @IBOutlet private weak var readingTextField: GrowingTextView!
     @IBOutlet private weak var meanTextField: GrowingTextView!
     
     @IBOutlet private weak var imageButton: UIButton!
     
+    weak var tableView: UITableView?
+    
     var indexPath: IndexPath? {
-        didSet {
-            updateTextFieldsTag()
-        }
+        tableView?.indexPath(for: self)
     }
     var isFocusedField: Bool = false
-    weak var tableView: UITableView?
 
     private var currentSortingLanguage: LanguageSortingType = .normal
         
@@ -60,7 +57,6 @@ class NewCardCell: SwipeTableViewCell {
     
     func updateCard(_ card: CardEntity, sortingLanguage: LanguageSortingType) {
         wordTextField.text = card.frontText
-        readingTextField.text = card.frontExtraText
         meanTextField.text = card.backText
         updateSortingLanguage(sortingLanguage)
     }
@@ -68,8 +64,8 @@ class NewCardCell: SwipeTableViewCell {
     func updateSortingLanguage(_ sortingLang: LanguageSortingType) {
         if currentSortingLanguage != sortingLang {
             let arrangedViews: [UIView] = sortingLang == .normal ?
-            [wordViewContainer, readingViewContainer, seperateViewContainer, meanViewContainer] :
-            [wordViewContainer, seperateViewContainer, meanViewContainer, readingViewContainer]
+            [wordViewContainer, seperateViewContainer, meanViewContainer] :
+            [meanViewContainer, seperateViewContainer, wordViewContainer]
             
             stackView.removeAllArrangedSubviews()
             
@@ -81,9 +77,6 @@ class NewCardCell: SwipeTableViewCell {
             }
         }
         currentSortingLanguage = sortingLang
-
-        frontImageView.image = sortingLang.firstImage
-        backImageView.image = sortingLang.secondImage
     }
     
     @IBAction
@@ -100,13 +93,10 @@ class NewCardCell: SwipeTableViewCell {
 extension NewCardCell: FocusTextFieldCellProtocol {
     func becomeNextResponder(_ completion: ((DeskChangedEvent) -> Void)?) {
         let needStartResponder = !wordTextField.isFirstResponder &&
-                                !readingTextField.isFirstResponder &&
                                 !meanTextField.isFirstResponder
         if needStartResponder {
             wordTextField.becomeFirstResponder()
         } else if wordTextField.isFirstResponder {
-            readingTextField.becomeFirstResponder()
-        } else if readingTextField.isFirstResponder {
             meanTextField.becomeFirstResponder()
         } else if meanTextField.isFirstResponder, let indexPath = indexPath {
             completion?(.focusNextFrom(indexPath))
@@ -121,6 +111,7 @@ extension NewCardCell: FocusTextFieldCellProtocol {
 extension NewCardCell: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         isFocusedField = true
+        print("Editting indexPath", indexPath ?? "Unknow")
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -131,22 +122,9 @@ extension NewCardCell: UITextViewDelegate {
         let type: NewCardFieldType
         if textView == wordTextField {
             type = .keyword
-        } else if textView == readingTextField {
-            type = .reading
         } else {
             type = .mean
         }
         dataChangeDelegate?.newCardCell(self, type: type, didTextChange: textView.text)
-    }
-}
-
-extension NewCardCell {
-    private func updateTextFieldsTag() {
-        if let row = indexPath?.row {
-            let tagOffset = row * 10
-            wordTextField.tag = tagOffset + 1
-            readingTextField.tag = tagOffset + 2
-            meanTextField.tag = tagOffset + 3
-        }
     }
 }

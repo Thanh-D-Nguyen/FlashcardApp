@@ -164,6 +164,7 @@
 		9291706029B30E5000894551 /* Typist in Frameworks */ = {isa = PBXBuildFile; productRef = 9291705F29B30E5000894551 /* Typist */; };
 		9291706629B36CD800894551 /* GrowingTextView in Frameworks */ = {isa = PBXBuildFile; productRef = 9291706529B36CD800894551 /* GrowingTextView */; };
 		9291706929B45FB700894551 /* SwipeCellSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291706829B45FB700894551 /* SwipeCellSupport.swift */; };
+		9291706B29B62D0A00894551 /* DeskDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291706A29B62D0A00894551 /* DeskDataModel.swift */; };
 		929C4DB729A7332D007651E9 /* Card.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 929C4DB629A7332D007651E9 /* Card.storyboard */; };
 		929C4DBA29A73358007651E9 /* CardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DB829A73358007651E9 /* CardCell.swift */; };
 		929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DBC29A733A2007651E9 /* CardEntity.swift */; };
@@ -358,6 +359,7 @@
 		9288BAD929A3B54E00F9AC9F /* flash_card.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = flash_card.realm; sourceTree = "<group>"; };
 		9291705929AB672800894551 /* AppImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImage.swift; sourceTree = "<group>"; };
 		9291706829B45FB700894551 /* SwipeCellSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellSupport.swift; sourceTree = "<group>"; };
+		9291706A29B62D0A00894551 /* DeskDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskDataModel.swift; sourceTree = "<group>"; };
 		929C4DB629A7332D007651E9 /* Card.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Card.storyboard; sourceTree = "<group>"; };
 		929C4DB829A73358007651E9 /* CardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCell.swift; sourceTree = "<group>"; };
 		929C4DBC29A733A2007651E9 /* CardEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardEntity.swift; sourceTree = "<group>"; };
@@ -538,6 +540,7 @@
 				9251EBFE29A1EAA5006C1D1C /* SocialUserEntity.swift */,
 				929C4DBC29A733A2007651E9 /* CardEntity.swift */,
 				929C4DD929A7646F007651E9 /* DeskEntity.swift */,
+				9291706A29B62D0A00894551 /* DeskDataModel.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -1141,6 +1144,7 @@
 				92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */,
 				9251ECA929A1EAA5006C1D1C /* HomeCardCell.swift in Sources */,
 				9251EC9F29A1EAA5006C1D1C /* AdvanceCardCell.swift in Sources */,
+				9291706B29B62D0A00894551 /* DeskDataModel.swift in Sources */,
 				929C4DD529A76442007651E9 /* DeskPresenter.swift in Sources */,
 				9251EC8329A1EAA5006C1D1C /* DefaultRefreshView.swift in Sources */,
 				929C4DD729A76442007651E9 /* DeskInteractor.swift in Sources */,

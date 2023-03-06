@@ -75,7 +75,14 @@ final class CreateDeskViewController: BaseViewController {
         if sender.action == .next {
             handleNextResponder()
         } else if sender.action == .insert {
-            presenter.insertNewCardAtIndexPath(IndexPath(row: 0, section: CreateDeskTableSection.cards.rawValue))
+            let focusedCell = deskTableView.visibleCells.compactMap({ $0 as? FocusTextFieldCellProtocol }).first(where: { $0.isFocusedField == true })
+            var indexPath = focusedCell?.indexPath ?? IndexPath(row: 0, section: CreateDeskTableSection.cards.rawValue)
+            if indexPath.section != CreateDeskTableSection.cards.rawValue {
+                indexPath.section = CreateDeskTableSection.cards.rawValue
+            } else {
+                indexPath.row += 1
+            }
+            presenter.insertNewCardAtIndexPath(indexPath)
         }
     }
     
@@ -91,20 +98,15 @@ final class CreateDeskViewController: BaseViewController {
         }
     }
     
-    private func updateVisibleCellsIndexPath() {
-     
-    }
-    
     private func insertCardRowAt(_ indexPath: IndexPath) {
         deskTableView.beginUpdates()
         deskTableView.insertRows(at: [indexPath], with: .left)
         deskTableView.endUpdates()
         deskTableView.scrollToRow(at: indexPath, at: .top, animated: true)
         if let focusCell = deskTableView.cellForRow(at: indexPath) as? FocusTextFieldCellProtocol {
-            focusCell.indexPath = indexPath
+            print("focusCell.indexPath", focusCell.indexPath ?? "nil")
             focusCell.becomeNextResponder(nil)
         }
-        updateVisibleCellsIndexPath()
     }
     
     private func deleteCardRowAt(_ indexPath: IndexPath) {
@@ -114,7 +116,6 @@ final class CreateDeskViewController: BaseViewController {
         deskTableView.beginUpdates()
         deskTableView.deleteRows(at: [indexPath], with: .fade)
         deskTableView.endUpdates()
-        updateVisibleCellsIndexPath()
     }
     
     private func swapCardRow(_ fromIndexPath: IndexPath,_ toIndexPath: IndexPath) {
@@ -122,7 +123,6 @@ final class CreateDeskViewController: BaseViewController {
         deskTableView.moveRow(at: fromIndexPath, to: toIndexPath)
         deskTableView.endUpdates()
         deskTableView.scrollToRow(at: toIndexPath, at: .top, animated: true)
-        updateVisibleCellsIndexPath()
     }
     
     private func focusOrAddNewCardRowFrom(_ indexPath: IndexPath) {
@@ -156,14 +156,13 @@ extension CreateDeskViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == CreateDeskTableSection.desk.rawValue {
             let cell: DeskCell = tableView.dequeueResuableCell(forIndexPath: indexPath)
-            cell.indexPath = indexPath
             cell.tableView = tableView
             let desk = presenter.desk
             cell.updateName(desk.name, description: desk.description)
             return cell
         }
         let cell: NewCardCell = tableView.dequeueResuableCell(forIndexPath: indexPath)
-        cell.indexPath = indexPath
+        cell.tableView = tableView
         cell.delegate = self
         cell.dataChangeDelegate = self
         let cards = presenter.desk.cards
@@ -234,7 +233,7 @@ extension CreateDeskViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
         var options = SwipeOptions()
         options.buttonSpacing = 4
-        options.backgroundColor = #colorLiteral(red: 0.9467939734, green: 0.9468161464, blue: 0.9468042254, alpha: 1)
+        options.backgroundColor = UIColor.clear
         return options
     }
 }

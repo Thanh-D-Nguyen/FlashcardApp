@@ -9,7 +9,7 @@ import UIKit
 import GrowingTextView
 
 protocol FocusTextFieldCellProtocol: AnyObject {
-    var indexPath: IndexPath? { get set }
+    var indexPath: IndexPath? { get }
     var isFocusedField: Bool { get }
     
     func becomeNextResponder(_ completion: ((DeskChangedEvent) -> Void)?)
@@ -24,9 +24,11 @@ class DeskCell: UITableViewCell {
     @IBOutlet private weak var deskNameTextField: GrowingTextView!
     @IBOutlet private weak var deskDescTextField: GrowingTextView!
     
-    var indexPath: IndexPath?
-    var isFocusedField: Bool = true
     weak var tableView: UITableView?
+    var indexPath: IndexPath? {
+        tableView?.indexPath(for: self)
+    }
+    var isFocusedField: Bool = false
     
     override func awakeFromNib() {
         super.awakeFromNib()
