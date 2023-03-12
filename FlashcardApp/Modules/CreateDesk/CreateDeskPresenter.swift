@@ -8,13 +8,14 @@
 
 import Foundation
 import RxRelay
+import RxSwift
 
 enum DeskChangedEvent {
     case `default`
-    case cardInsert(_ indexPath: IndexPath)
-    case cardDelete(_ indexPath: IndexPath)
-    case cardSwap(_ fromIndexPath: IndexPath,_ toIndexPath: IndexPath)
-    case focusNextFrom(_ indexPath: IndexPath)
+    case cardInsert(_ afterUId: String,_ insertIndex: Int)
+    case cardDelete(_ atUId: String,_ deleteIndex: Int)
+    case cardSwap(_ fromUId: String,_ fromIndex: Int,_ toUId: String,_ toIndex: Int)
+    case focusNextFrom(_ uId: String)
 }
 
 enum CreateDeskTableSection: Int {
@@ -30,22 +31,25 @@ enum CardCellMoveType {
 
 protocol CreateDeskPresenterInterface: AnyObject {
     
-    var desk: DeskEntity { get }
+    var desk: DeskDataModel { get }
     var deskChangedRelay: BehaviorRelay<DeskChangedEvent> { get }
     var sortingLanguageRelay: BehaviorRelay<LanguageSortingType> { get }
     
     func viewDidLoad()
-    func insertNewCardAtIndexPath(_ indexPath: IndexPath)
-    func deleteCardAtIndexPath(_ indexPath: IndexPath)
-    func moveCardAtIndexPath(_ indexPath: IndexPath, moveType: CardCellMoveType)
-    func didChangeLanguageSortingIndex(_ index: Int)
+    func insertNewCardAfterUId(_ uId: String)
+    func deleteCardAtIndex(_ index: Int)
+    func moveCardAtIndex(_ index: Int, moveType: CardCellMoveType)
 }
 
 class CreateDeskPresenter {
     private let interactor: CreateDeskInteractorInterface
     private let wireframe: CreateDeskWireframeInterface
     
-    var desk: DeskEntity = DeskEntity.empty()
+    private let dictionaryInteractor = DictionaryInteractor()
+    
+    private let disposeBag = DisposeBag()
+    
+    var desk = DeskDataModel()
     let deskChangedRelay = BehaviorRelay<DeskChangedEvent>(value: .default)
     let sortingLanguageRelay = BehaviorRelay<LanguageSortingType>(value: .normal)
     
@@ -54,54 +58,64 @@ class CreateDeskPresenter {
         self.interactor = interactor
         self.wireframe = wireframe
     }
+    
+    private func bind(_ card: CardDataModel) {
+        card.frontRelay.bind(onNext: { [unowned self] text in
+            self.searchText(text)
+        }).disposed(by: disposeBag)
+        
+        card.backRelay.bind(onNext: { [unowned self] text in
+            self.searchText(text)
+        }).disposed(by: disposeBag)
+    }
+    
+    private func searchText(_ text: String) {
+        guard text.count > 0 else { return }
+        if sortingLanguageRelay.value == .normal {
+            print("search JA text", text)
+        }
+    }
 }
 
 extension CreateDeskPresenter: CreateDeskPresenterInterface {
     func viewDidLoad() {
-        
+        self.desk.sortingLanguageRelay.bind { [unowned self] type in
+            self.sortingLanguageRelay.accept(type)
+        }.disposed(by: disposeBag)
     }
     
-    func insertNewCardAtIndexPath(_ indexPath: IndexPath) {
-        var insertIndexPath = indexPath
-        var newCard = CardEntity.empty()
-        newCard.frontText = "\(indexPath.row)"
-        if desk.cards.count == 0 {
-            desk.cards.insert(newCard, at: 0)
-            insertIndexPath.section = CreateDeskTableSection.cards.rawValue
-            insertIndexPath.row = 0
-        } else {
-            desk.cards.insert(newCard, at: indexPath.row)
+    func insertNewCardAfterUId(_ uId: String) {
+        let newCard = CardDataModel()
+        self.bind(newCard)
+        var insertIndex = 0
+        if let currentIndex = desk.cards.firstIndex(where: { $0.uuid == uId }) {
+            insertIndex = currentIndex + 1
         }
-        deskChangedRelay.accept(.cardInsert(insertIndexPath))
+        desk.cards.insert(newCard, at: insertIndex)
+        deskChangedRelay.accept(.cardInsert(uId, insertIndex))
     }
     
-    func deleteCardAtIndexPath(_ indexPath: IndexPath) {
-        desk.cards.remove(at: indexPath.row)
-        deskChangedRelay.accept(.cardDelete(indexPath))
+    func deleteCardAtIndex(_ index: Int) {
+        let card = desk.cards.remove(at: index)
+        deskChangedRelay.accept(.cardDelete(card.uuid, index))
     }
     
-    func moveCardAtIndexPath(_ indexPath: IndexPath, moveType: CardCellMoveType) {
-        guard desk.cards.indices.contains(indexPath.row) else { return }
+    func moveCardAtIndex(_ index: Int, moveType: CardCellMoveType) {
         var toIndex = -1
         switch moveType {
             case .up:
-                if desk.cards.indices.contains(indexPath.row - 1) {
-                    toIndex = indexPath.row - 1
+                if desk.cards.indices.contains(index - 1) {
+                    toIndex = index - 1
                 }
             case .down:
-                if desk.cards.indices.contains(indexPath.row + 1) {
-                    toIndex = indexPath.row + 1
+                if desk.cards.indices.contains(index + 1) {
+                    toIndex = index + 1
                 }
         }
         if toIndex != -1 {
-            desk.cards.swapAt(indexPath.row, toIndex)
-            deskChangedRelay.accept(.cardSwap(indexPath, IndexPath(row: toIndex, section: indexPath.section)))
+            desk.cards.swapAt(index, toIndex)
+            let uid = desk.cards[index].uuid
+            deskChangedRelay.accept(.cardSwap(uid, index, desk.cards[toIndex].uuid, toIndex))
         }
-    }
-    
-    func didChangeLanguageSortingIndex(_ index: Int) {
-        guard let sortType = LanguageSortingType(rawValue: index) else { return }
-        desk.sortingLanguage = sortType
-        sortingLanguageRelay.accept(sortType)
     }
 }

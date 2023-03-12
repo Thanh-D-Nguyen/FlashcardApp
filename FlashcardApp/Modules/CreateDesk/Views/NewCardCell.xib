@@ -197,9 +197,6 @@
                                         <color key="value" name="blackA80Color"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="selectImageAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="bCy-mj-MjN"/>
-                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" name="whiteColor"/>

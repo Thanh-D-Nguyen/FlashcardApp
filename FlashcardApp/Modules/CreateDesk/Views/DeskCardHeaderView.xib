@@ -44,9 +44,6 @@
                         <segment title="Nhật - Việt"/>
                         <segment title="Việt - Nhật"/>
                     </segments>
-                    <connections>
-                        <action selector="segmentDidChangeAction:" destination="iN0-l3-epB" eventType="valueChanged" id="J8U-8D-QOz"/>
-                    </connections>
                 </segmentedControl>
             </subviews>
             <constraints>

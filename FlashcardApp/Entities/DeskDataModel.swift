@@ -9,32 +9,52 @@ import UIKit
 import RxRelay
 
 struct DeskDataModel {
-    var entity: DeskEntity
-    
+    let uuid = UUID().uuidString
     let deskNameRelay: BehaviorRelay<String>
+    var deskName: String {
+        return deskNameRelay.value
+    }
     let deskDescRelay: BehaviorRelay<String>
+    var deskDesc: String {
+        return deskDescRelay.value
+    }
+    let sortingLanguageRelay: BehaviorRelay<LanguageSortingType>
+    var sortingLang: LanguageSortingType {
+        return sortingLanguageRelay.value
+    }
+    var cards: [CardDataModel]
     
-    let cardsRelay: BehaviorRelay<[CardDataModel]>
-    
-    init(entity: DeskEntity) {
-        self.entity = entity
-        self.deskNameRelay = BehaviorRelay(value: entity.name)
-        self.deskDescRelay = BehaviorRelay(value: entity.description)
-        cardsRelay = BehaviorRelay(value: entity.cards.map({ CardDataModel(entity: $0) }))
+    init(name: String = "", desc: String = "", language: LanguageSortingType = .normal, cards: [CardDataModel] = []) {
+        self.deskNameRelay = BehaviorRelay(value: name)
+        self.deskDescRelay = BehaviorRelay(value: desc)
+        self.sortingLanguageRelay = BehaviorRelay(value: language)
+        self.cards = cards
     }
 }
 
 struct CardDataModel {
-    var entity: CardEntity
+    let uuid = UUID().uuidString
     
     let frontRelay: BehaviorRelay<String>
+    var front: String {
+        return frontRelay.value
+    }
     let backRelay: BehaviorRelay<String>
+    var back: String {
+        return backRelay.value
+    }
     let imageRelay: BehaviorRelay<String>
+    var imageUrl: String {
+        return imageRelay.value
+    }
     
-    init(entity: CardEntity) {
-        self.entity = entity
-        self.frontRelay = BehaviorRelay(value: entity.frontText)
-        self.backRelay = BehaviorRelay(value: entity.backText)
-        self.imageRelay = BehaviorRelay(value: entity.imageUrl)
+    init(front: String = "", back: String = "", imageUrl: String = "") {
+        self.frontRelay = BehaviorRelay(value: front)
+        self.backRelay = BehaviorRelay(value: back)
+        self.imageRelay = BehaviorRelay(value: imageUrl)
+    }
+    
+    static func ==(lhs: CardDataModel, rhs: CardDataModel) -> Bool {
+        return lhs.uuid == rhs.uuid
     }
 }

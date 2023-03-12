@@ -7,9 +7,10 @@
 
 import UIKit
 import GrowingTextView
+import RxSwift
 
 protocol FocusTextFieldCellProtocol: AnyObject {
-    var indexPath: IndexPath? { get }
+    var cellUniqueId: String? { get }
     var isFocusedField: Bool { get }
     
     func becomeNextResponder(_ completion: ((DeskChangedEvent) -> Void)?)
@@ -18,23 +19,22 @@ protocol FocusTextFieldCellProtocol: AnyObject {
 
 class DeskCell: UITableViewCell {
     
+    private var disposeBag = DisposeBag()
+    
     @IBOutlet private weak var deskButtonContainerView: UIView!
     @IBOutlet private weak var deskDescContainerView: UIView!
     
     @IBOutlet private weak var deskNameTextField: GrowingTextView!
     @IBOutlet private weak var deskDescTextField: GrowingTextView!
     
-    weak var tableView: UITableView?
-    var indexPath: IndexPath? {
-        tableView?.indexPath(for: self)
-    }
+    var cellUniqueId: String?
     var isFocusedField: Bool = false
-    
+        
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
         deskButtonContainerView.isHidden = false
-        deskDescContainerView.isHidden = true        
+        deskDescContainerView.isHidden = true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -48,9 +48,17 @@ class DeskCell: UITableViewCell {
         deskDescContainerView.isHidden = false
     }
    
-    func updateName(_ name: String, description: String) {
-        deskNameTextField.text = name
-        deskDescTextField.text = description
+    func update(_ desk: DeskDataModel) {
+        cellUniqueId = desk.uuid
+        deskNameTextField.text = desk.deskNameRelay.value
+        deskDescTextField.text = desk.deskDescRelay.value
+        disposeBag = DisposeBag()
+        deskNameTextField.rx.didChange
+            .map({ [unowned self] in self.deskNameTextField.text })
+            .bind(to: desk.deskNameRelay).disposed(by: disposeBag)
+        deskDescTextField.rx.didChange
+            .map({ [unowned self] in self.deskDescTextField.text })
+            .bind(to: desk.deskDescRelay).disposed(by: disposeBag)
     }
 }
 
@@ -62,14 +70,14 @@ extension DeskCell: FocusTextFieldCellProtocol {
             return
         }
         if deskDescContainerView.isHidden {
-            if deskNameTextField.isFirstResponder, let indexPath = indexPath {
-                completion?(.focusNextFrom(indexPath))
+            if deskNameTextField.isFirstResponder, let uId = cellUniqueId {
+                completion?(.focusNextFrom(uId))
             }
         } else {
             if deskNameTextField.isFirstResponder {
                 deskDescTextField.becomeFirstResponder()
-            } else if deskDescTextField.isFirstResponder, let indexPath = indexPath {
-                completion?(.focusNextFrom(indexPath))
+            } else if deskDescTextField.isFirstResponder, let uId = cellUniqueId {
+                completion?(.focusNextFrom(uId))
             }
         }
     }

@@ -6,10 +6,10 @@
 //
 
 import UIKit
+import RxSwift
 
 class DeskCardHeaderView: UITableViewHeaderFooterView {
-    
-    var didChangeLanguageSorting: ((Int) -> Void)?
+    private let disposeBag = DisposeBag()
     @IBOutlet private weak var languageSegmented: UISegmentedControl!
     
     override init(reuseIdentifier: String?) {
@@ -20,12 +20,10 @@ class DeskCardHeaderView: UITableViewHeaderFooterView {
         super.init(coder: coder)
     }
     
-    @IBAction
-    private func segmentDidChangeAction(_ sender: UISegmentedControl) {
-        didChangeLanguageSorting?(sender.selectedSegmentIndex)
-    }
-    
-    func updateSortingLanguage(_ type: LanguageSortingType) {
-        languageSegmented.selectedSegmentIndex = type.rawValue
+    func updateSortingLanguage(_ desk: DeskDataModel) {
+        languageSegmented.selectedSegmentIndex = desk.sortingLanguageRelay.value.rawValue
+        languageSegmented.rx.controlEvent(.valueChanged)
+            .map({ [unowned self] in LanguageSortingType(rawValue: self.languageSegmented.selectedSegmentIndex) ?? .normal })
+            .bind(to: desk.sortingLanguageRelay).disposed(by: disposeBag)
     }
 }
