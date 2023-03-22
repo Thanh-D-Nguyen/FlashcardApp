@@ -8,6 +8,7 @@
 import UIKit
 
 class AppColor {
+    static let blackA15 = UIColor(named: "blackA15Color")
     static let blackA30 = UIColor(named: "blackA30Color")
     static let blackA54 = UIColor(named: "blackA54Color")
     static let blackA80 = UIColor(named: "blackA80Color")
@@ -23,4 +24,8 @@ class AppColor {
     static let whiteA30 = UIColor(named: "whiteA30Color")
     static let whitey = UIColor(named: "whiteyColor")
     static let white = UIColor(named: "whiteColor")
+    static let whiteSmoke = UIColor(named: "whiteSmokeColor")
+    static let darkSlateGray = UIColor(named: "darkSlateGrayColor")
+    static let royalBlue = UIColor(named: "royalBlueColor")
+    static let gainsBoro = UIColor(named: "gainsBoroColor")
 }

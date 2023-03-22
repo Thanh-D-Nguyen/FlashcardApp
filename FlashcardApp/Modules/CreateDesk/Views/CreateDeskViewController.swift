@@ -17,6 +17,7 @@ final class CreateDeskViewController: BaseViewController {
     
     @IBOutlet private weak var bottomView: AddDeskBottomView!
     @IBOutlet private weak var bottomConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var doneButton: RoundCornerButton!
     
     private let keyboard = Typist.shared
     
@@ -37,17 +38,15 @@ final class CreateDeskViewController: BaseViewController {
     func subscribe() {
         keyboard.toolbar(scrollView: deskTableView).on(event: .willShow, do: { [weak self] options in
             guard let self else { return }
-            self.bottomConstraint.constant = -options.endFrame.height
-            UIView.animate(withDuration: 0.5) {
-                self.view.layoutIfNeeded()
-            }
-        }).on(event: .willHide, do: { options in
-            self.bottomConstraint.constant = 0
-            UIView.animate(withDuration: 0.5) {
-                self.view.layoutIfNeeded()
-            }
+            self.updateBottomConstraint(-options.endFrame.height)
+        }).on(event: .willHide, do: { [weak self] _ in
+            guard let self else { return }
+            self.updateBottomConstraint(0)
         }).start()
-        
+        doneButton.rx.tap.subscribe(onNext: { [weak self] in
+            guard let self else { return }
+            self.presenter.saveDesk()
+        }).disposed(by: disposeBag)
         subscribe(presenter.deskChangedRelay) { [weak self] event in
             guard let self else { return }
             switch event {
@@ -61,11 +60,33 @@ final class CreateDeskViewController: BaseViewController {
                     self.swapCardRow(fromIndex, toIndex)
                 case .focusNextFrom(let uId):
                     self.focusOrAddNewCardRowFrom(uId)
+                case .reloadCard(let index):
+                    self.reloadCardCellAtIndex(index)
             }
         }
         subscribe(presenter.sortingLanguageRelay) { [weak self] _ in
             guard let self else { return }
             self.deskTableView.reloadData()
+        }
+        
+        subscribe(presenter.wordsSearchResultRelay) { [weak self] searchResult in
+            guard let self else { return }
+            self.bottomView.setSearchResult(searchResult)
+        }
+        
+        bottomView.didSelectCard = { [weak self] card in
+            guard let self else { return }
+            self.presenter.updateEditingCard(card)
+        }
+    }
+    
+    private func updateBottomConstraint(_ constant: CGFloat) {
+        self.bottomConstraint.constant = constant
+        if constant == 0 {
+            self.bottomView.setSearchResult(SearchResultEntity(face: .front, cards: []))
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
         }
     }
     
@@ -139,6 +160,11 @@ final class CreateDeskViewController: BaseViewController {
             presenter.insertNewCardAfterUId(uId)
         }
     }
+    
+    private func reloadCardCellAtIndex(_ index: Int) {
+        let indexPath = IndexPath(row: index, section: CreateDeskTableSection.cards.rawValue)
+        deskTableView.reloadRows(at: [indexPath], with: .none)
+    }
 }
 
 extension CreateDeskViewController: UITableViewDataSource {
@@ -155,15 +181,17 @@ extension CreateDeskViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == CreateDeskTableSection.desk.rawValue {
             let cell: DeskCell = tableView.dequeueResuableCell(forIndexPath: indexPath)
+            cell.tableView = tableView
             let desk = presenter.desk
             cell.update(desk)
             return cell
         }
         let cell: NewCardCell = tableView.dequeueResuableCell(forIndexPath: indexPath)
+        cell.tableView = tableView
         cell.delegate = self
         let cards = presenter.desk.cards
         if cards.indices.contains(indexPath.row) {
-            cell.updateCard(cards[indexPath.row], sortingLanguage: presenter.desk.sortingLanguageRelay.value)
+            cell.updateCard(cards[indexPath.row])
         }
         return cell
     }

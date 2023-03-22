@@ -32,17 +32,17 @@ enum LanguageSortingType: Int {
 }
 
 struct DeskEntity {
-    var id: Int
+    var id: String
     var name: String
     var description: String
     var imageNamed: String
     var sortingLanguage: LanguageSortingType
-    var cards: [CardEntity] = []
+    var cards: [CardEntity]
     var date: Date
 
     var selectIndex = Constants.unknowSelectIndex
     static func empty() -> DeskEntity {
-        DeskEntity(id: -1, name: "", description: "", imageNamed: "", sortingLanguage: .normal, date: Date())
+        DeskEntity(id: UUID().uuidString, name: "", description: "", imageNamed: "", sortingLanguage: .normal, cards: [], date: Date())
     }
     
 }

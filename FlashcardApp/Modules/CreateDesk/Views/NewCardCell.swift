@@ -7,7 +7,6 @@
 
 import UIKit
 import SwipeCellKit
-import GrowingTextView
 import RxSwift
 
 class NewCardCell: SwipeTableViewCell {
@@ -21,15 +20,15 @@ class NewCardCell: SwipeTableViewCell {
     @IBOutlet private weak var backImageView: UIImageView!
     @IBOutlet private weak var frontImageView: UIImageView!
 
-    @IBOutlet private weak var wordTextField: GrowingTextView!
-    @IBOutlet private weak var meanTextField: GrowingTextView!
+    @IBOutlet private weak var wordTextField: MMTextView!
+    @IBOutlet private weak var meanTextField: MMTextView!
     
     @IBOutlet private weak var imageButton: UIButton!
     
+    weak var tableView: UITableView?
+    
     var cellUniqueId: String?
     var isFocusedField: Bool = false
-
-    private var currentSortingLanguage: LanguageSortingType = .normal
             
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -41,11 +40,10 @@ class NewCardCell: SwipeTableViewCell {
         // Configure the view for the selected state
     }
     
-    func updateCard(_ card: CardDataModel, sortingLanguage: LanguageSortingType) {
+    func updateCard(_ card: CardDataModel) {
         cellUniqueId = card.uuid
-        wordTextField.text = card.frontRelay.value
-        meanTextField.text = card.backRelay.value
-        updateSortingLanguage(sortingLanguage)
+        wordTextField.text = card.front
+        meanTextField.text = card.back
         disposeBag = DisposeBag()
         wordTextField.rx.didChange
             .map({ [unowned self] in self.wordTextField.text })
@@ -53,51 +51,33 @@ class NewCardCell: SwipeTableViewCell {
         meanTextField.rx.didChange
             .map({ [unowned self] in self.meanTextField.text })
             .bind(to: card.backRelay).disposed(by: disposeBag)
-    }
-    
-    func updateSortingLanguage(_ sortingLang: LanguageSortingType) {
-        if currentSortingLanguage != sortingLang {
-            let arrangedViews: [UIView] = sortingLang == .normal ?
-            [wordViewContainer, seperateViewContainer, meanViewContainer] :
-            [meanViewContainer, seperateViewContainer, wordViewContainer]
-            
-            stackView.removeAllArrangedSubviews()
-            
-            for arrangedView in arrangedViews {
-                stackView.addArrangedSubview(arrangedView)
-            }
-            UIView.animate(withDuration: 0.20) {
-                self.layoutIfNeeded()
-            }
-        }
-        currentSortingLanguage = sortingLang
+        Observable.combineLatest([wordTextField.rx.observe(\.contentSize),
+                                  meanTextField.rx.observe(\.contentSize)])
+            .observe(on: MainScheduler.asyncInstance)
+            .subscribe(onNext: { [unowned self] _ in
+                self.tableView?.beginUpdates()
+                self.tableView?.endUpdates()
+            }).disposed(by: disposeBag)
+        
+        imageButton.rx.tap.subscribe(onNext: {
+            print("Image button tap...")
+        }).disposed(by: disposeBag)
     }
 }
 
 extension NewCardCell: FocusTextFieldCellProtocol {
     func becomeNextResponder(_ completion: ((DeskChangedEvent) -> Void)?) {
         let needStartResponder = !wordTextField.isFirstResponder &&
-                                !meanTextField.isFirstResponder
-        if currentSortingLanguage == .normal {
-            if needStartResponder {
-                wordTextField.becomeFirstResponder()
-            } else if wordTextField.isFirstResponder {
-                meanTextField.becomeFirstResponder()
-            } else if meanTextField.isFirstResponder, let uuid = cellUniqueId {
-                completion?(.focusNextFrom(uuid))
-            }
-        } else {
-            if needStartResponder {
-                meanTextField.becomeFirstResponder()
-            } else if meanTextField.isFirstResponder {
-                wordTextField.becomeFirstResponder()
-            } else if wordTextField.isFirstResponder, let uuid = cellUniqueId {
-                completion?(.focusNextFrom(uuid))
-            }
+        !meanTextField.isFirstResponder
+        if needStartResponder {
+            wordTextField.becomeFirstResponder()
+        } else if wordTextField.isFirstResponder {
+            meanTextField.becomeFirstResponder()
+        } else if meanTextField.isFirstResponder, let uuid = cellUniqueId {
+            completion?(.focusNextFrom(uuid))
         }
-        
     }
-
+    
     func resignFirstResponder() {
         self.endEditing(true)
     }

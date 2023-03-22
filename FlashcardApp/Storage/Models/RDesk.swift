@@ -9,7 +9,7 @@ import Foundation
 import RealmSwift
 
 class RDesk: Object {
-    @Persisted(primaryKey: true) var id: Int
+    @Persisted(primaryKey: true) var id: String
     @Persisted var name: String
     @Persisted var desc: String
     @Persisted var sortingLanguage: Int

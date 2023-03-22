@@ -9,7 +9,7 @@ import Foundation
 import RealmSwift
 
 class RCard: Object {
-    @Persisted(primaryKey: true) var id: Int
+    @Persisted(primaryKey: true) var id: String
     @Persisted var frontText: String
     @Persisted var frontExtraText: String
     @Persisted var backText: String

@@ -16,6 +16,8 @@ enum DeskChangedEvent {
     case cardDelete(_ atUId: String,_ deleteIndex: Int)
     case cardSwap(_ fromUId: String,_ fromIndex: Int,_ toUId: String,_ toIndex: Int)
     case focusNextFrom(_ uId: String)
+    
+    case reloadCard(_ index: Int)
 }
 
 enum CreateDeskTableSection: Int {
@@ -35,14 +37,21 @@ protocol CreateDeskPresenterInterface: AnyObject {
     var deskChangedRelay: BehaviorRelay<DeskChangedEvent> { get }
     var sortingLanguageRelay: BehaviorRelay<LanguageSortingType> { get }
     
+    var wordsSearchResultRelay: BehaviorRelay<SearchResultEntity> { get }
+    
     func viewDidLoad()
     func insertNewCardAfterUId(_ uId: String)
     func deleteCardAtIndex(_ index: Int)
     func moveCardAtIndex(_ index: Int, moveType: CardCellMoveType)
+    
+    func updateEditingCard(_ card: CardEntity)
+    
+    func saveDesk()
 }
 
 class CreateDeskPresenter {
     private let interactor: CreateDeskInteractorInterface
+    private let searchWordInteractor: SearchWordsInteractor
     private let wireframe: CreateDeskWireframeInterface
     
     private let dictionaryInteractor = DictionaryInteractor()
@@ -52,28 +61,46 @@ class CreateDeskPresenter {
     var desk = DeskDataModel()
     let deskChangedRelay = BehaviorRelay<DeskChangedEvent>(value: .default)
     let sortingLanguageRelay = BehaviorRelay<LanguageSortingType>(value: .normal)
+    let wordsSearchResultRelay = BehaviorRelay<SearchResultEntity>(value: SearchResultEntity(face: .front, cards: []))
+    
+    private var editingCard: CardDataModel!
     
     init(interactor: CreateDeskInteractorInterface,
         wireframe: CreateDeskWireframeInterface) {
         self.interactor = interactor
         self.wireframe = wireframe
+        self.searchWordInteractor = SearchWordsInteractor()
     }
     
     private func bind(_ card: CardDataModel) {
-        card.frontRelay.bind(onNext: { [unowned self] text in
-            self.searchText(text)
+        // Search front
+        let searchFront = card.frontRelay.throttle(.milliseconds(100), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+        let queryFront = searchFront.map({
+            let words = self.searchWordInteractor.searchText($0, cardFace: .front)
+            return words
+        }).asDriver(onErrorJustReturn: self.searchWordInteractor.searchText("", cardFace: .front))
+        queryFront.asObservable().subscribe(onNext: { [unowned self] obj in
+            self.editingCard = card
+            self.wordsSearchResultRelay.accept(obj)
         }).disposed(by: disposeBag)
         
-        card.backRelay.bind(onNext: { [unowned self] text in
-            self.searchText(text)
+        // Search back
+        let searchBack = card.backRelay.throttle(.milliseconds(100), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+        let queryBack = searchBack.map({
+            let words = self.searchWordInteractor.searchText($0, cardFace: .back)
+            return words
+        }).asDriver(onErrorJustReturn: self.searchWordInteractor.searchText("", cardFace: .back))
+        queryBack.asObservable().subscribe(onNext: { [unowned self] obj in
+            self.editingCard = card
+            self.wordsSearchResultRelay.accept(obj)
         }).disposed(by: disposeBag)
     }
     
-    private func searchText(_ text: String) {
-        guard text.count > 0 else { return }
-        if sortingLanguageRelay.value == .normal {
-            print("search JA text", text)
-        }
+    private func searchText(_ text: String, cardFace: CardFace) {
+        let words = self.searchWordInteractor.searchText(text, cardFace: cardFace)
+        wordsSearchResultRelay.accept(words)
     }
 }
 
@@ -116,6 +143,28 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
             desk.cards.swapAt(index, toIndex)
             let uid = desk.cards[index].uuid
             deskChangedRelay.accept(.cardSwap(uid, index, desk.cards[toIndex].uuid, toIndex))
+        }
+    }
+    
+    func updateEditingCard(_ card: CardEntity) {
+        guard self.editingCard != nil else { return }
+        self.editingCard.backRelay.accept(card.backText)
+        self.editingCard.frontRelay.accept(card.frontText + "(\(card.frontExtraText))")
+        guard let index = desk.cards.firstIndex(where: { $0 == self.editingCard }) else { return }
+        
+        desk.cards[index] = self.editingCard
+        deskChangedRelay.accept(.reloadCard(index))
+    }
+    
+    func saveDesk() {
+        let deskEntity = self.desk.toDeskEntity()
+        do {
+            defer {
+                wireframe.close()
+            }
+            try DeskManagement.shared.add(deskEntity)
+        } catch {
+            print(error)
         }
     }
 }

@@ -6,8 +6,8 @@
 //
 
 import UIKit
-import GrowingTextView
 import RxSwift
+import RxCocoa
 
 protocol FocusTextFieldCellProtocol: AnyObject {
     var cellUniqueId: String? { get }
@@ -24,9 +24,10 @@ class DeskCell: UITableViewCell {
     @IBOutlet private weak var deskButtonContainerView: UIView!
     @IBOutlet private weak var deskDescContainerView: UIView!
     
-    @IBOutlet private weak var deskNameTextField: GrowingTextView!
-    @IBOutlet private weak var deskDescTextField: GrowingTextView!
+    @IBOutlet private weak var deskNameTextField: MMTextView!
+    @IBOutlet private weak var deskDescTextField: MMTextView!
     
+    weak var tableView: UITableView?
     var cellUniqueId: String?
     var isFocusedField: Bool = false
         
@@ -59,6 +60,14 @@ class DeskCell: UITableViewCell {
         deskDescTextField.rx.didChange
             .map({ [unowned self] in self.deskDescTextField.text })
             .bind(to: desk.deskDescRelay).disposed(by: disposeBag)
+
+        Observable.combineLatest([deskNameTextField.rx.observe(\.contentSize),
+                                  deskDescTextField.rx.observe(\.contentSize)])
+            .observe(on: MainScheduler.asyncInstance)
+            .subscribe(onNext: { [unowned self] _ in
+            self.tableView?.beginUpdates()
+            self.tableView?.endUpdates()
+        }).disposed(by: disposeBag)
     }
 }
 

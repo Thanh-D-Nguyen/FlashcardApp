@@ -99,10 +99,10 @@
                                     </constraints>
                                 </view>
                                 <view contentMode="scaleToFill" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7kD-1r-9up" userLabel="KanjiView">
-                                    <rect key="frame" x="0.0" y="160.33333333333334" width="255" height="138.00000000000003"/>
+                                    <rect key="frame" x="0.0" y="160.33333333333337" width="255" height="146.66666666666663"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="楽しい" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.29999999999999999" translatesAutoresizingMaskIntoConstraints="NO" id="Jo8-M9-iLE">
-                                            <rect key="frame" x="4" y="4" width="247" height="130"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="楽しい" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.29999999999999999" translatesAutoresizingMaskIntoConstraints="NO" id="Jo8-M9-iLE">
+                                            <rect key="frame" x="4" y="4" width="247" height="138.66666666666666"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="84"/>
                                             <color key="textColor" name="CardsBackground"/>
                                             <nil key="highlightedColor"/>
@@ -117,10 +117,10 @@
                                     </constraints>
                                 </view>
                                 <view contentMode="scaleToFill" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FnV-1K-Cvw" userLabel="SpellView">
-                                    <rect key="frame" x="0.0" y="302.33333333333331" width="255" height="52.666666666666686"/>
+                                    <rect key="frame" x="0.0" y="311" width="255" height="44"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="たのしい" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.29999999999999999" translatesAutoresizingMaskIntoConstraints="NO" id="ayq-2u-Fim">
-                                            <rect key="frame" x="4" y="4" width="247" height="44.666666666666664"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="たのしい" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.29999999999999999" translatesAutoresizingMaskIntoConstraints="NO" id="ayq-2u-Fim">
+                                            <rect key="frame" x="4" y="4" width="247" height="36"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
                                             <color key="textColor" name="CardsBackground"/>
                                             <nil key="highlightedColor"/>

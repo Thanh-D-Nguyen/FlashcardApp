@@ -15,7 +15,7 @@ class DeskManagement {
         return Array(desks).map({ $0.toEntity() })
     }
     
-    func deskFromId(_ id: Int) -> RDesk? {
+    func deskFromId(_ id: String) -> RDesk? {
         return RealmService.shared.realm.objects(RDesk.self).first(where: { $0.id == id })
     }
     

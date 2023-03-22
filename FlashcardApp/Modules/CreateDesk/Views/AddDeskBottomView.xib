@@ -5,12 +5,13 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AddDeskBottomView" customModule="FlashcardApp" customModuleProvider="target">
             <connections>
+                <outlet property="collectionContainerView" destination="y9r-P0-wsO" id="lP4-hr-qPt"/>
+                <outlet property="collectionView" destination="wOu-94-NGf" id="Cxl-Cl-Whc"/>
                 <outlet property="numOfItemLabel" destination="zhw-Ji-8QW" id="8Hd-Mb-NSy"/>
             </connections>
         </placeholder>
@@ -20,84 +21,114 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="H8z-sZ-kEs">
-                    <rect key="frame" x="0.0" y="37" width="393" height="95"/>
+                    <rect key="frame" x="0.0" y="29" width="393" height="103"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y9r-P0-wsO">
                             <rect key="frame" x="0.0" y="0.0" width="393" height="50"/>
                             <subviews>
-                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="wOu-94-NGf">
+                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="wOu-94-NGf" customClass="FadingEdgesCollectionView" customModule="FlashcardApp" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="50"/>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="50" id="t8b-sF-UkZ"/>
                                     </constraints>
-                                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="4lC-vr-8dw">
+                                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="5" minimumInteritemSpacing="5" id="4lC-vr-8dw">
                                         <size key="itemSize" width="128" height="128"/>
                                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                         <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                         <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                     </collectionViewFlowLayout>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="fGK-tL-txE"/>
+                                        <outlet property="delegate" destination="-1" id="2Fh-ZP-Yxy"/>
+                                    </connections>
                                 </collectionView>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cHg-U9-8XJ">
-                                    <rect key="frame" x="348" y="2.6666666666666643" width="45" height="45"/>
-                                    <color key="tintColor" name="blackA54Color"/>
-                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                    <state key="normal" image="chevron.compact.down" catalog="system"/>
-                                </button>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="bottom" secondItem="wOu-94-NGf" secondAttribute="bottom" id="BNh-QR-dSK"/>
-                                <constraint firstAttribute="trailing" secondItem="cHg-U9-8XJ" secondAttribute="trailing" id="IMr-cX-JV4"/>
                                 <constraint firstAttribute="trailing" secondItem="wOu-94-NGf" secondAttribute="trailing" id="NbJ-jJ-b95"/>
-                                <constraint firstItem="cHg-U9-8XJ" firstAttribute="centerY" secondItem="wOu-94-NGf" secondAttribute="centerY" id="O5v-oH-VaV"/>
                                 <constraint firstItem="wOu-94-NGf" firstAttribute="top" secondItem="y9r-P0-wsO" secondAttribute="top" id="X6K-gG-JRr"/>
                                 <constraint firstItem="wOu-94-NGf" firstAttribute="leading" secondItem="y9r-P0-wsO" secondAttribute="leading" id="zVu-B2-Opr"/>
                             </constraints>
                         </view>
-                        <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="PZ8-oT-HKK">
-                            <rect key="frame" x="0.0" y="50" width="393" height="45"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mDN-fe-zrv">
+                            <rect key="frame" x="0.0" y="50" width="393" height="53"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sXl-3m-gud">
-                                    <rect key="frame" x="0.0" y="0.0" width="45" height="45"/>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GgK-kc-1Ao" userLabel="LineView">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="1"/>
+                                    <color key="backgroundColor" name="blackA15Color"/>
                                     <constraints>
-                                        <constraint firstAttribute="width" secondItem="sXl-3m-gud" secondAttribute="height" multiplier="1:1" id="qu3-qg-9uq"/>
+                                        <constraint firstAttribute="height" constant="1" id="0zv-Bt-gva"/>
                                     </constraints>
-                                    <color key="tintColor" name="blackA80Color"/>
-                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                    <state key="normal" image="chevron.down" catalog="system"/>
-                                    <connections>
-                                        <action selector="nextAction:" destination="-1" eventType="touchUpInside" id="vRc-na-m8w"/>
-                                    </connections>
-                                </button>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1/3" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zhw-Ji-8QW">
-                                    <rect key="frame" x="188.66666666666666" y="0.0" width="15.666666666666657" height="45"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                    <color key="textColor" name="blackA80Color"/>
-                                    <nil key="highlightedColor"/>
-                                </label>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b3Y-Bm-Q84">
-                                    <rect key="frame" x="348" y="0.0" width="45" height="45"/>
+                                </view>
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="PZ8-oT-HKK">
+                                    <rect key="frame" x="4" y="4" width="385" height="45"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sXl-3m-gud" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="45" height="45"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="sXl-3m-gud" secondAttribute="height" multiplier="1:1" id="qu3-qg-9uq"/>
+                                            </constraints>
+                                            <color key="tintColor" name="blackA80Color"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <state key="normal" image="chevron.down" catalog="system"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                                    <color key="value" name="gainsBoroColor"/>
+                                                </userDefinedRuntimeAttribute>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                    <real key="value" value="8"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                            <connections>
+                                                <action selector="nextAction:" destination="-1" eventType="touchUpInside" id="vRc-na-m8w"/>
+                                            </connections>
+                                        </button>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1/3" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zhw-Ji-8QW">
+                                            <rect key="frame" x="184.66666666666666" y="0.0" width="15.666666666666657" height="45"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                            <color key="textColor" name="blackA80Color"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b3Y-Bm-Q84" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                            <rect key="frame" x="340" y="0.0" width="45" height="45"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="45" id="JDm-px-vn5"/>
+                                            </constraints>
+                                            <color key="tintColor" name="blackA80Color"/>
+                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                            <state key="normal" image="text.insert" catalog="system"/>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
+                                                    <color key="value" name="gainsBoroColor"/>
+                                                </userDefinedRuntimeAttribute>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                    <real key="value" value="8"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                            <connections>
+                                                <action selector="insertCardAction:" destination="-1" eventType="touchUpInside" id="3rw-7o-Chf"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="45" id="JDm-px-vn5"/>
+                                        <constraint firstItem="b3Y-Bm-Q84" firstAttribute="width" secondItem="b3Y-Bm-Q84" secondAttribute="height" multiplier="1:1" id="gIa-nY-U1I"/>
                                     </constraints>
-                                    <color key="tintColor" name="blackA80Color"/>
-                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                    <state key="normal" image="text.insert" catalog="system"/>
-                                    <connections>
-                                        <action selector="insertCardAction:" destination="-1" eventType="touchUpInside" id="3rw-7o-Chf"/>
-                                    </connections>
-                                </button>
+                                </stackView>
                             </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
-                                <constraint firstItem="b3Y-Bm-Q84" firstAttribute="width" secondItem="b3Y-Bm-Q84" secondAttribute="height" multiplier="1:1" id="gIa-nY-U1I"/>
+                                <constraint firstItem="PZ8-oT-HKK" firstAttribute="leading" secondItem="mDN-fe-zrv" secondAttribute="leading" constant="4" id="1S0-8c-eh1"/>
+                                <constraint firstAttribute="bottom" secondItem="PZ8-oT-HKK" secondAttribute="bottom" constant="4" id="Hb1-Ix-fBD"/>
+                                <constraint firstAttribute="trailing" secondItem="GgK-kc-1Ao" secondAttribute="trailing" id="M47-te-4VJ"/>
+                                <constraint firstItem="GgK-kc-1Ao" firstAttribute="top" secondItem="mDN-fe-zrv" secondAttribute="top" id="WGm-D7-mLO"/>
+                                <constraint firstItem="GgK-kc-1Ao" firstAttribute="leading" secondItem="mDN-fe-zrv" secondAttribute="leading" id="d3s-oK-hiv"/>
+                                <constraint firstAttribute="trailing" secondItem="PZ8-oT-HKK" secondAttribute="trailing" constant="4" id="izh-I3-yo6"/>
+                                <constraint firstItem="PZ8-oT-HKK" firstAttribute="top" secondItem="mDN-fe-zrv" secondAttribute="top" constant="4" id="kuc-cn-rzV"/>
                             </constraints>
-                        </stackView>
+                        </view>
                     </subviews>
-                    <constraints>
-                        <constraint firstItem="b3Y-Bm-Q84" firstAttribute="height" secondItem="cHg-U9-8XJ" secondAttribute="height" id="CUk-yB-pQ3"/>
-                        <constraint firstItem="b3Y-Bm-Q84" firstAttribute="width" secondItem="cHg-U9-8XJ" secondAttribute="width" id="nh5-KV-XKj"/>
-                    </constraints>
                 </stackView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -111,18 +142,25 @@
             <point key="canvasLocation" x="-63.358778625954194" y="278.87323943661971"/>
         </view>
     </objects>
+    <designables>
+        <designable name="b3Y-Bm-Q84">
+            <size key="intrinsicContentSize" width="21" height="22"/>
+        </designable>
+        <designable name="sXl-3m-gud">
+            <size key="intrinsicContentSize" width="18.666666666666668" height="22"/>
+        </designable>
+    </designables>
     <resources>
-        <image name="chevron.compact.down" catalog="system" width="128" height="42"/>
         <image name="chevron.down" catalog="system" width="128" height="70"/>
         <image name="text.insert" catalog="system" width="128" height="99"/>
-        <namedColor name="blackA54Color">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.54000002145767212" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="blackA15Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.14999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="blackA80Color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
+        <namedColor name="gainsBoroColor">
+            <color red="0.85098039215686272" green="0.86274509803921573" blue="0.90588235294117647" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

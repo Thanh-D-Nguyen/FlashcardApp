@@ -46,6 +46,7 @@ class RoundCornerView: UIView {
         didSet {
             updateShadowPath()
             layer.shadowColor = shadowColor.cgColor
+            layer.masksToBounds = false
         }
     }
     

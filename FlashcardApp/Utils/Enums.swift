@@ -18,6 +18,10 @@ enum SignInType: Int {
     case facebook
 }
 
+enum CardFace {
+    case front, back
+}
+
 enum MainTabbarName: Int {
     case home
     case quiz

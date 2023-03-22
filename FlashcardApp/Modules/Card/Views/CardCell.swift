@@ -54,7 +54,7 @@ class CardCell: UICollectionViewCell {
         let topBottomMargin = 24.0
         edgeConstraints = contentView.fill(
             with: cardView,
-            edges: UIEdgeInsets(top: topBottomMargin, left: leftRightMargin, bottom: -topBottomMargin, right: -leftRightMargin)
+            edges: UIEdgeInsets(top: topBottomMargin, left: leftRightMargin, bottom: topBottomMargin, right: leftRightMargin)
         )
         clipsToBounds = false
         contentView.clipsToBounds = false

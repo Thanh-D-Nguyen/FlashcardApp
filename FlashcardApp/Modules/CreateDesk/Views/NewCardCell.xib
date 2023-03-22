@@ -23,35 +23,25 @@
                         <rect key="frame" x="8" y="4" width="312" height="148"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="N2B-GE-f3s">
-                                <rect key="frame" x="0.0" y="0.0" width="247" height="126"/>
+                                <rect key="frame" x="0.0" y="0.0" width="232" height="126"/>
                                 <subviews>
                                     <view tag="100001" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ojp-90-g43" userLabel="wordView">
-                                        <rect key="frame" x="0.0" y="0.0" width="247" height="58"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="232" height="58"/>
                                         <subviews>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MKS-et-eco" userLabel="TextBgView" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
-                                                <rect key="frame" x="4" y="8" width="239" height="42"/>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MKS-et-eco" userLabel="TextBgView">
+                                                <rect key="frame" x="4" y="8" width="224" height="42"/>
                                                 <subviews>
-                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="JP" translatesAutoresizingMaskIntoConstraints="NO" id="g0v-Tp-EyN">
-                                                        <rect key="frame" x="8" y="9.3333333333333339" width="33" height="23.333333333333329"/>
-                                                        <constraints>
-                                                            <constraint firstAttribute="width" secondItem="g0v-Tp-EyN" secondAttribute="height" multiplier="7:5" id="cPE-Lo-Q0g"/>
-                                                        </constraints>
-                                                    </imageView>
-                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="U8t-kp-QdI" customClass="GrowingTextView" customModule="GrowingTextView">
-                                                        <rect key="frame" x="45" y="0.0" width="194" height="42"/>
+                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="U8t-kp-QdI" customClass="MMTextView" customModule="FlashcardApp" customModuleProvider="target">
+                                                        <rect key="frame" x="4" y="0.0" width="220" height="42"/>
                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                        <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                                         <color key="textColor" systemColor="labelColor"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                         <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="number" keyPath="minHeight">
-                                                                <real key="value" value="40"/>
+                                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Nhập từ khoá"/>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                                <color key="value" name="darkSlateGrayColor"/>
                                                             </userDefinedRuntimeAttribute>
-                                                            <userDefinedRuntimeAttribute type="number" keyPath="maxHeight">
-                                                                <real key="value" value="40"/>
-                                                            </userDefinedRuntimeAttribute>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Từ khoá"/>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <outlet property="delegate" destination="KGk-i7-Jjw" id="YaQ-QF-1Dx"/>
@@ -60,25 +50,11 @@
                                                 </subviews>
                                                 <color key="backgroundColor" name="whiteColor"/>
                                                 <constraints>
-                                                    <constraint firstItem="U8t-kp-QdI" firstAttribute="leading" secondItem="MKS-et-eco" secondAttribute="leading" constant="45" id="93X-lC-fyQ"/>
+                                                    <constraint firstItem="U8t-kp-QdI" firstAttribute="leading" secondItem="MKS-et-eco" secondAttribute="leading" constant="4" id="93X-lC-fyQ"/>
                                                     <constraint firstAttribute="bottom" secondItem="U8t-kp-QdI" secondAttribute="bottom" id="AJQ-PQ-7q2"/>
-                                                    <constraint firstItem="U8t-kp-QdI" firstAttribute="leading" secondItem="g0v-Tp-EyN" secondAttribute="trailing" constant="4" id="N8P-ki-rbo"/>
-                                                    <constraint firstItem="g0v-Tp-EyN" firstAttribute="centerY" secondItem="MKS-et-eco" secondAttribute="centerY" id="Qsi-9j-Dcg"/>
                                                     <constraint firstItem="U8t-kp-QdI" firstAttribute="top" secondItem="MKS-et-eco" secondAttribute="top" id="W8f-Fq-CNN"/>
-                                                    <constraint firstItem="g0v-Tp-EyN" firstAttribute="leading" secondItem="MKS-et-eco" secondAttribute="leading" constant="8" id="gdF-rN-bk4"/>
                                                     <constraint firstAttribute="trailing" secondItem="U8t-kp-QdI" secondAttribute="trailing" id="jhs-MX-ZuM"/>
                                                 </constraints>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                        <real key="value" value="4"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
-                                                        <real key="value" value="1"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                        <color key="value" name="blackA30Color"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </view>
                                         </subviews>
                                         <color key="backgroundColor" name="whiteColor"/>
@@ -91,10 +67,10 @@
                                         </constraints>
                                     </view>
                                     <view tag="100003" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JDV-27-W3x" userLabel="seperateView">
-                                        <rect key="frame" x="0.0" y="58" width="247" height="10"/>
+                                        <rect key="frame" x="0.0" y="58" width="232" height="10"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pbd-UI-1IH" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
-                                                <rect key="frame" x="98.666666666666671" y="3" width="50.000000000000014" height="4"/>
+                                                <rect key="frame" x="91" y="3" width="50" height="4"/>
                                                 <color key="backgroundColor" name="blackA30Color"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="4" id="1v6-wB-ftY"/>
@@ -105,7 +81,7 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
-                                                        <color key="value" name="pastelRed"/>
+                                                        <color key="value" name="blackA15Color"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </view>
@@ -118,32 +94,22 @@
                                         </constraints>
                                     </view>
                                     <view tag="100004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gtc-CQ-G0H" userLabel="meanView">
-                                        <rect key="frame" x="0.0" y="68" width="247" height="58"/>
+                                        <rect key="frame" x="0.0" y="68" width="232" height="58"/>
                                         <subviews>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Fru-gt-t4x" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
-                                                <rect key="frame" x="4" y="8" width="239" height="42"/>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Fru-gt-t4x">
+                                                <rect key="frame" x="4" y="8" width="224" height="42"/>
                                                 <subviews>
-                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="VN" translatesAutoresizingMaskIntoConstraints="NO" id="YyM-0m-Rlx">
-                                                        <rect key="frame" x="8" y="9.3333333333333268" width="33" height="23.333333333333329"/>
-                                                        <constraints>
-                                                            <constraint firstAttribute="width" secondItem="YyM-0m-Rlx" secondAttribute="height" multiplier="7:5" id="4Pm-SF-Q5L"/>
-                                                        </constraints>
-                                                    </imageView>
-                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="41F-aO-VH7" customClass="GrowingTextView" customModule="GrowingTextView">
-                                                        <rect key="frame" x="45" y="0.0" width="194" height="42"/>
+                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="41F-aO-VH7" customClass="MMTextView" customModule="FlashcardApp" customModuleProvider="target">
+                                                        <rect key="frame" x="4" y="0.0" width="220" height="42"/>
                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                        <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                                         <color key="textColor" systemColor="labelColor"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                         <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="number" keyPath="minHeight">
-                                                                <real key="value" value="40"/>
-                                                            </userDefinedRuntimeAttribute>
-                                                            <userDefinedRuntimeAttribute type="number" keyPath="maxHeight">
-                                                                <real key="value" value="40"/>
-                                                            </userDefinedRuntimeAttribute>
                                                             <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Ý nghĩa"/>
+                                                            <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                                <color key="value" name="darkSlateGrayColor"/>
+                                                            </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <outlet property="delegate" destination="KGk-i7-Jjw" id="Bej-cI-rIv"/>
@@ -154,23 +120,9 @@
                                                 <constraints>
                                                     <constraint firstAttribute="trailing" secondItem="41F-aO-VH7" secondAttribute="trailing" id="141-oB-dur"/>
                                                     <constraint firstItem="41F-aO-VH7" firstAttribute="top" secondItem="Fru-gt-t4x" secondAttribute="top" id="90L-oi-ItB"/>
-                                                    <constraint firstItem="41F-aO-VH7" firstAttribute="leading" secondItem="YyM-0m-Rlx" secondAttribute="trailing" constant="4" id="Cib-RP-FV1"/>
-                                                    <constraint firstItem="YyM-0m-Rlx" firstAttribute="centerY" secondItem="Fru-gt-t4x" secondAttribute="centerY" id="D1d-p3-0HI"/>
-                                                    <constraint firstItem="YyM-0m-Rlx" firstAttribute="leading" secondItem="Fru-gt-t4x" secondAttribute="leading" constant="8" id="daG-HM-h6j"/>
                                                     <constraint firstAttribute="bottom" secondItem="41F-aO-VH7" secondAttribute="bottom" id="fw6-vE-wah"/>
-                                                    <constraint firstItem="41F-aO-VH7" firstAttribute="leading" secondItem="Fru-gt-t4x" secondAttribute="leading" constant="45" id="zsV-Us-Ttk"/>
+                                                    <constraint firstItem="41F-aO-VH7" firstAttribute="leading" secondItem="Fru-gt-t4x" secondAttribute="leading" constant="4" id="zsV-Us-Ttk"/>
                                                 </constraints>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                        <real key="value" value="4"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                        <color key="value" name="blackA30Color"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
-                                                        <real key="value" value="1"/>
-                                                    </userDefinedRuntimeAttribute>
-                                                </userDefinedRuntimeAttributes>
                                             </view>
                                         </subviews>
                                         <color key="backgroundColor" name="whiteColor"/>
@@ -184,14 +136,21 @@
                                     </view>
                                 </subviews>
                             </stackView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DSCF6520" translatesAutoresizingMaskIntoConstraints="NO" id="8DC-Jb-uXy">
+                                <rect key="frame" x="232" y="10" width="72" height="128"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="8DC-Jb-uXy" secondAttribute="height" multiplier="9:16" id="Ajn-R4-kyY"/>
+                                </constraints>
+                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Jd-Hq-tUe" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                <rect key="frame" x="247" y="41.666666666666657" width="65" height="65"/>
+                                <rect key="frame" x="282" y="0.0" width="30" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="4Jd-Hq-tUe" secondAttribute="height" id="64R-72-rhB"/>
+                                    <constraint firstAttribute="width" constant="30" id="guY-Aa-bSj"/>
                                 </constraints>
-                                <color key="tintColor" name="blackA80Color"/>
+                                <color key="tintColor" name="royalBlueColor"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" image="photo" catalog="system"/>
+                                <state key="normal" image="pencil.circle.fill" catalog="system"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundImagePressedColor">
                                         <color key="value" name="blackA80Color"/>
@@ -202,28 +161,23 @@
                         <color key="backgroundColor" name="whiteColor"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="N2B-GE-f3s" secondAttribute="bottom" priority="250" id="9ca-Bd-vCw"/>
-                            <constraint firstItem="4Jd-Hq-tUe" firstAttribute="centerY" secondItem="Jdu-IE-AwL" secondAttribute="centerY" id="CR9-ei-4yt"/>
-                            <constraint firstAttribute="trailing" secondItem="4Jd-Hq-tUe" secondAttribute="trailing" id="FPb-BX-7Nc"/>
-                            <constraint firstItem="4Jd-Hq-tUe" firstAttribute="leading" secondItem="N2B-GE-f3s" secondAttribute="trailing" id="XOw-gn-Act"/>
+                            <constraint firstItem="8DC-Jb-uXy" firstAttribute="leading" secondItem="N2B-GE-f3s" secondAttribute="trailing" id="CNA-pz-SBk"/>
+                            <constraint firstItem="8DC-Jb-uXy" firstAttribute="centerY" secondItem="Jdu-IE-AwL" secondAttribute="centerY" id="cf4-Lh-nbs"/>
+                            <constraint firstAttribute="trailing" secondItem="4Jd-Hq-tUe" secondAttribute="trailing" id="cpC-8k-JYY"/>
+                            <constraint firstAttribute="trailing" secondItem="8DC-Jb-uXy" secondAttribute="trailing" constant="8" id="fIx-TB-0Zi"/>
                             <constraint firstItem="N2B-GE-f3s" firstAttribute="leading" secondItem="Jdu-IE-AwL" secondAttribute="leading" id="fLD-Lp-z2E"/>
                             <constraint firstItem="N2B-GE-f3s" firstAttribute="top" secondItem="Jdu-IE-AwL" secondAttribute="top" id="iRN-Gx-7l5"/>
-                            <constraint firstAttribute="trailing" secondItem="N2B-GE-f3s" secondAttribute="trailing" constant="65" id="o1m-dh-FoO"/>
+                            <constraint firstAttribute="trailing" secondItem="N2B-GE-f3s" secondAttribute="trailing" constant="80" id="o1m-dh-FoO"/>
+                            <constraint firstItem="4Jd-Hq-tUe" firstAttribute="top" secondItem="Jdu-IE-AwL" secondAttribute="top" id="p6N-aR-Vjc"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                <real key="value" value="4"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
-                                <real key="value" value="1"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
-                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                <color key="value" name="blackA80Color"/>
+                            <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
+                                <color key="value" name="blackA15Color"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </view>
                 </subviews>
-                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <color key="backgroundColor" name="whiteSmokeColor"/>
                 <constraints>
                     <constraint firstItem="Jdu-IE-AwL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="SFF-q8-nBe"/>
                     <constraint firstAttribute="trailing" secondItem="Jdu-IE-AwL" secondAttribute="trailing" constant="8" id="quw-nF-Yki"/>
@@ -233,8 +187,6 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="backImageView" destination="YyM-0m-Rlx" id="BaX-2V-IZY"/>
-                <outlet property="frontImageView" destination="g0v-Tp-EyN" id="dBw-Tb-Sgk"/>
                 <outlet property="imageButton" destination="4Jd-Hq-tUe" id="6eu-gf-uUS"/>
                 <outlet property="meanTextField" destination="41F-aO-VH7" id="Csg-Ks-4Ch"/>
                 <outlet property="meanViewContainer" destination="Gtc-CQ-G0H" id="amT-mP-P9k"/>
@@ -247,25 +199,39 @@
         </tableViewCell>
     </objects>
     <designables>
+        <designable name="41F-aO-VH7">
+            <size key="intrinsicContentSize" width="-1" height="33"/>
+        </designable>
         <designable name="4Jd-Hq-tUe">
-            <size key="intrinsicContentSize" width="23.666666666666668" height="22"/>
+            <size key="intrinsicContentSize" width="19.666666666666668" height="22"/>
+        </designable>
+        <designable name="U8t-kp-QdI">
+            <size key="intrinsicContentSize" width="-1" height="33"/>
         </designable>
     </designables>
     <resources>
-        <image name="JP" width="21" height="15"/>
-        <image name="VN" width="21" height="15"/>
-        <image name="photo" catalog="system" width="128" height="93"/>
+        <image name="DSCF6520" width="1920" height="1280"/>
+        <image name="pencil.circle.fill" catalog="system" width="128" height="123"/>
+        <namedColor name="blackA15Color">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.14999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="blackA30Color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="blackA80Color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="pastelRed">
-            <color red="1" green="0.42745098039215684" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="darkSlateGrayColor">
+            <color red="0.28235294117647058" green="0.32156862745098042" blue="0.3411764705882353" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="royalBlueColor">
+            <color red="0.27450980392156865" green="0.32941176470588235" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="whiteColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="whiteSmokeColor">
+            <color red="0.96470588235294119" green="0.96862745098039216" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="labelColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

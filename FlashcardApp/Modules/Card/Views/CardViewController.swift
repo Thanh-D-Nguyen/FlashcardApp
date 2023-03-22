@@ -19,6 +19,10 @@ final class CardViewController: BaseViewController {
         super.viewDidLoad()
         setupUI()
         subscribe()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         presenter.loadDesks()
     }
 

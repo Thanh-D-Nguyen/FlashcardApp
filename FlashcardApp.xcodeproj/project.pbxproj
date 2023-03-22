@@ -11,6 +11,22 @@
 		9209760F29A7887800ECF29C /* RCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760E29A7887800ECF29C /* RCard.swift */; };
 		9209761129A7AC4C00ECF29C /* DeskManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761029A7AC4C00ECF29C /* DeskManagement.swift */; };
 		9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761229A7B2AC00ECF29C /* CardManagement.swift */; };
+		9238009429C5737000FECD23 /* WordSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009329C5737000FECD23 /* WordSuggestionCell.swift */; };
+		9238009629C5777000FECD23 /* FadingEdgeCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009529C5777000FECD23 /* FadingEdgeCollectionView.swift */; };
+		9238009829C5866900FECD23 /* SearchWordsInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009729C5866900FECD23 /* SearchWordsInteractor.swift */; };
+		9238009A29C5870800FECD23 /* JaViEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009929C5870800FECD23 /* JaViEntity.swift */; };
+		9238009C29C5888300FECD23 /* ViJaEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009B29C5888300FECD23 /* ViJaEntity.swift */; };
+		9238009E29C5891E00FECD23 /* SearchResultEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009D29C5891E00FECD23 /* SearchResultEntity.swift */; };
+		923800A029C96FD800FECD23 /* JaViMeansEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009F29C96FD800FECD23 /* JaViMeansEntity.swift */; };
+		923800A329C9732C00FECD23 /* ViJaMeansEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800A229C9732C00FECD23 /* ViJaMeansEntity.swift */; };
+		923800AF29C97CA500FECD23 /* MMTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800A529C97CA500FECD23 /* MMTextField.swift */; };
+		923800B029C97CA500FECD23 /* String+Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800A729C97CA500FECD23 /* String+Size.swift */; };
+		923800B129C97CA500FECD23 /* UIView+Constraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800A829C97CA500FECD23 /* UIView+Constraint.swift */; };
+		923800B229C97CA500FECD23 /* LineLeftRightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AA29C97CA500FECD23 /* LineLeftRightView.swift */; };
+		923800B329C97CA500FECD23 /* LineCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AB29C97CA500FECD23 /* LineCenterView.swift */; };
+		923800B429C97CA500FECD23 /* AnimationViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AC29C97CA500FECD23 /* AnimationViewProtocol.swift */; };
+		923800B529C97CA500FECD23 /* MMTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AD29C97CA500FECD23 /* MMTextView.swift */; };
+		923800B629C97CA500FECD23 /* MMTextProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AE29C97CA500FECD23 /* MMTextProtocol.swift */; };
 		924052C629A9D06300B47E09 /* DeskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052C529A9D06300B47E09 /* DeskListView.swift */; };
 		924052C829A9D07600B47E09 /* DeskListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924052C729A9D07600B47E09 /* DeskListView.xib */; };
 		924052CB29A9D20C00B47E09 /* DeskListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052C929A9D20C00B47E09 /* DeskListCell.swift */; };
@@ -162,7 +178,6 @@
 		9291705829AB64E400894551 /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9291705729AB64E400894551 /* SwipeCellKit */; };
 		9291705A29AB672800894551 /* AppImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705929AB672800894551 /* AppImage.swift */; };
 		9291706029B30E5000894551 /* Typist in Frameworks */ = {isa = PBXBuildFile; productRef = 9291705F29B30E5000894551 /* Typist */; };
-		9291706629B36CD800894551 /* GrowingTextView in Frameworks */ = {isa = PBXBuildFile; productRef = 9291706529B36CD800894551 /* GrowingTextView */; };
 		9291706929B45FB700894551 /* SwipeCellSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291706829B45FB700894551 /* SwipeCellSupport.swift */; };
 		9291706B29B62D0A00894551 /* DeskDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291706A29B62D0A00894551 /* DeskDataModel.swift */; };
 		929C4DB729A7332D007651E9 /* Card.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 929C4DB629A7332D007651E9 /* Card.storyboard */; };
@@ -219,6 +234,22 @@
 		9209760E29A7887800ECF29C /* RCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCard.swift; sourceTree = "<group>"; };
 		9209761029A7AC4C00ECF29C /* DeskManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskManagement.swift; sourceTree = "<group>"; };
 		9209761229A7B2AC00ECF29C /* CardManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardManagement.swift; sourceTree = "<group>"; };
+		9238009329C5737000FECD23 /* WordSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionCell.swift; sourceTree = "<group>"; };
+		9238009529C5777000FECD23 /* FadingEdgeCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadingEdgeCollectionView.swift; sourceTree = "<group>"; };
+		9238009729C5866900FECD23 /* SearchWordsInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchWordsInteractor.swift; sourceTree = "<group>"; };
+		9238009929C5870800FECD23 /* JaViEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaViEntity.swift; sourceTree = "<group>"; };
+		9238009B29C5888300FECD23 /* ViJaEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaEntity.swift; sourceTree = "<group>"; };
+		9238009D29C5891E00FECD23 /* SearchResultEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultEntity.swift; sourceTree = "<group>"; };
+		9238009F29C96FD800FECD23 /* JaViMeansEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaViMeansEntity.swift; sourceTree = "<group>"; };
+		923800A229C9732C00FECD23 /* ViJaMeansEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaMeansEntity.swift; sourceTree = "<group>"; };
+		923800A529C97CA500FECD23 /* MMTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTextField.swift; sourceTree = "<group>"; };
+		923800A729C97CA500FECD23 /* String+Size.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Size.swift"; sourceTree = "<group>"; };
+		923800A829C97CA500FECD23 /* UIView+Constraint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Constraint.swift"; sourceTree = "<group>"; };
+		923800AA29C97CA500FECD23 /* LineLeftRightView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineLeftRightView.swift; sourceTree = "<group>"; };
+		923800AB29C97CA500FECD23 /* LineCenterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineCenterView.swift; sourceTree = "<group>"; };
+		923800AC29C97CA500FECD23 /* AnimationViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationViewProtocol.swift; sourceTree = "<group>"; };
+		923800AD29C97CA500FECD23 /* MMTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTextView.swift; sourceTree = "<group>"; };
+		923800AE29C97CA500FECD23 /* MMTextProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTextProtocol.swift; sourceTree = "<group>"; };
 		924052C529A9D06300B47E09 /* DeskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListView.swift; sourceTree = "<group>"; };
 		924052C729A9D07600B47E09 /* DeskListView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskListView.xib; sourceTree = "<group>"; };
 		924052C929A9D20C00B47E09 /* DeskListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListCell.swift; sourceTree = "<group>"; };
@@ -407,7 +438,6 @@
 				9251ECF129A1EC4A006C1D1C /* RxSwift in Frameworks */,
 				9251ED0829A1ED9C006C1D1C /* FacebookShare in Frameworks */,
 				9251ECFF29A1ED54006C1D1C /* FirebaseDynamicLinks in Frameworks */,
-				9291706629B36CD800894551 /* GrowingTextView in Frameworks */,
 				9251ED0429A1ED9C006C1D1C /* FacebookCore in Frameworks */,
 				929C4DC829A74CAE007651E9 /* Kingfisher in Frameworks */,
 				92A93EB829A25A1B00CE7E70 /* Realm in Frameworks */,
@@ -435,6 +465,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		923800A429C97CA500FECD23 /* MMTextView */ = {
+			isa = PBXGroup;
+			children = (
+				923800A529C97CA500FECD23 /* MMTextField.swift */,
+				923800A629C97CA500FECD23 /* Extension */,
+				923800A929C97CA500FECD23 /* LineView */,
+				923800AD29C97CA500FECD23 /* MMTextView.swift */,
+				923800AE29C97CA500FECD23 /* MMTextProtocol.swift */,
+			);
+			path = MMTextView;
+			sourceTree = "<group>";
+		};
+		923800A629C97CA500FECD23 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				923800A729C97CA500FECD23 /* String+Size.swift */,
+				923800A829C97CA500FECD23 /* UIView+Constraint.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		923800A929C97CA500FECD23 /* LineView */ = {
+			isa = PBXGroup;
+			children = (
+				923800AA29C97CA500FECD23 /* LineLeftRightView.swift */,
+				923800AB29C97CA500FECD23 /* LineCenterView.swift */,
+				923800AC29C97CA500FECD23 /* AnimationViewProtocol.swift */,
+			);
+			path = LineView;
+			sourceTree = "<group>";
+		};
 		924052C429A9CE4600B47E09 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -468,6 +529,7 @@
 				92777FAF29AB4415002891DB /* DeskCardHeaderView.xib */,
 				92B2EBEC29AB5A58008833D4 /* AddDeskBottomView.swift */,
 				92B2EBEE29AB5A63008833D4 /* AddDeskBottomView.xib */,
+				9238009329C5737000FECD23 /* WordSuggestionCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -541,6 +603,11 @@
 				929C4DBC29A733A2007651E9 /* CardEntity.swift */,
 				929C4DD929A7646F007651E9 /* DeskEntity.swift */,
 				9291706A29B62D0A00894551 /* DeskDataModel.swift */,
+				9238009929C5870800FECD23 /* JaViEntity.swift */,
+				9238009B29C5888300FECD23 /* ViJaEntity.swift */,
+				9238009D29C5891E00FECD23 /* SearchResultEntity.swift */,
+				9238009F29C96FD800FECD23 /* JaViMeansEntity.swift */,
+				923800A229C9732C00FECD23 /* ViJaMeansEntity.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -548,6 +615,7 @@
 		9251EBFF29A1EAA5006C1D1C /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				923800A429C97CA500FECD23 /* MMTextView */,
 				9251EC0029A1EAA5006C1D1C /* PullToRefresh */,
 			);
 			path = Vendors;
@@ -583,6 +651,7 @@
 				9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */,
 				9251ED2929A212B5006C1D1C /* QuizInteractor.swift */,
 				9251ED1329A20040006C1D1C /* SettingInteractor.swift */,
+				9238009729C5866900FECD23 /* SearchWordsInteractor.swift */,
 			);
 			path = Interactors;
 			sourceTree = "<group>";
@@ -642,6 +711,7 @@
 				929C4DC229A74103007651E9 /* GradientView.swift */,
 				929C4DC929A75B8D007651E9 /* TopBarView.swift */,
 				929C4DCB29A75C38007651E9 /* TopBarView.xib */,
+				9238009529C5777000FECD23 /* FadingEdgeCollectionView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -968,7 +1038,6 @@
 				929C4DC729A74CAE007651E9 /* Kingfisher */,
 				9291705729AB64E400894551 /* SwipeCellKit */,
 				9291705F29B30E5000894551 /* Typist */,
-				9291706529B36CD800894551 /* GrowingTextView */,
 			);
 			productName = FlashcardApp;
 			productReference = 9251EBC929A1E9A6006C1D1C /* FlashcardApp.app */;
@@ -1057,7 +1126,6 @@
 				929C4DC629A74CAE007651E9 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				9291705629AB64E400894551 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				9291705E29B30E5000894551 /* XCRemoteSwiftPackageReference "Typist" */,
-				9291706429B36CD800894551 /* XCRemoteSwiftPackageReference "GrowingTextView" */,
 			);
 			productRefGroup = 9251EBCA29A1E9A6006C1D1C /* Products */;
 			projectDirPath = "";
@@ -1167,6 +1235,7 @@
 				9251ECA429A1EAA5006C1D1C /* SimpleCardCell.swift in Sources */,
 				9209761129A7AC4C00ECF29C /* DeskManagement.swift in Sources */,
 				9291705A29AB672800894551 /* AppImage.swift in Sources */,
+				923800B629C97CA500FECD23 /* MMTextProtocol.swift in Sources */,
 				9251ED1629A20040006C1D1C /* SettingPresenter.swift in Sources */,
 				9251ED1929A20040006C1D1C /* SettingWireframe.swift in Sources */,
 				9251ED2F29A212B5006C1D1C /* QuizWireframe.swift in Sources */,
@@ -1178,12 +1247,14 @@
 				92A93EBE29A25C1900CE7E70 /* RJaVi.swift in Sources */,
 				9251EC8929A1EAA5006C1D1C /* SocialSignInInteractor.swift in Sources */,
 				9251ED1829A20040006C1D1C /* SettingInteractor.swift in Sources */,
+				9238009629C5777000FECD23 /* FadingEdgeCollectionView.swift in Sources */,
 				9251EC8829A1EAA5006C1D1C /* RefreshViewAnimator.swift in Sources */,
 				9251EC8429A1EAA5006C1D1C /* PullToRefresh.swift in Sources */,
 				9251ED1729A20040006C1D1C /* SettingViewController.swift in Sources */,
 				9251ECD929A1EAA5006C1D1C /* SlideShowPresenter.swift in Sources */,
 				9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */,
 				9251ED2D29A212B5006C1D1C /* QuizViewController.swift in Sources */,
+				923800B529C97CA500FECD23 /* MMTextView.swift in Sources */,
 				9251ED2C29A212B5006C1D1C /* QuizPresenter.swift in Sources */,
 				92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */,
 				9251EC9629A1EAA5006C1D1C /* BaseWireframe.swift in Sources */,
@@ -1191,16 +1262,19 @@
 				92A93ECB29A260F700CE7E70 /* KanjiManagement.swift in Sources */,
 				9251EBCD29A1E9A6006C1D1C /* AppDelegate.swift in Sources */,
 				92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */,
+				9238009429C5737000FECD23 /* WordSuggestionCell.swift in Sources */,
 				9251EC8629A1EAA5006C1D1C /* DefaultViewAnimator.swift in Sources */,
 				9251EC9A29A1EAA5006C1D1C /* StackView.swift in Sources */,
 				9251ECE929A1EAA5006C1D1C /* Constants.swift in Sources */,
 				9251ECB029A1EAA5006C1D1C /* HomeViewController.swift in Sources */,
 				9291706929B45FB700894551 /* SwipeCellSupport.swift in Sources */,
 				9251ECBC29A1EAA5006C1D1C /* MailLoginWireframe.swift in Sources */,
+				923800B329C97CA500FECD23 /* LineCenterView.swift in Sources */,
 				9251ECE829A1EAA5006C1D1C /* AppService.swift in Sources */,
 				9251EC9129A1EAA5006C1D1C /* MailLoginInteractor.swift in Sources */,
 				9251ECC829A1EAA5006C1D1C /* StartUpInteractor.swift in Sources */,
 				9251ECB129A1EAA5006C1D1C /* HomeWireframe.swift in Sources */,
+				923800A029C96FD800FECD23 /* JaViMeansEntity.swift in Sources */,
 				9251ECA829A1EAA5006C1D1C /* RoundCornerButton.swift in Sources */,
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
 				9251EC8E29A1EAA5006C1D1C /* MarketInteractor.swift in Sources */,
@@ -1208,11 +1282,13 @@
 				9251ECD829A1EAA5006C1D1C /* SlideItemViewController.swift in Sources */,
 				92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */,
 				9251ECAE29A1EAA5006C1D1C /* HomeCarouselCell.swift in Sources */,
+				9238009C29C5888300FECD23 /* ViJaEntity.swift in Sources */,
 				9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */,
 				9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */,
 				9251ED4329A2133A006C1D1C /* DictionaryPresenter.swift in Sources */,
 				9251ECCC29A1EAA5006C1D1C /* StartUpPresenter.swift in Sources */,
 				9209760D29A787C100ECF29C /* RDesk.swift in Sources */,
+				923800A329C9732C00FECD23 /* ViJaMeansEntity.swift in Sources */,
 				924052CB29A9D20C00B47E09 /* DeskListCell.swift in Sources */,
 				9251EC8A29A1EAA5006C1D1C /* HomeInteractor.swift in Sources */,
 				9251ECC929A1EAA5006C1D1C /* StartUpWireframe.swift in Sources */,
@@ -1222,6 +1298,7 @@
 				9251ECCE29A1EAA5006C1D1C /* MainPresenter.swift in Sources */,
 				9251ECCD29A1EAA5006C1D1C /* MainViewController.swift in Sources */,
 				92B2EBED29AB5A58008833D4 /* AddDeskBottomView.swift in Sources */,
+				9238009E29C5891E00FECD23 /* SearchResultEntity.swift in Sources */,
 				924052C629A9D06300B47E09 /* DeskListView.swift in Sources */,
 				9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */,
 				9251EC8B29A1EAA5006C1D1C /* CreateInteractor.swift in Sources */,
@@ -1231,6 +1308,7 @@
 				924052E629AB3ADD00B47E09 /* DeskCell.swift in Sources */,
 				9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */,
 				9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */,
+				9238009A29C5870800FECD23 /* JaViEntity.swift in Sources */,
 				92A93EC529A2602800CE7E70 /* ExampleManagement.swift in Sources */,
 				929C4DBA29A73358007651E9 /* CardCell.swift in Sources */,
 				9251EBCF29A1E9A6006C1D1C /* SceneDelegate.swift in Sources */,
@@ -1238,10 +1316,15 @@
 				9251ECE729A1EAA5006C1D1C /* PushNotificationService.swift in Sources */,
 				9251EC8229A1EAA5006C1D1C /* SocialUserEntity.swift in Sources */,
 				9251ECD729A1EAA5006C1D1C /* SlideShowViewController.swift in Sources */,
+				923800B029C97CA500FECD23 /* String+Size.swift in Sources */,
+				9238009829C5866900FECD23 /* SearchWordsInteractor.swift in Sources */,
+				923800B129C97CA500FECD23 /* UIView+Constraint.swift in Sources */,
 				9251EC8129A1EAA5006C1D1C /* WelcomeEntity.swift in Sources */,
+				923800AF29C97CA500FECD23 /* MMTextField.swift in Sources */,
 				9251ECBF29A1EAA5006C1D1C /* MailLoginViewController.swift in Sources */,
 				929C4DD829A76442007651E9 /* DeskWireframe.swift in Sources */,
 				924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */,
+				923800B429C97CA500FECD23 /* AnimationViewProtocol.swift in Sources */,
 				9251ECE629A1EAA5006C1D1C /* RealmService.swift in Sources */,
 				9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */,
 				9251EC8729A1EAA5006C1D1C /* UIScrollView+PullToRefresh.swift in Sources */,
@@ -1262,6 +1345,7 @@
 				9251EC9429A1EAA5006C1D1C /* BaseViewControler.swift in Sources */,
 				929C4DBF29A73404007651E9 /* CardView.swift in Sources */,
 				929C4DD629A76442007651E9 /* DeskViewController.swift in Sources */,
+				923800B229C97CA500FECD23 /* LineLeftRightView.swift in Sources */,
 				9251EC8529A1EAA5006C1D1C /* State.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1668,14 +1752,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		9291706429B36CD800894551 /* XCRemoteSwiftPackageReference "GrowingTextView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/KennethTsang/GrowingTextView.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.7.2;
-			};
-		};
 		929C4DC629A74CAE007651E9 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -1779,11 +1855,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9291705E29B30E5000894551 /* XCRemoteSwiftPackageReference "Typist" */;
 			productName = Typist;
-		};
-		9291706529B36CD800894551 /* GrowingTextView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9291706429B36CD800894551 /* XCRemoteSwiftPackageReference "GrowingTextView" */;
-			productName = GrowingTextView;
 		};
 		929C4DC729A74CAE007651E9 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
