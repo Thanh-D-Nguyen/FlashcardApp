@@ -182,6 +182,7 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         flickrImageSearchInteractor.fetchPhotos(.init(query: card.frontText, photosPerPage: 10))
         flickrImageSearchInteractor.resultImage = { [weak self] image in
             guard let self else { return }
+            
             self.desk.cards[index].imageRelay.accept(image)
         }
         deskChangedRelay.accept(.reloadCard(index))

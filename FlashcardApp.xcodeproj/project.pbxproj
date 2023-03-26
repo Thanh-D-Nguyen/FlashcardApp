@@ -24,6 +24,16 @@
 		9226D82229D010C00042F6DA /* ImageSearchEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82129D010C00042F6DA /* ImageSearchEntity.swift */; };
 		9226D82429D01D960042F6DA /* FlickrImageDetailInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82329D01D960042F6DA /* FlickrImageDetailInteractor.swift */; };
 		9226D82629D01DC90042F6DA /* ImageDetailEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82529D01DC90042F6DA /* ImageDetailEntity.swift */; };
+		9226D83229D0368B0042F6DA /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82829D0368A0042F6DA /* Disk.swift */; };
+		9226D83329D0368B0042F6DA /* Disk+InternalHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82929D0368A0042F6DA /* Disk+InternalHelpers.swift */; };
+		9226D83429D0368B0042F6DA /* Disk+[Data].swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82A29D0368A0042F6DA /* Disk+[Data].swift */; };
+		9226D83529D0368B0042F6DA /* Disk+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82B29D0368A0042F6DA /* Disk+Data.swift */; };
+		9226D83629D0368B0042F6DA /* Disk+Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82C29D0368A0042F6DA /* Disk+Errors.swift */; };
+		9226D83729D0368B0042F6DA /* Disk+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82D29D0368A0042F6DA /* Disk+Helpers.swift */; };
+		9226D83829D0368B0042F6DA /* Disk+VolumeInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82E29D0368A0042F6DA /* Disk+VolumeInformation.swift */; };
+		9226D83929D0368B0042F6DA /* Disk+[UIImage].swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D82F29D0368A0042F6DA /* Disk+[UIImage].swift */; };
+		9226D83A29D0368B0042F6DA /* Disk+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D83029D0368A0042F6DA /* Disk+UIImage.swift */; };
+		9226D83B29D0368B0042F6DA /* Disk+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D83129D0368A0042F6DA /* Disk+Codable.swift */; };
 		9238009429C5737000FECD23 /* WordSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009329C5737000FECD23 /* WordSuggestionCell.swift */; };
 		9238009629C5777000FECD23 /* FadingEdgeCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009529C5777000FECD23 /* FadingEdgeCollectionView.swift */; };
 		9238009829C5866900FECD23 /* SearchWordsInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009729C5866900FECD23 /* SearchWordsInteractor.swift */; };
@@ -260,6 +270,16 @@
 		9226D82129D010C00042F6DA /* ImageSearchEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchEntity.swift; sourceTree = "<group>"; };
 		9226D82329D01D960042F6DA /* FlickrImageDetailInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrImageDetailInteractor.swift; sourceTree = "<group>"; };
 		9226D82529D01DC90042F6DA /* ImageDetailEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDetailEntity.swift; sourceTree = "<group>"; };
+		9226D82829D0368A0042F6DA /* Disk.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
+		9226D82929D0368A0042F6DA /* Disk+InternalHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+InternalHelpers.swift"; sourceTree = "<group>"; };
+		9226D82A29D0368A0042F6DA /* Disk+[Data].swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+[Data].swift"; sourceTree = "<group>"; };
+		9226D82B29D0368A0042F6DA /* Disk+Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+Data.swift"; sourceTree = "<group>"; };
+		9226D82C29D0368A0042F6DA /* Disk+Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+Errors.swift"; sourceTree = "<group>"; };
+		9226D82D29D0368A0042F6DA /* Disk+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+Helpers.swift"; sourceTree = "<group>"; };
+		9226D82E29D0368A0042F6DA /* Disk+VolumeInformation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+VolumeInformation.swift"; sourceTree = "<group>"; };
+		9226D82F29D0368A0042F6DA /* Disk+[UIImage].swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+[UIImage].swift"; sourceTree = "<group>"; };
+		9226D83029D0368A0042F6DA /* Disk+UIImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+UIImage.swift"; sourceTree = "<group>"; };
+		9226D83129D0368A0042F6DA /* Disk+Codable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+Codable.swift"; sourceTree = "<group>"; };
 		9238009329C5737000FECD23 /* WordSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionCell.swift; sourceTree = "<group>"; };
 		9238009529C5777000FECD23 /* FadingEdgeCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadingEdgeCollectionView.swift; sourceTree = "<group>"; };
 		9238009729C5866900FECD23 /* SearchWordsInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchWordsInteractor.swift; sourceTree = "<group>"; };
@@ -537,6 +557,23 @@
 			path = Routes;
 			sourceTree = "<group>";
 		};
+		9226D82729D0368A0042F6DA /* Disk */ = {
+			isa = PBXGroup;
+			children = (
+				9226D82829D0368A0042F6DA /* Disk.swift */,
+				9226D82929D0368A0042F6DA /* Disk+InternalHelpers.swift */,
+				9226D82A29D0368A0042F6DA /* Disk+[Data].swift */,
+				9226D82B29D0368A0042F6DA /* Disk+Data.swift */,
+				9226D82C29D0368A0042F6DA /* Disk+Errors.swift */,
+				9226D82D29D0368A0042F6DA /* Disk+Helpers.swift */,
+				9226D82E29D0368A0042F6DA /* Disk+VolumeInformation.swift */,
+				9226D82F29D0368A0042F6DA /* Disk+[UIImage].swift */,
+				9226D83029D0368A0042F6DA /* Disk+UIImage.swift */,
+				9226D83129D0368A0042F6DA /* Disk+Codable.swift */,
+			);
+			path = Disk;
+			sourceTree = "<group>";
+		};
 		923800A429C97CA500FECD23 /* MMTextView */ = {
 			isa = PBXGroup;
 			children = (
@@ -690,6 +727,7 @@
 		9251EBFF29A1EAA5006C1D1C /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				9226D82729D0368A0042F6DA /* Disk */,
 				923800A429C97CA500FECD23 /* MMTextView */,
 				9251EC0029A1EAA5006C1D1C /* PullToRefresh */,
 			);
@@ -1285,6 +1323,7 @@
 			files = (
 				929C4DC329A74103007651E9 /* GradientView.swift in Sources */,
 				9251ECD629A1EAA5006C1D1C /* SlideShowWireframe.swift in Sources */,
+				9226D83229D0368B0042F6DA /* Disk.swift in Sources */,
 				9251ECD129A1EAA5006C1D1C /* MainWireframe.swift in Sources */,
 				929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */,
 				9251ED2129A2074D006C1D1C /* CommonCell.swift in Sources */,
@@ -1309,6 +1348,7 @@
 				9251EC9929A1EAA5006C1D1C /* CollectionView.swift in Sources */,
 				924052ED29AB3D7200B47E09 /* DeskCardHeaderView.swift in Sources */,
 				9251EC9729A1EAA5006C1D1C /* ViewInterface.swift in Sources */,
+				9226D83329D0368B0042F6DA /* Disk+InternalHelpers.swift in Sources */,
 				9251ECE229A1EAA5006C1D1C /* EvironmentConfig.swift in Sources */,
 				9251EC9529A1EAA5006C1D1C /* MainScheduleSubscribler.swift in Sources */,
 				9251ECBE29A1EAA5006C1D1C /* MailLoginPresenter.swift in Sources */,
@@ -1331,6 +1371,7 @@
 				9251EC8929A1EAA5006C1D1C /* SocialSignInInteractor.swift in Sources */,
 				9251ED1829A20040006C1D1C /* SettingInteractor.swift in Sources */,
 				9238009629C5777000FECD23 /* FadingEdgeCollectionView.swift in Sources */,
+				9226D83429D0368B0042F6DA /* Disk+[Data].swift in Sources */,
 				9251EC8829A1EAA5006C1D1C /* RefreshViewAnimator.swift in Sources */,
 				9251EC8429A1EAA5006C1D1C /* PullToRefresh.swift in Sources */,
 				9251ED1729A20040006C1D1C /* SettingViewController.swift in Sources */,
@@ -1338,6 +1379,7 @@
 				9226D81E29D00E0F0042F6DA /* RouteType.swift in Sources */,
 				9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */,
 				9251ED2D29A212B5006C1D1C /* QuizViewController.swift in Sources */,
+				9226D83529D0368B0042F6DA /* Disk+Data.swift in Sources */,
 				923800B529C97CA500FECD23 /* MMTextView.swift in Sources */,
 				9251ED2C29A212B5006C1D1C /* QuizPresenter.swift in Sources */,
 				92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */,
@@ -1364,6 +1406,7 @@
 				923800A029C96FD800FECD23 /* JaViMeansEntity.swift in Sources */,
 				9251ECA829A1EAA5006C1D1C /* RoundCornerButton.swift in Sources */,
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
+				9226D83829D0368B0042F6DA /* Disk+VolumeInformation.swift in Sources */,
 				9251EC8E29A1EAA5006C1D1C /* MarketInteractor.swift in Sources */,
 				929C4DC529A74806007651E9 /* AppColor.swift in Sources */,
 				9251ECD829A1EAA5006C1D1C /* SlideItemViewController.swift in Sources */,
@@ -1387,6 +1430,7 @@
 				9251ECCD29A1EAA5006C1D1C /* MainViewController.swift in Sources */,
 				92B2EBED29AB5A58008833D4 /* AddDeskBottomView.swift in Sources */,
 				9238009E29C5891E00FECD23 /* SearchResultEntity.swift in Sources */,
+				9226D83B29D0368B0042F6DA /* Disk+Codable.swift in Sources */,
 				924052C629A9D06300B47E09 /* DeskListView.swift in Sources */,
 				9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */,
 				9251EC8B29A1EAA5006C1D1C /* CreateInteractor.swift in Sources */,
@@ -1398,6 +1442,7 @@
 				924052E629AB3ADD00B47E09 /* DeskCell.swift in Sources */,
 				9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */,
 				9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */,
+				9226D83629D0368B0042F6DA /* Disk+Errors.swift in Sources */,
 				9238009A29C5870800FECD23 /* JaViEntity.swift in Sources */,
 				92A93EC529A2602800CE7E70 /* ExampleManagement.swift in Sources */,
 				929C4DBA29A73358007651E9 /* CardCell.swift in Sources */,
@@ -1411,11 +1456,13 @@
 				923800B129C97CA500FECD23 /* UIView+Constraint.swift in Sources */,
 				9251EC8129A1EAA5006C1D1C /* WelcomeEntity.swift in Sources */,
 				923800AF29C97CA500FECD23 /* MMTextField.swift in Sources */,
+				9226D83929D0368B0042F6DA /* Disk+[UIImage].swift in Sources */,
 				9251ECBF29A1EAA5006C1D1C /* MailLoginViewController.swift in Sources */,
 				929C4DD829A76442007651E9 /* DeskWireframe.swift in Sources */,
 				924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */,
 				923800B429C97CA500FECD23 /* AnimationViewProtocol.swift in Sources */,
 				9251ECE629A1EAA5006C1D1C /* RealmService.swift in Sources */,
+				9226D83A29D0368B0042F6DA /* Disk+UIImage.swift in Sources */,
 				9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */,
 				9251EC8729A1EAA5006C1D1C /* UIScrollView+PullToRefresh.swift in Sources */,
 				9251ED3829A212E9006C1D1C /* CardInteractor.swift in Sources */,
@@ -1426,6 +1473,7 @@
 				9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */,
 				9226D82629D01DC90042F6DA /* ImageDetailEntity.swift in Sources */,
 				9251EC9329A1EAA5006C1D1C /* BaseApi.swift in Sources */,
+				9226D83729D0368B0042F6DA /* Disk+Helpers.swift in Sources */,
 				92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */,
 				924052EA29AB3AFC00B47E09 /* NewCardCell.swift in Sources */,
 				9251EC9E29A1EAA5006C1D1C /* BaseNavigationController.swift in Sources */,
