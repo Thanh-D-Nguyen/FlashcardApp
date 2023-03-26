@@ -33,6 +33,7 @@ final class CreateDeskViewController: BaseViewController {
         deskTableView.registerNib(cellClass: DeskCell.self)
         deskTableView.registerNib(cellClass: NewCardCell.self)
         deskTableView.registerHeaderFooterNib(aClass: DeskCardHeaderView.self)
+        bottomView.updateKeyboardHidden(true)
     }
     
     func subscribe() {
@@ -78,15 +79,23 @@ final class CreateDeskViewController: BaseViewController {
             guard let self else { return }
             self.presenter.updateEditingCard(card)
         }
+    
+        subscribe(presenter.focusIndexRelay) { focusString in
+            self.bottomView.updateNumOfItems(focusString)
+        }
+        
     }
     
     private func updateBottomConstraint(_ constant: CGFloat) {
         self.bottomConstraint.constant = constant
-        if constant == 0 {
+        let isKeyboardHidden = constant == 0
+        if isKeyboardHidden {
             self.bottomView.setSearchResult(SearchResultEntity(face: .front, cards: []))
         }
+        bottomView.updateKeyboardHidden(isKeyboardHidden)
         UIView.animate(withDuration: 0.25) {
             self.view.layoutIfNeeded()
+            self.bottomView.layoutIfNeeded()
         }
     }
     
@@ -98,18 +107,21 @@ final class CreateDeskViewController: BaseViewController {
             let focusedCell = deskTableView.visibleCells.compactMap({ $0 as? FocusTextFieldCellProtocol }).first(where: { $0.isFocusedField == true })
             if let uId = focusedCell?.cellUniqueId {
                 presenter.insertNewCardAfterUId(uId)
+            } else {
+                presenter.insertNewCardAfterUId(nil)
             }
         }
     }
     
     private func handleNextResponder() {
-        guard let focusedCell = deskTableView.visibleCells.compactMap({ $0 as? FocusTextFieldCellProtocol }).first(where: { $0.isFocusedField == true }) else { return }
-        focusedCell.becomeNextResponder { [weak self] event in
-            guard let self else { return }
-            switch event {
-                case .focusNextFrom(let uId):
-                    self.focusOrAddNewCardRowFrom(uId)
-                default: break
+        if let focusedCell = deskTableView.visibleCells.compactMap({ $0 as? FocusTextFieldCellProtocol }).first(where: { $0.isFocusedField == true }) {
+            focusedCell.becomeNextResponder { [weak self] event in
+                guard let self else { return }
+                switch event {
+                    case .focusNextFrom(let uId):
+                        self.focusOrAddNewCardRowFrom(uId)
+                    default: break
+                }
             }
         }
     }
@@ -163,7 +175,12 @@ final class CreateDeskViewController: BaseViewController {
     
     private func reloadCardCellAtIndex(_ index: Int) {
         let indexPath = IndexPath(row: index, section: CreateDeskTableSection.cards.rawValue)
-        deskTableView.reloadRows(at: [indexPath], with: .none)
+        if let cell = deskTableView.cellForRow(at: indexPath) as? NewCardCell {
+            let cards = presenter.desk.cards
+            if cards.indices.contains(indexPath.row) {
+                cell.updateCard(cards[indexPath.row])
+            }
+        }
     }
 }
 
@@ -237,7 +254,9 @@ extension CreateDeskViewController: SwipeTableViewCellDelegate {
             configure(action: deleteAction, with: .trash)
             return [deleteAction]
         }
-        
+        if presenter.desk.cards.count == 1 {
+            return nil
+        }
         let moveUpAction = SwipeAction(style: .default, title: nil) { [weak self] _, indexPath in
             guard let self else { return }
             self.presenter.moveCardAtIndex(indexPath.row, moveType: .up)
@@ -264,7 +283,7 @@ extension CreateDeskViewController {
         let buttonStyle = ButtonStyle.circular
         action.title = descriptor.title(forDisplayMode: .imageOnly)
         action.image = descriptor.image(forStyle: buttonStyle, displayMode: .imageOnly)
-        action.backgroundColor = AppColor.white
+        action.backgroundColor = AppColor.whiteSmoke
         action.textColor = descriptor.color(forStyle: buttonStyle)
         action.font = .systemFont(ofSize: 13)
         action.transitionDelegate = ScaleTransition.default

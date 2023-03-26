@@ -18,7 +18,8 @@ protocol CardPresenterInterface: AnyObject {
     func loadDesks()
     func didSelectDeskAtIndex(_ index: Int)
     func createNewCard()
-    func showDesk(byAddNew: Bool)
+    func showDeskList()
+    func createNewDesk()
     
 }
 
@@ -59,19 +60,15 @@ extension CardPresenter: CardPresenterInterface {
         loadDesks()
     }
     
-    func showDesk(byAddNew: Bool) {
-        if byAddNew == true {
-            wireframe.showDeskWithEntity(nil)
-        } else {
-            if deskDataRelay.value.isEmpty {
-                wireframe.showDeskWithEntity(selectingDesk)
-            } else {
-                wireframe.showDeskList(deskDataRelay.value)
-            }
-        }
+    func showDeskList() {
+        wireframe.showDeskList()
     }
     
     func createNewCard() {
         wireframe.showCreateNewCard()
+    }
+    
+    func createNewDesk() {
+        wireframe.showCreateNewDesk()
     }
 }

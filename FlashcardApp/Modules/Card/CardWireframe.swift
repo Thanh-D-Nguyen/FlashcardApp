@@ -9,9 +9,9 @@
 import UIKit
 
 protocol CardWireframeInterface: AnyObject {
-    func showDeskWithEntity(_ entity: DeskEntity?)
-    func showDeskList(_ desks: [DeskEntity])
+    func showDeskList()
     func showCreateNewCard()
+    func showCreateNewDesk()
 }
 
 final class CardWireframe: BaseWireframe<CardViewController> {
@@ -30,27 +30,20 @@ final class CardWireframe: BaseWireframe<CardViewController> {
 }
 
 extension CardWireframe: CardWireframeInterface {
-    func showDeskWithEntity(_ entity: DeskEntity?) {
-//        let deskWireFrame = DeskWireframe(entity)
-//        deskWireFrame.didDeskChange = { [weak self] index in
-//            self?.viewController.presenter.didSelectDeskAtIndex(index)
-//        }
-//        navigationController?.presentWireframe(deskWireFrame)
-        
+    
+    func showCreateNewDesk() {
         let createDeskWireframe = CreateDeskWireframe()
         navigationController?.presentWireframe(createDeskWireframe)
-
     }
     
-    func showDeskList(_ desks: [DeskEntity]) {
-        let deskListView = DeskListView(frame: .zero)
-        self.viewController.view.fill(with: deskListView)
-        deskListView.didSelectDeskAtIndex = { [weak self] index in
-            guard let self else { return }
-            self.viewController.presenter.didSelectDeskAtIndex(index)
-            deskListView.removeFromSuperview()
+    func showDeskList() {
+        let deskListWireFrame = DeskWireframe()
+        deskListWireFrame.didSelectDeskIndex = { [weak self] index in
+            if let self, let index = index {
+                self.viewController.presenter.didSelectDeskAtIndex(index)
+            }
         }
-        deskListView.updateDesks(desks)
+        navigationController?.presentWireframe(deskListWireFrame)
     }
     
     func showCreateNewCard() {

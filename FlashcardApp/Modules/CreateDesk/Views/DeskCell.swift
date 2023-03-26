@@ -36,6 +36,18 @@ class DeskCell: UITableViewCell {
         // Initialization code
         deskButtonContainerView.isHidden = false
         deskDescContainerView.isHidden = true
+        deskNameTextField.inputViewStyle = .borderWith(radius: 4.0)
+        deskNameTextField.lineColor = AppColor.royalBlue?.withAlphaComponent(0.3)
+        deskNameTextField.editLineColor = AppColor.royalBlue
+        deskNameTextField.indicatorStyle = .default
+        deskNameTextField.textColor = AppColor.darkSlateGray
+        
+        deskDescTextField.inputViewStyle = .borderWith(radius: 4.0)
+        deskDescTextField.indicatorStyle = .default
+        deskDescTextField.lineColor = AppColor.royalBlue?.withAlphaComponent(0.3)
+        deskDescTextField.editLineColor = AppColor.royalBlue
+        deskDescTextField.textColor = AppColor.darkSlateGray
+
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -51,8 +63,13 @@ class DeskCell: UITableViewCell {
    
     func update(_ desk: DeskDataModel) {
         cellUniqueId = desk.uuid
-        deskNameTextField.text = desk.deskNameRelay.value
-        deskDescTextField.text = desk.deskDescRelay.value
+        deskNameTextField.text = desk.deskName
+        deskDescTextField.text = desk.deskDesc
+        subscrible(desk)
+        
+    }
+    
+    private func subscrible(_ desk: DeskDataModel) {
         disposeBag = DisposeBag()
         deskNameTextField.rx.didChange
             .map({ [unowned self] in self.deskNameTextField.text })
@@ -60,14 +77,32 @@ class DeskCell: UITableViewCell {
         deskDescTextField.rx.didChange
             .map({ [unowned self] in self.deskDescTextField.text })
             .bind(to: desk.deskDescRelay).disposed(by: disposeBag)
-
+        
         Observable.combineLatest([deskNameTextField.rx.observe(\.contentSize),
                                   deskDescTextField.rx.observe(\.contentSize)])
-            .observe(on: MainScheduler.asyncInstance)
-            .subscribe(onNext: { [unowned self] _ in
+        .observe(on: MainScheduler.asyncInstance)
+        .subscribe(onNext: { [unowned self] _ in
             self.tableView?.beginUpdates()
             self.tableView?.endUpdates()
         }).disposed(by: disposeBag)
+        
+        Observable.merge([deskNameTextField.rx.didBeginEditing.asObservable(),
+                          deskDescTextField.rx.didBeginEditing.asObservable()])
+        .observe(on: MainScheduler.asyncInstance)
+            .map({ [unowned self] _ in
+                self.isFocusedField = true
+                return self.isFocusedField
+            }).bind(to: desk.focusRelay)
+            .disposed(by: disposeBag)
+        
+        Observable.merge([deskNameTextField.rx.didEndEditing.asObservable(),
+                                  deskDescTextField.rx.didEndEditing.asObservable()])
+            .observe(on: MainScheduler.asyncInstance)
+            .map({ [unowned self] _ in
+                self.isFocusedField = false
+                return self.isFocusedField
+            }).bind(to: desk.focusRelay)
+            .disposed(by: disposeBag)
     }
 }
 
@@ -93,15 +128,5 @@ extension DeskCell: FocusTextFieldCellProtocol {
     
     func resignFirstResponder() {
         self.endEditing(true)
-    }
-}
-
-extension DeskCell: UITextViewDelegate {
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        isFocusedField = true
-    }
-    
-    func textViewDidEndEditing(_ textView: UITextView) {
-        isFocusedField = false
     }
 }

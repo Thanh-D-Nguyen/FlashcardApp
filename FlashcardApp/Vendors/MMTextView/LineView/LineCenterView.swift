@@ -140,7 +140,7 @@ class LineCenterView: UIView, InputViewProtocol {
             right.move(to: CGPoint(x: 0, y: self.frame.height))
             right.addLine(to: CGPoint(x: half, y: self.frame.height))
             editRightLayer.path = right.cgPath
-        case .boderWith(let radius):
+        case .borderWith(let radius):
             let bezier = UIBezierPath(roundedRect: self.bounds, cornerRadius: radius)
             bezier.move(to: CGPoint.init(x: bound.maxX, y: bound.height))
             lineLayer.path = bezier.cgPath

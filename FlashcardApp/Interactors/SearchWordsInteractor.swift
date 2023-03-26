@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol SearchWordsInteractorProtocol: AnyObject {
+protocol SearchWordsInteractorInterface: AnyObject {
     func searchText(_ text: String?, cardFace: CardFace) -> SearchResultEntity
 }
 
@@ -23,7 +23,7 @@ class SearchWordsInteractor {
     }
 }
 
-extension SearchWordsInteractor: SearchWordsInteractorProtocol {
+extension SearchWordsInteractor: SearchWordsInteractorInterface {
     func searchText(_ text: String?, cardFace: CardFace) -> SearchResultEntity {
         guard let txt = text, !txt.isEmpty else { return SearchResultEntity(face: .front, cards: []) }
         if cardFace == .front {

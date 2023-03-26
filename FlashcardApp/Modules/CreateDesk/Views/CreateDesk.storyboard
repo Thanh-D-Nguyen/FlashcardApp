@@ -6,7 +6,6 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -19,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="interactive" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RXZ-cm-D1Q">
-                                <rect key="frame" x="0.0" y="115" width="375" height="563"/>
+                                <rect key="frame" x="0.0" y="115" width="375" height="597"/>
                                 <color key="backgroundColor" name="whiteSmokeColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="zIc-eW-6fX" id="tEK-H5-3Nk"/>
@@ -61,35 +60,35 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sdP-dJ-39N" userLabel="BottomView">
-                                <rect key="frame" x="0.0" y="678" width="375" height="100"/>
+                                <rect key="frame" x="0.0" y="712" width="375" height="100"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eH9-iY-dbt" customClass="AddDeskBottomView" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="8" width="375" height="84"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <rect key="frame" x="0.0" y="8" width="375" height="58"/>
+                                        <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <connections>
                                             <action selector="bottomTapAction:" destination="zIc-eW-6fX" eventType="touchUpInside" id="xyL-dL-6OJ"/>
                                         </connections>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" name="whiteyColor"/>
+                                <color key="backgroundColor" name="whiteSmokeColor"/>
                                 <constraints>
                                     <constraint firstItem="eH9-iY-dbt" firstAttribute="leading" secondItem="sdP-dJ-39N" secondAttribute="leading" id="Jhb-v1-hC3"/>
                                     <constraint firstAttribute="trailing" secondItem="eH9-iY-dbt" secondAttribute="trailing" id="N9N-Fo-ra0"/>
                                     <constraint firstItem="eH9-iY-dbt" firstAttribute="top" secondItem="sdP-dJ-39N" secondAttribute="top" constant="8" id="O8L-Rn-vwH"/>
                                     <constraint firstAttribute="height" constant="100" placeholder="YES" id="qKp-vg-vOe"/>
-                                    <constraint firstAttribute="bottom" secondItem="eH9-iY-dbt" secondAttribute="bottom" constant="8" id="teu-pf-rAB"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="eH9-iY-dbt" secondAttribute="bottom" constant="-8" id="t0f-2S-dDY"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" name="whiteSmokeColor"/>
                         <constraints>
                             <constraint firstItem="RXZ-cm-D1Q" firstAttribute="top" secondItem="SRs-Wo-cpA" secondAttribute="bottom" id="113-Aq-YN8"/>
                             <constraint firstAttribute="trailing" secondItem="SRs-Wo-cpA" secondAttribute="trailing" id="6jw-oF-OVw"/>
                             <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="sdP-dJ-39N" secondAttribute="trailing" id="7Ws-jO-Y0W"/>
                             <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="RXZ-cm-D1Q" secondAttribute="trailing" id="LX7-7q-meC"/>
                             <constraint firstItem="SRs-Wo-cpA" firstAttribute="top" secondItem="3pi-N7-nbV" secondAttribute="top" id="UKk-P3-ne6"/>
-                            <constraint firstItem="sdP-dJ-39N" firstAttribute="bottom" secondItem="3pi-N7-nbV" secondAttribute="bottom" id="Wkt-0K-K9R"/>
+                            <constraint firstItem="sdP-dJ-39N" firstAttribute="bottom" secondItem="Z2g-4m-atm" secondAttribute="bottom" id="Wkt-0K-K9R"/>
                             <constraint firstItem="sdP-dJ-39N" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="q2Q-sm-zDr"/>
                             <constraint firstItem="SRs-Wo-cpA" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="r9C-wK-atq"/>
                             <constraint firstItem="sdP-dJ-39N" firstAttribute="top" secondItem="RXZ-cm-D1Q" secondAttribute="bottom" id="yCj-z1-Vi8"/>
@@ -105,7 +104,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rle-ol-2Ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="304.80000000000001" y="302.6986506746627"/>
+            <point key="canvasLocation" x="304.80000000000001" y="302.21674876847294"/>
         </scene>
     </scenes>
     <designables>
@@ -120,11 +119,5 @@
         <namedColor name="whiteSmokeColor">
             <color red="0.96470588235294119" green="0.96862745098039216" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="whiteyColor">
-            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
     </resources>
 </document>

@@ -59,3 +59,8 @@ enum MainTabbarName: Int {
         }
     }
 }
+
+enum PhotoSize: String {
+    case thumbnail = "q"
+    case large = "b"
+}

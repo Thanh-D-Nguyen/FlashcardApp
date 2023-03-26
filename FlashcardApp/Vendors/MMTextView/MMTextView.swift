@@ -501,7 +501,7 @@ extension MMTextView {
     }
     private func updatePlaceHolderMargin() {
         switch inputViewStyle {
-        case .border, .boderWith(_):
+        case .border, .borderWith(_):
             let maxLine = max(lineWidth, editLineWidth)
             let x = (CGFloat(maxLine/2) + 5)
             lineContainerView.mmTextLayout[.width]?.constant = 2*x

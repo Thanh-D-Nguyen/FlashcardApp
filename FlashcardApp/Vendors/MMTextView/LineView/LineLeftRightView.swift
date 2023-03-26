@@ -118,7 +118,7 @@ class LineLeftAnimateView: LineBaseView {
             bezier.addLine(to: CGPoint(x: self.frame.width, y: self.frame.height))
             lineLayer.path = bezier.cgPath
             editLayer.path = bezier.cgPath
-        case .boderWith(let radius):
+        case .borderWith(let radius):
             let bezier = UIBezierPath(roundedRect: self.bounds, cornerRadius: radius)
             lineLayer.path = bezier.cgPath
             editLayer.path = bezier.cgPath

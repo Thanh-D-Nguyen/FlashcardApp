@@ -11,7 +11,7 @@ import UIKit
 public enum InputViewStyle {
     case line
     case border
-    case boderWith(radius: CGFloat)
+    case borderWith(radius: CGFloat)
 }
 
 protocol InputViewProtocol: AnyObject {

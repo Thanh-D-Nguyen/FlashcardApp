@@ -88,11 +88,11 @@ extension CardViewController: CollectionViewPagingLayoutDelegate {
 extension CardViewController {
     @IBAction
     private func selectDeskAction() {
-        presenter.showDesk(byAddNew: false)
+        presenter.showDeskList()
     }
     
     @IBAction
     private func addNewDeskAction() {
-        presenter.showDesk(byAddNew: true)
+        presenter.createNewDesk()
     }
 }

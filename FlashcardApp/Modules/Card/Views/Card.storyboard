@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,21 +14,21 @@
             <objects>
                 <viewController storyboardIdentifier="CardViewController" id="zIc-eW-6fX" customClass="CardViewController" customModule="FlashcardApp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Z2g-4m-atm">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aPJ-MS-3Q4">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
+                                <rect key="frame" x="0.0" y="47" width="390" height="68"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Hb-ly-Gqq" userLabel="TopBar" customClass="TopBarView" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="390" height="68"/>
+                                        <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="title" value="Card"/>
                                         </userDefinedRuntimeAttributes>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="backgroundColor" name="whiteSmokeColor"/>
                                 <constraints>
                                     <constraint firstItem="2Hb-ly-Gqq" firstAttribute="top" secondItem="aPJ-MS-3Q4" secondAttribute="top" id="Neo-rG-c6j"/>
                                     <constraint firstAttribute="height" constant="68" id="YpK-j3-rKR"/>
@@ -39,10 +38,10 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rIe-wG-YgS" userLabel="TopView">
-                                <rect key="frame" x="0.0" y="68" width="375" height="66"/>
+                                <rect key="frame" x="0.0" y="115" width="390" height="66"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g45-jZ-ttQ" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="8" y="8" width="301" height="50"/>
+                                        <rect key="frame" x="8" y="8" width="316" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="H24-6k-EeZ"/>
                                         </constraints>
@@ -50,21 +49,20 @@
                                         <inset key="titleEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Chạm để tạo Desk...">
-                                            <color key="titleColor" name="teflonColor"/>
+                                            <color key="titleColor" name="royalBlueColor"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundImageColor">
-                                                <color key="value" name="karlColor"/>
+                                                <color key="value" name="whiteSmokeColor"/>
                                             </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                <real key="value" value="8"/>
+                                                <real key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
                                                 <real key="value" value="1"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                <color key="value" name="blackA54Color"/>
+                                                <color key="value" name="royalBlueColor"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -72,25 +70,24 @@
                                         </connections>
                                     </button>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.down.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="6oL-ZS-M4v">
-                                        <rect key="frame" x="273" y="11.5" width="20" height="43"/>
+                                        <rect key="frame" x="288" y="12" width="20" height="42.666666666666671"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <color key="tintColor" name="gandalfColor"/>
+                                        <color key="tintColor" name="royalBlueColor"/>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vSx-MY-MSi" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="317" y="8" width="50" height="50"/>
-                                        <color key="tintColor" name="teflonColor"/>
+                                        <rect key="frame" x="332" y="8" width="50" height="50"/>
+                                        <color key="tintColor" name="royalBlueColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="plus.square.fill" catalog="system"/>
                                         <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
-                                                <real key="value" value="1"/>
-                                            </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                <color key="value" name="blackA30Color"/>
+                                                <color key="value" name="royalBlueColor"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="1"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -98,7 +95,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" name="whiteSmokeColor"/>
                                 <constraints>
                                     <constraint firstItem="g45-jZ-ttQ" firstAttribute="top" secondItem="rIe-wG-YgS" secondAttribute="top" constant="8" id="4Vc-eU-7A4"/>
                                     <constraint firstAttribute="bottom" secondItem="g45-jZ-ttQ" secondAttribute="bottom" constant="8" id="5En-pb-a19"/>
@@ -114,11 +111,11 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xun-cF-FCZ" userLabel="ContentView">
-                                <rect key="frame" x="0.0" y="134" width="375" height="533"/>
+                                <rect key="frame" x="0.0" y="181" width="390" height="629"/>
                                 <subviews>
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Dz9-Ys-Sge">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="533"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="390" height="629"/>
+                                        <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="RmT-Tf-VFi">
                                             <size key="itemSize" width="128" height="128"/>
                                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -132,7 +129,7 @@
                                         </connections>
                                     </collectionView>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" name="whiteSmokeColor"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="Dz9-Ys-Sge" secondAttribute="trailing" id="6Jg-ZE-5f8"/>
                                     <constraint firstItem="Dz9-Ys-Sge" firstAttribute="top" secondItem="xun-cF-FCZ" secondAttribute="top" id="RQb-pW-LYs"/>
@@ -142,7 +139,7 @@
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" name="whiteSmokeColor"/>
                         <constraints>
                             <constraint firstItem="aPJ-MS-3Q4" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="FWr-E9-MXh"/>
                             <constraint firstItem="rIe-wG-YgS" firstAttribute="top" secondItem="aPJ-MS-3Q4" secondAttribute="bottom" id="TFa-GC-U6c"/>
@@ -171,29 +168,17 @@
             <size key="intrinsicContentSize" width="153" height="32"/>
         </designable>
         <designable name="vSx-MY-MSi">
-            <size key="intrinsicContentSize" width="25" height="24"/>
+            <size key="intrinsicContentSize" width="25" height="23.666666666666668"/>
         </designable>
     </designables>
     <resources>
         <image name="chevron.down.circle.fill" catalog="system" width="128" height="123"/>
         <image name="plus.square.fill" catalog="system" width="128" height="114"/>
-        <namedColor name="blackA30Color">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="royalBlueColor">
+            <color red="0.27450980392156865" green="0.32941176470588235" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="blackA54Color">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.54000002145767212" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="whiteSmokeColor">
+            <color red="0.96470588235294119" green="0.96862745098039216" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="gandalfColor">
-            <color red="0.59200000762939453" green="0.5690000057220459" blue="0.59200000762939453" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="karlColor">
-            <color red="0.92900002002716064" green="0.92500001192092896" blue="0.92900002002716064" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="teflonColor">
-            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
     </resources>
 </document>

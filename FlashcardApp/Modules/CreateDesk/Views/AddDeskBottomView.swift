@@ -15,6 +15,7 @@ enum AddDeskBottomViewAction {
 @IBDesignable
 class AddDeskBottomView: UIControl {
     @IBOutlet private weak var numOfItemLabel: UILabel!
+    @IBOutlet private weak var nextFocusButton: UIButton!
     @IBOutlet private weak var collectionView: FadingEdgesCollectionView!
     @IBOutlet private weak var collectionContainerView: UIView!
     
@@ -58,7 +59,18 @@ class AddDeskBottomView: UIControl {
     func setSearchResult(_ result: SearchResultEntity) {
         self.result = result
         collectionContainerView.isHidden = result.cards.count == 0
-        self.collectionView.reloadData()
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    func updateKeyboardHidden(_ isHidden: Bool) {
+        numOfItemLabel.alpha = isHidden ? 0.0 : 1.0
+        nextFocusButton.alpha = isHidden ? 0.0 : 1.0
+    }
+    
+    func updateNumOfItemText(_ text: String) {
+        numOfItemLabel.text = text
     }
 }
 

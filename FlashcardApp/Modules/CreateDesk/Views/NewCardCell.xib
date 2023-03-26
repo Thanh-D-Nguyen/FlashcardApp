@@ -22,56 +22,41 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jdu-IE-AwL" userLabel="BgView" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
                         <rect key="frame" x="8" y="4" width="312" height="148"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="N2B-GE-f3s">
-                                <rect key="frame" x="0.0" y="0.0" width="232" height="126"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="N2B-GE-f3s">
+                                <rect key="frame" x="16" y="8" width="216" height="134"/>
                                 <subviews>
-                                    <view tag="100001" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ojp-90-g43" userLabel="wordView">
-                                        <rect key="frame" x="0.0" y="0.0" width="232" height="58"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ojp-90-g43" userLabel="wordView">
+                                        <rect key="frame" x="0.0" y="0.0" width="216" height="58"/>
                                         <subviews>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MKS-et-eco" userLabel="TextBgView">
-                                                <rect key="frame" x="4" y="8" width="224" height="42"/>
-                                                <subviews>
-                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="U8t-kp-QdI" customClass="MMTextView" customModule="FlashcardApp" customModuleProvider="target">
-                                                        <rect key="frame" x="4" y="0.0" width="220" height="42"/>
-                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                        <color key="textColor" systemColor="labelColor"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Nhập từ khoá"/>
-                                                            <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
-                                                                <color key="value" name="darkSlateGrayColor"/>
-                                                            </userDefinedRuntimeAttribute>
-                                                        </userDefinedRuntimeAttributes>
-                                                        <connections>
-                                                            <outlet property="delegate" destination="KGk-i7-Jjw" id="YaQ-QF-1Dx"/>
-                                                        </connections>
-                                                    </textView>
-                                                </subviews>
-                                                <color key="backgroundColor" name="whiteColor"/>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="U8t-kp-QdI" customClass="MMTextView" customModule="FlashcardApp" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="216" height="58"/>
+                                                <color key="backgroundColor" name="whiteSmokeColor"/>
                                                 <constraints>
-                                                    <constraint firstItem="U8t-kp-QdI" firstAttribute="leading" secondItem="MKS-et-eco" secondAttribute="leading" constant="4" id="93X-lC-fyQ"/>
-                                                    <constraint firstAttribute="bottom" secondItem="U8t-kp-QdI" secondAttribute="bottom" id="AJQ-PQ-7q2"/>
-                                                    <constraint firstItem="U8t-kp-QdI" firstAttribute="top" secondItem="MKS-et-eco" secondAttribute="top" id="W8f-Fq-CNN"/>
-                                                    <constraint firstAttribute="trailing" secondItem="U8t-kp-QdI" secondAttribute="trailing" id="jhs-MX-ZuM"/>
+                                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="60" id="LbD-Sj-S3j"/>
+                                                    <constraint firstAttribute="height" priority="251" constant="25" id="cHK-QB-ieL"/>
                                                 </constraints>
-                                            </view>
+                                                <color key="textColor" systemColor="labelColor"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Nhập từ khoá"/>
+                                                </userDefinedRuntimeAttributes>
+                                            </textView>
                                         </subviews>
-                                        <color key="backgroundColor" name="whiteColor"/>
+                                        <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <constraints>
-                                            <constraint firstAttribute="trailing" secondItem="MKS-et-eco" secondAttribute="trailing" constant="4" id="F1d-sP-YUP"/>
-                                            <constraint firstAttribute="height" constant="58" placeholder="YES" id="YoO-Q1-bpZ"/>
-                                            <constraint firstItem="MKS-et-eco" firstAttribute="top" secondItem="ojp-90-g43" secondAttribute="top" constant="8" id="ZZI-wV-QhF"/>
-                                            <constraint firstItem="MKS-et-eco" firstAttribute="centerY" secondItem="ojp-90-g43" secondAttribute="centerY" id="aqi-XY-D5Z"/>
-                                            <constraint firstItem="MKS-et-eco" firstAttribute="leading" secondItem="ojp-90-g43" secondAttribute="leading" constant="4" id="sat-AY-OnK"/>
+                                            <constraint firstAttribute="trailing" secondItem="U8t-kp-QdI" secondAttribute="trailing" id="Sst-eh-gF3"/>
+                                            <constraint firstItem="U8t-kp-QdI" firstAttribute="top" secondItem="ojp-90-g43" secondAttribute="top" id="V5d-Uv-Nt2"/>
+                                            <constraint firstAttribute="bottom" secondItem="U8t-kp-QdI" secondAttribute="bottom" id="dSU-hs-WwG"/>
+                                            <constraint firstItem="U8t-kp-QdI" firstAttribute="leading" secondItem="ojp-90-g43" secondAttribute="leading" id="uQ6-tK-oLd"/>
                                         </constraints>
                                     </view>
-                                    <view tag="100003" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JDV-27-W3x" userLabel="seperateView">
-                                        <rect key="frame" x="0.0" y="58" width="232" height="10"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JDV-27-W3x" userLabel="seperateView">
+                                        <rect key="frame" x="0.0" y="62" width="216" height="10"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pbd-UI-1IH" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
-                                                <rect key="frame" x="91" y="3" width="50" height="4"/>
-                                                <color key="backgroundColor" name="blackA30Color"/>
+                                                <rect key="frame" x="83" y="3" width="50" height="4"/>
+                                                <color key="backgroundColor" name="royalBlueColor"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="4" id="1v6-wB-ftY"/>
                                                     <constraint firstAttribute="width" constant="50" id="BfD-H6-ABM"/>
@@ -86,64 +71,50 @@
                                                 </userDefinedRuntimeAttributes>
                                             </view>
                                         </subviews>
-                                        <color key="backgroundColor" name="whiteColor"/>
+                                        <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <constraints>
                                             <constraint firstItem="Pbd-UI-1IH" firstAttribute="centerX" secondItem="JDV-27-W3x" secondAttribute="centerX" id="QVy-Gn-UPq"/>
                                             <constraint firstAttribute="height" constant="10" id="U5k-GW-4t6"/>
                                             <constraint firstItem="Pbd-UI-1IH" firstAttribute="centerY" secondItem="JDV-27-W3x" secondAttribute="centerY" id="rjV-Er-vhT"/>
                                         </constraints>
                                     </view>
-                                    <view tag="100004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gtc-CQ-G0H" userLabel="meanView">
-                                        <rect key="frame" x="0.0" y="68" width="232" height="58"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gtc-CQ-G0H" userLabel="meanView">
+                                        <rect key="frame" x="0.0" y="76" width="216" height="58"/>
                                         <subviews>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Fru-gt-t4x">
-                                                <rect key="frame" x="4" y="8" width="224" height="42"/>
-                                                <subviews>
-                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="41F-aO-VH7" customClass="MMTextView" customModule="FlashcardApp" customModuleProvider="target">
-                                                        <rect key="frame" x="4" y="0.0" width="220" height="42"/>
-                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                        <color key="textColor" systemColor="labelColor"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                        <userDefinedRuntimeAttributes>
-                                                            <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Ý nghĩa"/>
-                                                            <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
-                                                                <color key="value" name="darkSlateGrayColor"/>
-                                                            </userDefinedRuntimeAttribute>
-                                                        </userDefinedRuntimeAttributes>
-                                                        <connections>
-                                                            <outlet property="delegate" destination="KGk-i7-Jjw" id="Bej-cI-rIv"/>
-                                                        </connections>
-                                                    </textView>
-                                                </subviews>
-                                                <color key="backgroundColor" name="whiteColor"/>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="41F-aO-VH7" customClass="MMTextView" customModule="FlashcardApp" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="216" height="58"/>
+                                                <color key="backgroundColor" name="whiteSmokeColor"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="trailing" secondItem="41F-aO-VH7" secondAttribute="trailing" id="141-oB-dur"/>
-                                                    <constraint firstItem="41F-aO-VH7" firstAttribute="top" secondItem="Fru-gt-t4x" secondAttribute="top" id="90L-oi-ItB"/>
-                                                    <constraint firstAttribute="bottom" secondItem="41F-aO-VH7" secondAttribute="bottom" id="fw6-vE-wah"/>
-                                                    <constraint firstItem="41F-aO-VH7" firstAttribute="leading" secondItem="Fru-gt-t4x" secondAttribute="leading" constant="4" id="zsV-Us-Ttk"/>
+                                                    <constraint firstAttribute="height" priority="251" constant="25" id="02T-Ly-gut"/>
+                                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="60" id="xXI-vb-3oj"/>
                                                 </constraints>
-                                            </view>
+                                                <color key="textColor" systemColor="labelColor"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Ý nghĩa"/>
+                                                </userDefinedRuntimeAttributes>
+                                            </textView>
                                         </subviews>
-                                        <color key="backgroundColor" name="whiteColor"/>
+                                        <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <constraints>
-                                            <constraint firstItem="Fru-gt-t4x" firstAttribute="centerY" secondItem="Gtc-CQ-G0H" secondAttribute="centerY" id="9Dg-GF-qRC"/>
-                                            <constraint firstAttribute="trailing" secondItem="Fru-gt-t4x" secondAttribute="trailing" constant="4" id="AaO-PJ-70N"/>
-                                            <constraint firstItem="Fru-gt-t4x" firstAttribute="leading" secondItem="Gtc-CQ-G0H" secondAttribute="leading" constant="4" id="EKL-VA-60Z"/>
-                                            <constraint firstAttribute="height" constant="58" placeholder="YES" id="STA-TQ-H99"/>
-                                            <constraint firstItem="Fru-gt-t4x" firstAttribute="top" secondItem="Gtc-CQ-G0H" secondAttribute="top" constant="8" id="lOR-L2-OpV"/>
+                                            <constraint firstItem="41F-aO-VH7" firstAttribute="top" secondItem="Gtc-CQ-G0H" secondAttribute="top" id="MpJ-st-JLM"/>
+                                            <constraint firstAttribute="bottom" secondItem="41F-aO-VH7" secondAttribute="bottom" id="Yit-k9-2tJ"/>
+                                            <constraint firstItem="41F-aO-VH7" firstAttribute="leading" secondItem="Gtc-CQ-G0H" secondAttribute="leading" id="qOI-Dp-g87"/>
+                                            <constraint firstAttribute="trailing" secondItem="41F-aO-VH7" secondAttribute="trailing" id="qmm-5S-wJs"/>
                                         </constraints>
                                     </view>
                                 </subviews>
                             </stackView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DSCF6520" translatesAutoresizingMaskIntoConstraints="NO" id="8DC-Jb-uXy">
-                                <rect key="frame" x="232" y="10" width="72" height="128"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="8DC-Jb-uXy">
+                                <rect key="frame" x="248" y="24.333333333333336" width="56" height="99.333333333333314"/>
+                                <color key="backgroundColor" name="chartreuseYellow"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="8DC-Jb-uXy" secondAttribute="height" multiplier="9:16" id="Ajn-R4-kyY"/>
+                                    <constraint firstAttribute="width" secondItem="8DC-Jb-uXy" secondAttribute="height" multiplier="9:16" id="K9W-im-lIr"/>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Jd-Hq-tUe" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                <rect key="frame" x="282" y="0.0" width="30" height="30"/>
+                                <rect key="frame" x="282" y="24.333333333333329" width="30" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="4Jd-Hq-tUe" secondAttribute="height" id="64R-72-rhB"/>
                                     <constraint firstAttribute="width" constant="30" id="guY-Aa-bSj"/>
@@ -158,17 +129,18 @@
                                 </userDefinedRuntimeAttributes>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" name="whiteColor"/>
+                        <color key="backgroundColor" name="whiteSmokeColor"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="N2B-GE-f3s" secondAttribute="bottom" priority="250" id="9ca-Bd-vCw"/>
-                            <constraint firstItem="8DC-Jb-uXy" firstAttribute="leading" secondItem="N2B-GE-f3s" secondAttribute="trailing" id="CNA-pz-SBk"/>
+                            <constraint firstAttribute="bottom" secondItem="N2B-GE-f3s" secondAttribute="bottom" priority="250" constant="8" id="9ca-Bd-vCw"/>
+                            <constraint firstItem="8DC-Jb-uXy" firstAttribute="leading" secondItem="N2B-GE-f3s" secondAttribute="trailing" constant="16" id="CNA-pz-SBk"/>
                             <constraint firstItem="8DC-Jb-uXy" firstAttribute="centerY" secondItem="Jdu-IE-AwL" secondAttribute="centerY" id="cf4-Lh-nbs"/>
                             <constraint firstAttribute="trailing" secondItem="4Jd-Hq-tUe" secondAttribute="trailing" id="cpC-8k-JYY"/>
                             <constraint firstAttribute="trailing" secondItem="8DC-Jb-uXy" secondAttribute="trailing" constant="8" id="fIx-TB-0Zi"/>
-                            <constraint firstItem="N2B-GE-f3s" firstAttribute="leading" secondItem="Jdu-IE-AwL" secondAttribute="leading" id="fLD-Lp-z2E"/>
-                            <constraint firstItem="N2B-GE-f3s" firstAttribute="top" secondItem="Jdu-IE-AwL" secondAttribute="top" id="iRN-Gx-7l5"/>
+                            <constraint firstItem="N2B-GE-f3s" firstAttribute="leading" secondItem="Jdu-IE-AwL" secondAttribute="leading" constant="16" id="fLD-Lp-z2E"/>
+                            <constraint firstItem="4Jd-Hq-tUe" firstAttribute="top" secondItem="8DC-Jb-uXy" secondAttribute="top" id="iCy-1d-lv0"/>
+                            <constraint firstItem="N2B-GE-f3s" firstAttribute="top" secondItem="Jdu-IE-AwL" secondAttribute="top" constant="8" id="iRN-Gx-7l5"/>
                             <constraint firstAttribute="trailing" secondItem="N2B-GE-f3s" secondAttribute="trailing" constant="80" id="o1m-dh-FoO"/>
-                            <constraint firstItem="4Jd-Hq-tUe" firstAttribute="top" secondItem="Jdu-IE-AwL" secondAttribute="top" id="p6N-aR-Vjc"/>
+                            <constraint firstItem="8DC-Jb-uXy" firstAttribute="top" secondItem="Jdu-IE-AwL" secondAttribute="top" priority="250" id="wlC-Za-Nlc"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
@@ -187,6 +159,7 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="cardImageView" destination="8DC-Jb-uXy" id="Ky1-vH-rYm"/>
                 <outlet property="imageButton" destination="4Jd-Hq-tUe" id="6eu-gf-uUS"/>
                 <outlet property="meanTextField" destination="41F-aO-VH7" id="Csg-Ks-4Ch"/>
                 <outlet property="meanViewContainer" destination="Gtc-CQ-G0H" id="amT-mP-P9k"/>
@@ -210,34 +183,24 @@
         </designable>
     </designables>
     <resources>
-        <image name="DSCF6520" width="1920" height="1280"/>
         <image name="pencil.circle.fill" catalog="system" width="128" height="123"/>
         <namedColor name="blackA15Color">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.14999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="blackA30Color">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.15000000596046448" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="blackA80Color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="darkSlateGrayColor">
-            <color red="0.28235294117647058" green="0.32156862745098042" blue="0.3411764705882353" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="chartreuseYellow">
+            <color red="0.91764705882352937" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="royalBlueColor">
             <color red="0.27450980392156865" green="0.32941176470588235" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="whiteColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="whiteSmokeColor">
             <color red="0.96470588235294119" green="0.96862745098039216" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="labelColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

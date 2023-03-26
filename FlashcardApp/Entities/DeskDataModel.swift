@@ -22,6 +22,9 @@ struct DeskDataModel {
     var sortingLang: LanguageSortingType {
         return sortingLanguageRelay.value
     }
+    
+    let focusRelay = BehaviorRelay<Bool>(value: false)
+    
     var cards: [CardDataModel]
     
     init(name: String = "", desc: String = "", language: LanguageSortingType = .normal, cards: [CardDataModel] = []) {
@@ -38,7 +41,7 @@ struct DeskDataModel {
     }
 }
 
-struct CardDataModel {
+struct CardDataModel: Equatable {
     let uuid = UUID().uuidString
     
     let frontRelay: BehaviorRelay<String?>
@@ -49,15 +52,26 @@ struct CardDataModel {
     var back: String {
         return backRelay.value ?? ""
     }
-    let imageRelay: BehaviorRelay<String>
+    let imageUrlRelay: BehaviorRelay<String>
     var imageUrl: String {
+        return imageUrlRelay.value
+    }
+    
+    let imageRelay: BehaviorRelay<UIImage?>
+    var image: UIImage? {
         return imageRelay.value
     }
+    
+    let didSelectImageRelay: PublishRelay<Void>
+    
+    let focusRelay = BehaviorRelay<Bool>(value: false)
     
     init(front: String = "", back: String = "", imageUrl: String = "") {
         self.frontRelay = BehaviorRelay(value: front)
         self.backRelay = BehaviorRelay(value: back)
-        self.imageRelay = BehaviorRelay(value: imageUrl)
+        self.imageUrlRelay = BehaviorRelay(value: imageUrl)
+        self.imageRelay = BehaviorRelay(value: nil)
+        self.didSelectImageRelay = PublishRelay()
     }
     
     func toCardEntity() -> CardEntity? {

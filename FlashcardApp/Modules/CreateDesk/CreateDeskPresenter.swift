@@ -36,11 +36,11 @@ protocol CreateDeskPresenterInterface: AnyObject {
     var desk: DeskDataModel { get }
     var deskChangedRelay: BehaviorRelay<DeskChangedEvent> { get }
     var sortingLanguageRelay: BehaviorRelay<LanguageSortingType> { get }
-    
+    var focusIndexRelay: BehaviorRelay<String> { get }
     var wordsSearchResultRelay: BehaviorRelay<SearchResultEntity> { get }
     
     func viewDidLoad()
-    func insertNewCardAfterUId(_ uId: String)
+    func insertNewCardAfterUId(_ uId: String?)
     func deleteCardAtIndex(_ index: Int)
     func moveCardAtIndex(_ index: Int, moveType: CardCellMoveType)
     
@@ -51,16 +51,18 @@ protocol CreateDeskPresenterInterface: AnyObject {
 
 class CreateDeskPresenter {
     private let interactor: CreateDeskInteractorInterface
-    private let searchWordInteractor: SearchWordsInteractor
+    private let searchWordInteractor: SearchWordsInteractorInterface
     private let wireframe: CreateDeskWireframeInterface
+    private let flickrImageSearchInteractor: FlickrImageSearchInteractorInterface
     
-    private let dictionaryInteractor = DictionaryInteractor()
+    private let dictionaryInteractor: DictionaryInteractorInterface
     
     private let disposeBag = DisposeBag()
     
     var desk = DeskDataModel()
     let deskChangedRelay = BehaviorRelay<DeskChangedEvent>(value: .default)
     let sortingLanguageRelay = BehaviorRelay<LanguageSortingType>(value: .normal)
+    let focusIndexRelay = BehaviorRelay<String>(value: "")
     let wordsSearchResultRelay = BehaviorRelay<SearchResultEntity>(value: SearchResultEntity(face: .front, cards: []))
     
     private var editingCard: CardDataModel!
@@ -70,11 +72,18 @@ class CreateDeskPresenter {
         self.interactor = interactor
         self.wireframe = wireframe
         self.searchWordInteractor = SearchWordsInteractor()
+        self.flickrImageSearchInteractor = FlickrImageSearchInteractor()
+        self.dictionaryInteractor = DictionaryInteractor()
+        desk.focusRelay.bind(onNext: { [unowned self] isFocused in
+            if isFocused {
+                self.focusIndexRelay.accept("")
+            }
+        }).disposed(by: disposeBag)
     }
     
     private func bind(_ card: CardDataModel) {
         // Search front
-        let searchFront = card.frontRelay.throttle(.milliseconds(100), scheduler: MainScheduler.instance)
+        let searchFront = card.frontRelay.throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
         let queryFront = searchFront.map({
             let words = self.searchWordInteractor.searchText($0, cardFace: .front)
@@ -86,7 +95,7 @@ class CreateDeskPresenter {
         }).disposed(by: disposeBag)
         
         // Search back
-        let searchBack = card.backRelay.throttle(.milliseconds(100), scheduler: MainScheduler.instance)
+        let searchBack = card.backRelay.throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
         let queryBack = searchBack.map({
             let words = self.searchWordInteractor.searchText($0, cardFace: .back)
@@ -96,6 +105,19 @@ class CreateDeskPresenter {
             self.editingCard = card
             self.wordsSearchResultRelay.accept(obj)
         }).disposed(by: disposeBag)
+        
+        card.focusRelay.bind(onNext: { [unowned self] isFocused in
+            var resultString = ""
+            if let index = self.desk.cards.firstIndex(of: card) {
+                resultString = "\(index + 1)/\(self.desk.cards.count)"
+            }
+            
+            self.focusIndexRelay.accept(resultString)
+        }).disposed(by: disposeBag)
+        
+        card.didSelectImageRelay.bind { [unowned self] in
+            self.wireframe.showImageSearch()
+        }.disposed(by: disposeBag)
     }
     
     private func searchText(_ text: String, cardFace: CardFace) {
@@ -111,7 +133,7 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         }.disposed(by: disposeBag)
     }
     
-    func insertNewCardAfterUId(_ uId: String) {
+    func insertNewCardAfterUId(_ uId: String?) {
         let newCard = CardDataModel()
         self.bind(newCard)
         var insertIndex = 0
@@ -119,7 +141,11 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
             insertIndex = currentIndex + 1
         }
         desk.cards.insert(newCard, at: insertIndex)
-        deskChangedRelay.accept(.cardInsert(uId, insertIndex))
+        if let existedUid = uId {
+            deskChangedRelay.accept(.cardInsert(existedUid, insertIndex))
+        } else {
+            deskChangedRelay.accept(.cardInsert("", insertIndex))
+        }
     }
     
     func deleteCardAtIndex(_ index: Int) {
@@ -153,6 +179,11 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         guard let index = desk.cards.firstIndex(where: { $0 == self.editingCard }) else { return }
         
         desk.cards[index] = self.editingCard
+        flickrImageSearchInteractor.fetchPhotos(.init(query: card.frontText, photosPerPage: 10))
+        flickrImageSearchInteractor.resultImage = { [weak self] image in
+            guard let self else { return }
+            self.desk.cards[index].imageRelay.accept(image)
+        }
         deskChangedRelay.accept(.reloadCard(index))
     }
     
