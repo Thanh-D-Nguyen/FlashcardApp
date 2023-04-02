@@ -1,6 +1,6 @@
 //
-//  StubConfig.xcconfig
-//  SnackOverflowApp
+//  DevelopmentConfig.xcconfig
+//  Flashcard App
 //
 //  Created by タイン・グエン on 2023/01/08.
 //
@@ -11,5 +11,5 @@
 
 PRODUCT_DISPLAY_NAME = $(inherited) STUB
 PRODUCT_ICON = AppIconStub
-PRODUCT_BUNDLE_IDENTIFIER = com.ds.FlashcardApp.stub
+PRODUCT_BUNDLE_IDENTIFIER = com.ds.FlashcardApp.dev
 PRODUCT_BASE_URL = http:\/\/127.0.0.1

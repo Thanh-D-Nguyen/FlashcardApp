@@ -32,6 +32,7 @@ extension CreateDeskWireframe: CreateDeskWireframeInterface {
     }
     
     func showImageSearch() {
-        
+        let imageSearchView = ImageSearchWireframe()
+        self.viewController.show(imageSearchView.viewController, sender: nil)
     }
 }

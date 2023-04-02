@@ -1,8 +1,8 @@
 //
-//  Models.swift
-//  ImageSearchApp
+//  FlickrPhoto.swift
+//  FlashcardApp
 //
-//  Created by Rodion Artyukhin on 13.12.2022.
+//  Created by タイン・グエン on 2023/04/01.
 //
 
 import Foundation
@@ -13,16 +13,21 @@ struct PhotoSearchResult: Codable {
 }
 
 struct PagedPhotoSearchResult: Codable {
-    let photo: [Photo]
+    let photo: [FlickrPhoto]
     let page: Int
     let pages: Int
     let perpage: Int
     let total: Int
 }
 
-struct Photo: Codable {
+struct FlickrPhoto: Codable {
     let id: String
     let title: String
     let secret: String
     let server: String
+    
+    
+    func imagePath(_ size: PhotoSize) -> String {
+        return "https://live.staticflickr.com/\(server)/\(id)_\(secret)_\(size.rawValue).jpg"
+    }
 }

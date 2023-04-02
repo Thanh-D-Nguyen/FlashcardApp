@@ -53,7 +53,7 @@ class CreateDeskPresenter {
     private let interactor: CreateDeskInteractorInterface
     private let searchWordInteractor: SearchWordsInteractorInterface
     private let wireframe: CreateDeskWireframeInterface
-    private let flickrImageSearchInteractor: FlickrImageSearchInteractorInterface
+    private let imageSearchInteractor: ImageSearchInteractorInterface
     
     private let dictionaryInteractor: DictionaryInteractorInterface
     
@@ -72,7 +72,7 @@ class CreateDeskPresenter {
         self.interactor = interactor
         self.wireframe = wireframe
         self.searchWordInteractor = SearchWordsInteractor()
-        self.flickrImageSearchInteractor = FlickrImageSearchInteractor()
+        self.imageSearchInteractor = ImageSearchInteractor.create(type: .pixabay)
         self.dictionaryInteractor = DictionaryInteractor()
         desk.focusRelay.bind(onNext: { [unowned self] isFocused in
             if isFocused {
@@ -179,12 +179,14 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         guard let index = desk.cards.firstIndex(where: { $0 == self.editingCard }) else { return }
         
         desk.cards[index] = self.editingCard
-        flickrImageSearchInteractor.fetchPhotos(.init(query: card.frontText, photosPerPage: 10))
-        flickrImageSearchInteractor.resultImage = { [weak self] image in
-            guard let self else { return }
+        imageSearchInteractor.search(query: card.frontText, page: 1, perpage: 10)
+            .subscribe(onSuccess: { [weak self] photos in
+                guard let self else { return }
+                if let imageUrl = photos.compactMap({ $0.url }).first {
+                    self.desk.cards[index].imageUrlRelay.accept(imageUrl)
+                }
+            }).disposed(by: disposeBag)
             
-            self.desk.cards[index].imageRelay.accept(image)
-        }
         deskChangedRelay.accept(.reloadCard(index))
     }
     

@@ -19,6 +19,9 @@ class APIError: Error {
 
 class APIErrorFilter {
     class func filter(_ response: Any?, _ error: Error?) -> APIError? {
-        return APIError(status: 0, message: "OK")
+        if let error = error {
+            return APIError(status: 1, message: error.localizedDescription)
+        }
+        return nil
     }
 }

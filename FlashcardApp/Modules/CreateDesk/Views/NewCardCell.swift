@@ -8,6 +8,7 @@
 import UIKit
 import SwipeCellKit
 import RxSwift
+import Kingfisher
 
 class NewCardCell: SwipeTableViewCell {
     private var disposeBag = DisposeBag()
@@ -77,10 +78,10 @@ class NewCardCell: SwipeTableViewCell {
 
         imageButton.rx.tap.bind(to: card.didSelectImageRelay).disposed(by: disposeBag)
         
-        card.imageRelay.bind(onNext: { [unowned self] image in
-            self.cardImageView.image = image
+        card.imageUrlRelay.subscribe(onNext: { [unowned self] imageUrl in
+            self.cardImageView.kf.setImage(with: URL(string: imageUrl))
         }).disposed(by: disposeBag)
-    
+        
         Observable.merge([wordTextField.rx.didBeginEditing.asObservable(),
                           meanTextField.rx.didBeginEditing.asObservable()])
             .map({ [unowned self] _ in

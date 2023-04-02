@@ -7,6 +7,8 @@ class AppService {
     class func bootstrap(_ app: UIApplication) {
         FirebaseApp.configure()
         FBSDKCoreKit.ApplicationDelegate.shared.application(app)
+        
+        print(EnvironmentConfig.baseUrl())
     }
     
     class func handleOpenGoogleUrl(_ url: URL) -> Bool {

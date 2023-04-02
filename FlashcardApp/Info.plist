@@ -21,6 +21,10 @@
 			</array>
 		</dict>
 	</array>
+	<key>ProductBaseUrl</key>
+	<string>$(PRODUCT_BASE_URL)</string>
+	<key>FlickrSearchUrl</key>
+	<string>$(FLICKR_SEARCH_URL)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
