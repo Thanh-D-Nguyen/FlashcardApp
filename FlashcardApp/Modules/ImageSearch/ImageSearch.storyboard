@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -23,19 +24,37 @@
                                     <outlet property="delegate" destination="zIc-eW-6fX" id="Tg0-5w-M8w"/>
                                 </connections>
                             </searchBar>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tNw-wc-pVn" customClass="RESegmentedControl" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="76" width="375" height="44"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="vcn-ZF-46k"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="PS5-zu-4ko" firstAttribute="trailing" secondItem="3pi-N7-nbV" secondAttribute="trailing" id="8JT-Fn-kau"/>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="tNw-wc-pVn" secondAttribute="trailing" id="Byo-p2-C2m"/>
+                            <constraint firstItem="tNw-wc-pVn" firstAttribute="top" secondItem="PS5-zu-4ko" secondAttribute="bottom" id="MDv-0P-DfM"/>
                             <constraint firstItem="PS5-zu-4ko" firstAttribute="top" secondItem="3pi-N7-nbV" secondAttribute="top" id="Yf5-1y-EF7"/>
+                            <constraint firstItem="tNw-wc-pVn" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="pZF-ld-iHn"/>
                             <constraint firstItem="PS5-zu-4ko" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="prP-b5-3ZD"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="segmentedControl" destination="tNw-wc-pVn" id="ZMM-ft-9LF"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rle-ol-2Ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="306" y="303"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

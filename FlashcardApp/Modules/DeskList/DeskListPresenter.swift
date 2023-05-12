@@ -20,14 +20,14 @@ protocol DeskListPresenterInterface: AnyObject {
 
 class DeskListPresenter {
     private let interactor: DeskInteractorInterface
-    private let wireframe: DeskWireframeInterface
+    private let wireframe: DeskListWireframeInterface
 
     private var entity: DeskEntity?
     
     let desksRelay = BehaviorRelay<[DeskEntity]>(value: [])
 
     init(interactor: DeskInteractorInterface, 
-        wireframe: DeskWireframeInterface) {
+        wireframe: DeskListWireframeInterface) {
         self.interactor = interactor
         self.wireframe = wireframe
     }

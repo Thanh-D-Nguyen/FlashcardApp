@@ -74,6 +74,9 @@ class CreateDeskPresenter {
         self.searchWordInteractor = SearchWordsInteractor()
         self.imageSearchInteractor = ImageSearchInteractor.create(type: .pixabay)
         self.dictionaryInteractor = DictionaryInteractor()
+        
+        desk.cards = [CardDataModel(), CardDataModel()]
+        
         desk.focusRelay.bind(onNext: { [unowned self] isFocused in
             if isFocused {
                 self.focusIndexRelay.accept("")
@@ -193,12 +196,22 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
     func saveDesk() {
         let deskEntity = self.desk.toDeskEntity()
         do {
-            defer {
-                wireframe.close()
-            }
+            try validateDesk(deskEntity)
             try DeskManagement.shared.add(deskEntity)
+            wireframe.close()
+        } catch let error as AppError {
+            wireframe.showAlert(with: "Error", message: error.errorDescription)
         } catch {
             print(error)
+        }
+    }
+    
+    private func validateDesk(_ desk: DeskEntity) throws {
+        if desk.name.isEmpty {
+            throw AppError.deskNameEmpty
+        }
+        if desk.cards.count < 2 {
+            throw AppError.flashCardMinimum
         }
     }
 }

@@ -21,6 +21,40 @@
 		9216367029D958FF005C9F39 /* PixabayImageSearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9216366F29D958FF005C9F39 /* PixabayImageSearchInteractor.swift */; };
 		9216367229D95B44005C9F39 /* ImageSearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9216367129D95B44005C9F39 /* ImageSearchInteractor.swift */; };
 		9216367429D96519005C9F39 /* SearchPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9216367329D96519005C9F39 /* SearchPhoto.swift */; };
+		921636DB29D96F60005C9F39 /* BackgroundCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636B229D96F60005C9F39 /* BackgroundCollectionViewCell.swift */; };
+		921636DC29D96F60005C9F39 /* SegmentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636B329D96F60005C9F39 /* SegmentCollectionViewCell.swift */; };
+		921636DD29D96F60005C9F39 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636B529D96F60005C9F39 /* ImageDownloader.swift */; };
+		921636DE29D96F60005C9F39 /* SegmentedControlSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636B729D96F60005C9F39 /* SegmentedControlSize.swift */; };
+		921636DF29D96F60005C9F39 /* SegmentGradientColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636B829D96F60005C9F39 /* SegmentGradientColor.swift */; };
+		921636E029D96F60005C9F39 /* SelectedSegmentSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636B929D96F60005C9F39 /* SelectedSegmentSize.swift */; };
+		921636E129D96F60005C9F39 /* SegmentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636BA29D96F60005C9F39 /* SegmentModel.swift */; };
+		921636E229D96F60005C9F39 /* SegmentContentWidthType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636BB29D96F60005C9F39 /* SegmentContentWidthType.swift */; };
+		921636E329D96F60005C9F39 /* Data+HexEncodedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636BD29D96F60005C9F39 /* Data+HexEncodedString.swift */; };
+		921636E429D96F60005C9F39 /* URL+Filename.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636BE29D96F60005C9F39 /* URL+Filename.swift */; };
+		921636E529D96F60005C9F39 /* FileManager+Save.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636BF29D96F60005C9F39 /* FileManager+Save.swift */; };
+		921636E629D96F60005C9F39 /* Bundle+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C029D96F60005C9F39 /* Bundle+Module.swift */; };
+		921636E729D96F60005C9F39 /* UIView+Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C129D96F60005C9F39 /* UIView+Gradient.swift */; };
+		921636E829D96F60005C9F39 /* Bundle+Current.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C229D96F60005C9F39 /* Bundle+Current.swift */; };
+		921636E929D96F60005C9F39 /* UIView+SementItemShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C329D96F60005C9F39 /* UIView+SementItemShadow.swift */; };
+		921636EA29D96F60005C9F39 /* SegmentStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C529D96F60005C9F39 /* SegmentStyle.swift */; };
+		921636EB29D96F60005C9F39 /* SeporatorStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C629D96F60005C9F39 /* SeporatorStyle.swift */; };
+		921636EC29D96F60005C9F39 /* SegmentSelectedItemStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C729D96F60005C9F39 /* SegmentSelectedItemStyle.swift */; };
+		921636ED29D96F60005C9F39 /* SegmentItemStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C829D96F60005C9F39 /* SegmentItemStyle.swift */; };
+		921636EE29D96F60005C9F39 /* SegmentItemShadowStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636C929D96F60005C9F39 /* SegmentItemShadowStyle.swift */; };
+		921636EF29D96F60005C9F39 /* RESegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636CA29D96F60005C9F39 /* RESegmentedControl.swift */; };
+		921636F029D96F60005C9F39 /* iOS7Preset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636CC29D96F60005C9F39 /* iOS7Preset.swift */; };
+		921636F129D96F60005C9F39 /* BootstapPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636CD29D96F60005C9F39 /* BootstapPreset.swift */; };
+		921636F229D96F60005C9F39 /* MaterialPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636CE29D96F60005C9F39 /* MaterialPreset.swift */; };
+		921636F329D96F60005C9F39 /* iOS13Preset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636CF29D96F60005C9F39 /* iOS13Preset.swift */; };
+		921636F429D96F60005C9F39 /* ShadowStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636D129D96F60005C9F39 /* ShadowStylable.swift */; };
+		921636F529D96F60005C9F39 /* SegmentStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636D229D96F60005C9F39 /* SegmentStylable.swift */; };
+		921636F629D96F60005C9F39 /* SegmentItemStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636D329D96F60005C9F39 /* SegmentItemStylable.swift */; };
+		921636F729D96F60005C9F39 /* SegmentSelectedItemStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636D429D96F60005C9F39 /* SegmentSelectedItemStylable.swift */; };
+		921636F829D96F60005C9F39 /* SegmentedControlPresettable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636D529D96F60005C9F39 /* SegmentedControlPresettable.swift */; };
+		921636F929D96F60005C9F39 /* SeporatorStylable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636D629D96F60005C9F39 /* SeporatorStylable.swift */; };
+		921636FA29D96F60005C9F39 /* SegmentedControl+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921636D729D96F60005C9F39 /* SegmentedControl+API.swift */; };
+		921636FB29D96F60005C9F39 /* SegmentCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 921636D929D96F60005C9F39 /* SegmentCollectionViewCell.xib */; };
+		921636FC29D96F60005C9F39 /* BackgroundCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 921636DA29D96F60005C9F39 /* BackgroundCollectionViewCell.xib */; };
 		9226D80929D00C1B0042F6DA /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D80829D00C1B0042F6DA /* PlaceholderView.swift */; };
 		9226D80B29D00C520042F6DA /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D80A29D00C520042F6DA /* Atomic.swift */; };
 		9226D82029D0103E0042F6DA /* FlickrImageSearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D81F29D0103E0042F6DA /* FlickrImageSearchInteractor.swift */; };
@@ -37,6 +71,8 @@
 		9226D83A29D0368B0042F6DA /* Disk+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D83029D0368A0042F6DA /* Disk+UIImage.swift */; };
 		9226D83B29D0368B0042F6DA /* Disk+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D83129D0368A0042F6DA /* Disk+Codable.swift */; };
 		9226D84029D7F3E80042F6DA /* FlickrSearchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D83F29D7F3E80042F6DA /* FlickrSearchApi.swift */; };
+		923744622A0E377B0013C450 /* DeskListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923744602A0E377B0013C450 /* DeskListCell.swift */; };
+		923744632A0E377B0013C450 /* DeskListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 923744612A0E377B0013C450 /* DeskListCell.xib */; };
 		9238009429C5737000FECD23 /* WordSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009329C5737000FECD23 /* WordSuggestionCell.swift */; };
 		9238009629C5777000FECD23 /* FadingEdgeCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009529C5777000FECD23 /* FadingEdgeCollectionView.swift */; };
 		9238009829C5866900FECD23 /* SearchWordsInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009729C5866900FECD23 /* SearchWordsInteractor.swift */; };
@@ -53,10 +89,6 @@
 		923800B429C97CA500FECD23 /* AnimationViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AC29C97CA500FECD23 /* AnimationViewProtocol.swift */; };
 		923800B529C97CA500FECD23 /* MMTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AD29C97CA500FECD23 /* MMTextView.swift */; };
 		923800B629C97CA500FECD23 /* MMTextProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800AE29C97CA500FECD23 /* MMTextProtocol.swift */; };
-		924052C629A9D06300B47E09 /* DeskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052C529A9D06300B47E09 /* DeskListView.swift */; };
-		924052C829A9D07600B47E09 /* DeskListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924052C729A9D07600B47E09 /* DeskListView.xib */; };
-		924052CB29A9D20C00B47E09 /* DeskListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052C929A9D20C00B47E09 /* DeskListCell.swift */; };
-		924052CC29A9D20C00B47E09 /* DeskListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 924052CA29A9D20C00B47E09 /* DeskListCell.xib */; };
 		924052DE29AB398C00B47E09 /* CreateDesk.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 924052D929AB398C00B47E09 /* CreateDesk.storyboard */; };
 		924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */; };
 		924052E029AB398C00B47E09 /* CreateDeskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */; };
@@ -232,7 +264,7 @@
 		929C4DD529A76442007651E9 /* DeskListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD029A76442007651E9 /* DeskListPresenter.swift */; };
 		929C4DD629A76442007651E9 /* DeskListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD129A76442007651E9 /* DeskListViewController.swift */; };
 		929C4DD729A76442007651E9 /* DeskInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD229A76442007651E9 /* DeskInteractor.swift */; };
-		929C4DD829A76442007651E9 /* DeskWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD329A76442007651E9 /* DeskWireframe.swift */; };
+		929C4DD829A76442007651E9 /* DeskListWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD329A76442007651E9 /* DeskListWireframe.swift */; };
 		929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD929A7646F007651E9 /* DeskEntity.swift */; };
 		92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EB429A258CB00CE7E70 /* RExample.swift */; };
 		92A93EB829A25A1B00CE7E70 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 92A93EB729A25A1B00CE7E70 /* Realm */; };
@@ -248,6 +280,7 @@
 		92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */; };
 		92B2EBED29AB5A58008833D4 /* AddDeskBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B2EBEC29AB5A58008833D4 /* AddDeskBottomView.swift */; };
 		92B2EBEF29AB5A63008833D4 /* AddDeskBottomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92B2EBEE29AB5A63008833D4 /* AddDeskBottomView.xib */; };
+		92C5B44929F3C17000EE3377 /* AppErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C5B44829F3C17000EE3377 /* AppErrors.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -282,6 +315,40 @@
 		9216366F29D958FF005C9F39 /* PixabayImageSearchInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixabayImageSearchInteractor.swift; sourceTree = "<group>"; };
 		9216367129D95B44005C9F39 /* ImageSearchInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchInteractor.swift; sourceTree = "<group>"; };
 		9216367329D96519005C9F39 /* SearchPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPhoto.swift; sourceTree = "<group>"; };
+		921636B229D96F60005C9F39 /* BackgroundCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundCollectionViewCell.swift; sourceTree = "<group>"; };
+		921636B329D96F60005C9F39 /* SegmentCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentCollectionViewCell.swift; sourceTree = "<group>"; };
+		921636B529D96F60005C9F39 /* ImageDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDownloader.swift; sourceTree = "<group>"; };
+		921636B729D96F60005C9F39 /* SegmentedControlSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedControlSize.swift; sourceTree = "<group>"; };
+		921636B829D96F60005C9F39 /* SegmentGradientColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentGradientColor.swift; sourceTree = "<group>"; };
+		921636B929D96F60005C9F39 /* SelectedSegmentSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectedSegmentSize.swift; sourceTree = "<group>"; };
+		921636BA29D96F60005C9F39 /* SegmentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentModel.swift; sourceTree = "<group>"; };
+		921636BB29D96F60005C9F39 /* SegmentContentWidthType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentContentWidthType.swift; sourceTree = "<group>"; };
+		921636BD29D96F60005C9F39 /* Data+HexEncodedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+HexEncodedString.swift"; sourceTree = "<group>"; };
+		921636BE29D96F60005C9F39 /* URL+Filename.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+Filename.swift"; sourceTree = "<group>"; };
+		921636BF29D96F60005C9F39 /* FileManager+Save.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FileManager+Save.swift"; sourceTree = "<group>"; };
+		921636C029D96F60005C9F39 /* Bundle+Module.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+Module.swift"; sourceTree = "<group>"; };
+		921636C129D96F60005C9F39 /* UIView+Gradient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Gradient.swift"; sourceTree = "<group>"; };
+		921636C229D96F60005C9F39 /* Bundle+Current.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+Current.swift"; sourceTree = "<group>"; };
+		921636C329D96F60005C9F39 /* UIView+SementItemShadow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+SementItemShadow.swift"; sourceTree = "<group>"; };
+		921636C529D96F60005C9F39 /* SegmentStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentStyle.swift; sourceTree = "<group>"; };
+		921636C629D96F60005C9F39 /* SeporatorStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeporatorStyle.swift; sourceTree = "<group>"; };
+		921636C729D96F60005C9F39 /* SegmentSelectedItemStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentSelectedItemStyle.swift; sourceTree = "<group>"; };
+		921636C829D96F60005C9F39 /* SegmentItemStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentItemStyle.swift; sourceTree = "<group>"; };
+		921636C929D96F60005C9F39 /* SegmentItemShadowStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentItemShadowStyle.swift; sourceTree = "<group>"; };
+		921636CA29D96F60005C9F39 /* RESegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RESegmentedControl.swift; sourceTree = "<group>"; };
+		921636CC29D96F60005C9F39 /* iOS7Preset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS7Preset.swift; sourceTree = "<group>"; };
+		921636CD29D96F60005C9F39 /* BootstapPreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BootstapPreset.swift; sourceTree = "<group>"; };
+		921636CE29D96F60005C9F39 /* MaterialPreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MaterialPreset.swift; sourceTree = "<group>"; };
+		921636CF29D96F60005C9F39 /* iOS13Preset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS13Preset.swift; sourceTree = "<group>"; };
+		921636D129D96F60005C9F39 /* ShadowStylable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowStylable.swift; sourceTree = "<group>"; };
+		921636D229D96F60005C9F39 /* SegmentStylable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentStylable.swift; sourceTree = "<group>"; };
+		921636D329D96F60005C9F39 /* SegmentItemStylable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentItemStylable.swift; sourceTree = "<group>"; };
+		921636D429D96F60005C9F39 /* SegmentSelectedItemStylable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentSelectedItemStylable.swift; sourceTree = "<group>"; };
+		921636D529D96F60005C9F39 /* SegmentedControlPresettable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedControlPresettable.swift; sourceTree = "<group>"; };
+		921636D629D96F60005C9F39 /* SeporatorStylable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeporatorStylable.swift; sourceTree = "<group>"; };
+		921636D729D96F60005C9F39 /* SegmentedControl+API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SegmentedControl+API.swift"; sourceTree = "<group>"; };
+		921636D929D96F60005C9F39 /* SegmentCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SegmentCollectionViewCell.xib; sourceTree = "<group>"; };
+		921636DA29D96F60005C9F39 /* BackgroundCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BackgroundCollectionViewCell.xib; sourceTree = "<group>"; };
 		9226D80829D00C1B0042F6DA /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		9226D80A29D00C520042F6DA /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
 		9226D81F29D0103E0042F6DA /* FlickrImageSearchInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrImageSearchInteractor.swift; sourceTree = "<group>"; };
@@ -298,6 +365,8 @@
 		9226D83029D0368A0042F6DA /* Disk+UIImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+UIImage.swift"; sourceTree = "<group>"; };
 		9226D83129D0368A0042F6DA /* Disk+Codable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Disk+Codable.swift"; sourceTree = "<group>"; };
 		9226D83F29D7F3E80042F6DA /* FlickrSearchApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrSearchApi.swift; sourceTree = "<group>"; };
+		923744602A0E377B0013C450 /* DeskListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListCell.swift; sourceTree = "<group>"; };
+		923744612A0E377B0013C450 /* DeskListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskListCell.xib; sourceTree = "<group>"; };
 		9238009329C5737000FECD23 /* WordSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSuggestionCell.swift; sourceTree = "<group>"; };
 		9238009529C5777000FECD23 /* FadingEdgeCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadingEdgeCollectionView.swift; sourceTree = "<group>"; };
 		9238009729C5866900FECD23 /* SearchWordsInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchWordsInteractor.swift; sourceTree = "<group>"; };
@@ -314,10 +383,6 @@
 		923800AC29C97CA500FECD23 /* AnimationViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationViewProtocol.swift; sourceTree = "<group>"; };
 		923800AD29C97CA500FECD23 /* MMTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTextView.swift; sourceTree = "<group>"; };
 		923800AE29C97CA500FECD23 /* MMTextProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTextProtocol.swift; sourceTree = "<group>"; };
-		924052C529A9D06300B47E09 /* DeskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListView.swift; sourceTree = "<group>"; };
-		924052C729A9D07600B47E09 /* DeskListView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskListView.xib; sourceTree = "<group>"; };
-		924052C929A9D20C00B47E09 /* DeskListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListCell.swift; sourceTree = "<group>"; };
-		924052CA29A9D20C00B47E09 /* DeskListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeskListCell.xib; sourceTree = "<group>"; };
 		924052D929AB398C00B47E09 /* CreateDesk.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CreateDesk.storyboard; sourceTree = "<group>"; };
 		924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskPresenter.swift; sourceTree = "<group>"; };
 		924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskViewController.swift; sourceTree = "<group>"; };
@@ -480,7 +545,7 @@
 		929C4DD029A76442007651E9 /* DeskListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListPresenter.swift; sourceTree = "<group>"; };
 		929C4DD129A76442007651E9 /* DeskListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListViewController.swift; sourceTree = "<group>"; };
 		929C4DD229A76442007651E9 /* DeskInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskInteractor.swift; sourceTree = "<group>"; };
-		929C4DD329A76442007651E9 /* DeskWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskWireframe.swift; sourceTree = "<group>"; };
+		929C4DD329A76442007651E9 /* DeskListWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskListWireframe.swift; sourceTree = "<group>"; };
 		929C4DD929A7646F007651E9 /* DeskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskEntity.swift; sourceTree = "<group>"; };
 		92A93EB429A258CB00CE7E70 /* RExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RExample.swift; sourceTree = "<group>"; };
 		92A93EBB29A25B5000CE7E70 /* RGrammar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGrammar.swift; sourceTree = "<group>"; };
@@ -494,6 +559,7 @@
 		92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaManagement.swift; sourceTree = "<group>"; };
 		92B2EBEC29AB5A58008833D4 /* AddDeskBottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDeskBottomView.swift; sourceTree = "<group>"; };
 		92B2EBEE29AB5A63008833D4 /* AddDeskBottomView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddDeskBottomView.xib; sourceTree = "<group>"; };
+		92C5B44829F3C17000EE3377 /* AppErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -558,6 +624,119 @@
 				9216366529D9521B005C9F39 /* ImageSearchWireframe.swift */,
 			);
 			path = ImageSearch;
+			sourceTree = "<group>";
+		};
+		921636AF29D96F60005C9F39 /* RESegmentedControl */ = {
+			isa = PBXGroup;
+			children = (
+				921636B029D96F60005C9F39 /* Classes */,
+				921636D829D96F60005C9F39 /* Resources */,
+			);
+			path = RESegmentedControl;
+			sourceTree = "<group>";
+		};
+		921636B029D96F60005C9F39 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				921636B129D96F60005C9F39 /* Cells */,
+				921636B429D96F60005C9F39 /* Network */,
+				921636B629D96F60005C9F39 /* Models */,
+				921636BC29D96F60005C9F39 /* Extensions */,
+				921636C429D96F60005C9F39 /* Styles */,
+				921636CA29D96F60005C9F39 /* RESegmentedControl.swift */,
+				921636CB29D96F60005C9F39 /* Presets */,
+				921636D029D96F60005C9F39 /* Stylables */,
+				921636D729D96F60005C9F39 /* SegmentedControl+API.swift */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		921636B129D96F60005C9F39 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				921636B229D96F60005C9F39 /* BackgroundCollectionViewCell.swift */,
+				921636B329D96F60005C9F39 /* SegmentCollectionViewCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		921636B429D96F60005C9F39 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				921636B529D96F60005C9F39 /* ImageDownloader.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		921636B629D96F60005C9F39 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				921636B729D96F60005C9F39 /* SegmentedControlSize.swift */,
+				921636B829D96F60005C9F39 /* SegmentGradientColor.swift */,
+				921636B929D96F60005C9F39 /* SelectedSegmentSize.swift */,
+				921636BA29D96F60005C9F39 /* SegmentModel.swift */,
+				921636BB29D96F60005C9F39 /* SegmentContentWidthType.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		921636BC29D96F60005C9F39 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				921636BD29D96F60005C9F39 /* Data+HexEncodedString.swift */,
+				921636BE29D96F60005C9F39 /* URL+Filename.swift */,
+				921636BF29D96F60005C9F39 /* FileManager+Save.swift */,
+				921636C029D96F60005C9F39 /* Bundle+Module.swift */,
+				921636C129D96F60005C9F39 /* UIView+Gradient.swift */,
+				921636C229D96F60005C9F39 /* Bundle+Current.swift */,
+				921636C329D96F60005C9F39 /* UIView+SementItemShadow.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		921636C429D96F60005C9F39 /* Styles */ = {
+			isa = PBXGroup;
+			children = (
+				921636C529D96F60005C9F39 /* SegmentStyle.swift */,
+				921636C629D96F60005C9F39 /* SeporatorStyle.swift */,
+				921636C729D96F60005C9F39 /* SegmentSelectedItemStyle.swift */,
+				921636C829D96F60005C9F39 /* SegmentItemStyle.swift */,
+				921636C929D96F60005C9F39 /* SegmentItemShadowStyle.swift */,
+			);
+			path = Styles;
+			sourceTree = "<group>";
+		};
+		921636CB29D96F60005C9F39 /* Presets */ = {
+			isa = PBXGroup;
+			children = (
+				921636CC29D96F60005C9F39 /* iOS7Preset.swift */,
+				921636CD29D96F60005C9F39 /* BootstapPreset.swift */,
+				921636CE29D96F60005C9F39 /* MaterialPreset.swift */,
+				921636CF29D96F60005C9F39 /* iOS13Preset.swift */,
+			);
+			path = Presets;
+			sourceTree = "<group>";
+		};
+		921636D029D96F60005C9F39 /* Stylables */ = {
+			isa = PBXGroup;
+			children = (
+				921636D129D96F60005C9F39 /* ShadowStylable.swift */,
+				921636D229D96F60005C9F39 /* SegmentStylable.swift */,
+				921636D329D96F60005C9F39 /* SegmentItemStylable.swift */,
+				921636D429D96F60005C9F39 /* SegmentSelectedItemStylable.swift */,
+				921636D529D96F60005C9F39 /* SegmentedControlPresettable.swift */,
+				921636D629D96F60005C9F39 /* SeporatorStylable.swift */,
+			);
+			path = Stylables;
+			sourceTree = "<group>";
+		};
+		921636D829D96F60005C9F39 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				921636D929D96F60005C9F39 /* SegmentCollectionViewCell.xib */,
+				921636DA29D96F60005C9F39 /* BackgroundCollectionViewCell.xib */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		9226D80C29D00E0F0042F6DA /* Networks */ = {
@@ -656,10 +835,10 @@
 		924052C429A9CE4600B47E09 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				924052C929A9D20C00B47E09 /* DeskListCell.swift */,
-				924052CA29A9D20C00B47E09 /* DeskListCell.xib */,
 				929C4DCF29A76442007651E9 /* DeskList.storyboard */,
 				929C4DD129A76442007651E9 /* DeskListViewController.swift */,
+				923744602A0E377B0013C450 /* DeskListCell.swift */,
+				923744612A0E377B0013C450 /* DeskListCell.xib */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -776,6 +955,7 @@
 		9251EBFF29A1EAA5006C1D1C /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				921636AF29D96F60005C9F39 /* RESegmentedControl */,
 				9216365D29D950C9005C9F39 /* VImage */,
 				9226D82729D0368A0042F6DA /* Disk */,
 				923800A429C97CA500FECD23 /* MMTextView */,
@@ -1043,6 +1223,7 @@
 				9291705929AB672800894551 /* AppImage.swift */,
 				9291706829B45FB700894551 /* SwipeCellSupport.swift */,
 				9226D80A29D00C520042F6DA /* Atomic.swift */,
+				92C5B44829F3C17000EE3377 /* AppErrors.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -1110,8 +1291,6 @@
 				929C4DB829A73358007651E9 /* CardCell.swift */,
 				929C4DBE29A73404007651E9 /* CardView.swift */,
 				929C4DC029A73412007651E9 /* CardView.xib */,
-				924052C529A9D06300B47E09 /* DeskListView.swift */,
-				924052C729A9D07600B47E09 /* DeskListView.xib */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1138,7 +1317,7 @@
 			children = (
 				924052C429A9CE4600B47E09 /* Views */,
 				929C4DD029A76442007651E9 /* DeskListPresenter.swift */,
-				929C4DD329A76442007651E9 /* DeskWireframe.swift */,
+				929C4DD329A76442007651E9 /* DeskListWireframe.swift */,
 			);
 			path = DeskList;
 			sourceTree = "<group>";
@@ -1335,18 +1514,19 @@
 				924052DE29AB398C00B47E09 /* CreateDesk.storyboard in Resources */,
 				9216366629D9521B005C9F39 /* ImageSearch.storyboard in Resources */,
 				9251ED1E29A20341006C1D1C /* AccountCell.xib in Resources */,
-				924052CC29A9D20C00B47E09 /* DeskListCell.xib in Resources */,
 				9251ECE129A1EAA5006C1D1C /* ReleaseConfig.xcconfig in Resources */,
 				9251ECBD29A1EAA5006C1D1C /* MailLogin.storyboard in Resources */,
 				924052E729AB3ADD00B47E09 /* DeskCell.xib in Resources */,
+				923744632A0E377B0013C450 /* DeskListCell.xib in Resources */,
 				9251ECAF29A1EAA5006C1D1C /* Home.storyboard in Resources */,
 				929C4DD429A76442007651E9 /* DeskList.storyboard in Resources */,
 				9251ED2B29A212B5006C1D1C /* Quiz.storyboard in Resources */,
 				924052EB29AB3AFC00B47E09 /* NewCardCell.xib in Resources */,
-				924052C829A9D07600B47E09 /* DeskListView.xib in Resources */,
 				9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */,
+				921636FC29D96F60005C9F39 /* BackgroundCollectionViewCell.xib in Resources */,
 				92B2EBEF29AB5A63008833D4 /* AddDeskBottomView.xib in Resources */,
 				929C4DB729A7332D007651E9 /* Card.storyboard in Resources */,
+				921636FB29D96F60005C9F39 /* SegmentCollectionViewCell.xib in Resources */,
 				9251ECDA29A1EAA5006C1D1C /* SlideShow.storyboard in Resources */,
 				9251ECA529A1EAA5006C1D1C /* SimpleCardCell.xib in Resources */,
 				9251ED2229A2074D006C1D1C /* CommonCell.xib in Resources */,
@@ -1395,9 +1575,12 @@
 				9251ECD629A1EAA5006C1D1C /* SlideShowWireframe.swift in Sources */,
 				9226D83229D0368B0042F6DA /* Disk.swift in Sources */,
 				9251ECD129A1EAA5006C1D1C /* MainWireframe.swift in Sources */,
+				921636F029D96F60005C9F39 /* iOS7Preset.swift in Sources */,
 				929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */,
+				921636F629D96F60005C9F39 /* SegmentItemStylable.swift in Sources */,
 				9251ED2129A2074D006C1D1C /* CommonCell.swift in Sources */,
 				92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */,
+				921636E329D96F60005C9F39 /* Data+HexEncodedString.swift in Sources */,
 				9286B93129D7FE430040025F /* Extensions.swift in Sources */,
 				9251ECA929A1EAA5006C1D1C /* HomeCardCell.swift in Sources */,
 				9251EC9F29A1EAA5006C1D1C /* AdvanceCardCell.swift in Sources */,
@@ -1407,6 +1590,7 @@
 				9251EC8329A1EAA5006C1D1C /* DefaultRefreshView.swift in Sources */,
 				929C4DD729A76442007651E9 /* DeskInteractor.swift in Sources */,
 				9251ECA229A1EAA5006C1D1C /* SnackBoxesCell.swift in Sources */,
+				921636E929D96F60005C9F39 /* UIView+SementItemShadow.swift in Sources */,
 				9226D82229D010C00042F6DA /* ImageSearchEntity.swift in Sources */,
 				9286B92F29D7FE430040025F /* JSONEncodableEncoding.swift in Sources */,
 				92A93EC229A25F3300CE7E70 /* RViJa.swift in Sources */,
@@ -1415,12 +1599,15 @@
 				9286B92C29D7FE430040025F /* AlamofireImplementations.swift in Sources */,
 				9251ED1D29A20341006C1D1C /* AccountCell.swift in Sources */,
 				9251ECB829A1EAA5006C1D1C /* WelcomeMainViewController.swift in Sources */,
+				921636EF29D96F60005C9F39 /* RESegmentedControl.swift in Sources */,
 				9251ECB929A1EAA5006C1D1C /* WelcomeMainPresenter.swift in Sources */,
 				9226D80B29D00C520042F6DA /* Atomic.swift in Sources */,
 				9209760F29A7887800ECF29C /* RCard.swift in Sources */,
 				9251EC9929A1EAA5006C1D1C /* CollectionView.swift in Sources */,
+				921636E829D96F60005C9F39 /* Bundle+Current.swift in Sources */,
 				924052ED29AB3D7200B47E09 /* DeskCardHeaderView.swift in Sources */,
 				9251EC9729A1EAA5006C1D1C /* ViewInterface.swift in Sources */,
+				921636F429D96F60005C9F39 /* ShadowStylable.swift in Sources */,
 				9226D83329D0368B0042F6DA /* Disk+InternalHelpers.swift in Sources */,
 				9251ECE229A1EAA5006C1D1C /* EvironmentConfig.swift in Sources */,
 				9251EC9529A1EAA5006C1D1C /* MainScheduleSubscribler.swift in Sources */,
@@ -1437,6 +1624,7 @@
 				9251ED2F29A212B5006C1D1C /* QuizWireframe.swift in Sources */,
 				9286B93229D7FE430040025F /* JSONEncodingHelper.swift in Sources */,
 				929C4DCA29A75B8D007651E9 /* TopBarView.swift in Sources */,
+				921636F329D96F60005C9F39 /* iOS13Preset.swift in Sources */,
 				9251EC9D29A1EAA5006C1D1C /* Color.swift in Sources */,
 				9251ECEA29A1EAA5006C1D1C /* Enums.swift in Sources */,
 				929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */,
@@ -1444,6 +1632,7 @@
 				92A93EBE29A25C1900CE7E70 /* RJaVi.swift in Sources */,
 				9251EC8929A1EAA5006C1D1C /* SocialSignInInteractor.swift in Sources */,
 				9251ED1829A20040006C1D1C /* SettingInteractor.swift in Sources */,
+				921636F929D96F60005C9F39 /* SeporatorStylable.swift in Sources */,
 				9238009629C5777000FECD23 /* FadingEdgeCollectionView.swift in Sources */,
 				9226D83429D0368B0042F6DA /* Disk+[Data].swift in Sources */,
 				9251EC8829A1EAA5006C1D1C /* RefreshViewAnimator.swift in Sources */,
@@ -1460,6 +1649,7 @@
 				9251ECAB29A1EAA5006C1D1C /* HomeSubSectionCell.swift in Sources */,
 				92A93ECB29A260F700CE7E70 /* KanjiManagement.swift in Sources */,
 				9251EBCD29A1E9A6006C1D1C /* AppDelegate.swift in Sources */,
+				921636E029D96F60005C9F39 /* SelectedSegmentSize.swift in Sources */,
 				92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */,
 				9238009429C5737000FECD23 /* WordSuggestionCell.swift in Sources */,
 				9251EC8629A1EAA5006C1D1C /* DefaultViewAnimator.swift in Sources */,
@@ -1471,13 +1661,20 @@
 				9291706929B45FB700894551 /* SwipeCellSupport.swift in Sources */,
 				9251ECBC29A1EAA5006C1D1C /* MailLoginWireframe.swift in Sources */,
 				923800B329C97CA500FECD23 /* LineCenterView.swift in Sources */,
+				921636ED29D96F60005C9F39 /* SegmentItemStyle.swift in Sources */,
 				9251ECE829A1EAA5006C1D1C /* AppService.swift in Sources */,
 				9251EC9129A1EAA5006C1D1C /* MailLoginInteractor.swift in Sources */,
+				921636F529D96F60005C9F39 /* SegmentStylable.swift in Sources */,
 				9251ECC829A1EAA5006C1D1C /* StartUpInteractor.swift in Sources */,
+				921636E229D96F60005C9F39 /* SegmentContentWidthType.swift in Sources */,
 				9251ECB129A1EAA5006C1D1C /* HomeWireframe.swift in Sources */,
 				923800A029C96FD800FECD23 /* JaViMeansEntity.swift in Sources */,
+				921636DD29D96F60005C9F39 /* ImageDownloader.swift in Sources */,
+				921636E629D96F60005C9F39 /* Bundle+Module.swift in Sources */,
 				9286B92B29D7FE430040025F /* APIHelper.swift in Sources */,
 				9251ECA829A1EAA5006C1D1C /* RoundCornerButton.swift in Sources */,
+				921636F229D96F60005C9F39 /* MaterialPreset.swift in Sources */,
+				921636F829D96F60005C9F39 /* SegmentedControlPresettable.swift in Sources */,
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
 				9226D83829D0368B0042F6DA /* Disk+VolumeInformation.swift in Sources */,
 				9251EC8E29A1EAA5006C1D1C /* MarketInteractor.swift in Sources */,
@@ -1485,19 +1682,24 @@
 				9251ECD829A1EAA5006C1D1C /* SlideItemViewController.swift in Sources */,
 				92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */,
 				9216366829D9521B005C9F39 /* ImageSearchViewController.swift in Sources */,
+				921636DC29D96F60005C9F39 /* SegmentCollectionViewCell.swift in Sources */,
 				9251ECAE29A1EAA5006C1D1C /* HomeCarouselCell.swift in Sources */,
+				921636EE29D96F60005C9F39 /* SegmentItemShadowStyle.swift in Sources */,
 				9238009C29C5888300FECD23 /* ViJaEntity.swift in Sources */,
 				9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */,
 				9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */,
+				921636E529D96F60005C9F39 /* FileManager+Save.swift in Sources */,
 				9251ED4329A2133A006C1D1C /* DictionaryPresenter.swift in Sources */,
 				9251ECCC29A1EAA5006C1D1C /* StartUpPresenter.swift in Sources */,
+				921636EA29D96F60005C9F39 /* SegmentStyle.swift in Sources */,
 				9209760D29A787C100ECF29C /* RDesk.swift in Sources */,
 				923800A329C9732C00FECD23 /* ViJaMeansEntity.swift in Sources */,
-				924052CB29A9D20C00B47E09 /* DeskListCell.swift in Sources */,
 				9216366729D9521B005C9F39 /* ImageSearchPresenter.swift in Sources */,
 				9251EC8A29A1EAA5006C1D1C /* HomeInteractor.swift in Sources */,
 				9251ECC929A1EAA5006C1D1C /* StartUpWireframe.swift in Sources */,
 				9251EC9B29A1EAA5006C1D1C /* Storyboard.swift in Sources */,
+				92C5B44929F3C17000EE3377 /* AppErrors.swift in Sources */,
+				921636E729D96F60005C9F39 /* UIView+Gradient.swift in Sources */,
 				9216365F29D950C9005C9F39 /* Resizer.swift in Sources */,
 				9251EC9829A1EAA5006C1D1C /* View.swift in Sources */,
 				9251EC8C29A1EAA5006C1D1C /* MainInteractor.swift in Sources */,
@@ -1507,7 +1709,6 @@
 				92B2EBED29AB5A58008833D4 /* AddDeskBottomView.swift in Sources */,
 				9238009E29C5891E00FECD23 /* SearchResultEntity.swift in Sources */,
 				9226D83B29D0368B0042F6DA /* Disk+Codable.swift in Sources */,
-				924052C629A9D06300B47E09 /* DeskListView.swift in Sources */,
 				9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */,
 				9286B92E29D7FE430040025F /* CodableHelper.swift in Sources */,
 				9251EC8B29A1EAA5006C1D1C /* CreateInteractor.swift in Sources */,
@@ -1534,13 +1735,15 @@
 				9216367229D95B44005C9F39 /* ImageSearchInteractor.swift in Sources */,
 				9238009829C5866900FECD23 /* SearchWordsInteractor.swift in Sources */,
 				923800B129C97CA500FECD23 /* UIView+Constraint.swift in Sources */,
+				923744622A0E377B0013C450 /* DeskListCell.swift in Sources */,
 				9251EC8129A1EAA5006C1D1C /* WelcomeEntity.swift in Sources */,
 				923800AF29C97CA500FECD23 /* MMTextField.swift in Sources */,
+				921636FA29D96F60005C9F39 /* SegmentedControl+API.swift in Sources */,
 				9226D83929D0368B0042F6DA /* Disk+[UIImage].swift in Sources */,
 				9216366C29D9528C005C9F39 /* PixabaySearchApi.swift in Sources */,
 				9286B93029D7FE430040025F /* APIs.swift in Sources */,
 				9251ECBF29A1EAA5006C1D1C /* MailLoginViewController.swift in Sources */,
-				929C4DD829A76442007651E9 /* DeskWireframe.swift in Sources */,
+				929C4DD829A76442007651E9 /* DeskListWireframe.swift in Sources */,
 				924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */,
 				923800B429C97CA500FECD23 /* AnimationViewProtocol.swift in Sources */,
 				9251ECE629A1EAA5006C1D1C /* RealmService.swift in Sources */,
@@ -1548,10 +1751,12 @@
 				9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */,
 				9251EC8729A1EAA5006C1D1C /* UIScrollView+PullToRefresh.swift in Sources */,
 				9251ED3829A212E9006C1D1C /* CardInteractor.swift in Sources */,
+				921636F729D96F60005C9F39 /* SegmentSelectedItemStylable.swift in Sources */,
 				9251EC9029A1EAA5006C1D1C /* WishlistInteractor.swift in Sources */,
 				924052E229AB398C00B47E09 /* CreateDeskWireframe.swift in Sources */,
 				92A93EC029A25DBF00CE7E70 /* RKanji.swift in Sources */,
 				9216367429D96519005C9F39 /* SearchPhoto.swift in Sources */,
+				921636E429D96F60005C9F39 /* URL+Filename.swift in Sources */,
 				9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */,
 				9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */,
 				9226D82629D01DC90042F6DA /* ImageDetailEntity.swift in Sources */,
@@ -1559,14 +1764,21 @@
 				9251EC9329A1EAA5006C1D1C /* BaseApi.swift in Sources */,
 				9226D83729D0368B0042F6DA /* Disk+Helpers.swift in Sources */,
 				92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */,
+				921636DB29D96F60005C9F39 /* BackgroundCollectionViewCell.swift in Sources */,
 				924052EA29AB3AFC00B47E09 /* NewCardCell.swift in Sources */,
 				9251EC9E29A1EAA5006C1D1C /* BaseNavigationController.swift in Sources */,
+				921636DE29D96F60005C9F39 /* SegmentedControlSize.swift in Sources */,
+				921636DF29D96F60005C9F39 /* SegmentGradientColor.swift in Sources */,
 				9251ED3929A212E9006C1D1C /* CardWireframe.swift in Sources */,
 				9251ECBB29A1EAA5006C1D1C /* WelcomeMainWireframe.swift in Sources */,
 				9251EC8F29A1EAA5006C1D1C /* MarketSearchInteractor.swift in Sources */,
 				9251ED2E29A212B5006C1D1C /* QuizInteractor.swift in Sources */,
 				9251EC9429A1EAA5006C1D1C /* BaseViewControler.swift in Sources */,
+				921636EB29D96F60005C9F39 /* SeporatorStyle.swift in Sources */,
+				921636F129D96F60005C9F39 /* BootstapPreset.swift in Sources */,
+				921636E129D96F60005C9F39 /* SegmentModel.swift in Sources */,
 				929C4DBF29A73404007651E9 /* CardView.swift in Sources */,
+				921636EC29D96F60005C9F39 /* SegmentSelectedItemStyle.swift in Sources */,
 				929C4DD629A76442007651E9 /* DeskListViewController.swift in Sources */,
 				923800B229C97CA500FECD23 /* LineLeftRightView.swift in Sources */,
 				9226D80929D00C1B0042F6DA /* PlaceholderView.swift in Sources */,

@@ -8,9 +8,8 @@
 
 import UIKit
 
-protocol CreateDeskWireframeInterface: AnyObject {
+protocol CreateDeskWireframeInterface: BaseWireframe<CreateDeskViewController> {
     func showImageSearch()
-    func close()
 }
 
 final class CreateDeskWireframe: BaseWireframe<CreateDeskViewController> {
@@ -27,10 +26,7 @@ final class CreateDeskWireframe: BaseWireframe<CreateDeskViewController> {
 }
 
 extension CreateDeskWireframe: CreateDeskWireframeInterface {
-    func close() {
-        self.viewController.dismiss(animated: true)
-    }
-    
+
     func showImageSearch() {
         let imageSearchView = ImageSearchWireframe()
         self.viewController.show(imageSearchView.viewController, sender: nil)

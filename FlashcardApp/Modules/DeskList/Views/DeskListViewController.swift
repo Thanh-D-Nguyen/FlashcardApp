@@ -10,7 +10,7 @@ import UIKit
 
 final class DeskListViewController: BaseViewController {
     var presenter: DeskListPresenterInterface!
-    @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet private weak var deskListCollectionView: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,44 +20,41 @@ final class DeskListViewController: BaseViewController {
     }
 
     func setupUI() {
-        tableView.registerNib(cellClass: DeskListCell.self)
-        let tapGusture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-        tapGusture.cancelsTouchesInView = false
-        self.view.addGestureRecognizer(tapGusture)
+        deskListCollectionView.registerNib(cellClass: DeskListCell.self)
+        deskListCollectionView.contentInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
     }
 
     func subscribe() {
-        subscribe(presenter.desksRelay) { [weak self] value in
+        subscribe(presenter.desksRelay) { [weak self] _ in
             guard let self else { return }
-            self.tableView.reloadData()
+            self.deskListCollectionView.reloadData()
         }
     }
     
-    @objc private func handleTap(_ guesture: UITapGestureRecognizer) {
-        let location = guesture.location(in: view)
-        let tappedView = view.hitTest(location, with: nil)
-        if tappedView == view {
-            presenter.dismiss()
-        }
+    @IBAction private func close() {
+        self.dismiss(animated: true)
     }
 }
 
-extension DeskListViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension DeskListViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return presenter.desksRelay.value.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: DeskListCell = tableView.dequeueResuableCell(forIndexPath: indexPath)
-        if presenter.desksRelay.value.indices.contains(indexPath.row) {
-            cell.updateInfo(presenter.desksRelay.value[indexPath.row])
-        }
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell: DeskListCell = collectionView.dequeueResuableCell(forIndexPath: indexPath)
+        cell.updateDesk(presenter.desksRelay.value[indexPath.row])
         return cell
     }
 }
 
-extension DeskListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        presenter.didSelectDeskAtIndex(indexPath.row)
+extension DeskListViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width - 16
+        return CGSize(width: width, height: 66)
     }
+}
+
+extension DeskListViewController: UICollectionViewDelegate {
+    
 }

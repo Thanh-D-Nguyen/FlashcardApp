@@ -9,6 +9,8 @@ import UIKit
 
 protocol WireframeInterface: AnyObject {
     func showAlert(with title: String?, message: String?)
+    func back()
+    func close()
 }
 
 class BaseWireframe<ViewController> where ViewController: BaseVC {
@@ -34,7 +36,19 @@ extension BaseWireframe: WireframeInterface {
     func showAlert(with title: String?, message: String?, actions: [UIAlertAction]) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         actions.forEach { alert.addAction($0) }
-        navigationController?.present(alert, animated: true, completion: nil)
+        if navigationController != nil {
+            navigationController?.present(alert, animated: true)
+        } else {
+            viewController.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func back() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func close() {
+        viewController.dismiss(animated: true)
     }
 }
 

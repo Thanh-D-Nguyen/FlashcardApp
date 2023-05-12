@@ -37,13 +37,11 @@ extension UITableView {
     }
     
     func registerHeaderFooterNib<T: UITableViewHeaderFooterView>(aClass: T.Type) {
-        print("registerHeaderFooterNib", T.reuseIdentifier)
         let nib = UINib(nibName: T.reuseIdentifier, bundle: nil)
         register(nib, forHeaderFooterViewReuseIdentifier: T.reuseIdentifier)
     }
 
     func dequeueReusableHeaderFooterView<T: UITableViewHeaderFooterView>() -> T {
-        print("T.reuseIdentifier", T.reuseIdentifier)
         guard let view = dequeueReusableHeaderFooterView(withIdentifier: T.reuseIdentifier) as? T else {
             fatalError("Could not dequeue header/footer view with identifier: \(T.reuseIdentifier)")
         }

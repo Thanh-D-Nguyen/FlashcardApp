@@ -37,7 +37,7 @@ extension CardWireframe: CardWireframeInterface {
     }
     
     func showDeskList() {
-        let deskListWireFrame = DeskWireframe()
+        let deskListWireFrame = DeskListWireframe()
         deskListWireFrame.didSelectDeskIndex = { [weak self] index in
             if let self, let index = index {
                 self.viewController.presenter.didSelectDeskAtIndex(index)
