@@ -12,7 +12,7 @@ class DeskManagement {
     
     func getAll() -> [DeskEntity] {
         let desks = RealmService.shared.realm.objects(RDesk.self)
-        return Array(desks).map({ $0.toEntity() })
+        return Array(desks).map({ $0.toEntity() }).sorted(by: { $0.date > $1.date })
     }
     
     func deskFromId(_ id: String) -> RDesk? {

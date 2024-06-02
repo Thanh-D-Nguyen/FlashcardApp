@@ -18,6 +18,7 @@ final class CreateDeskViewController: BaseViewController {
     @IBOutlet private weak var bottomView: AddDeskBottomView!
     @IBOutlet private weak var bottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var doneButton: RoundCornerButton!
+    @IBOutlet private weak var closeButton: UIButton!
     
     private let keyboard = Typist.shared
     
@@ -47,6 +48,10 @@ final class CreateDeskViewController: BaseViewController {
         doneButton.rx.tap.subscribe(onNext: { [weak self] in
             guard let self else { return }
             self.presenter.saveDesk()
+        }).disposed(by: disposeBag)
+        closeButton.rx.tap.subscribe(onNext: { [weak self] in
+            guard let self else { return }
+            self.presenter.close()
         }).disposed(by: disposeBag)
         subscribe(presenter.deskChangedRelay) { [weak self] event in
             guard let self else { return }
@@ -230,7 +235,7 @@ extension CreateDeskViewController: UITableViewDataSource {
 extension CreateDeskViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == CreateDeskTableSection.cards.rawValue {
-            return 50.0
+            return 44.0
         }
         return 0.0
     }
@@ -283,7 +288,7 @@ extension CreateDeskViewController {
         let buttonStyle = ButtonStyle.circular
         action.title = descriptor.title(forDisplayMode: .imageOnly)
         action.image = descriptor.image(forStyle: buttonStyle, displayMode: .imageOnly)
-        action.backgroundColor = AppColor.whiteSmoke
+        action.backgroundColor = AppColors.cardBackground
         action.textColor = descriptor.color(forStyle: buttonStyle)
         action.font = .systemFont(ofSize: 13)
         action.transitionDelegate = ScaleTransition.default

@@ -8,7 +8,7 @@ import Foundation
 import Kingfisher
 import UIKit
 
-struct CardEntity: Codable {
+class CardEntity: Codable {
     var id: String
     var frontText: String
     var frontExtraText: String
@@ -20,14 +20,18 @@ struct CardEntity: Codable {
     // At card list, to store card display state (back or front)
     var displayingFront: Bool = true
     
+    init() {
+        id = UUID().uuidString
+        frontText = ""
+        frontExtraText = ""
+        backText = ""
+        backExtraText = ""
+        imageUrl = ""
+        videoUrl = ""
+    }
+    
     static func empty() -> CardEntity {
-        CardEntity(id: UUID().uuidString,
-                   frontText: "",
-                   frontExtraText: "",
-                   backText: "",
-                   backExtraText: "",
-                   imageUrl: "",
-                   videoUrl: "")
+        CardEntity()
     }
 }
 

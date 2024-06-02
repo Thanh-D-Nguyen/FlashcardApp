@@ -8,14 +8,23 @@
 
 import Foundation
 import RxRelay
+import RxSwift
+
+enum NestedAdapterSection {
+    case text(String)
+    case horizontal(DeskEntity)
+}
+
 
 protocol DeskListPresenterInterface: AnyObject {
     var desksRelay: BehaviorRelay<[DeskEntity]> { get }
-    
+
     func viewDidLoad()
     func dismiss()
-    
+    func updateDesk()
     func didSelectDeskAtIndex(_ index: Int)
+    
+    func addDesk()
 }
 
 class DeskListPresenter {
@@ -25,8 +34,8 @@ class DeskListPresenter {
     private var entity: DeskEntity?
     
     let desksRelay = BehaviorRelay<[DeskEntity]>(value: [])
-
-    init(interactor: DeskInteractorInterface, 
+    
+    init(interactor: DeskInteractorInterface,
         wireframe: DeskListWireframeInterface) {
         self.interactor = interactor
         self.wireframe = wireframe
@@ -35,8 +44,15 @@ class DeskListPresenter {
 
 extension DeskListPresenter: DeskListPresenterInterface {
     func viewDidLoad() {
-        let desks = interactor.desks
-        desksRelay.accept(desks)
+        updateDesk()
+    }
+    
+    func updateDesk() {
+        var result: [DeskEntity] = []
+        interactor.desks.forEach({
+            result.append($0)
+        })
+        desksRelay.accept(result)
     }
     
     func dismiss() {
@@ -45,5 +61,9 @@ extension DeskListPresenter: DeskListPresenterInterface {
     
     func didSelectDeskAtIndex(_ index: Int) {
         wireframe.dismiss(selectedIndex: index)
+    }
+    
+    func addDesk() {
+        wireframe.openCreateDesk()
     }
 }

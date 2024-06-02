@@ -7,7 +7,6 @@
 
 import UIKit
 
-@IBDesignable
 class TopBarView: UIView {
 
     @IBInspectable var title: String = "Screen Name" {

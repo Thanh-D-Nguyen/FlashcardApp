@@ -11,6 +11,7 @@ import RxSwift
 import Kingfisher
 
 class NewCardCell: SwipeTableViewCell {
+    final private let textFieldBorderWidth = 2.0
     private var disposeBag = DisposeBag()
     
     @IBOutlet private weak var stackView: UIStackView!
@@ -34,17 +35,18 @@ class NewCardCell: SwipeTableViewCell {
         super.awakeFromNib()
         // Initialization code
         
-        wordTextField.inputViewStyle = .borderWith(radius: 4.0)
-        wordTextField.lineColor = AppColor.royalBlue?.withAlphaComponent(0.3)
-        wordTextField.editLineColor = AppColor.royalBlue
+        wordTextField.inputViewStyle = .borderWith(radius: textFieldBorderWidth)
+        wordTextField.lineColor = AppColors.highlightYellow
+        wordTextField.editLineColor = AppColors.secondary
         wordTextField.indicatorStyle = .default
-        wordTextField.textColor = AppColor.darkSlateGray
+        wordTextField.textColor = AppColors.textPrimary
         
-        meanTextField.inputViewStyle = .borderWith(radius: 4.0)
-        meanTextField.lineColor = AppColor.royalBlue?.withAlphaComponent(0.3)
-        meanTextField.editLineColor = AppColor.royalBlue
+        meanTextField.inputViewStyle = .borderWith(radius: textFieldBorderWidth)
+        meanTextField.lineColor = AppColors.highlightYellow
+        meanTextField.editLineColor = AppColors.secondary
         meanTextField.indicatorStyle = .default
-        meanTextField.textColor = AppColor.darkSlateGray
+        meanTextField.textColor = AppColors.textPrimary
+        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -79,7 +81,7 @@ class NewCardCell: SwipeTableViewCell {
         imageButton.rx.tap.bind(to: card.didSelectImageRelay).disposed(by: disposeBag)
         
         card.imageUrlRelay.subscribe(onNext: { [unowned self] imageUrl in
-            self.cardImageView.kf.setImage(with: URL(string: imageUrl))
+            self.cardImageView.kf.setImage(with: URL(string: imageUrl), placeholder: AppImages.noImage)
         }).disposed(by: disposeBag)
         
         Observable.merge([wordTextField.rx.didBeginEditing.asObservable(),

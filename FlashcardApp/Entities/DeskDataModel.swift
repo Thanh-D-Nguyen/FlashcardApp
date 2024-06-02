@@ -36,7 +36,14 @@ struct DeskDataModel {
     
     func toDeskEntity() -> DeskEntity {
         let savingCard = self.cards.compactMap { $0.toCardEntity() }
-        let deskEntity = DeskEntity(id: uuid, name: deskName, description: deskDesc, imageNamed: "", sortingLanguage: sortingLang, cards: savingCard, date: Date())
+        let deskEntity = DeskEntity()
+        deskEntity.id = uuid
+        deskEntity.name = deskName
+        deskEntity.description = deskDesc
+        deskEntity.imageNamed = ""
+        deskEntity.sortingLanguage = sortingLang
+        deskEntity.cards = savingCard
+        deskEntity.date = Date()
         return deskEntity
     }
 }
@@ -76,7 +83,15 @@ struct CardDataModel: Equatable {
     
     func toCardEntity() -> CardEntity? {
         if !front.isEmpty, !back.isEmpty {
-            return CardEntity(id: uuid, frontText: front, frontExtraText: "", backText: back, backExtraText: "", imageUrl: imageUrl, videoUrl: "")
+            let entity = CardEntity()
+            entity.id = uuid
+            entity.frontText = front
+            entity.frontExtraText = ""
+            entity.backText = back
+            entity.backExtraText = ""
+            entity.imageUrl = imageUrl
+            entity.videoUrl = ""
+            return entity
         }
         return nil
     }

@@ -1,79 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="DeskListCell" customModule="FlashcardApp" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="363" height="103"/>
+        <collectionViewCell opaque="NO" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="DeskListCell" customModule="FlashcardApp" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="334" height="124"/>
             <autoresizingMask key="autoresizingMask"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                <rect key="frame" x="0.0" y="0.0" width="363" height="103"/>
+                <rect key="frame" x="0.0" y="0.0" width="334" height="124"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="dyZ-Na-Rft">
-                        <rect key="frame" x="16" y="8" width="331" height="37"/>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wYY-JX-XRq" userLabel="BackgroundView" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
+                        <rect key="frame" x="4" y="4" width="326" height="116"/>
+                        <color key="backgroundColor" name="CardBackground"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="4"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="dashed" value="YES"/>
+                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                <real key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
+                                <color key="value" name="Shadow"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="dyZ-Na-Rft">
+                        <rect key="frame" x="12" y="11.999999999999996" width="310" height="52.666666666666657"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xwo-JW-SPx">
-                                <rect key="frame" x="0.0" y="0.0" width="331" height="19.333333333333332"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Desk title Desk title Desk title Desk title Desk title " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xwo-JW-SPx">
+                                <rect key="frame" x="0.0" y="0.0" width="310" height="19.333333333333332"/>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
-                                <color key="textColor" name="teflonColor"/>
+                                <color key="textColor" name="TextPrimary"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Iw-If-JqA">
-                                <rect key="frame" x="0.0" y="21.333333333333332" width="331" height="15.666666666666668"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Desk title Desk title Desk title Desk title Desk title " lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Iw-If-JqA">
+                                <rect key="frame" x="0.0" y="21.333333333333336" width="163" height="31.333333333333336"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" name="teflonColor"/>
+                                <color key="textColor" name="TextSecondary"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                    </stackView>
-                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="B5S-V3-iud">
-                        <rect key="frame" x="249" y="53" width="98" height="30"/>
-                        <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bO2-kt-Kqi">
-                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="bO2-kt-Kqi" secondAttribute="height" id="v3m-cb-nib"/>
-                                </constraints>
-                            </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="McX-bb-qBl">
-                                <rect key="frame" x="34" y="0.0" width="30" height="30"/>
-                            </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="znt-sb-n9F">
-                                <rect key="frame" x="68" y="0.0" width="30" height="30"/>
-                            </imageView>
-                        </subviews>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="30" id="Oyt-hv-r1T"/>
-                        </constraints>
                     </stackView>
                     <stackView opaque="NO" contentMode="scaleToFill" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="FgZ-Nm-ELZ">
-                        <rect key="frame" x="16" y="60.666666666666657" width="73" height="15"/>
+                        <rect key="frame" x="12" y="72.666666666666671" width="86.666666666666671" height="15"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="81E-1j-V0I">
                                 <rect key="frame" x="0.0" y="0.0" width="32.666666666666664" height="15"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                <color key="tintColor" name="indianRedColor"/>
+                                <color key="tintColor" name="Secondary"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="12" image="heart" catalog="system">
-                                    <color key="titleColor" name="indianRedColor"/>
+                                    <color key="titleColor" name="Primary"/>
                                 </state>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gtP-RJ-B0o">
-                                <rect key="frame" x="34.666666666666657" y="0.0" width="38.333333333333343" height="15"/>
+                                <rect key="frame" x="34.666666666666664" y="0.0" width="51.999999999999993" height="15"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                <color key="tintColor" name="indianRedColor"/>
+                                <color key="tintColor" name="Secondary"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" title="12" image="eye" catalog="system">
-                                    <color key="titleColor" name="indianRedColor"/>
+                                <state key="normal" title="12 Thẻ" image="lanyardcard" catalog="system">
+                                    <color key="titleColor" name="Primary"/>
                                 </state>
                             </button>
                         </subviews>
@@ -81,39 +75,166 @@
                             <constraint firstAttribute="height" constant="15" id="MdM-12-EWO"/>
                         </constraints>
                     </stackView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v0U-qK-79R">
+                        <rect key="frame" x="177.66666666666663" y="35.333333333333336" width="140.33333333333337" height="72.333333333333314"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Eai-21-jrj" customClass="CardMiniView" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="83.000000000000028" y="0.0" width="50.333333333333343" height="72.333333333333329"/>
+                                <color key="backgroundColor" name="CardPink"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="frontText" value="RFVdfdsfsdf"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
+                                        <real key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
+                                        <size key="value" width="2" height="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WB2-eM-8HY" customClass="CardMiniView" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="53" y="0.0" width="50.666666666666657" height="72.333333333333329"/>
+                                <color key="backgroundColor" name="CardYellow"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="frontText" value="QAZ"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
+                                        <real key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
+                                        <size key="value" width="2" height="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="di2-yc-TUU" customClass="CardMiniView" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="25.333333333333346" y="0.0" width="50.333333333333343" height="72.333333333333329"/>
+                                <color key="backgroundColor" name="CardGreen"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="frontText" value="EFG"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
+                                        <real key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
+                                        <size key="value" width="2" height="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" name="CardGreen"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YK2-Qo-LLO" customClass="CardMiniView" customModule="FlashcardApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="50.666666666666664" height="72.333333333333329"/>
+                                <color key="backgroundColor" name="CardBlue"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="YK2-Qo-LLO" secondAttribute="height" multiplier="0.7" id="ccL-kB-OMk"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="frontText" value="ABC"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
+                                        <real key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
+                                        <size key="value" width="2" height="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="Eai-21-jrj" firstAttribute="leading" secondItem="WB2-eM-8HY" secondAttribute="trailing" multiplier="0.8" id="0TM-YE-jbz"/>
+                            <constraint firstItem="Eai-21-jrj" firstAttribute="top" secondItem="v0U-qK-79R" secondAttribute="top" id="1UU-7H-Lci"/>
+                            <constraint firstItem="WB2-eM-8HY" firstAttribute="width" secondItem="di2-yc-TUU" secondAttribute="width" id="5Sq-Rf-wPi"/>
+                            <constraint firstItem="di2-yc-TUU" firstAttribute="leading" secondItem="YK2-Qo-LLO" secondAttribute="trailing" multiplier="0.5" id="9t0-7H-vGQ"/>
+                            <constraint firstAttribute="bottom" secondItem="WB2-eM-8HY" secondAttribute="bottom" id="FDB-rb-NTh"/>
+                            <constraint firstItem="di2-yc-TUU" firstAttribute="top" secondItem="v0U-qK-79R" secondAttribute="top" id="GYj-uy-gRO"/>
+                            <constraint firstItem="WB2-eM-8HY" firstAttribute="top" secondItem="v0U-qK-79R" secondAttribute="top" id="HTY-BP-Obo"/>
+                            <constraint firstAttribute="width" secondItem="v0U-qK-79R" secondAttribute="height" multiplier="35:18" id="LhA-vD-ThY"/>
+                            <constraint firstItem="YK2-Qo-LLO" firstAttribute="top" secondItem="v0U-qK-79R" secondAttribute="top" id="UGh-in-WDn"/>
+                            <constraint firstAttribute="bottom" secondItem="Eai-21-jrj" secondAttribute="bottom" id="Xc7-6h-Kic"/>
+                            <constraint firstItem="YK2-Qo-LLO" firstAttribute="leading" secondItem="v0U-qK-79R" secondAttribute="leading" id="aBQ-yd-2QX"/>
+                            <constraint firstItem="di2-yc-TUU" firstAttribute="width" secondItem="YK2-Qo-LLO" secondAttribute="width" id="bE8-0K-XG8"/>
+                            <constraint firstAttribute="bottom" secondItem="di2-yc-TUU" secondAttribute="bottom" id="hEA-eL-pxl"/>
+                            <constraint firstItem="Eai-21-jrj" firstAttribute="width" secondItem="WB2-eM-8HY" secondAttribute="width" id="vTL-vS-fIC"/>
+                            <constraint firstItem="WB2-eM-8HY" firstAttribute="leading" secondItem="di2-yc-TUU" secondAttribute="trailing" multiplier="0.7" id="xc9-fF-C9O"/>
+                            <constraint firstAttribute="bottom" secondItem="YK2-Qo-LLO" secondAttribute="bottom" id="y86-hO-meh"/>
+                        </constraints>
+                    </view>
                 </subviews>
             </view>
-            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
-            <color key="backgroundColor" name="whiteSmokeColor"/>
+            <color key="backgroundColor" name="Background"/>
             <constraints>
-                <constraint firstItem="dyZ-Na-Rft" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="8" id="1Sy-5X-xYl"/>
-                <constraint firstItem="B5S-V3-iud" firstAttribute="top" secondItem="dyZ-Na-Rft" secondAttribute="bottom" constant="8" id="1WD-lP-SRN"/>
-                <constraint firstAttribute="trailing" secondItem="dyZ-Na-Rft" secondAttribute="trailing" constant="16" id="AYx-bW-P5I"/>
+                <constraint firstItem="dyZ-Na-Rft" firstAttribute="top" secondItem="wYY-JX-XRq" secondAttribute="top" constant="8" id="1Sy-5X-xYl"/>
+                <constraint firstItem="wYY-JX-XRq" firstAttribute="trailing" secondItem="dyZ-Na-Rft" secondAttribute="trailing" constant="8" id="AYx-bW-P5I"/>
                 <constraint firstItem="FgZ-Nm-ELZ" firstAttribute="leading" secondItem="dyZ-Na-Rft" secondAttribute="leading" id="C52-V2-Z2H"/>
-                <constraint firstAttribute="bottom" secondItem="B5S-V3-iud" secondAttribute="bottom" priority="250" constant="8" id="XAg-gq-eAD"/>
-                <constraint firstAttribute="trailing" secondItem="B5S-V3-iud" secondAttribute="trailing" constant="16" id="aDn-9m-ghx"/>
-                <constraint firstItem="FgZ-Nm-ELZ" firstAttribute="centerY" secondItem="B5S-V3-iud" secondAttribute="centerY" id="ioP-bo-qLp"/>
-                <constraint firstItem="dyZ-Na-Rft" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="16" id="m8y-3N-cUO"/>
+                <constraint firstAttribute="trailing" secondItem="v0U-qK-79R" secondAttribute="trailing" constant="16" id="Hyv-4h-fLK"/>
+                <constraint firstAttribute="bottom" secondItem="wYY-JX-XRq" secondAttribute="bottom" priority="250" constant="4" id="LLv-9m-7sc"/>
+                <constraint firstItem="wYY-JX-XRq" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="4" id="Slh-36-ucY"/>
+                <constraint firstItem="v0U-qK-79R" firstAttribute="top" secondItem="Xwo-JW-SPx" secondAttribute="bottom" constant="4.0000000000000036" id="Zsc-g9-9Vb"/>
+                <constraint firstItem="2Iw-If-JqA" firstAttribute="width" secondItem="wYY-JX-XRq" secondAttribute="width" multiplier="0.5" id="a91-Tj-hY9"/>
+                <constraint firstItem="wYY-JX-XRq" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="4" id="hj6-En-5aJ"/>
+                <constraint firstItem="dyZ-Na-Rft" firstAttribute="leading" secondItem="wYY-JX-XRq" secondAttribute="leading" constant="8" id="m8y-3N-cUO"/>
+                <constraint firstAttribute="trailing" secondItem="wYY-JX-XRq" secondAttribute="trailing" constant="4" id="se7-Oc-XTu"/>
+                <constraint firstItem="v0U-qK-79R" firstAttribute="leading" secondItem="2Iw-If-JqA" secondAttribute="trailing" constant="2.6666666666666288" id="w5p-k7-bWp"/>
+                <constraint firstItem="FgZ-Nm-ELZ" firstAttribute="top" secondItem="2Iw-If-JqA" secondAttribute="bottom" constant="8" id="xXR-Kd-s8C"/>
             </constraints>
-            <size key="customSize" width="363" height="103"/>
+            <size key="customSize" width="334" height="124"/>
             <connections>
                 <outlet property="deskSubTitle" destination="2Iw-If-JqA" id="OOc-Om-lpW"/>
                 <outlet property="deskTitle" destination="Xwo-JW-SPx" id="MRg-eH-gQc"/>
+                <outlet property="favoriteButton" destination="81E-1j-V0I" id="IAb-RS-l7V"/>
+                <outlet property="numOfCardsButton" destination="gtP-RJ-B0o" id="He8-Ga-9vC"/>
+                <outletCollection property="cardMiniViews" destination="YK2-Qo-LLO" collectionClass="NSMutableArray" id="73u-LT-Cuy"/>
+                <outletCollection property="cardMiniViews" destination="di2-yc-TUU" collectionClass="NSMutableArray" id="8VM-eT-eOe"/>
+                <outletCollection property="cardMiniViews" destination="WB2-eM-8HY" collectionClass="NSMutableArray" id="4Sb-o6-fkw"/>
+                <outletCollection property="cardMiniViews" destination="Eai-21-jrj" collectionClass="NSMutableArray" id="Hhd-bt-aw7"/>
             </connections>
-            <point key="canvasLocation" x="313.74045801526717" y="40.492957746478872"/>
+            <point key="canvasLocation" x="-39.694656488549619" y="-40.140845070422536"/>
         </collectionViewCell>
     </objects>
     <resources>
-        <image name="eye" catalog="system" width="128" height="79"/>
         <image name="heart" catalog="system" width="128" height="107"/>
-        <namedColor name="indianRedColor">
-            <color red="1" green="0.42745098039215684" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <image name="lanyardcard" catalog="system" width="108" height="128"/>
+        <namedColor name="Background">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="teflonColor">
-            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="CardBackground">
+            <color red="0.97299998998641968" green="0.97600001096725464" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="whiteSmokeColor">
-            <color red="0.96470588235294119" green="0.96862745098039216" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="CardBlue">
+            <color red="0.67799997329711914" green="0.84700000286102295" blue="0.90200001001358032" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="CardGreen">
+            <color red="0.67799997329711914" green="0.90200001001358032" blue="0.67799997329711914" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="CardPink">
+            <color red="0.90200001001358032" green="0.67799997329711914" blue="0.84700000286102295" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="CardYellow">
+            <color red="0.90200001001358032" green="0.90200001001358032" blue="0.67799997329711914" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Primary">
+            <color red="0.0" green="0.48199999332427979" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Secondary">
+            <color red="0.0" green="0.33700001239776611" blue="0.70200002193450928" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Shadow">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="TextPrimary">
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="TextSecondary">
+            <color red="0.42399999499320984" green="0.42399999499320984" blue="0.42399999499320984" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

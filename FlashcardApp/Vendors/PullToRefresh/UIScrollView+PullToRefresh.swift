@@ -132,15 +132,10 @@ internal extension UIScrollView {
     
     var effectiveContentInset: UIEdgeInsets {
         get {
-            if #available(iOS 11, *) {
-                return adjustedContentInset
-            } else {
-                return contentInset
-            }
+            return adjustedContentInset
         }
-        
         set {
-            if #available(iOS 11.0, *), contentInsetAdjustmentBehavior != .never {
+            if contentInsetAdjustmentBehavior != .never {
                 contentInset = newValue - safeAreaInsets
             } else {
                 contentInset = newValue

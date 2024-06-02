@@ -58,14 +58,14 @@ class RealmService {
                     }
                 }
             } catch let error {
-                print("Error: \(error.localizedDescription)")
+                logger.error("Error: \(error.localizedDescription)")
             }
             
         }
     }
     
     func configuration() {
-        print("configuration-----")
+        logger.debug("configuration-----")
         copyBundleData(completion: { [unowned self] url in
             let configuration = Realm.Configuration(fileURL: url,
                                                     schemaVersion: databaseVersion,

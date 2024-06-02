@@ -6,10 +6,15 @@
 //
 
 import UIKit
+import FBSDKLoginKit
 
 class SlideShowViewController: BaseViewController {
     
     var presenter: SlideShowPresenterInterface!
+    
+    var welcomePresenter: WelcomeMainPresenterInterface!
+    @IBOutlet private weak var signInFBButton: UIButton!
+    private let facebookLoginButton = FBLoginButton()
     
     @IBOutlet weak private var containerView: UIView!
     @IBOutlet weak private var pageControl: UIPageControl!
@@ -39,6 +44,14 @@ class SlideShowViewController: BaseViewController {
         pageView.didMove(toParent: self)
         pageView.setViewControllers([presenter.pageBefore(nil)!], direction: .forward, animated: false)
         updatePageControlUI(currentPageIndex: 0)
+        
+        view.addSubview(facebookLoginButton)
+        view.sendSubviewToBack(facebookLoginButton)
+        facebookLoginButton.translatesAutoresizingMaskIntoConstraints = false
+        signInFBButton.topAnchor.constraint(equalTo: facebookLoginButton.topAnchor).isActive = true
+        signInFBButton.leadingAnchor.constraint(equalTo: facebookLoginButton.leadingAnchor).isActive = true
+        signInFBButton.trailingAnchor.constraint(equalTo: facebookLoginButton.trailingAnchor).isActive = true
+        facebookLoginButton.delegate = self
     }
     
     func subscribe() { }
@@ -52,11 +65,16 @@ class SlideShowViewController: BaseViewController {
         }
     }
     
-    @IBAction
-    private func getStartedAction() {
-        presenter.getStartedAction()
-    }
 
+    @IBAction
+    private func signInAction(_ sender: UIButton) {
+        if sender.tag == SignInType.facebook.rawValue {
+            // 1. Login Facebook by open webview
+            facebookLoginButton.sendActions(for: .touchUpInside)
+        } else {
+            welcomePresenter.signInAction(sender.tag)
+        }
+    }
 }
 
 extension SlideShowViewController: UIPageViewControllerDataSource {
@@ -74,5 +92,16 @@ extension SlideShowViewController: UIPageViewControllerDelegate {
         guard let selectedVC = pageViewController.viewControllers?.first as? SlideItemViewController else { return }
         pageControl.currentPage = selectedVC.index ?? 0
         updatePageControlUI(currentPageIndex: selectedVC.index ?? 0)
+    }
+}
+
+extension SlideShowViewController: LoginButtonDelegate {
+    func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?) {
+        // 2. Login Facebook using firebase
+        welcomePresenter.signInAction(SignInType.facebook.rawValue)
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBLoginButton) {
+        
     }
 }

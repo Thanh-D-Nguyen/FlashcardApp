@@ -5,12 +5,12 @@
   Created by タイン・グエン on 2023/01/09.
   
 */
-"Hand-pickle high quality snacks." = "Hand-pickle high quality snacks.";
-"Shop global. Mind-blownly affordable." = "Shop global. Mind-blownly affordable.";
-"Deliver on the promise of time." = "Deliver on the promise of time.";
-"By clicking \"Create account\", I agree to SnackOverflow’s TOS and Privacy Policy." = "By clicking \"Create account\", I agree to SnackOverflow’s TOS and Privacy Policy.";
-"Go with your flow." = "Go with your flow.";
-"Welcome back!" = "Welcome back!";
+"Master Japanese with Flashcards" = "Master Japanese with Flashcards";
+"Test Your Knowledge with Quizzes" = "Test Your Knowledge with Quizzes";
+"Expand Your Vocabulary with the Dictionary" = "Expand Your Vocabulary with the Dictionary";
+"By clicking \"Create account\", I agree to Flashcard’s TOS and Privacy Policy." = "By clicking \"Create account\", I agree to Flashcard’s TOS and Privacy Policy.";
+"Go with your Flashcard." = "Go with your Flashcard.";
+"Welcome to FlashCard!" = "Welcome to FlashCard!";
 "Create account" = "Create account";
 "Login" = "Login";
 
@@ -19,7 +19,7 @@
 "Create" = "Create";
 "Wishlist" = "Wishlist";
 "Account" = "Account";
-"mr.donuts@gmail.com" = "mr.donuts@gmail.com";
+"email@domain.com" = "email@domain.com";
 "password" = "password";
 // Home
 "Daily quests" = "Daily quests";

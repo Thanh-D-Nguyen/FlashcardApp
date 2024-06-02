@@ -9,6 +9,7 @@ import UIKit
 import RxSwift
 
 class FlickrImageSearchInteractor: ImageSearchInteractorInterface {
+    
     private let flickrSearchApi: FlickrSearchApiInterface
     
     init() {

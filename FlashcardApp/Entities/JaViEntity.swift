@@ -35,12 +35,11 @@ struct JaViEntity {
 
 extension JaViEntity {
     func toCard() -> CardEntity {
-        CardEntity(id: "\(self.id)",
-                   frontText: self.word,
-                   frontExtraText: self.phonetic,
-                   backText: self.means?.first?.mean ?? "",
-                   backExtraText: "",
-                   imageUrl: "",
-                   videoUrl: "")
+        let entity = CardEntity()
+        entity.id = "\(self.id)"
+        entity.frontText = self.word
+        entity.frontExtraText = self.phonetic
+        entity.backText = self.means?.first?.mean ?? ""
+        return entity
     }
 }

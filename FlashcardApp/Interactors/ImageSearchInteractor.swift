@@ -8,9 +8,21 @@
 import Foundation
 import RxSwift
 
-enum SearchImageType {
+enum SearchImageType: Int, CaseIterable {
     case pixabay
     case flickr
+    
+    var description: String {
+        switch self {
+            case .pixabay:
+                return "Pixabay"
+            case .flickr:
+                return "Flickr"
+        }
+    }
+    static func all() -> [String] {
+        return self.allCases.map { $0.description }
+    }
 }
 
 protocol ImageSearchInteractorInterface {
@@ -18,6 +30,15 @@ protocol ImageSearchInteractorInterface {
 }
 
 class ImageSearchInteractor {
+    
+    private var currentSearchType: SearchImageType
+    private var interactor: ImageSearchInteractorInterface
+        
+    init(searchType: SearchImageType) {
+        self.currentSearchType = searchType
+        self.interactor = ImageSearchInteractor.create(type: searchType)
+    }
+    
     static func create(type: SearchImageType) -> ImageSearchInteractorInterface {
         switch type {
             case .pixabay:
@@ -27,3 +48,11 @@ class ImageSearchInteractor {
         }
     }
 }
+
+extension ImageSearchInteractor: ImageSearchInteractorInterface {
+    
+    func search(query: String, page: Int, perpage: Int) -> Single<[SearchPhoto]> {
+        interactor.search(query: query, page: page, perpage: perpage)
+    }
+}
+ 

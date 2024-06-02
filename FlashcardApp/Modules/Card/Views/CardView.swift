@@ -38,9 +38,9 @@ class CardView: UIView {
     private func setupView() {
         instantiate()
         contentView.set(startPoint: .zero, endPoint: CGPoint(x: 1, y: 1))
-        contentView.set(colors: [AppColor.indianRed, AppColor.gold].compactMap({ $0! }))
+        contentView.set(colors: [AppColors.primary, AppColors.secondary].compactMap({ $0! }))
         addMoreView.set(startPoint: .zero, endPoint: CGPoint(x: 1, y: 1))
-        addMoreView.set(colors: [AppColor.indianRed, AppColor.gold].compactMap({ $0! }))
+        addMoreView.set(colors: [AppColors.primary, AppColors.secondary].compactMap({ $0! }))
         
         tapGuesture = UITapGestureRecognizer(target: self, action: #selector(flip))
         addGestureRecognizer(tapGuesture)

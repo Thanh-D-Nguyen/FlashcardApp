@@ -39,7 +39,7 @@ class MailLoginPresenter {
     private var userInfo: SocialUserEntity?
     
     var warningAttributedText: NSAttributedString {
-        let warningText = NSLocalizedString("By clicking \"Create account\", I agree to SnackOverflow’s TOS and Privacy Policy.", comment: "")
+        let warningText = NSLocalizedString("By clicking \"Create account\", I agree to Flashcard’s TOS and Privacy Policy.", comment: "")
         let attribuedTxt = NSMutableAttributedString(string: warningText)
         attribuedTxt.addAttribute(.link, value: "www.google.com", range: (warningText as NSString).range(of: "TOS"))
         attribuedTxt.addAttribute(.link, value: "www.yahoo.com", range: (warningText as NSString).range(of: "Privacy Policy."))
@@ -48,20 +48,20 @@ class MailLoginPresenter {
     
     var mailPlaceHolderAttributedText: NSAttributedString {
         NSAttributedString(
-            string: NSLocalizedString("mr.donuts@gmail.com", comment: ""),
-            attributes: [.foregroundColor: AppColor.clooney ?? UIColor.white])
+            string: NSLocalizedString("email@domain.com", comment: ""),
+            attributes: [.foregroundColor: AppColors.placeholderText])
     }
     
     var passPlaceHolderAttributedText: NSAttributedString {
         NSAttributedString(
             string: NSLocalizedString("password", comment: ""),
-            attributes: [.foregroundColor: AppColor.clooney ?? UIColor.white])
+            attributes: [.foregroundColor: AppColors.placeholderText])
     }
     
     var titleText: String {
         return loginType == .register ?
-        NSLocalizedString("Go with your flow.", comment: "") :
-        NSLocalizedString("Welcome back!", comment: "")
+        NSLocalizedString("Go with your Flashcard.", comment: "") :
+        NSLocalizedString("Welcome to Flashcard!", comment: "")
     }
     
     var loginButtonText: String {

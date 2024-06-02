@@ -25,6 +25,7 @@ enum CardFace {
 enum MainTabbarName: Int {
     case home
     case quiz
+    case desk
     case card
     case dictionary
     case setting
@@ -35,6 +36,8 @@ enum MainTabbarName: Int {
                 return NSLocalizedString("Home", comment: "")
             case .quiz:
                 return NSLocalizedString("Quiz", comment: "")
+            case .desk:
+                return NSLocalizedString("Desk", comment: "")
             case .card:
                 return NSLocalizedString("Card", comment: "")
             case .dictionary:
@@ -50,6 +53,8 @@ enum MainTabbarName: Int {
                 return UIImage(systemName: "house")
             case .quiz:
                 return UIImage(systemName: "checklist")
+            case .desk:
+                return UIImage(systemName: "menucard")
             case .card:
                 return UIImage(systemName: "menucard")
             case .dictionary:

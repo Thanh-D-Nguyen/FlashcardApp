@@ -45,12 +45,12 @@ extension MainPresenter: MainPresenterInterface {
         let home = HomeWireframe()
         let quiz = QuizWireframe()
         let quizNav = BaseNavigationController(rootViewController: quiz.viewController)
-        let card = CardWireframe()
-        let cardNav = BaseNavigationController(rootViewController: card.viewController)
+        let desk = DeskListWireframe()
+        let deskNav = BaseNavigationController(rootViewController: desk.viewController)
         let dictionary = DictionaryWireframe()
         let dictionaryNav = BaseNavigationController(rootViewController: dictionary.viewController)
         let setting = SettingWireframe()
-        let viewControllers = [home.viewController, quizNav, cardNav, dictionaryNav, setting.viewController]
+        let viewControllers = [home.viewController, quizNav, deskNav, dictionaryNav, setting.viewController]
         tabbarController.viewControllers = viewControllers
         return tabbarController
     }

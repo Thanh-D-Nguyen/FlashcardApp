@@ -10,6 +10,8 @@ import UIKit
 
 protocol DeskListWireframeInterface: AnyObject {
     func dismiss(selectedIndex index: Int?)
+    
+    func openCreateDesk()
 }
 
 final class DeskListWireframe: BaseWireframe<DeskListViewController> {
@@ -20,7 +22,9 @@ final class DeskListWireframe: BaseWireframe<DeskListViewController> {
     init() {
         let moduleViewController = storyboard.instantiateViewController(ofType: DeskListViewController.self)
         super.init(viewController: moduleViewController)
-        let interactor = DeskInteractor() 
+        moduleViewController.title = MainTabbarName.desk.title
+        moduleViewController.tabBarItem = UITabBarItem(title: MainTabbarName.desk.title, image: MainTabbarName.desk.image, tag: MainTabbarName.desk.rawValue)
+        let interactor = DeskInteractor()
         let presenter = DeskListPresenter(interactor: interactor, wireframe: self)
         moduleViewController.presenter = presenter
     } 
@@ -30,5 +34,10 @@ extension DeskListWireframe: DeskListWireframeInterface {
     func dismiss(selectedIndex index: Int?) {
         didSelectDeskIndex?(index)
         self.viewController.dismiss(animated: true)
+    }
+    
+    func openCreateDesk() {
+        let createDeskView = CreateDeskWireframe()
+        self.viewController.present(createDeskView.viewController, animated: true)
     }
 }

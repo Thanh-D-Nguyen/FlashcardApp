@@ -21,12 +21,14 @@ class RDesk: Object {
 
 extension RDesk {
     func toEntity() -> DeskEntity {
-        DeskEntity(id: id,
-                   name: name,
-                   description: desc,
-                   imageNamed: imageNamed,
-                   sortingLanguage: LanguageSortingType(rawValue: sortingLanguage) ?? .normal,
-                   cards: cards.map({ $0.toEntity() }),
-                   date: date)
+        let desk = DeskEntity()
+        desk.id = id
+        desk.name = name
+        desk.description = desc
+        desk.imageNamed = imageNamed
+        desk.sortingLanguage = LanguageSortingType(rawValue: sortingLanguage) ?? .normal
+        desk.cards = cards.map({ $0.toEntity() })
+        desk.date = date
+        return desk
     }
 }

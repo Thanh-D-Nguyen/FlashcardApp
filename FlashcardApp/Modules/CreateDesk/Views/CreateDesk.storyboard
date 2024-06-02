@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,44 +17,57 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="interactive" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RXZ-cm-D1Q">
-                                <rect key="frame" x="0.0" y="115" width="375" height="597"/>
-                                <color key="backgroundColor" name="whiteSmokeColor"/>
+                                <rect key="frame" x="0.0" y="104" width="375" height="608"/>
+                                <color key="backgroundColor" name="Background"/>
                                 <connections>
                                     <outlet property="dataSource" destination="zIc-eW-6fX" id="tEK-H5-3Nk"/>
                                     <outlet property="delegate" destination="zIc-eW-6fX" id="DMk-dy-Xb9"/>
                                 </connections>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SRs-Wo-cpA">
-                                <rect key="frame" x="0.0" y="47" width="375" height="68"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="104"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nc2-lm-v2K" userLabel="TopBar" customClass="TopBarView" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="68"/>
-                                        <color key="backgroundColor" name="whiteSmokeColor"/>
+                                        <rect key="frame" x="0.0" y="50" width="375" height="54"/>
+                                        <color key="backgroundColor" name="HeaderBackground"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="54" id="Lhc-hM-75p"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="title" value="Tạo Desk"/>
                                         </userDefinedRuntimeAttributes>
                                     </view>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OR2-hf-7DE" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="307" y="8" width="52" height="52"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="P4Y-pA-T1q">
+                                        <rect key="frame" x="0.0" y="50" width="54" height="54"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="P4Y-pA-T1q" secondAttribute="height" id="ojU-B6-8A2"/>
+                                        </constraints>
+                                        <color key="tintColor" name="ButtonTextColor"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="" image="xmark" catalog="system"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OR2-hf-7DE" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                        <rect key="frame" x="321" y="50" width="54" height="54"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="OR2-hf-7DE" secondAttribute="height" multiplier="1:1" id="9DG-zw-9cz"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Xong">
-                                            <color key="titleColor" name="teflonColor"/>
+                                            <color key="titleColor" name="ButtonTextColor"/>
                                         </state>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" name="whiteSmokeColor"/>
+                                <color key="backgroundColor" name="HeaderBackground"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="Nc2-lm-v2K" secondAttribute="bottom" id="0eM-SE-A8a"/>
-                                    <constraint firstItem="OR2-hf-7DE" firstAttribute="top" secondItem="SRs-Wo-cpA" secondAttribute="top" constant="8" id="OAu-y8-DLY"/>
-                                    <constraint firstAttribute="trailing" secondItem="OR2-hf-7DE" secondAttribute="trailing" constant="16" id="T5A-OM-DbR"/>
-                                    <constraint firstAttribute="bottom" secondItem="OR2-hf-7DE" secondAttribute="bottom" constant="8" id="ckn-Bj-Qyk"/>
+                                    <constraint firstItem="P4Y-pA-T1q" firstAttribute="leading" secondItem="SRs-Wo-cpA" secondAttribute="leading" id="BHX-af-3FO"/>
+                                    <constraint firstItem="P4Y-pA-T1q" firstAttribute="top" secondItem="OR2-hf-7DE" secondAttribute="top" id="P7S-8e-a3y"/>
+                                    <constraint firstItem="P4Y-pA-T1q" firstAttribute="top" secondItem="Nc2-lm-v2K" secondAttribute="top" id="Ryz-i9-dLG"/>
+                                    <constraint firstAttribute="trailing" secondItem="OR2-hf-7DE" secondAttribute="trailing" id="T5A-OM-DbR"/>
+                                    <constraint firstAttribute="bottom" secondItem="P4Y-pA-T1q" secondAttribute="bottom" id="bgV-x0-E4p"/>
+                                    <constraint firstAttribute="bottom" secondItem="OR2-hf-7DE" secondAttribute="bottom" id="ckn-Bj-Qyk"/>
                                     <constraint firstItem="Nc2-lm-v2K" firstAttribute="leading" secondItem="SRs-Wo-cpA" secondAttribute="leading" id="i6t-ya-zXP"/>
-                                    <constraint firstAttribute="height" constant="68" id="qf3-B0-JAf"/>
-                                    <constraint firstItem="Nc2-lm-v2K" firstAttribute="top" secondItem="SRs-Wo-cpA" secondAttribute="top" id="sy4-RF-enZ"/>
                                     <constraint firstAttribute="trailing" secondItem="Nc2-lm-v2K" secondAttribute="trailing" id="xiL-qk-Acb"/>
                                 </constraints>
                             </view>
@@ -63,32 +75,33 @@
                                 <rect key="frame" x="0.0" y="712" width="375" height="100"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eH9-iY-dbt" customClass="AddDeskBottomView" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="8" width="375" height="58"/>
-                                        <color key="backgroundColor" name="whiteSmokeColor"/>
+                                        <rect key="frame" x="0.0" y="4" width="375" height="62"/>
+                                        <color key="backgroundColor" name="Background"/>
                                         <connections>
                                             <action selector="bottomTapAction:" destination="zIc-eW-6fX" eventType="touchUpInside" id="xyL-dL-6OJ"/>
                                         </connections>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" name="whiteSmokeColor"/>
+                                <color key="backgroundColor" name="Background"/>
                                 <constraints>
                                     <constraint firstItem="eH9-iY-dbt" firstAttribute="leading" secondItem="sdP-dJ-39N" secondAttribute="leading" id="Jhb-v1-hC3"/>
                                     <constraint firstAttribute="trailing" secondItem="eH9-iY-dbt" secondAttribute="trailing" id="N9N-Fo-ra0"/>
-                                    <constraint firstItem="eH9-iY-dbt" firstAttribute="top" secondItem="sdP-dJ-39N" secondAttribute="top" constant="8" id="O8L-Rn-vwH"/>
+                                    <constraint firstItem="eH9-iY-dbt" firstAttribute="top" secondItem="sdP-dJ-39N" secondAttribute="top" constant="4" id="O8L-Rn-vwH"/>
                                     <constraint firstAttribute="height" constant="100" placeholder="YES" id="qKp-vg-vOe"/>
                                     <constraint firstAttribute="bottomMargin" secondItem="eH9-iY-dbt" secondAttribute="bottom" constant="-8" id="t0f-2S-dDY"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="3pi-N7-nbV"/>
-                        <color key="backgroundColor" name="whiteSmokeColor"/>
+                        <color key="backgroundColor" name="Background"/>
                         <constraints>
                             <constraint firstItem="RXZ-cm-D1Q" firstAttribute="top" secondItem="SRs-Wo-cpA" secondAttribute="bottom" id="113-Aq-YN8"/>
                             <constraint firstAttribute="trailing" secondItem="SRs-Wo-cpA" secondAttribute="trailing" id="6jw-oF-OVw"/>
                             <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="sdP-dJ-39N" secondAttribute="trailing" id="7Ws-jO-Y0W"/>
                             <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="RXZ-cm-D1Q" secondAttribute="trailing" id="LX7-7q-meC"/>
-                            <constraint firstItem="SRs-Wo-cpA" firstAttribute="top" secondItem="3pi-N7-nbV" secondAttribute="top" id="UKk-P3-ne6"/>
+                            <constraint firstItem="SRs-Wo-cpA" firstAttribute="top" secondItem="Z2g-4m-atm" secondAttribute="top" id="WOa-4o-jHU"/>
                             <constraint firstItem="sdP-dJ-39N" firstAttribute="bottom" secondItem="Z2g-4m-atm" secondAttribute="bottom" id="Wkt-0K-K9R"/>
+                            <constraint firstItem="3pi-N7-nbV" firstAttribute="top" secondItem="Nc2-lm-v2K" secondAttribute="top" id="lvW-AL-cQm"/>
                             <constraint firstItem="sdP-dJ-39N" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="q2Q-sm-zDr"/>
                             <constraint firstItem="SRs-Wo-cpA" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="r9C-wK-atq"/>
                             <constraint firstItem="sdP-dJ-39N" firstAttribute="top" secondItem="RXZ-cm-D1Q" secondAttribute="bottom" id="yCj-z1-Vi8"/>
@@ -98,6 +111,7 @@
                     <connections>
                         <outlet property="bottomConstraint" destination="Wkt-0K-K9R" id="4PO-eV-gzN"/>
                         <outlet property="bottomView" destination="eH9-iY-dbt" id="3MH-sO-ITu"/>
+                        <outlet property="closeButton" destination="P4Y-pA-T1q" id="hTo-Hc-TtH"/>
                         <outlet property="deskTableView" destination="RXZ-cm-D1Q" id="x6T-YM-jxf"/>
                         <outlet property="doneButton" destination="OR2-hf-7DE" id="huZ-P2-LF2"/>
                     </connections>
@@ -113,11 +127,15 @@
         </designable>
     </designables>
     <resources>
-        <namedColor name="teflonColor">
-            <color red="0.33300000429153442" green="0.30199998617172241" blue="0.33700001239776611" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <image name="xmark" catalog="system" width="128" height="113"/>
+        <namedColor name="Background">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="whiteSmokeColor">
-            <color red="0.96470588235294119" green="0.96862745098039216" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="ButtonTextColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="HeaderBackground">
+            <color red="0.0" green="0.48199999332427979" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

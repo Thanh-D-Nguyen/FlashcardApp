@@ -25,12 +25,10 @@ struct ViJaEntity {
 
 extension ViJaEntity {
     func toCard() -> CardEntity {
-        CardEntity(id: "\(self.id)",
-                   frontText: self.word,
-                   frontExtraText: "",
-                   backText: self.means?.first?.mean ?? "",
-                   backExtraText: "",
-                   imageUrl: "",
-                   videoUrl: "")
+        let entity = CardEntity()
+        entity.id = "\(self.id)"
+        entity.frontText = self.word
+        entity.backText = self.means?.first?.mean ?? ""
+        return entity
     }
 }

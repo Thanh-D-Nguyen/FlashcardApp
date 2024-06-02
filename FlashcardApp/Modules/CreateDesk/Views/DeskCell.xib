@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -20,7 +19,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="9gL-Uk-cJf">
-                        <rect key="frame" x="16" y="8" width="288" height="143"/>
+                        <rect key="frame" x="16" y="8" width="288" height="148"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vsb-jM-jZy" userLabel="DeskNameView">
                                 <rect key="frame" x="0.0" y="0.0" width="288" height="50"/>
@@ -37,10 +36,19 @@
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Nhập tên"/>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                <color key="value" name="SeparatorLine"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="editLineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </textView>
                                 </subviews>
-                                <color key="backgroundColor" name="whiteyColor"/>
+                                <color key="backgroundColor" name="TextFieldBackground"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="KLj-Iw-mgJ" secondAttribute="trailing" id="4jh-17-HdX"/>
                                     <constraint firstItem="KLj-Iw-mgJ" firstAttribute="top" secondItem="vsb-jM-jZy" secondAttribute="top" id="D8p-wj-kW9"/>
@@ -49,16 +57,16 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0er-cB-diL" customClass="RoundCornerView" customModule="FlashcardApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="54" width="288" height="35"/>
+                                <rect key="frame" x="0.0" y="54" width="288" height="40"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1fk-P0-gpE" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
                                         <rect key="frame" x="222" y="6.0000000000000018" width="66" height="25.666666666666671"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                        <color key="tintColor" name="royalBlueColor"/>
+                                        <color key="tintColor" name="Primary"/>
                                         <inset key="contentEdgeInsets" minX="8" minY="4" maxX="8" maxY="4"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Mô tả" image="plus" catalog="system">
-                                            <color key="titleColor" name="royalBlueColor"/>
+                                            <color key="titleColor" name="Primary"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -68,7 +76,7 @@
                                                 <real key="value" value="1"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                                <color key="value" name="royalBlueColor"/>
+                                                <color key="value" name="Primary"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -76,19 +84,19 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" name="whiteyColor"/>
+                                <color key="backgroundColor" name="TextFieldBackground"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="35" id="HbS-u9-R9w"/>
+                                    <constraint firstAttribute="height" constant="40" id="HbS-u9-R9w"/>
                                     <constraint firstItem="1fk-P0-gpE" firstAttribute="top" secondItem="0er-cB-diL" secondAttribute="top" constant="6" id="rde-2j-xRM"/>
                                     <constraint firstAttribute="trailing" secondItem="1fk-P0-gpE" secondAttribute="trailing" id="rpn-vF-CrI"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PmV-ef-Xnd" userLabel="DeskDescView">
-                                <rect key="frame" x="0.0" y="93" width="288" height="50"/>
+                                <rect key="frame" x="0.0" y="98" width="288" height="50"/>
                                 <subviews>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="VPU-HD-a19" customClass="MMTextView" customModule="FlashcardApp" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="288" height="50"/>
-                                        <color key="backgroundColor" name="whiteSmokeColor"/>
+                                        <rect key="frame" x="0.0" y="8" width="288" height="42"/>
+                                        <color key="backgroundColor" name="Background"/>
                                         <constraints>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="60" id="8VE-53-FCb"/>
                                             <constraint firstAttribute="height" priority="251" constant="25" id="Mp0-JE-KPh"/>
@@ -98,21 +106,30 @@
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Nhập mô tả"/>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                <color key="value" name="SeparatorLine"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="editLineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </textView>
                                 </subviews>
-                                <color key="backgroundColor" name="whiteyColor"/>
+                                <color key="backgroundColor" name="TextFieldBackground"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="VPU-HD-a19" secondAttribute="bottom" id="Nhw-HK-Z3R"/>
                                     <constraint firstAttribute="trailing" secondItem="VPU-HD-a19" secondAttribute="trailing" id="PEW-EO-nxv"/>
-                                    <constraint firstItem="VPU-HD-a19" firstAttribute="top" secondItem="PmV-ef-Xnd" secondAttribute="top" id="fF2-ev-2cr"/>
+                                    <constraint firstItem="VPU-HD-a19" firstAttribute="top" secondItem="PmV-ef-Xnd" secondAttribute="top" constant="8" id="fF2-ev-2cr"/>
                                     <constraint firstItem="VPU-HD-a19" firstAttribute="leading" secondItem="PmV-ef-Xnd" secondAttribute="leading" id="w4J-jT-RCz"/>
                                 </constraints>
                             </view>
                         </subviews>
                     </stackView>
                 </subviews>
-                <color key="backgroundColor" name="whiteSmokeColor"/>
+                <color key="backgroundColor" name="CardBackground"/>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="9gL-Uk-cJf" secondAttribute="bottom" priority="250" constant="4" id="5yL-lc-W8M"/>
                     <constraint firstAttribute="trailing" secondItem="9gL-Uk-cJf" secondAttribute="trailing" constant="16" id="7LF-GM-XDI"/>
@@ -134,26 +151,29 @@
         <designable name="1fk-P0-gpE">
             <size key="intrinsicContentSize" width="66" height="25.666666666666668"/>
         </designable>
-        <designable name="KLj-Iw-mgJ">
-            <size key="intrinsicContentSize" width="-1" height="33"/>
-        </designable>
-        <designable name="VPU-HD-a19">
-            <size key="intrinsicContentSize" width="-1" height="33"/>
-        </designable>
     </designables>
     <resources>
         <image name="plus" catalog="system" width="128" height="113"/>
-        <namedColor name="royalBlueColor">
-            <color red="0.27450980392156865" green="0.32941176470588235" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="Background">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="CardBackground">
+            <color red="0.97299998998641968" green="0.97600001096725464" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Primary">
+            <color red="0.0" green="0.48199999332427979" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="SeparatorLine">
+            <color red="0.82700002193450928" green="0.82700002193450928" blue="0.82700002193450928" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="TextFieldBackground">
+            <color red="0.97299998998641968" green="0.97600001096725464" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="whiteSmokeColor">
             <color red="0.96470588235294119" green="0.96862745098039216" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="whiteyColor">
-            <color red="0.96899998188018799" green="0.96899998188018799" blue="0.96899998188018799" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

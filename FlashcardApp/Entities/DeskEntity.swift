@@ -15,23 +15,23 @@ enum LanguageSortingType: Int {
     var firstImage: UIImage? {
         switch self {
             case .normal:
-                return AppImage.jaFlag
+                return AppImages.jaFlag
             case .opposite:
-                return AppImage.viFlag
+                return AppImages.viFlag
         }
     }
 
     var secondImage: UIImage? {
         switch self {
             case .normal:
-                return AppImage.viFlag
+                return AppImages.viFlag
             case .opposite:
-                return AppImage.jaFlag
+                return AppImages.jaFlag
         }
     }
 }
 
-struct DeskEntity {
+class DeskEntity {
     var id: String
     var name: String
     var description: String
@@ -41,10 +41,20 @@ struct DeskEntity {
     var date: Date
 
     var selectIndex = Constants.unknowSelectIndex
-    static func empty() -> DeskEntity {
-        DeskEntity(id: UUID().uuidString, name: "", description: "", imageNamed: "", sortingLanguage: .normal, cards: [], date: Date())
+    
+    init() {
+        id = UUID().uuidString
+        name = ""
+        description = ""
+        imageNamed = ""
+        sortingLanguage = .normal
+        cards = []
+        date = Date()
     }
     
+    static func empty() -> DeskEntity {
+        DeskEntity()
+    }
 }
 
 struct CreateDeskEntity {

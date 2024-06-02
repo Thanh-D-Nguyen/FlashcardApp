@@ -18,7 +18,8 @@ protocol FocusTextFieldCellProtocol: AnyObject {
 }
 
 class DeskCell: UITableViewCell {
-    
+    final private let textFieldBorderWidth = 2.0
+
     private var disposeBag = DisposeBag()
     
     @IBOutlet private weak var deskButtonContainerView: UIView!
@@ -36,17 +37,17 @@ class DeskCell: UITableViewCell {
         // Initialization code
         deskButtonContainerView.isHidden = false
         deskDescContainerView.isHidden = true
-        deskNameTextField.inputViewStyle = .borderWith(radius: 4.0)
-        deskNameTextField.lineColor = AppColor.royalBlue?.withAlphaComponent(0.3)
-        deskNameTextField.editLineColor = AppColor.royalBlue
+        deskNameTextField.inputViewStyle = .borderWith(radius: textFieldBorderWidth)
+        deskNameTextField.lineColor = AppColors.primary
+        deskNameTextField.editLineColor = AppColors.secondary
         deskNameTextField.indicatorStyle = .default
-        deskNameTextField.textColor = AppColor.darkSlateGray
+        deskNameTextField.textColor = AppColors.primary
         
-        deskDescTextField.inputViewStyle = .borderWith(radius: 4.0)
+        deskDescTextField.inputViewStyle = .borderWith(radius: textFieldBorderWidth)
         deskDescTextField.indicatorStyle = .default
-        deskDescTextField.lineColor = AppColor.royalBlue?.withAlphaComponent(0.3)
-        deskDescTextField.editLineColor = AppColor.royalBlue
-        deskDescTextField.textColor = AppColor.darkSlateGray
+        deskDescTextField.lineColor = AppColors.primary
+        deskDescTextField.editLineColor = AppColors.secondary
+        deskDescTextField.textColor = AppColors.textPrimary
 
     }
 

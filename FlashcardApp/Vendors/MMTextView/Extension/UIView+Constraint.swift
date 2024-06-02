@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-private var layoutHelperKey = "LayoutHelper+Key"
+private var layoutHelperKey: UInt8 = 0
 extension UIView {
     var mmTextLayout:LayoutHelper {
         get {

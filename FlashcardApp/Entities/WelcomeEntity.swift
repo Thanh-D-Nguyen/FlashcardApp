@@ -13,14 +13,14 @@ struct WelcomeEntity {
     var index: Int
     init(index: Int) {
         self.index = index
-        imageName =  "Variant\(index + 1)"
+        imageName =  "Welcome\(index + 1)"
         title = ""
         if index == 0 {
-            title = NSLocalizedString("Hand-pickle high quality snacks.", comment: "")
+            title = NSLocalizedString("Master Japanese with Flashcards", comment: "")
         } else if index == 1 {
-            title = NSLocalizedString("Shop global. Mind-blownly affordable.", comment: "")
+            title = NSLocalizedString("Test Your Knowledge with Quizzes", comment: "")
         } else if index == 2 {
-            title = NSLocalizedString("Deliver on the promise of time.", comment: "")
+            title = NSLocalizedString("Expand Your Vocabulary with the Dictionary", comment: "")
         }
     }
     static let pageCount = 3

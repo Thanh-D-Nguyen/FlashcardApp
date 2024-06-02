@@ -20,8 +20,11 @@ final class SlideShowWireframe: BaseWireframe<SlideShowViewController> {
         let moduleViewController = storyboard.instantiateViewController(ofType: SlideShowViewController.self)
         super.init(viewController: moduleViewController)
         let interactor = SlideShowInteractor()
-        let presenter = SlideShowPresenter(interactor: interactor, wireframe: self)        
+        let presenter = SlideShowPresenter(interactor: interactor, wireframe: self)
         moduleViewController.presenter = presenter
+        let welcomeInteractor = WelcomeMainInteractor()
+        let welcomePresenter = WelcomeMainPresenter(interactor: welcomeInteractor, wireframe: self)
+        moduleViewController.welcomePresenter = welcomePresenter
     }
 }
 
@@ -36,5 +39,11 @@ extension SlideShowWireframe: SlideShowWireframeInterface {
         let moduleViewController = storyboard.instantiateViewController(ofType: SlideItemViewController.self)
         moduleViewController.updatePageItem(entity)
         return moduleViewController
+    }
+}
+
+extension SlideShowWireframe: WelcomeMainWireframeInterface {
+    func showEmailLoginWithType(_ type: EmailLoginType, userInfo: SocialUserEntity?) {
+        navigationController?.setRootWireframe(MailLoginWireframe(type, userInfo: userInfo))
     }
 }

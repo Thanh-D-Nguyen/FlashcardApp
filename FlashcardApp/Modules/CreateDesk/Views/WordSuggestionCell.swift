@@ -10,12 +10,15 @@ import UIKit
 class WordSuggestionCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = AppColor.blackA80
+        label.textColor = AppColors.textSecondary
         label.numberOfLines = 2
         label.minimumScaleFactor = 0.5
-        label.backgroundColor = AppColor.whiteSmoke
+        label.adjustsFontSizeToFitWidth = true
+        label.backgroundColor = AppColors.background
         label.textAlignment = .center
-        label.layer.cornerRadius = 8.0
+        label.layer.cornerRadius = 4.0
+        label.layer.borderWidth = 1.0
+        label.layer.borderColor = AppColors.separatorLine.cgColor
         label.layer.masksToBounds = true
         return label
     }()
@@ -23,7 +26,7 @@ class WordSuggestionCell: UICollectionViewCell {
     private func setupView() {
         addSubview(titleLabel)
         titleLabel.text = "Text"
-        self.contentView.fill(with: titleLabel, edges: .init(top: 4, left: 4, bottom: 4, right: 4))
+        self.contentView.fill(with: titleLabel, edges: .init(top: 2, left: 2, bottom: 2, right: 2))
     }
     
     override func awakeFromNib() {

@@ -14,7 +14,7 @@ protocol FlickrSearchApiInterface {
 
 class FlickrSearchApi: FlickrSearchApiInterface, BaseApiProtocol {
     static let baseUrl = "https://api.flickr.com/services/rest"
-    static let apiKey = "466e6114c92be72912ec9971bef5df2e"
+    static let apiKey = "f229d927412e044c841570508a4daabf"
     
     private func search(_ model: ImageSearchRequestModel) -> RequestBuilder<PhotoSearchResult> {
         let urlString = FlickrSearchApi.baseUrl

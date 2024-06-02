@@ -30,7 +30,7 @@ final class StartUpViewController: BaseViewController {
     func subscribe() {
         subscribe(presenter.progressTextRelay) { [weak self] progressText in
             guard let self else { return }
-            print("progressPercentage", progressText)
+            logger.info("progressPercentage: \(progressText)")
 
             self.percentLabel.text = progressText
         }

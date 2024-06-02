@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -17,7 +16,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DSCF6562" translatesAutoresizingMaskIntoConstraints="NO" id="QK1-Bs-9qb">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sakuraBg2" translatesAutoresizingMaskIntoConstraints="NO" id="QK1-Bs-9qb">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="71q-9o-un0" userLabel="OverlayView">
@@ -27,15 +26,15 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="66B-XO-cYv">
                                 <rect key="frame" x="0.0" y="59" width="393" height="407"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="App logo" translatesAutoresizingMaskIntoConstraints="NO" id="swz-Zd-kBP">
-                                        <rect key="frame" x="0.0" y="3.6666666666666572" width="393" height="400"/>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AppLogo2" translatesAutoresizingMaskIntoConstraints="NO" id="swz-Zd-kBP">
+                                        <rect key="frame" x="78.666666666666671" y="-96.666666666666657" width="235.66666666666663" height="600.33333333333337"/>
                                     </imageView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstItem="swz-Zd-kBP" firstAttribute="leading" secondItem="66B-XO-cYv" secondAttribute="leading" id="7k0-VE-G5Y"/>
-                                    <constraint firstAttribute="trailing" secondItem="swz-Zd-kBP" secondAttribute="trailing" id="IBC-UQ-T7b"/>
-                                    <constraint firstItem="swz-Zd-kBP" firstAttribute="centerY" secondItem="66B-XO-cYv" secondAttribute="centerY" id="qkL-T6-iyH"/>
+                                    <constraint firstItem="swz-Zd-kBP" firstAttribute="centerX" secondItem="66B-XO-cYv" secondAttribute="centerX" id="JTJ-v6-pRF"/>
+                                    <constraint firstItem="swz-Zd-kBP" firstAttribute="width" secondItem="66B-XO-cYv" secondAttribute="width" multiplier="0.6" id="Ote-WT-bd6"/>
+                                    <constraint firstItem="swz-Zd-kBP" firstAttribute="centerY" secondItem="66B-XO-cYv" secondAttribute="centerY" id="WWu-pV-yHr"/>
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="pv9-NB-odv">
@@ -232,18 +231,18 @@
             <size key="intrinsicContentSize" width="227" height="24"/>
         </designable>
         <designable name="M3A-B8-JM3">
-            <size key="intrinsicContentSize" width="172" height="36"/>
+            <size key="intrinsicContentSize" width="172" height="24"/>
         </designable>
         <designable name="SRi-0s-Rtp">
             <size key="intrinsicContentSize" width="220" height="24"/>
         </designable>
     </designables>
     <resources>
-        <image name="App logo" width="1200" height="400"/>
+        <image name="AppLogo2" width="600" height="600"/>
         <image name="Apple Logo" width="24" height="24"/>
-        <image name="DSCF6562" width="1920" height="1280"/>
         <image name="Facebook Logo" width="24" height="24"/>
         <image name="Google Logo" width="24" height="24"/>
+        <image name="sakuraBg2" width="1675" height="2480"/>
         <namedColor name="blackA30Color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.30000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

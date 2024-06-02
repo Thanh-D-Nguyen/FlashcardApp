@@ -6,7 +6,7 @@
 //  
 //
 
-import Foundation
+import UIKit
 import RxRelay
 import RxSwift
 
@@ -47,6 +47,7 @@ protocol CreateDeskPresenterInterface: AnyObject {
     func updateEditingCard(_ card: CardEntity)
     
     func saveDesk()
+    func close()
 }
 
 class CreateDeskPresenter {
@@ -194,13 +195,34 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
     }
     
     func saveDesk() {
+        saveDesk(onComplete: { [weak self] in
+            self?.wireframe.close()
+        }, onError: { [weak self] error in
+            self?.wireframe.showAlert(with: "Error", message: error.errorDescription)
+        })
+    }
+    
+    func close() {
+        let deskEntity = self.desk.toDeskEntity()
+        do {
+            try validateDesk(deskEntity)
+        } catch {
+            let okAction = UIAlertAction(title: "Đồng ý", style: .default) { [weak self] _ in
+                self?.wireframe.close()
+            }
+            let cancelAction = UIAlertAction(title: "Ở lại", style: .cancel)
+            self.wireframe.showAlert(with: "Cảnh báo", message: "Bạn đang trong quá trình nhập dữ liệu, bạn muốn dừng nhập và trở về màn hình trước?", actions: [okAction, cancelAction])
+        }
+    }
+    
+    private func saveDesk(onComplete: (() -> Void)?, onError: ((AppError) -> Void)?) {
         let deskEntity = self.desk.toDeskEntity()
         do {
             try validateDesk(deskEntity)
             try DeskManagement.shared.add(deskEntity)
-            wireframe.close()
+            onComplete?()
         } catch let error as AppError {
-            wireframe.showAlert(with: "Error", message: error.errorDescription)
+            onError?(error)
         } catch {
             print(error)
         }

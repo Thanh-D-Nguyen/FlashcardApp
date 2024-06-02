@@ -36,7 +36,14 @@ extension DeskInteractor: DeskInteractorInterface {
         } else {
             choiceName = "Desk \(newId)"
         }
-        let desk = DeskEntity(id: UUID().uuidString, name: choiceName, description: description ?? "", imageNamed: "", sortingLanguage: LanguageSortingType(rawValue: sortingLanguage) ?? .normal, cards: [], date: Date())
+        let desk = DeskEntity()
+        desk.id = UUID().uuidString
+        desk.name = choiceName
+        desk.description = description ?? ""
+        desk.imageNamed = ""
+        desk.sortingLanguage = LanguageSortingType(rawValue: sortingLanguage) ?? .normal
+        desk.cards = []
+        desk.date = Date()
         try! DeskManagement.shared.add(desk)
     }
     

@@ -21,12 +21,14 @@ class RCard: Object {
 
 extension RCard {
     func toEntity() -> CardEntity {
-        CardEntity(id: id,
-                   frontText: frontText,
-                   frontExtraText: frontExtraText,
-                   backText: backText,
-                   backExtraText: backExtraText,
-                   imageUrl: imageUrl,
-                   videoUrl: videoUrl)
+        let entity = CardEntity()
+        entity.id = id
+        entity.frontText = frontText
+        entity.frontExtraText = frontExtraText
+        entity.backText = backText
+        entity.backExtraText = backExtraText
+        entity.imageUrl = imageUrl
+        entity.videoUrl = videoUrl
+        return entity
     }
 }
