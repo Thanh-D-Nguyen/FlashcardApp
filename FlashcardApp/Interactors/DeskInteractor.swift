@@ -9,26 +9,31 @@
 import Foundation
 
 protocol DeskInteractorInterface: AnyObject {
-    
+
     var desks: [DeskEntity] { get }
-    
-    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int)
-    func updateDesk(_ desk: DeskEntity)
+
+    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int) throws
+    func updateDesk(_ desk: DeskEntity) throws
 }
 
 class DeskInteractor {
-    
-    var desks: [DeskEntity] {
-        return DeskManagement.shared.getAll()
+    private let repository: DeskRepositoryInterface
+
+    init(repository: DeskRepositoryInterface = DeskManagement.shared) {
+        self.repository = repository
     }
-    
+
+    var desks: [DeskEntity] {
+        return repository.getAll()
+    }
+
     private var deskCount: Int {
         return desks.count
     }
 }
 
 extension DeskInteractor: DeskInteractorInterface {
-    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int) {
+    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int) throws {
         let newId = deskCount + 1
         let choiceName: String
         if let name = name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
@@ -44,10 +49,18 @@ extension DeskInteractor: DeskInteractorInterface {
         desk.sortingLanguage = LanguageSortingType(rawValue: sortingLanguage) ?? .normal
         desk.cards = []
         desk.date = Date()
-        try! DeskManagement.shared.add(desk)
+        do {
+            try repository.add(desk)
+        } catch {
+            throw AppError.databaseWriteFailed(error.localizedDescription)
+        }
     }
-    
-    func updateDesk(_ desk: DeskEntity) {
-        try! DeskManagement.shared.update(desk)
+
+    func updateDesk(_ desk: DeskEntity) throws {
+        do {
+            try repository.update(desk)
+        } catch {
+            throw AppError.databaseWriteFailed(error.localizedDescription)
+        }
     }
 }

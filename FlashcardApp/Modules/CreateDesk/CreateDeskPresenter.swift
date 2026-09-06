@@ -55,23 +55,26 @@ class CreateDeskPresenter {
     private let searchWordInteractor: SearchWordsInteractorInterface
     private let wireframe: CreateDeskWireframeInterface
     private let imageSearchInteractor: ImageSearchInteractorInterface
-    
+    private let deskRepository: DeskRepositoryInterface
+
     private let dictionaryInteractor: DictionaryInteractorInterface
-    
+
     private let disposeBag = DisposeBag()
-    
+
     var desk = DeskDataModel()
     let deskChangedRelay = BehaviorRelay<DeskChangedEvent>(value: .default)
     let sortingLanguageRelay = BehaviorRelay<LanguageSortingType>(value: .normal)
     let focusIndexRelay = BehaviorRelay<String>(value: "")
     let wordsSearchResultRelay = BehaviorRelay<SearchResultEntity>(value: SearchResultEntity(face: .front, cards: []))
-    
+
     private var editingCard: CardDataModel!
-    
+
     init(interactor: CreateDeskInteractorInterface,
-        wireframe: CreateDeskWireframeInterface) {
+         wireframe: CreateDeskWireframeInterface,
+         deskRepository: DeskRepositoryInterface = DeskManagement.shared) {
         self.interactor = interactor
         self.wireframe = wireframe
+        self.deskRepository = deskRepository
         self.searchWordInteractor = SearchWordsInteractor()
         self.imageSearchInteractor = ImageSearchInteractor.create(type: .pixabay)
         self.dictionaryInteractor = DictionaryInteractor()
@@ -219,7 +222,7 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         let deskEntity = self.desk.toDeskEntity()
         do {
             try validateDesk(deskEntity)
-            try DeskManagement.shared.add(deskEntity)
+            try deskRepository.add(deskEntity)
             onComplete?()
         } catch let error as AppError {
             onError?(error)

@@ -23,8 +23,9 @@ final class CardWireframe: BaseWireframe<CardViewController> {
         super.init(viewController: moduleViewController)
         moduleViewController.title = MainTabbarName.card.title
         moduleViewController.tabBarItem = UITabBarItem(title: MainTabbarName.card.title, image: MainTabbarName.card.image, tag: MainTabbarName.card.rawValue)
-        let interactor = CardInteractor() 
-        let presenter = CardPresenter(interactor: interactor, wireframe: self)
+        let interactor = CardInteractor()
+        let deskInteractor = DeskInteractor()
+        let presenter = CardPresenter(interactor: interactor, deskInteractor: deskInteractor, wireframe: self)
         moduleViewController.presenter = presenter
     } 
 }

@@ -7,14 +7,16 @@
 
 import Foundation
 
-class CardManagement {
+class CardManagement: CardRepositoryInterface {
     static let shared = CardManagement()
     
     func add(_ card: CardEntity, toDesk desk: DeskEntity) throws {
-        guard let desk = DeskManagement.shared.deskFromId(desk.id) else { return }
+        guard let realmDesk = DeskManagement.shared.deskFromId(desk.id) else {
+            throw AppError.entityNotFound("Desk with id \(desk.id)")
+        }
         try RealmService.shared.realm.write {
-            let card = card.toRealm()
-            desk.cards.append(card)
+            let rCard = card.toRealm()
+            realmDesk.cards.append(rCard)
         }
     }
 }

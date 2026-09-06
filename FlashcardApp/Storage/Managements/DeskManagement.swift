@@ -7,7 +7,7 @@
 
 import Foundation
 
-class DeskManagement {
+class DeskManagement: DeskRepositoryInterface {
     static let shared = DeskManagement()
     
     func getAll() -> [DeskEntity] {

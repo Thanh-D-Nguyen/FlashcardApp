@@ -35,11 +35,12 @@ class CardPresenter {
         return selectingDesk?.cards ?? []
     }
 
-    init(interactor: CardInteractorInterface, 
-        wireframe: CardWireframeInterface) {
+    init(interactor: CardInteractorInterface,
+         deskInteractor: DeskInteractorInterface,
+         wireframe: CardWireframeInterface) {
         self.interactor = interactor
+        self.deskInteractor = deskInteractor
         self.wireframe = wireframe
-        self.deskInteractor = DeskInteractor()
     }
 }
 
