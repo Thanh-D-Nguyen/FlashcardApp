@@ -50,12 +50,16 @@ class VocabularyPresenter {
     }
 }
 
+// TODO: [Layer 3 Audit] VocabularyPresenter methods are currently empty.
+// DictionaryPresenter creates VocabularyWireframe directly (tight coupling).
+// Determine if vocabulary search is placeholder or needs implementation.
+// If unused, remove Vocabulary module and decouple from DictionaryPresenter.
 extension VocabularyPresenter: VocabularyPresenterInterface {
     func updateSearchKeyword(_ keyword: String) {
-        
+
     }
-    
+
     func viewDidLoad() {
-        
+
     }
 }

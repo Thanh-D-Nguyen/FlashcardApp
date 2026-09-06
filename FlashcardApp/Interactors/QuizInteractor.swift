@@ -8,6 +8,9 @@
 
 import Foundation
 
+// TODO: [Layer 3 Audit] QuizInteractor is currently empty.
+// Determine if Quiz tab is placeholder/dead code or needs implementation.
+// If unused, remove Quiz module entirely in a future cleanup commit.
 protocol QuizInteractorInterface: AnyObject {
 
 }

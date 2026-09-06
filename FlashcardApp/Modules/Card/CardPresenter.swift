@@ -9,25 +9,30 @@
 import Foundation
 import RxRelay
 
+protocol CardViewInterface: AnyObject {
+    func didUpdateDesks()
+}
+
 protocol CardPresenterInterface: AnyObject {
     var deskDataRelay: BehaviorRelay<[DeskEntity]> { get }
-    
+
     var selectingDesk: DeskEntity? { get }
     var cards: [CardEntity] { get }
-    
+
     func loadDesks()
     func didSelectDeskAtIndex(_ index: Int)
     func createNewCard()
     func showDeskList()
     func createNewDesk()
-    
+
 }
 
 class CardPresenter {
     private let interactor: CardInteractorInterface
     private let deskInteractor: DeskInteractorInterface
     private let wireframe: CardWireframeInterface
-    
+    weak var view: CardViewInterface?
+
     let deskDataRelay = BehaviorRelay<[DeskEntity]>(value: [])
     
     var selectingDesk: DeskEntity?
@@ -52,6 +57,7 @@ extension CardPresenter: CardPresenterInterface {
             selectingDesk = desks.first
         }
         deskDataRelay.accept(desks)
+        view?.didUpdateDesks()
     }
     
     func didSelectDeskAtIndex(_ index: Int) {

@@ -9,8 +9,13 @@
 import UIKit
 import CollectionViewPagingLayout
 
-final class CardViewController: BaseViewController {
+final class CardViewController: BaseViewController, CardViewInterface {
     var presenter: CardPresenterInterface!
+
+    func didUpdateDesks() {
+        updateCurrentDesk()
+        cardCollectionView.reloadData()
+    }
     
     @IBOutlet private weak var deskButton: UIButton!
     @IBOutlet private weak var cardCollectionView: UICollectionView!

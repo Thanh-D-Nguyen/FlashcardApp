@@ -26,6 +26,7 @@ final class CardWireframe: BaseWireframe<CardViewController> {
         let interactor = CardInteractor()
         let deskInteractor = DeskInteractor()
         let presenter = CardPresenter(interactor: interactor, deskInteractor: deskInteractor, wireframe: self)
+        presenter.view = moduleViewController
         moduleViewController.presenter = presenter
     } 
 }
