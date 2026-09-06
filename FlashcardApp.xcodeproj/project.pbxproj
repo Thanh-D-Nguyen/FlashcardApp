@@ -312,6 +312,18 @@
 		92C5B44929F3C17000EE3377 /* AppErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C5B44829F3C17000EE3377 /* AppErrors.swift */; };
 		92F3A0042B4E1A0000REPOS3 /* DeskRepositoryInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0022B4E1A0000REPOS1 /* DeskRepositoryInterface.swift */; };
 		92F3A0052B4E1A0000REPOS4 /* CardRepositoryInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0032B4E1A0000REPOS2 /* CardRepositoryInterface.swift */; };
+		92F3A0062B4E1B0000AUTH01 /* AuthTokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0072B4E1B0000AUTH02 /* AuthTokenManager.swift */; };
+		92F3A0082B4E1B0000BJTR01 /* BJTDeckRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0092B4E1B0000BJTR02 /* BJTDeckRepository.swift */; };
+		92F3A0202B4E1C0000BJTS01 /* BJTSearchAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */; };
+		92F3A0212B4E1C0000BJTS02 /* BJTDictionaryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0122B4E1C0000BJTA02 /* BJTDictionaryAPI.swift */; };
+		92F3A0222B4E1C0000BJTS03 /* BJTExampleAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0132B4E1C0000BJTA03 /* BJTExampleAPI.swift */; };
+		92F3A0232B4E1C0000BJTS04 /* BJTLevelAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */; };
+		92F3A0242B4E1C0000BJTS05 /* BJTDeckDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0162B4E1C0000BJTD01 /* BJTDeckDTO.swift */; };
+		92F3A0252B4E1C0000BJTS06 /* BJTSearchDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0172B4E1C0000BJTD02 /* BJTSearchDTO.swift */; };
+		92F3A0262B4E1C0000BJTS07 /* BJTDictionaryDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0182B4E1C0000BJTD03 /* BJTDictionaryDTO.swift */; };
+		92F3A0272B4E1C0000BJTS08 /* BJTExampleDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0192B4E1C0000BJTD04 /* BJTExampleDTO.swift */; };
+		92F3A0282B4E1C0000BJTS09 /* BJTLevelDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */; };
+		92F3A0292B4E1C0000BJTS10 /* BJTReviewDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A01B2B4E1C0000BJTD06 /* BJTReviewDTO.swift */; };
 		92D411922AD3D652005A15DC /* VersionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D411912AD3D652005A15DC /* VersionFooterView.swift */; };
 		92D411942AD3D673005A15DC /* VersionFooterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92D411932AD3D673005A15DC /* VersionFooterView.xib */; };
 /* End PBXBuildFile section */
@@ -626,6 +638,18 @@
 		92C5B44829F3C17000EE3377 /* AppErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrors.swift; sourceTree = "<group>"; };
 		92F3A0022B4E1A0000REPOS1 /* DeskRepositoryInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskRepositoryInterface.swift; sourceTree = "<group>"; };
 		92F3A0032B4E1A0000REPOS2 /* CardRepositoryInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRepositoryInterface.swift; sourceTree = "<group>"; };
+		92F3A0072B4E1B0000AUTH02 /* AuthTokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTokenManager.swift; sourceTree = "<group>"; };
+		92F3A0092B4E1B0000BJTR02 /* BJTDeckRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTDeckRepository.swift; sourceTree = "<group>"; };
+		92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTSearchAPI.swift; sourceTree = "<group>"; };
+		92F3A0122B4E1C0000BJTA02 /* BJTDictionaryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTDictionaryAPI.swift; sourceTree = "<group>"; };
+		92F3A0132B4E1C0000BJTA03 /* BJTExampleAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTExampleAPI.swift; sourceTree = "<group>"; };
+		92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLevelAPI.swift; sourceTree = "<group>"; };
+		92F3A0162B4E1C0000BJTD01 /* BJTDeckDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTDeckDTO.swift; sourceTree = "<group>"; };
+		92F3A0172B4E1C0000BJTD02 /* BJTSearchDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTSearchDTO.swift; sourceTree = "<group>"; };
+		92F3A0182B4E1C0000BJTD03 /* BJTDictionaryDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTDictionaryDTO.swift; sourceTree = "<group>"; };
+		92F3A0192B4E1C0000BJTD04 /* BJTExampleDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTExampleDTO.swift; sourceTree = "<group>"; };
+		92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLevelDTO.swift; sourceTree = "<group>"; };
+		92F3A01B2B4E1C0000BJTD06 /* BJTReviewDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTReviewDTO.swift; sourceTree = "<group>"; };
 		92D411912AD3D652005A15DC /* VersionFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionFooterView.swift; sourceTree = "<group>"; };
 		92D411932AD3D673005A15DC /* VersionFooterView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VersionFooterView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -829,8 +853,34 @@
 			children = (
 				9286B92029D7FE430040025F /* Implementation */,
 				9226D80D29D00E0F0042F6DA /* Models */,
+				92F3A0102B4E1C0000BJTC00 /* BJTClient */,
 			);
 			path = Networks;
+			sourceTree = "<group>";
+		};
+		92F3A0102B4E1C0000BJTC00 /* BJTClient */ = {
+			isa = PBXGroup;
+			children = (
+				92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */,
+				92F3A0122B4E1C0000BJTA02 /* BJTDictionaryAPI.swift */,
+				92F3A0132B4E1C0000BJTA03 /* BJTExampleAPI.swift */,
+				92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */,
+				92F3A0152B4E1C0000BJTM00 /* Models */,
+			);
+			path = BJTClient;
+			sourceTree = "<group>";
+		};
+		92F3A0152B4E1C0000BJTM00 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				92F3A0162B4E1C0000BJTD01 /* BJTDeckDTO.swift */,
+				92F3A0172B4E1C0000BJTD02 /* BJTSearchDTO.swift */,
+				92F3A0182B4E1C0000BJTD03 /* BJTDictionaryDTO.swift */,
+				92F3A0192B4E1C0000BJTD04 /* BJTExampleDTO.swift */,
+				92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */,
+				92F3A01B2B4E1C0000BJTD06 /* BJTReviewDTO.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		9226D80D29D00E0F0042F6DA /* Models */ = {
@@ -1307,6 +1357,7 @@
 				9251EC7C29A1EAA5006C1D1C /* PushNotificationService.swift */,
 				9251EC7D29A1EAA5006C1D1C /* AppService.swift */,
 				9283B4E82BE4EAAD00C6EF8F /* ColoredLogHandler.swift */,
+				92F3A0072B4E1B0000AUTH02 /* AuthTokenManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1316,6 +1367,7 @@
 			children = (
 				92F3A0022B4E1A0000REPOS1 /* DeskRepositoryInterface.swift */,
 				92F3A0032B4E1A0000REPOS2 /* CardRepositoryInterface.swift */,
+				92F3A0092B4E1B0000BJTR02 /* BJTDeckRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -1725,6 +1777,18 @@
 			files = (
 				92F3A0042B4E1A0000REPOS3 /* DeskRepositoryInterface.swift in Sources */,
 				92F3A0052B4E1A0000REPOS4 /* CardRepositoryInterface.swift in Sources */,
+				92F3A0062B4E1B0000AUTH01 /* AuthTokenManager.swift in Sources */,
+				92F3A0082B4E1B0000BJTR01 /* BJTDeckRepository.swift in Sources */,
+				92F3A0202B4E1C0000BJTS01 /* BJTSearchAPI.swift in Sources */,
+				92F3A0212B4E1C0000BJTS02 /* BJTDictionaryAPI.swift in Sources */,
+				92F3A0222B4E1C0000BJTS03 /* BJTExampleAPI.swift in Sources */,
+				92F3A0232B4E1C0000BJTS04 /* BJTLevelAPI.swift in Sources */,
+				92F3A0242B4E1C0000BJTS05 /* BJTDeckDTO.swift in Sources */,
+				92F3A0252B4E1C0000BJTS06 /* BJTSearchDTO.swift in Sources */,
+				92F3A0262B4E1C0000BJTS07 /* BJTDictionaryDTO.swift in Sources */,
+				92F3A0272B4E1C0000BJTS08 /* BJTExampleDTO.swift in Sources */,
+				92F3A0282B4E1C0000BJTS09 /* BJTLevelDTO.swift in Sources */,
+				92F3A0292B4E1C0000BJTS10 /* BJTReviewDTO.swift in Sources */,
 				929C4DC329A74103007651E9 /* GradientView.swift in Sources */,
 				9251ECD629A1EAA5006C1D1C /* SlideShowWireframe.swift in Sources */,
 				9226D83229D0368B0042F6DA /* Disk.swift in Sources */,
