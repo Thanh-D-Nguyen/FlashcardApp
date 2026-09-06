@@ -9,7 +9,7 @@
 
 import UIKit
 
-protocol StartUpWireframeInterface: AnyObject {
+protocol StartUpWireframeInterface: WireframeInterface {
     func navigateToWelcomeSlideShow()
 }
 

@@ -11,8 +11,12 @@ class RealmService {
     
     init() { }
     
-    func copyBundleData(completion: @escaping ((URL) -> Void)) {
-        let bundlePathString = Bundle.main.path(forResource: databaseName, ofType: nil)!
+    func copyBundleData(completion: @escaping ((URL) -> Void), onError: ((AppError) -> Void)? = nil) {
+        guard let bundlePathString = Bundle.main.path(forResource: databaseName, ofType: nil) else {
+            logger.error("Bundle database file not found")
+            onError?(.databaseInitializationFailed("Bundle database file not found"))
+            return
+        }
         let sourcePath = URL(fileURLWithPath: bundlePathString)
         let destinationUrl = inLibrarayFolder(fileName: databaseName)
         print(destinationUrl)
@@ -58,13 +62,15 @@ class RealmService {
                     }
                 }
             } catch let error {
-                logger.error("Error: \(error.localizedDescription)")
+                logger.error("Error copying bundle data: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    onError?(.databaseInitializationFailed(error.localizedDescription))
+                }
             }
-            
         }
     }
     
-    func configuration() {
+    func configuration(onError: ((AppError) -> Void)? = nil) {
         logger.debug("configuration-----")
         copyBundleData(completion: { [unowned self] url in
             let configuration = Realm.Configuration(fileURL: url,
@@ -74,9 +80,10 @@ class RealmService {
                 self.realm = try Realm(configuration: configuration)
                 Realm.Configuration.defaultConfiguration = configuration
             } catch {
-                fatalError("Database initial error!")
+                logger.error("Database initial error: \(error.localizedDescription)")
+                onError?(.databaseInitializationFailed(error.localizedDescription))
             }
-        })
+        }, onError: onError)
     }
     
     static func migrate(migration: Migration, oldVersion: UInt64) {

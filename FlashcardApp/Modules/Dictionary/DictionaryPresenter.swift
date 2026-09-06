@@ -70,7 +70,7 @@ class DictionaryPresenter {
     }
     
     private func createWelcomeController() -> UIViewController {
-        
+        return UIViewController()
     }
 }
 
