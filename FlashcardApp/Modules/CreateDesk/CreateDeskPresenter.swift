@@ -71,13 +71,16 @@ class CreateDeskPresenter {
 
     init(interactor: CreateDeskInteractorInterface,
          wireframe: CreateDeskWireframeInterface,
-         deskRepository: DeskRepositoryInterface = DeskManagement.shared) {
+         deskRepository: DeskRepositoryInterface = DeskManagement.shared,
+         searchWordInteractor: SearchWordsInteractorInterface = SearchWordsInteractor(),
+         imageSearchInteractor: ImageSearchInteractorInterface = ImageSearchInteractor.create(type: .pixabay),
+         dictionaryInteractor: DictionaryInteractorInterface = DictionaryInteractor()) {
         self.interactor = interactor
         self.wireframe = wireframe
         self.deskRepository = deskRepository
-        self.searchWordInteractor = SearchWordsInteractor()
-        self.imageSearchInteractor = ImageSearchInteractor.create(type: .pixabay)
-        self.dictionaryInteractor = DictionaryInteractor()
+        self.searchWordInteractor = searchWordInteractor
+        self.imageSearchInteractor = imageSearchInteractor
+        self.dictionaryInteractor = dictionaryInteractor
         
         desk.cards = [CardDataModel(), CardDataModel()]
         

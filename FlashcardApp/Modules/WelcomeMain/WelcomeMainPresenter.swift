@@ -18,10 +18,11 @@ class WelcomeMainPresenter {
     private let wireframe: WelcomeMainWireframeInterface
     
     init(interactor: WelcomeMainInteractorInterface,
-         wireframe: WelcomeMainWireframeInterface) {
+         wireframe: WelcomeMainWireframeInterface,
+         socialSignInInteractor: SocialSignInInteractorInterface = SocialSignInInteractor()) {
         self.interactor = interactor
         self.wireframe = wireframe
-        self.socialSignInInteractor = SocialSignInInteractor()
+        self.socialSignInInteractor = socialSignInInteractor
     }
 }
 
