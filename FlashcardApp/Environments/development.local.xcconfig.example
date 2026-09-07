@@ -1,0 +1,3 @@
+// Copy to development.local.xcconfig when overriding the simulator backend port.
+// $() keeps Xcode from interpreting // as a comment.
+PRODUCT_BASE_URL = http:/$()/localhost:4000/api

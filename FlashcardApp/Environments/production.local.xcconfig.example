@@ -1,0 +1,3 @@
+// Copy to production.local.xcconfig and enter the provisioned production endpoint.
+// Example syntax only: https:/$()/api.your-domain/api
+PRODUCT_BASE_URL =
