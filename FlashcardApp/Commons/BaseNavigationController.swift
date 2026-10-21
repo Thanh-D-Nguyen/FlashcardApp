@@ -16,7 +16,10 @@ class BaseNavigationController: UINavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.view.backgroundColor = Design.Color.background
-        self.isNavigationBarHidden = true
+        view.backgroundColor = Design.Color.background
+        // Bars keep the system appearance: iOS 26 draws them as glass over content, so no
+        // custom background or UIBarAppearance is set. Screens that own a header hide the bar.
+        navigationBar.prefersLargeTitles = true
+        isNavigationBarHidden = true
     }
 }

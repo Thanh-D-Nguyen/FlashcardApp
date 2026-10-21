@@ -10,7 +10,6 @@ import UIKit
 
 class Constants {
     static let unknowSelectIndex = -1
-    static var currentBarStyle: UIStatusBarStyle = .darkContent
     
     static var mainView: UIViewController? {
         let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene

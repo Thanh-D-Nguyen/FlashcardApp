@@ -18,7 +18,7 @@ final class DictionaryWireframe: BaseWireframe<DictionaryViewController> {
         let moduleViewController = DictionaryViewController()
         super.init(viewController: moduleViewController)
         moduleViewController.title = MainTabbarName.dictionary.title
-        moduleViewController.tabBarItem = UITabBarItem(title: MainTabbarName.dictionary.title, image: MainTabbarName.dictionary.image, tag: MainTabbarName.dictionary.rawValue)
+        moduleViewController.tabBarItem = MainTabbarName.dictionary.tabBarItem
         let interactor = DictionaryInteractor() 
         let presenter = DictionaryPresenter(interactor: interactor, wireframe: self)
         moduleViewController.presenter = presenter

@@ -13,9 +13,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        let windownBounds = windowScene.coordinateSpace.bounds
-        window = UIWindow(frame: windownBounds)
-        window?.windowScene = windowScene
+        window = UIWindow(windowScene: windowScene)
         let initialViewController = BaseNavigationController()
         let startUpWireFrame = StartUpWireframe()
         initialViewController.setRootWireframe(startUpWireFrame)

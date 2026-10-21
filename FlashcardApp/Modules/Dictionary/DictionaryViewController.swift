@@ -16,6 +16,8 @@ final class DictionaryViewController: BaseViewController, UITableViewDataSource,
     }
 
     func setupUI() {
+        view.backgroundColor = Design.Color.background
+        tableView.backgroundColor = .clear
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self

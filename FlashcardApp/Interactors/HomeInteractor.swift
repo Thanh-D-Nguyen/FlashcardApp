@@ -24,7 +24,8 @@ final class HomeInteractor: HomeInteractorInterface {
                         .filter { !$0.isEmpty }.joined(separator: "\n")
                     return HomeRow(id: item.id, title: item.headword,
                                    subtitle: [item.reading, summary].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "),
-                                   detail: detail)
+                                   detail: detail,
+                                   reading: item.reading.flatMap { $0.isEmpty ? nil : $0 }, meaning: summary)
                 }
             }
         case .kanji:
@@ -33,7 +34,9 @@ final class HomeInteractor: HomeInteractorInterface {
                     let readings = [item.onyomi, item.kunyomi].compactMap { $0 }.filter { !$0.isEmpty }
                     return HomeRow(id: item.id, title: item.character,
                                    subtitle: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: " · "),
-                                   detail: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: "\n"))
+                                   detail: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: "\n"),
+                                   reading: readings.isEmpty ? nil : readings.joined(separator: " · "),
+                                   meaning: item.meaningVi.flatMap { $0.isEmpty ? nil : $0 })
                 }
             }
         case .grammar:
@@ -41,7 +44,8 @@ final class HomeInteractor: HomeInteractorInterface {
                 items.map { item in
                     HomeRow(id: item.id, title: item.pattern, subtitle: item.meaningVi ?? "",
                             detail: ([item.meaningVi].compactMap { $0 } + item.details.compactMap(\.explanationVi))
-                                .filter { !$0.isEmpty }.joined(separator: "\n"))
+                                .filter { !$0.isEmpty }.joined(separator: "\n"),
+                            meaning: item.meaningVi.flatMap { $0.isEmpty ? nil : $0 })
                 }
             }
         }

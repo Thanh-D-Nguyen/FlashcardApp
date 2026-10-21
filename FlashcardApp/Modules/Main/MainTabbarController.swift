@@ -15,7 +15,8 @@ class MainTabbarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        // System colors + default tab bar appearance keep light/dark and contrast native.
+        // The system tab bar floats as Liquid Glass above content; it keeps its default
+        // appearance (no custom background) and always shows icon + label for the four tabs.
         view.backgroundColor = Design.Color.background
     }
 }

@@ -14,6 +14,10 @@ class TopBarView: UIView {
             titleLabel.text = title
         }
     }
+    /// Overrides the nib's white title for bars placed on a light background.
+    @IBInspectable var titleColor: UIColor? {
+        didSet { if let titleColor { titleLabel.textColor = titleColor } }
+    }
     @IBOutlet private weak var titleLabel: UILabel!
 
     override init(frame: CGRect) {

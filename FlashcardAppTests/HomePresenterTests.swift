@@ -19,6 +19,42 @@ final class HomePresenterTests: XCTestCase {
         XCTAssertEqual(interactor.listCalls, 1)
     }
 
+    func testLevelRowSeparatesCodeFromNameAndKeepsBackendCounts() {
+        let interactor = LevelHomeInteractorStub()
+        interactor.levels = .just([level])
+        let presenter = HomePresenter(interactor: interactor, wireframe: LevelHomeWireframeSpy())
+        presenter.viewDidLoad()
+        let row = presenter.rows.first
+        XCTAssertEqual(row?.mark, "J5")
+        XCTAssertEqual(row?.name, "Sơ cấp")
+        XCTAssertEqual(row?.summary, "Cơ bản")
+        XCTAssertEqual(row?.counts, [HomeCount(value: 60, label: "từ vựng"),
+                                     HomeCount(value: 10, label: "kanji"),
+                                     HomeCount(value: 20, label: "ngữ pháp")])
+        XCTAssertEqual(row?.title, "J5 — Sơ cấp")
+    }
+
+    func testLevelNameWithoutCodePrefixIsKeptAndEmptyLevelHasNoCounts() {
+        let plain = BJTLevelDTO(code: "J1+", nameVi: "Chuyên sâu", descriptionVi: "", vocabCount: 0, kanjiCount: 0, grammarCount: 0)
+        let row = HomePresenter.levelRow(plain)
+        XCTAssertEqual(row.name, "Chuyên sâu")
+        XCTAssertTrue(row.counts.isEmpty, "A level with no items must not print three zero counts")
+        let dashed = BJTLevelDTO(code: "J1+", nameVi: "J1+ — Cao cấp+", descriptionVi: "", vocabCount: 0, kanjiCount: 0, grammarCount: 3)
+        XCTAssertEqual(HomePresenter.levelRow(dashed).name, "Cao cấp+")
+        XCTAssertEqual(HomePresenter.levelRow(dashed).counts.map(\.value), [0, 0, 3])
+    }
+
+    func testKindTotalFollowsSelectedKindOfOpenLevel() {
+        let presenter = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: LevelHomeWireframeSpy(), level: level)
+        XCTAssertEqual(presenter.kindTotal, 60)
+        presenter.selectKind(.kanji)
+        XCTAssertEqual(presenter.kindTotal, 10)
+        presenter.selectKind(.grammar)
+        XCTAssertEqual(presenter.kindTotal, 20)
+        let levels = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: LevelHomeWireframeSpy())
+        XCTAssertNil(levels.kindTotal)
+    }
+
     func testPaginationDoesNotOverlapRetriesSameOffsetAndEndsOnShortPage() {
         let interactor = LevelHomeInteractorStub()
         let wireframe = LevelHomeWireframeSpy()

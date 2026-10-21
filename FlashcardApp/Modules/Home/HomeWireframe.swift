@@ -10,8 +10,7 @@ final class HomeWireframe: BaseWireframe<HomeViewController>, HomeWireframeInter
         let controller = HomeViewController()
         super.init(viewController: controller)
         controller.title = level?.nameVi ?? "Cấp độ"
-        controller.tabBarItem = UITabBarItem(title: MainTabbarName.home.title,
-                                           image: MainTabbarName.home.image, tag: MainTabbarName.home.rawValue)
+        controller.tabBarItem = MainTabbarName.home.tabBarItem
         controller.presenter = HomePresenter(interactor: HomeInteractor(), wireframe: self, level: level)
     }
 

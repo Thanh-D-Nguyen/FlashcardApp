@@ -6,11 +6,24 @@ enum HomeContentKind: Int, CaseIterable {
     var title: String { ["Từ vựng", "Kanji", "Ngữ pháp"][rawValue] }
 }
 
+struct HomeCount: Equatable {
+    let value: Int
+    let label: String
+}
+
 struct HomeRow {
     let id: String
     let title: String
     let subtitle: String
     let detail: String
+    /// Level rows: short code shown as the row mark ("J5") and the name without that prefix.
+    var mark: String?
+    var name: String?
+    var summary: String?
+    var counts: [HomeCount] = []
+    /// Content rows: reading and Vietnamese meaning kept apart so each can use its own text role.
+    var reading: String?
+    var meaning: String?
 }
 
 protocol HomePresenterInterface: AnyObject {
@@ -20,6 +33,8 @@ protocol HomePresenterInterface: AnyObject {
     var canLoadMore: Bool { get }
     var isContent: Bool { get }
     var kind: HomeContentKind { get }
+    /// Backend item count of the selected kind for the open level.
+    var kindTotal: Int? { get }
     var onChange: (() -> Void)? { get set }
     func viewDidLoad()
     func selectRow(at index: Int)
@@ -44,6 +59,14 @@ final class HomePresenter: HomePresenterInterface {
     private(set) var canLoadMore = false
     private(set) var kind: HomeContentKind = .vocabulary
     var isContent: Bool { level != nil }
+    var kindTotal: Int? {
+        guard let level else { return nil }
+        switch kind {
+        case .vocabulary: return level.vocabCount
+        case .kanji: return level.kanjiCount
+        case .grammar: return level.grammarCount
+        }
+    }
     var onChange: (() -> Void)?
 
     init(interactor: HomeInteractorInterface, wireframe: HomeWireframeInterface, level: BJTLevelDTO? = nil) {
@@ -118,15 +141,32 @@ final class HomePresenter: HomePresenterInterface {
                 .subscribe(onSuccess: { [weak self] levels in
                     guard let self else { return }
                     self.levels = levels
-                    self.rows = levels.map { level in
-                        HomeRow(id: level.code, title: level.nameVi,
-                                subtitle: "\(level.descriptionVi)\nTừ vựng: \(level.vocabCount) · Kanji: \(level.kanjiCount) · Ngữ pháp: \(level.grammarCount)",
-                                detail: level.descriptionVi)
-                    }
+                    self.rows = levels.map(Self.levelRow)
                     self.hasLoaded = true
                     self.finishLoading()
                 }, onFailure: { [weak self] _ in self?.failedLoading() })
         }
+    }
+
+    static func levelRow(_ level: BJTLevelDTO) -> HomeRow {
+        let counts = [HomeCount(value: level.vocabCount, label: "từ vựng"),
+                      HomeCount(value: level.kanjiCount, label: "kanji"),
+                      HomeCount(value: level.grammarCount, label: "ngữ pháp")]
+        // A level without any item (e.g. J1+ today) states that instead of printing three zeros.
+        let hasContent = counts.contains { $0.value > 0 }
+        return HomeRow(id: level.code, title: level.nameVi,
+                       subtitle: "\(level.descriptionVi)\nTừ vựng: \(level.vocabCount) · Kanji: \(level.kanjiCount) · Ngữ pháp: \(level.grammarCount)",
+                       detail: level.descriptionVi,
+                       mark: level.code, name: displayName(level), summary: level.descriptionVi,
+                       counts: hasContent ? counts : [])
+    }
+
+    /// The backend sends "J5 — Sơ cấp"; the code is shown separately as the row mark.
+    static func displayName(_ level: BJTLevelDTO) -> String {
+        for separator in [" — ", " – ", " - "] where level.nameVi.hasPrefix(level.code + separator) {
+            return String(level.nameVi.dropFirst(level.code.count + separator.count))
+        }
+        return level.nameVi
     }
 
     private func failedLoading() {

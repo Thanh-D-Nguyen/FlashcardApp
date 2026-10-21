@@ -24,7 +24,10 @@
                                         <rect key="frame" x="0.0" y="0.0" width="390" height="68"/>
                                         <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="Card"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="Thẻ"/>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="titleColor">
+                                                <color key="value" systemColor="darkTextColor"/>
+                                            </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </view>
                                 </subviews>

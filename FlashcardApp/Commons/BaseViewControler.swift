@@ -19,10 +19,9 @@ typealias BaseViewController = BaseVC & BaseViewControllerProtocol & ViewInterfa
 class BaseVC: UIViewController {
     let disposeBag = DisposeBag()
         
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        Constants.currentBarStyle
-    }
-        
+    /// `.default` adapts to light/dark automatically; screens do not pick a style themselves.
+    override var preferredStatusBarStyle: UIStatusBarStyle { .default }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 //        setNeedsUpdateOfScreenEdgesDeferringSystemGestures()
@@ -30,14 +29,6 @@ class BaseVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if self is HomeViewController {
-            Constants.currentBarStyle = .lightContent
-        } else {
-            Constants.currentBarStyle = .darkContent
-        }
-        UIView.animate(withDuration: 0.3) {
-            self.setNeedsStatusBarAppearanceUpdate()
-        }
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(appMovedToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)

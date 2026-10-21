@@ -28,13 +28,7 @@ final class SettingWireframe: BaseWireframe<SettingViewController> {
         let moduleViewController = storyboard.instantiateViewController(ofType: SettingViewController.self)
         super.init(viewController: moduleViewController)
         moduleViewController.title = MainTabbarName.setting.title
-        let tabBarItem = UITabBarItem(
-            title: MainTabbarName.setting.title,
-            image: UIImage(systemName: "gearshape"),
-            selectedImage: UIImage(systemName: "gearshape.fill")
-        )
-        tabBarItem.tag = MainTabbarName.setting.rawValue
-        moduleViewController.tabBarItem = tabBarItem
+        moduleViewController.tabBarItem = MainTabbarName.setting.tabBarItem
 
         let interactor = SettingInteractor(
             preferences: UserDefaultsPreferences.shared

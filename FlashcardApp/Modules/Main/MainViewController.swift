@@ -27,9 +27,8 @@ final class MainViewController: BaseViewController {
     }
     
     func setupUI() {
-        // Matches the tab bar material below the home indicator.
-        tabBarContainerView.backgroundColor = .systemBackground
-        view.backgroundColor = .systemBackground
+        tabBarContainerView.backgroundColor = Design.Color.background
+        view.backgroundColor = Design.Color.background
     }
     
     func subscribe() {
@@ -40,13 +39,15 @@ final class MainViewController: BaseViewController {
     }
     
     private func updateTabbarController(_ controller: MainTabbarController) {
+        addChild(controller)
         tabBarContainerView.addSubview(controller.view)
-        controller.didMove(toParent: self)
-        self.addChild(controller)
         controller.view.translatesAutoresizingMaskIntoConstraints = false
-        tabBarContainerView.topAnchor.constraint(equalTo: controller.view.topAnchor).isActive = true
-        tabBarContainerView.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor).isActive = true
-        tabBarContainerView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor).isActive = true
-        tabBarContainerView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            tabBarContainerView.topAnchor.constraint(equalTo: controller.view.topAnchor),
+            tabBarContainerView.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor),
+            tabBarContainerView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor),
+            tabBarContainerView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor)
+        ])
+        controller.didMove(toParent: self)
     }
 }
