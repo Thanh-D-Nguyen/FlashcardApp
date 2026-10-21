@@ -83,4 +83,30 @@ final class FlashcardAppUITests: XCTestCase {
         app.buttons["continueWithoutLoginButton"].tap()
         XCTAssertTrue(app.tabBars.buttons["tab_levels"].waitForExistence(timeout: 5))
     }
+
+    /// Levels and a level's content stay reachable at the largest accessibility text size.
+    func testLevelsAndContentRemainUsableAtAccessibilityTextSize() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        let levels = app.tables["home_levels"]
+        XCTAssertTrue(levels.waitForExistence(timeout: 40))
+        let firstLevel = levels.cells["home_row_J5"]
+        XCTAssertTrue(firstLevel.waitForExistence(timeout: 15))
+        attachScreenshot(app, name: "levels-ax-xxxl")
+        firstLevel.tap()
+        let content = app.tables["level_content"]
+        XCTAssertTrue(content.waitForExistence(timeout: 10))
+        let firstContent = content.cells.matching(NSPredicate(format: "identifier BEGINSWITH %@", "home_row_")).firstMatch
+        XCTAssertTrue(firstContent.waitForExistence(timeout: 15))
+        XCTAssertTrue(firstContent.isHittable)
+        attachScreenshot(app, name: "content-ax-xxxl")
+    }
+
+    private func attachScreenshot(_ app: XCUIApplication, name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 }

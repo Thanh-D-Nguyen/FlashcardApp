@@ -141,6 +141,7 @@
 		929C4DC129A73412007651E9 /* CardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 929C4DC029A73412007651E9 /* CardView.xib */; };
 		929C4DC329A74103007651E9 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DC229A74103007651E9 /* GradientView.swift */; };
 		929C4DC529A74806007651E9 /* AppColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DC429A74806007651E9 /* AppColor.swift */; };
+		D5A0000100000000000000A1 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A0000200000000000000A1 /* DesignSystem.swift */; };
 		929C4DC829A74CAE007651E9 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 929C4DC729A74CAE007651E9 /* Kingfisher */; };
 		929C4DCA29A75B8D007651E9 /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DC929A75B8D007651E9 /* TopBarView.swift */; };
 		929C4DCC29A75C38007651E9 /* TopBarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 929C4DCB29A75C38007651E9 /* TopBarView.xib */; };
@@ -333,6 +334,7 @@
 		929C4DC029A73412007651E9 /* CardView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CardView.xib; sourceTree = "<group>"; };
 		929C4DC229A74103007651E9 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		929C4DC429A74806007651E9 /* AppColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColor.swift; sourceTree = "<group>"; };
+		D5A0000200000000000000A1 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		929C4DC929A75B8D007651E9 /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		929C4DCB29A75C38007651E9 /* TopBarView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopBarView.xib; sourceTree = "<group>"; };
 		929C4DCF29A76442007651E9 /* DeskList.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DeskList.storyboard; sourceTree = "<group>"; };
@@ -742,6 +744,7 @@
 				9251EC7F29A1EAA5006C1D1C /* Constants.swift */,
 				9251EC8029A1EAA5006C1D1C /* Enums.swift */,
 				929C4DC429A74806007651E9 /* AppColor.swift */,
+				D5A0000200000000000000A1 /* DesignSystem.swift */,
 				9291705929AB672800894551 /* AppImages.swift */,
 				9291706829B45FB700894551 /* SwipeCellSupport.swift */,
 				9226D80A29D00C520042F6DA /* Atomic.swift */,
@@ -1158,6 +1161,7 @@
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
 				9283B4E02BE4CA1400C6EF8F /* GridFlowLayout.swift in Sources */,
 				929C4DC529A74806007651E9 /* AppColor.swift in Sources */,
+				D5A0000100000000000000A1 /* DesignSystem.swift in Sources */,
 				92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */,
 				9238009C29C5888300FECD23 /* ViJaEntity.swift in Sources */,
 				9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */,

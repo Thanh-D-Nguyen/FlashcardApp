@@ -27,9 +27,9 @@ final class SettingWireframe: BaseWireframe<SettingViewController> {
     init() {
         let moduleViewController = storyboard.instantiateViewController(ofType: SettingViewController.self)
         super.init(viewController: moduleViewController)
-        moduleViewController.title = NSLocalizedString("Settings", comment: "")
+        moduleViewController.title = MainTabbarName.setting.title
         let tabBarItem = UITabBarItem(
-            title: NSLocalizedString("Settings", comment: ""),
+            title: MainTabbarName.setting.title,
             image: UIImage(systemName: "gearshape"),
             selectedImage: UIImage(systemName: "gearshape.fill")
         )

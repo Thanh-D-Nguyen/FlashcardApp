@@ -15,7 +15,7 @@ class MainTabbarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.view.backgroundColor = .white
-        self.tabBar.barTintColor = .white
+        // System colors + default tab bar appearance keep light/dark and contrast native.
+        view.backgroundColor = Design.Color.background
     }
 }

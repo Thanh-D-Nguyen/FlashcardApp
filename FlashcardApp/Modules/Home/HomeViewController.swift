@@ -25,12 +25,13 @@ final class HomeViewController: BaseViewController {
     }
 
     func setupUI() {
-        view.backgroundColor = .systemGroupedBackground
+        view.backgroundColor = Design.Color.background
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
+        tableView.separatorColor = Design.Color.separator
         tableView.accessibilityIdentifier = presenter.isContent ? "level_content" : "home_levels"
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
@@ -80,12 +81,11 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "home_row")
             ?? UITableViewCell(style: .subtitle, reuseIdentifier: "home_row")
         var content = cell.defaultContentConfiguration()
-        content.textProperties.font = .preferredFont(forTextStyle: .body)
-        content.textProperties.adjustsFontForContentSizeCategory = true
-        content.textProperties.numberOfLines = 0
-        content.secondaryTextProperties.font = .preferredFont(forTextStyle: .subheadline)
-        content.secondaryTextProperties.adjustsFontForContentSizeCategory = true
-        content.secondaryTextProperties.numberOfLines = 0
+        // Level names are plain titles; inside a level the title is a Japanese headword.
+        content.textProperties.apply(presenter.isContent ? .headword : .title)
+        content.secondaryTextProperties.apply(presenter.isContent ? .meaning : .reading)
+        content.textToSecondaryTextVerticalPadding = Design.Spacing.xs
+        cell.backgroundColor = Design.Color.surface
         cell.accessoryView = nil
         cell.accessoryType = .none
         cell.accessibilityTraits = .staticText
@@ -98,8 +98,19 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
             cell.accessibilityTraits = .button
             cell.selectionStyle = .default
         } else {
+            let isError = presenter.errorMessage != nil && !presenter.isLoading
+            let actionable = !presenter.isLoading && (isError || presenter.canLoadMore)
             content.text = statusText
-            let actionable = !presenter.isLoading && (presenter.errorMessage != nil || presenter.canLoadMore)
+            content.textProperties.apply(.metadata)
+            content.textProperties.alignment = .center
+            if isError {
+                // Color is never the only signal: icon + text + retry hint.
+                content.textProperties.color = Design.Color.error
+                content.image = UIImage(systemName: "exclamationmark.triangle")
+                content.imageProperties.tintColor = Design.Color.error
+            } else if actionable {
+                content.textProperties.color = Design.Color.accent
+            }
             cell.selectionStyle = actionable ? .default : .none
             cell.accessibilityIdentifier = "home_status"
             cell.accessibilityTraits = actionable ? .button : .staticText

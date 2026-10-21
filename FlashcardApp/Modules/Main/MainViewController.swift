@@ -16,6 +16,9 @@ final class MainViewController: BaseViewController {
     @IBOutlet
     private weak var tabBarContainerView: UIView!
 
+    // The tab controller is embedded as a child; let it decide the status bar style.
+    override var childForStatusBarStyle: UIViewController? { children.first }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -24,7 +27,9 @@ final class MainViewController: BaseViewController {
     }
     
     func setupUI() {
-        tabBarContainerView.backgroundColor = .white
+        // Matches the tab bar material below the home indicator.
+        tabBarContainerView.backgroundColor = .systemBackground
+        view.backgroundColor = .systemBackground
     }
     
     func subscribe() {

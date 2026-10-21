@@ -61,6 +61,10 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
 
 ## Workflow routing
 
+- **All implementation tasks:** follow `docs/ENGINEERING_GUARDRAILS.md` for
+  architecture boundaries, risk-based testing, visual verification, and evidence
+  required before reporting completion. These rules also apply to work already
+  in progress when the agent next reads project instructions.
 - Feature/bug: `.claude/skills/flashcard-feature/SKILL.md`.
 - Backend integration/DTO/auth: `.claude/skills/flashcard-api-contract/SKILL.md`.
 - Environment, build or release verification:

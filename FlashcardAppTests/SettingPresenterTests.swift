@@ -7,6 +7,7 @@
 
 import XCTest
 import RxSwift
+import UserNotifications
 @testable import FlashcardApp
 
 // MARK: - Mocks
@@ -15,7 +16,6 @@ final class MockSettingInteractor: SettingInteractorInterface {
     var currentUser: SocialUserEntity?
     var logoutCalled = false
     var logoutError: Error?
-    var darkModeEnabled = false
     var notificationEnabled = true
     var soundEnabled = true
 
@@ -26,8 +26,12 @@ final class MockSettingInteractor: SettingInteractorInterface {
         if let error = logoutError { throw error }
     }
 
-    func getDarkModeEnabled() -> Bool { darkModeEnabled }
-    func setDarkModeEnabled(_ enabled: Bool) { darkModeEnabled = enabled }
+    var appearance = "system"
+    var notificationStatus: UNAuthorizationStatus = .authorized
+    func getAppearance() -> String { appearance }
+    func setAppearance(_ value: String) { appearance = value }
+    func getNotificationAuthorizationStatus() -> UNAuthorizationStatus { notificationStatus }
+
     func getNotificationEnabled() -> Bool { notificationEnabled }
     func setNotificationEnabled(_ enabled: Bool) { notificationEnabled = enabled }
     func getSoundEnabled() -> Bool { soundEnabled }
@@ -50,6 +54,13 @@ final class MockSettingWireframe: SettingWireframeInterface {
     func showError(message: String) {
         lastErrorMessage = message
     }
+
+    func showNotificationDeniedAlert() {}
+    func openSystemSettings() {}
+    func showAppearancePicker(current: AppearanceOption, onSelect: @escaping (AppearanceOption) -> Void) {}
+    func showLanguagePicker() {}
+    func showPrivacyPolicy() {}
+    func showAbout() {}
 }
 
 // MARK: - Tests
@@ -96,34 +107,41 @@ final class SettingPresenterTests: XCTestCase {
         }
     }
 
-    func test_viewDidLoad_preferencesSectionHasThreeToggles() {
+    func test_viewDidLoad_preferencesSectionHasAppearanceAndTwoToggles() {
         presenter.viewDidLoad()
 
         let sections = presenter.sectionsRelay.value
         let prefItems = sections[1].items
-        XCTAssertEqual(prefItems.count, 3)
-        for item in prefItems {
-            guard case .toggle = item else {
-                XCTFail("Preferences section should only contain toggle items")
-                return
-            }
+        guard prefItems.count == 3 else { return XCTFail("Expected three preferences") }
+        guard case .navigation(let appearance) = prefItems[0],
+              case .toggle(let notifications) = prefItems[1],
+              case .toggle(let sound) = prefItems[2] else {
+            return XCTFail("Expected appearance navigation, notifications toggle and sound toggle")
         }
+        XCTAssertEqual(appearance.id, "appearance")
+        XCTAssertEqual(notifications.id, "notification")
+        XCTAssertEqual(sound.id, "sound")
     }
 
     func test_viewDidLoad_reflectsCurrentToggleStates() {
-        mockInteractor.darkModeEnabled = true
+        mockInteractor.appearance = "dark"
         mockInteractor.notificationEnabled = false
         mockInteractor.soundEnabled = true
 
         presenter.viewDidLoad()
 
-        let toggles = presenter.sectionsRelay.value[1].items.compactMap { item -> ToggleConfig? in
+        let items = presenter.sectionsRelay.value[1].items
+        guard items.count == 3, case .navigation(let appearance) = items[0] else {
+            return XCTFail("Expected appearance navigation")
+        }
+        XCTAssertEqual(appearance.subText, AppearanceOption.dark.title)
+        let toggles = items.compactMap { item -> ToggleConfig? in
             if case .toggle(let config) = item { return config }
             return nil
         }
-        XCTAssertTrue(toggles[0].isOn, "Dark mode should be on")
-        XCTAssertFalse(toggles[1].isOn, "Notification should be off")
-        XCTAssertTrue(toggles[2].isOn, "Sound should be on")
+        guard toggles.count == 2 else { return XCTFail("Expected two toggles") }
+        XCTAssertFalse(toggles[0].isOn, "Notification should be off")
+        XCTAssertTrue(toggles[1].isOn, "Sound should be on")
     }
 
     // MARK: - Toggle actions
@@ -132,7 +150,7 @@ final class SettingPresenterTests: XCTestCase {
         presenter.viewDidLoad()
         presenter.toggleDarkMode(to: true)
 
-        XCTAssertTrue(mockInteractor.darkModeEnabled)
+        XCTAssertEqual(mockInteractor.appearance, "dark")
     }
 
     func test_toggleNotification_persistsValue() {
@@ -159,7 +177,7 @@ final class SettingPresenterTests: XCTestCase {
         presenter.viewDidLoad()
         presenter.toggleDarkMode(to: true)
 
-        XCTAssertGreaterThanOrEqual(reloadCount, 1, "Sections should reload after toggle")
+        XCTAssertEqual(reloadCount, 2, "One reload on load and one after appearance changes")
     }
 
     // MARK: - Logout
@@ -191,7 +209,7 @@ final class SettingPresenterTests: XCTestCase {
 
         XCTAssertTrue(mockInteractor.logoutCalled)
         XCTAssertFalse(mockWireframe.navigateToWelcomeCalled)
-        XCTAssertEqual(mockWireframe.lastErrorMessage, "Test error")
+        XCTAssertEqual(mockWireframe.lastErrorMessage, mockInteractor.logoutError?.localizedDescription)
     }
 
     // MARK: - Account display
@@ -222,16 +240,5 @@ final class SettingPresenterTests: XCTestCase {
             return
         }
         XCTAssertNil(displayedUser)
-    }
-}
-
-// MARK: - SocialUserEntity test helper
-
-private extension SocialUserEntity {
-    init(displayName: String?, email: String?) {
-        self.displayName = displayName
-        self.email = email
-        self.phoneNumber = nil
-        self.photoUrl = nil
     }
 }
