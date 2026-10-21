@@ -2,7 +2,7 @@
 
 ## Phạm vi hiện tại
 
-App dùng UIKit/storyboard, Swift 5 và iOS 17+. Giữ View → Presenter → Interactor →
+App dùng UIKit/storyboard, Swift 5 và iOS 26+. Giữ View → Presenter → Interactor →
 API/local manager; điều hướng trong wireframe. Các màn danh sách mới dùng UIKit
 trực tiếp, các màn thẻ/cài đặt vẫn dùng XIB/storyboard hiện có.
 

@@ -1,5 +1,7 @@
 # Nền tảng giao diện (P0)
 
+> Đã được mở rộng bởi `docs/UI_REDESIGN_BLUEPRINT.md` (iOS 26, Liquid Glass, màu chàm/giấy, màn Cấp độ mới). Các token màu nền/nhấn, `headword` (nay `title2`) và component trạng thái trong tài liệu này đã thay đổi theo bản đó; phần audit P0 giữ làm bằng chứng lịch sử.
+
 Phạm vi: token thiết kế, điều hướng 4 tab và màn Cấp độ/Nội dung cấp độ (`HomeViewController`).
 Các màn khác (Từ điển, Thẻ, Cài đặt, tạo bộ thẻ) chưa được thiết kế lại.
 

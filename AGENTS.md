@@ -5,7 +5,7 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
 
 ## Project map
 
-- iOS 17+, Swift 5, UIKit/storyboards, VIPER-style modules, RxSwift, Alamofire,
+- iOS 26+, Swift 5, UIKit/storyboards, VIPER-style modules, RxSwift, Alamofire,
   Realm, Swift Package Manager. This is an existing application, not a template.
 - `Modules/<Feature>`: view/controller, presenter, wireframe. `Interactors`:
   use cases. `DataManager/Local`: Realm access. `Entities`: presentation models.

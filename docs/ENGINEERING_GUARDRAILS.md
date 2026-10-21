@@ -58,7 +58,7 @@ metrics to achieve a passing result.
 ## 4. UI and learning-science quality bar
 
 - Follow current Apple HIG and UIKit platform behavior on the deployment target
-  (iOS 17+). Prefer native navigation/tab controls and system accessibility
+  (iOS 26+). Prefer native navigation/tab controls and system accessibility
   behaviors over custom lookalikes.
 - Prioritize Japanese headwords/readings and Vietnamese meanings, clear actions,
   adequate contrast, Dynamic Type, VoiceOver and Reduce Motion. Verify compact

@@ -1,6 +1,6 @@
 # FlashcardApp
 
-Ứng dụng iOS 17+ học tiếng Nhật bằng UIKit, nội dung từ API Nihongo và bộ thẻ Realm offline.
+Ứng dụng iOS 26+ học tiếng Nhật bằng UIKit, nội dung từ API Nihongo và bộ thẻ Realm offline.
 
 Mở `FlashcardApp.xcodeproj`, chọn scheme **FlashcardApp-Local** và iOS Simulator.
 Backend local: `http://localhost:18081/api` (website ở `/vi`).
