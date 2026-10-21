@@ -1,19 +1,11 @@
-//
-//  EvironmentConfig.swift
-//  SnackOverflowApp
-//
-//  Created by タイン・グエン on 2023/01/09.
-//
-
 import Foundation
 
-class EnvironmentConfig {
-    static private func infoForKey(_ key: String) -> String? {
-        return (Bundle.main.infoDictionary?[key] as? String)?
-            .replacingOccurrences(of: "\\", with: "")
-    }
-    
+final class EnvironmentConfig {
     static func baseUrl() -> String {
-        return infoForKey("ProductBaseUrl")!
+        guard let value = Bundle.main.object(forInfoDictionaryKey: "ProductBaseUrl") as? String,
+              let url = URL(string: value), url.host != nil else {
+            preconditionFailure("Configure PRODUCT_BASE_URL before building the app.")
+        }
+        return value.hasSuffix("/") ? String(value.dropLast()) : value
     }
 }

@@ -16,9 +16,6 @@ final class DeskListViewController: BaseViewController {
     private let gridLayout = GridFlowLayout()
     private let listLayout = ListFlowLayout()
     
-    deinit {
-        deskListCollectionView.removeAllPullToRefresh()
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +33,9 @@ final class DeskListViewController: BaseViewController {
         layoutButton.setImage(AppImages.gridImage, for: .normal)
         deskListCollectionView.dataSource = self
         deskListCollectionView.delegate = self
-        deskListCollectionView.addPullToRefresh(PullToRefresh()) {[weak self] in
-            guard let self else { return }
-            self.handlePullToRefresh()
-        }
-        deskListCollectionView.topPullToRefresh?.setEnable(isEnabled: true)
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(handlePullToRefresh), for: .valueChanged)
+        deskListCollectionView.refreshControl = refresh
     }
     
     func subscribe() {
@@ -71,11 +66,11 @@ extension DeskListViewController {
         }
     }
     
-    private func handlePullToRefresh() {
+    @objc private func handlePullToRefresh() {
         presenter.updateDesk()
         self.deskListCollectionView.reloadData()
         logger.debug("reloadData")
-        self.deskListCollectionView.endRefreshing(at: .top)
+        self.deskListCollectionView.refreshControl?.endRefreshing()
     }
 }
 
@@ -93,5 +88,7 @@ extension DeskListViewController: UICollectionViewDataSource {
 }
 
 extension DeskListViewController: UICollectionViewDelegate {
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        presenter.didSelectDeskAtIndex(indexPath.item)
+    }
 }

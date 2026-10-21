@@ -37,11 +37,10 @@ extension StartUpPresenter: StartUpPresenterInterface {
             let progressFomated = String(format: "%.1f", progress)
             let progressText = String(format: progressTextFormat, "\(progressFomated)/100.0")
             self.progressTextRelay.accept(progressText)
-            if progress >= 100.0 {
-                self.wireframe.navigateToWelcomeSlideShow()
-            }
         }
-        RealmService.shared.configuration(onError: { [weak self] error in
+        RealmService.shared.configuration(onComplete: { [weak self] in
+            self?.wireframe.navigateToMain()
+        }, onError: { [weak self] error in
             guard let self else { return }
             logger.error("Database initialization failed: \(error.localizedDescription)")
             self.wireframe.showAlert(with: "Lỗi", message: error.errorDescription)

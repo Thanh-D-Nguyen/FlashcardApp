@@ -1,97 +1,71 @@
 import RealmSwift
 import Foundation
 
-class RealmService {
+final class RealmService {
     private let databaseName = "flash_card.realm"
-    private let databaseVersion: UInt64 = 001
+    private let databaseVersion: UInt64 = 1
     static let shared = RealmService()
     var realm: Realm!
-    
     var copyProgress: ((Double) -> Void)?
-    
-    init() { }
-    
-    func copyBundleData(completion: @escaping ((URL) -> Void), onError: ((AppError) -> Void)? = nil) {
-        guard let bundlePathString = Bundle.main.path(forResource: databaseName, ofType: nil) else {
-            logger.error("Bundle database file not found")
-            onError?(.databaseInitializationFailed("Bundle database file not found"))
+
+    func copyBundleData(completion: @escaping (URL) -> Void, onError: ((AppError) -> Void)? = nil) {
+        guard let source = Bundle.main.url(forResource: databaseName, withExtension: nil) else {
+            onError?(.databaseInitializationFailed("Không tìm thấy dữ liệu offline đi kèm."))
             return
         }
-        let sourcePath = URL(fileURLWithPath: bundlePathString)
-        let destinationUrl = inLibrarayFolder(fileName: databaseName)
-        print(destinationUrl)
-        let fileManager = FileManager.default
-        if fileManager.fileExists(atPath: destinationUrl.path) {
-            completion(destinationUrl)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.copyProgress?(100.0)
-            }
-            return
-        }
-        DispatchQueue.global(qos: .background).async {
+        let destination = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(databaseName)
+        copyProgress?(0)
+        DispatchQueue.global(qos: .userInitiated).async {
             do {
-                let sourceData = try Data(contentsOf: sourcePath)
-                let sourceSize = sourceData.count
-                let progress = Progress(totalUnitCount: Int64(sourceSize))
-                let bufferSize = 1024 * 1024
-                var copiedSize: Int = 0
-                if !fileManager.fileExists(atPath: destinationUrl.path) {
-                    let created = fileManager.createFile(atPath: destinationUrl.path, contents: nil, attributes: nil)
-                    if !created {
-                        throw NSError(domain: "FileError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not create file at path \(destinationUrl.path)"])
-                    }
-                }
-                let fileHandle = try FileHandle(forReadingFrom: sourcePath)
-                let destinationHandle = try FileHandle(forWritingTo: destinationUrl)
-                defer {
-                    fileHandle.closeFile()
-                    destinationHandle.closeFile()
-                }
-                while copiedSize < sourceSize {
-                    let bytesToCopy = min(bufferSize, sourceSize - copiedSize)
-                    let data = fileHandle.readData(ofLength: bytesToCopy)
-                    destinationHandle.write(data)
-                    copiedSize += bytesToCopy
-                    progress.completedUnitCount = Int64(copiedSize)
-                    let progressPercentage = progress.fractionCompleted * 100.0
-                    DispatchQueue.main.async {
-                        self.copyProgress?(progressPercentage)
-                        if progressPercentage >= 100.0 {
-                            completion(destinationUrl)
-                        }
-                    }
-                }
-            } catch let error {
-                logger.error("Error copying bundle data: \(error.localizedDescription)")
+                try Self.installBundleDatabase(from: source, to: destination)
                 DispatchQueue.main.async {
-                    onError?(.databaseInitializationFailed(error.localizedDescription))
+                    self.copyProgress?(100)
+                    completion(destination)
+                }
+            } catch {
+                logger.error("Database copy failed: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    onError?(.databaseInitializationFailed("Không thể chuẩn bị dữ liệu offline. Dữ liệu hiện có được giữ nguyên."))
                 }
             }
         }
     }
-    
-    func configuration(onError: ((AppError) -> Void)? = nil) {
-        logger.debug("configuration-----")
-        copyBundleData(completion: { [unowned self] url in
-            let configuration = Realm.Configuration(fileURL: url,
-                                                    schemaVersion: databaseVersion,
-                                                    migrationBlock: RealmService.migrate)
+
+    static func installBundleDatabase(from source: URL, to destination: URL) throws {
+        let manager = FileManager.default
+        let temporary = destination.appendingPathExtension("importing")
+        if manager.fileExists(atPath: temporary.path) { try manager.removeItem(at: temporary) }
+        let sourceData = try Data(contentsOf: source, options: .mappedIfSafe)
+        let exists = manager.fileExists(atPath: destination.path)
+        if exists {
+            let existing = try Data(contentsOf: destination, options: .mappedIfSafe)
+            // Repair only an exact, truncated bundle copy; never replace a modified user store.
+            guard existing.count < sourceData.count, sourceData.starts(with: existing) else { return }
+        }
+        defer { if manager.fileExists(atPath: temporary.path) { try? manager.removeItem(at: temporary) } }
+        try manager.copyItem(at: source, to: temporary)
+        if exists {
+            _ = try manager.replaceItemAt(destination, withItemAt: temporary)
+        } else {
+            try manager.moveItem(at: temporary, to: destination)
+        }
+    }
+
+    func configuration(onComplete: @escaping () -> Void = {}, onError: ((AppError) -> Void)? = nil) {
+        copyBundleData(completion: { [self] url in
+            let config = Realm.Configuration(fileURL: url, schemaVersion: databaseVersion,
+                                             migrationBlock: RealmService.migrate)
             do {
-                self.realm = try Realm(configuration: configuration)
-                Realm.Configuration.defaultConfiguration = configuration
+                realm = try Realm(configuration: config)
+                Realm.Configuration.defaultConfiguration = config
+                onComplete()
             } catch {
-                logger.error("Database initial error: \(error.localizedDescription)")
-                onError?(.databaseInitializationFailed(error.localizedDescription))
+                logger.error("Database open failed: \(error.localizedDescription)")
+                onError?(.databaseInitializationFailed("Không thể mở dữ liệu offline. Dữ liệu hiện có được giữ nguyên."))
             }
         }, onError: onError)
     }
-    
-    static func migrate(migration: Migration, oldVersion: UInt64) {
-        
-    }
-    
-    private func inLibrarayFolder(fileName: String) -> URL {
-        return URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0], isDirectory: true)
-            .appendingPathComponent(fileName)
-    }
+
+    static func migrate(migration: Migration, oldVersion: UInt64) {}
 }

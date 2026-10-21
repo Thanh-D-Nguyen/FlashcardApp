@@ -5,16 +5,20 @@
 //  Created by タイン・グエン on 2023/01/14.
 //
 
-import Foundation
+import RxSwift
 
 protocol MailLoginInteractorInterface: AnyObject {
-    
+    func login(email: String, password: String) -> Single<SocialUserEntity>
 }
 
-class MailLoginInteractor {
-    
-}
+final class MailLoginInteractor: MailLoginInteractorInterface {
+    private let session: AuthSession
 
-extension MailLoginInteractor: MailLoginInteractorInterface {
-    
+    init(session: AuthSession = .shared) {
+        self.session = session
+    }
+
+    func login(email: String, password: String) -> Single<SocialUserEntity> {
+        session.login(email: email, password: password)
+    }
 }

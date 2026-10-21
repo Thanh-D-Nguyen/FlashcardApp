@@ -19,12 +19,11 @@ final class MailLoginWireframe: BaseWireframe<MailLoginViewController> {
     private let storyboard = UIStoryboard(name: "MailLogin", bundle: nil)
 
     // MARK: - Module setup -
-    init(_ type: EmailLoginType, userInfo: SocialUserEntity?) {
+    init() {
         let moduleViewController = storyboard.instantiateViewController(ofType: MailLoginViewController.self)
         super.init(viewController: moduleViewController)
         let interactor = MailLoginInteractor()
         let presenter = MailLoginPresenter(interactor: interactor, wireframe: self)
-        presenter.setLoginType(type, userInfo: userInfo)
         moduleViewController.presenter = presenter
     }
 }

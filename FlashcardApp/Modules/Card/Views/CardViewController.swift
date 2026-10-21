@@ -60,28 +60,17 @@ final class CardViewController: BaseViewController, CardViewInterface {
 
 extension CardViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return presenter.cards.count + 1
+        return presenter.cards.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: CardCell = collectionView.dequeueResuableCell(forIndexPath: indexPath)
-        if presenter.cards.indices.contains(indexPath.row) {
-            cell.entity = presenter.cards[indexPath.row]
-        } else {
-            cell.entity = nil
-        }
+        cell.entity = presenter.cards[indexPath.row]
         return cell
     }
 }
 
-extension CardViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // If select empty entity cell, it mean add new card
-        if !presenter.cards.indices.contains(indexPath.row) {
-            presenter.createNewCard()
-        }
-    }
-}
+extension CardViewController: UICollectionViewDelegate {}
 
 extension CardViewController: CollectionViewPagingLayoutDelegate {
     func onCurrentPageChanged(layout: CollectionViewPagingLayout, currentPage: Int) {

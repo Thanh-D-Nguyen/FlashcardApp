@@ -9,15 +9,13 @@
 import UIKit
 
 protocol DictionaryWireframeInterface: AnyObject {
-
+    func showResult(_ result: BJTSearchResultDTO)
 }
 
 final class DictionaryWireframe: BaseWireframe<DictionaryViewController> {
 
-    private let storyboard = UIStoryboard(name: "Dictionary", bundle: nil)
-
     init() {
-        let moduleViewController = storyboard.instantiateViewController(ofType: DictionaryViewController.self)
+        let moduleViewController = DictionaryViewController()
         super.init(viewController: moduleViewController)
         moduleViewController.title = MainTabbarName.dictionary.title
         moduleViewController.tabBarItem = UITabBarItem(title: MainTabbarName.dictionary.title, image: MainTabbarName.dictionary.image, tag: MainTabbarName.dictionary.rawValue)
@@ -28,5 +26,8 @@ final class DictionaryWireframe: BaseWireframe<DictionaryViewController> {
 }
 
 extension DictionaryWireframe: DictionaryWireframeInterface {
-
+    func showResult(_ result: BJTSearchResultDTO) {
+        showAlert(with: result.title, message: [result.reading, result.description, result.jlptLevel]
+            .compactMap { $0 }.joined(separator: "\n\n"))
+    }
 }

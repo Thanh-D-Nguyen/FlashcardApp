@@ -21,7 +21,6 @@ protocol CardPresenterInterface: AnyObject {
 
     func loadDesks()
     func didSelectDeskAtIndex(_ index: Int)
-    func createNewCard()
     func showDeskList()
     func createNewDesk()
 
@@ -71,9 +70,6 @@ extension CardPresenter: CardPresenterInterface {
         wireframe.showDeskList()
     }
     
-    func createNewCard() {
-        wireframe.showCreateNewCard()
-    }
     
     func createNewDesk() {
         wireframe.showCreateNewDesk()

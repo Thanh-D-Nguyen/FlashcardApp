@@ -10,41 +10,32 @@
 import Foundation
 import UIKit
 import RxRelay
+import RxSwift
 
-enum EmailLoginType {
-    case login
-    case register
+enum MailLoginViewState: Equatable {
+    case idle
+    case loading
+    case error(String)
 }
 
 protocol MailLoginPresenterInterface: AnyObject {
-    var warningAttributedText: NSAttributedString { get }
     var mailPlaceHolderAttributedText: NSAttributedString { get }
     var passPlaceHolderAttributedText: NSAttributedString { get }
     var titleText: String { get }
     var loginButtonText: String { get }
-    
-    var userInfoRelay: PublishRelay<SocialUserEntity> { get }
-    
-    func loginWithEmail()
-    func viewDidLoad()
+    var viewState: BehaviorRelay<MailLoginViewState> { get }
+
+    func loginWithEmail(email: String, password: String)
+    func cancelLogin()
+    func continueWithoutLogin()
 }
 
-class MailLoginPresenter {
+final class MailLoginPresenter {
     private let wireframe: MailLoginWireframeInterface
     private let interactor: MailLoginInteractorInterface
-    
-    let userInfoRelay = PublishRelay<SocialUserEntity>()
-    
-    private var loginType: EmailLoginType = .register
-    private var userInfo: SocialUserEntity?
-    
-    var warningAttributedText: NSAttributedString {
-        let warningText = NSLocalizedString("By clicking \"Create account\", I agree to Flashcard’s TOS and Privacy Policy.", comment: "")
-        let attribuedTxt = NSMutableAttributedString(string: warningText)
-        attribuedTxt.addAttribute(.link, value: "www.google.com", range: (warningText as NSString).range(of: "TOS"))
-        attribuedTxt.addAttribute(.link, value: "www.yahoo.com", range: (warningText as NSString).range(of: "Privacy Policy."))
-        return attribuedTxt
-    }
+    private var loginRequest: SingleAssignmentDisposable?
+
+    let viewState = BehaviorRelay<MailLoginViewState>(value: .idle)
     
     var mailPlaceHolderAttributedText: NSAttributedString {
         NSAttributedString(
@@ -59,14 +50,10 @@ class MailLoginPresenter {
     }
     
     var titleText: String {
-        return loginType == .register ?
-        NSLocalizedString("Go with your Flashcard.", comment: "") :
         NSLocalizedString("Welcome to Flashcard!", comment: "")
     }
     
     var loginButtonText: String {
-        return loginType == .register ?
-        NSLocalizedString("Create account", comment: "") :
         NSLocalizedString("Login", comment: "")
     }
     
@@ -78,19 +65,62 @@ class MailLoginPresenter {
         self.wireframe = wireframe
     }
     
-    func setLoginType(_ type: EmailLoginType, userInfo: SocialUserEntity?) {
-        self.loginType = type
-        self.userInfo = userInfo
+    deinit {
+        loginRequest?.dispose()
+    }
+
+    private func finishLogin(_ request: SingleAssignmentDisposable, error: Error?) {
+        guard loginRequest === request else { return }
+        loginRequest = nil
+        request.dispose()
+        if let error {
+            viewState.accept(.error(error.localizedDescription))
+        } else {
+            viewState.accept(.idle)
+            wireframe.showMain()
+        }
     }
 }
 
 extension MailLoginPresenter: MailLoginPresenterInterface {
-    func viewDidLoad() {
-        if let userInfo = userInfo {
-            userInfoRelay.accept(userInfo)
+    func loginWithEmail(email: String, password: String) {
+        guard loginRequest == nil else { return }
+        let email = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let components = email.split(separator: "@", omittingEmptySubsequences: false)
+        guard components.count == 2, components.allSatisfy({ !$0.isEmpty }),
+              email.rangeOfCharacter(from: .whitespacesAndNewlines) == nil else {
+            viewState.accept(.error(NSLocalizedString("Enter a valid email address.", comment: "")))
+            return
         }
+        guard !password.isEmpty else {
+            viewState.accept(.error(NSLocalizedString("Enter your password.", comment: "")))
+            return
+        }
+
+        let request = SingleAssignmentDisposable()
+        loginRequest = request
+        viewState.accept(.loading)
+        guard loginRequest === request else { return }
+        request.setDisposable(interactor.login(email: email, password: password)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self, weak request] _ in
+                guard let request else { return }
+                self?.finishLogin(request, error: nil)
+            }, onFailure: { [weak self, weak request] error in
+                guard let request else { return }
+                self?.finishLogin(request, error: error)
+            }))
     }
-    func loginWithEmail() {
+
+    func cancelLogin() {
+        let request = loginRequest
+        loginRequest = nil
+        request?.dispose()
+        viewState.accept(.idle)
+    }
+
+    func continueWithoutLogin() {
+        cancelLogin()
         wireframe.showMain()
     }
 }

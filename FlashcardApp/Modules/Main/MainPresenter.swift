@@ -43,14 +43,17 @@ extension MainPresenter: MainPresenterInterface {
     private func createTabbar() -> MainTabbarController {
         let tabbarController = MainTabbarController()
         let home = HomeWireframe()
-        let quiz = QuizWireframe()
-        let quizNav = BaseNavigationController(rootViewController: quiz.viewController)
-        let desk = DeskListWireframe()
-        let deskNav = BaseNavigationController(rootViewController: desk.viewController)
+        let homeNav = BaseNavigationController(rootViewController: home.viewController)
+        let card = CardWireframe()
+        let cardNav = BaseNavigationController(rootViewController: card.viewController)
         let dictionary = DictionaryWireframe()
         let dictionaryNav = BaseNavigationController(rootViewController: dictionary.viewController)
         let setting = SettingWireframe()
-        let viewControllers = [home.viewController, quizNav, deskNav, dictionaryNav, setting.viewController]
+        home.viewController.tabBarItem.accessibilityIdentifier = "tab_levels"
+        dictionary.viewController.tabBarItem.accessibilityIdentifier = "tab_dictionary"
+        card.viewController.tabBarItem.accessibilityIdentifier = "tab_cards"
+        setting.viewController.tabBarItem.accessibilityIdentifier = "tab_settings"
+        let viewControllers = [homeNav, dictionaryNav, cardNav, setting.viewController]
         tabbarController.viewControllers = viewControllers
         return tabbarController
     }

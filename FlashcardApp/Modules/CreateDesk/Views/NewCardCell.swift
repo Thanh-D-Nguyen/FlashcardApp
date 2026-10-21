@@ -24,7 +24,6 @@ class NewCardCell: SwipeTableViewCell {
     @IBOutlet private weak var wordTextField: MMTextView!
     @IBOutlet private weak var meanTextField: MMTextView!
     
-    @IBOutlet private weak var imageButton: UIButton!
     
     weak var tableView: UITableView?
     
@@ -78,7 +77,6 @@ class NewCardCell: SwipeTableViewCell {
             self.tableView?.endUpdates()
         }).disposed(by: disposeBag)
 
-        imageButton.rx.tap.bind(to: card.didSelectImageRelay).disposed(by: disposeBag)
         
         card.imageUrlRelay.subscribe(onNext: { [unowned self] imageUrl in
             self.cardImageView.kf.setImage(with: URL(string: imageUrl), placeholder: AppImages.noImage)

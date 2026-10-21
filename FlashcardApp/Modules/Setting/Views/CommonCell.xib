@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="25098" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="25072"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -19,27 +18,20 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chart.bar" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="vh3-cD-cMr">
-                        <rect key="frame" x="8" y="5.6666666666666679" width="36" height="33.333333333333329"/>
+                        <rect key="frame" x="8" y="5" width="36" height="34"/>
                         <color key="tintColor" name="blackA80Color"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="vh3-cD-cMr" secondAttribute="height" id="e8S-ta-wqb"/>
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sounds" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ocn-Ym-oe6">
-                        <rect key="frame" x="52" y="14.333333333333336" width="47.666666666666657" height="15.666666666666664"/>
+                        <rect key="frame" x="52" y="16" width="47.666666666666657" height="12"/>
                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="13"/>
                         <color key="textColor" name="blackA80Color"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.right" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="5eX-0c-rsm">
-                        <rect key="frame" x="293.33333333333331" y="6" width="10.666666666666686" height="32.333333333333329"/>
-                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="5eX-0c-rsm" secondAttribute="height" multiplier="0.3" id="w2M-LU-yiK"/>
-                        </constraints>
-                    </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="English" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yxy-38-1PH">
-                        <rect key="frame" x="248.33333333333337" y="15" width="41" height="14.333333333333336"/>
+                        <rect key="frame" x="251" y="15" width="41" height="14"/>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <color key="textColor" name="blackA54Color"/>
                         <nil key="highlightedColor"/>
@@ -48,13 +40,11 @@
                 <color key="backgroundColor" name="whiteColor"/>
                 <constraints>
                     <constraint firstItem="vh3-cD-cMr" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="0qO-3d-3Ta"/>
+                    <constraint firstAttribute="trailing" secondItem="yxy-38-1PH" secondAttribute="trailing" constant="28" id="2RF-zJ-6wl"/>
                     <constraint firstAttribute="bottom" secondItem="ocn-Ym-oe6" secondAttribute="bottom" priority="250" constant="16" id="7li-zC-ATo"/>
                     <constraint firstItem="yxy-38-1PH" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="ESZ-bL-NCs"/>
+                    <constraint firstItem="ocn-Ym-oe6" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="R5M-d1-x5B"/>
                     <constraint firstItem="ocn-Ym-oe6" firstAttribute="leading" secondItem="vh3-cD-cMr" secondAttribute="trailing" constant="8" id="S2S-Rl-9Un"/>
-                    <constraint firstAttribute="trailing" secondItem="5eX-0c-rsm" secondAttribute="trailing" constant="16" id="Txx-7T-IUA"/>
-                    <constraint firstAttribute="bottom" secondItem="5eX-0c-rsm" secondAttribute="bottom" constant="4" id="Ulc-Zy-og0"/>
-                    <constraint firstItem="5eX-0c-rsm" firstAttribute="leading" secondItem="yxy-38-1PH" secondAttribute="trailing" constant="4" id="Uyq-AQ-eNz"/>
-                    <constraint firstItem="5eX-0c-rsm" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="eZ7-sc-m0q"/>
                     <constraint firstItem="vh3-cD-cMr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="oWU-uD-8bA"/>
                     <constraint firstAttribute="bottom" secondItem="vh3-cD-cMr" secondAttribute="bottom" constant="4" id="t8Q-8N-afD"/>
                     <constraint firstItem="ocn-Ym-oe6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="yeu-SK-jRb"/>
@@ -70,8 +60,7 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="chart.bar" catalog="system" width="128" height="89"/>
-        <image name="chevron.right" catalog="system" width="97" height="128"/>
+        <image name="chart.bar" catalog="system" width="128" height="92"/>
         <namedColor name="blackA54Color">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.54000002145767212" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

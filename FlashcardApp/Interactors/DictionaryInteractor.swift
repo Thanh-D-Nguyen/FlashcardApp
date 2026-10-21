@@ -1,21 +1,13 @@
-//
-//  DictionaryInteractor.swift
-//  FlashcardApp
-//
-//  Created by タイン・グエン on 2023/02/19.
-//  
-//
-
-import Foundation
+import RxSwift
 
 protocol DictionaryInteractorInterface: AnyObject {
-
+    func search(_ query: String, type: DictionarySearchType) -> Single<[BJTSearchResultDTO]>
 }
 
-class DictionaryInteractor {
-
-}
-
-extension DictionaryInteractor: DictionaryInteractorInterface {
-
+final class DictionaryInteractor: DictionaryInteractorInterface {
+    private let api: BJTSearchAPI
+    init(api: BJTSearchAPI = .shared) { self.api = api }
+    func search(_ query: String, type: DictionarySearchType) -> Single<[BJTSearchResultDTO]> {
+        api.search(q: query, scope: type)
+    }
 }

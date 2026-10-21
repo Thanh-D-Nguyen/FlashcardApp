@@ -7,24 +7,12 @@
 
 import UIKit
 
-// Welcome
-enum WelcomeType {
-    case show, main, emailLogin, signUpLogin
-}
-enum SignInType: Int {
-    case signUpWithMail = 1
-    case apple
-    case google
-    case facebook
-}
-
 enum CardFace {
     case front, back
 }
 
 enum MainTabbarName: Int {
     case home
-    case quiz
     case desk
     case card
     case dictionary
@@ -34,8 +22,6 @@ enum MainTabbarName: Int {
         switch self {
             case .home:
                 return NSLocalizedString("Home", comment: "")
-            case .quiz:
-                return NSLocalizedString("Quiz", comment: "")
             case .desk:
                 return NSLocalizedString("Desk", comment: "")
             case .card:
@@ -51,8 +37,6 @@ enum MainTabbarName: Int {
         switch self {
             case .home:
                 return UIImage(systemName: "house")
-            case .quiz:
-                return UIImage(systemName: "checklist")
             case .desk:
                 return UIImage(systemName: "menucard")
             case .card:
@@ -63,9 +47,4 @@ enum MainTabbarName: Int {
                 return UIImage(systemName: "gear")
         }
     }
-}
-
-enum PhotoSize: String {
-    case thumbnail = "q"
-    case large = "b"
 }

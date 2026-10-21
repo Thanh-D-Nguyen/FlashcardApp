@@ -1,181 +1,98 @@
-//
-//  BJTLevelAPI.swift
-//  FlashcardApp
-//
-//  Created by Claude on 2026/09/06.
-//
-
 import Alamofire
 import Foundation
 import RxSwift
 
-/// API client for nihongo-bjt BJT level endpoints.
 final class BJTLevelAPI {
-
     static let shared = BJTLevelAPI()
+    private let session: Session
+    private let baseURL: String
 
-    private var baseURL: String {
-        let base = ClientAPI.basePath
-        return base.isEmpty ? EnvironmentConfig.baseUrl() : base
+    init(session: Session = Session(), baseURL: String = EnvironmentConfig.baseUrl()) {
+        self.session = session
+        self.baseURL = baseURL
     }
 
-    // MARK: - List Levels
-
-    /// GET /api/levels — list all BJT levels (J5 → J1+) with content counts.
-    func list(token: String) -> Single<[BJTLevelDTO]> {
-        let url = "\(baseURL)/levels"
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, headers: headers)
-                .validate()
-                .responseDecodable(of: [BJTLevelDTO].self) { response in
-                    switch response.result {
-                    case .success(let items):
-                        observer(.success(items))
-                    case .failure(let error):
-                        observer(.failure(error))
+    func list() -> Single<[BJTLevelDTO]> {
+        Single.create { observer in
+            do {
+                let url = try self.endpoint(["levels"])
+                let request = self.session.request(url)
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: [BJTLevelDTO].self) { response in
+                        observer(response.result.mapError { $0 as Error })
                     }
-                }
-            return Disposables.create { request.cancel() }
+                return Disposables.create { request.cancel() }
+            } catch {
+                observer(.failure(error))
+                return Disposables.create()
+            }
         }
     }
 
-    // MARK: - Level Detail
-
-    /// GET /api/levels/{code} — get a single BJT level definition.
-    func detail(token: String, code: String) -> Single<BJTLevelDetailDTO> {
-        let url = "\(baseURL)/levels/\(code)"
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, headers: headers)
-                .validate()
-                .responseDecodable(of: BJTLevelDetailDTO.self) { response in
-                    switch response.result {
-                    case .success(let item):
-                        observer(.success(item))
-                    case .failure(let error):
-                        observer(.failure(error))
+    func vocabulary(code: String, limit: Int = 30, offset: Int = 0) -> Single<[BJTLevelVocabularyItemDTO]> {
+        Single.create { observer in
+            do {
+                let url = try self.referenceURL(code: code, kind: "vocabulary", limit: limit, offset: offset)
+                let request = self.session.request(url, parameters: ["limit": limit, "offset": offset])
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: [BJTLevelVocabularyItemDTO].self) { response in
+                        observer(response.result.mapError { $0 as Error })
                     }
-                }
-            return Disposables.create { request.cancel() }
+                return Disposables.create { request.cancel() }
+            } catch {
+                observer(.failure(error))
+                return Disposables.create()
+            }
         }
     }
 
-    // MARK: - Lessons for Level
-
-    /// GET /api/levels/{code}/lessons — list lessons for a BJT level.
-    func lessons(token: String, code: String) -> Single<[BJTLevelLessonSummaryDTO]> {
-        let url = "\(baseURL)/levels/\(code)/lessons"
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, headers: headers)
-                .validate()
-                .responseDecodable(of: [BJTLevelLessonSummaryDTO].self) { response in
-                    switch response.result {
-                    case .success(let items):
-                        observer(.success(items))
-                    case .failure(let error):
-                        observer(.failure(error))
+    func kanji(code: String, limit: Int = 30, offset: Int = 0) -> Single<[BJTLevelKanjiItemDTO]> {
+        Single.create { observer in
+            do {
+                let url = try self.referenceURL(code: code, kind: "kanji", limit: limit, offset: offset)
+                let request = self.session.request(url, parameters: ["limit": limit, "offset": offset])
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: [BJTLevelKanjiItemDTO].self) { response in
+                        observer(response.result.mapError { $0 as Error })
                     }
-                }
-            return Disposables.create { request.cancel() }
+                return Disposables.create { request.cancel() }
+            } catch {
+                observer(.failure(error))
+                return Disposables.create()
+            }
         }
     }
 
-    // MARK: - Lesson Detail
-
-    /// GET /api/levels/lessons/{slug} — get lesson detail with all content items.
-    func lessonDetail(token: String, slug: String) -> Single<BJTLevelLessonDetailDTO> {
-        let url = "\(baseURL)/levels/lessons/\(slug)"
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, headers: headers)
-                .validate()
-                .responseDecodable(of: BJTLevelLessonDetailDTO.self) { response in
-                    switch response.result {
-                    case .success(let item):
-                        observer(.success(item))
-                    case .failure(let error):
-                        observer(.failure(error))
+    func grammar(code: String, limit: Int = 30, offset: Int = 0) -> Single<[BJTLevelGrammarItemDTO]> {
+        Single.create { observer in
+            do {
+                let url = try self.referenceURL(code: code, kind: "grammar", limit: limit, offset: offset)
+                let request = self.session.request(url, parameters: ["limit": limit, "offset": offset])
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: [BJTLevelGrammarItemDTO].self) { response in
+                        observer(response.result.mapError { $0 as Error })
                     }
-                }
-            return Disposables.create { request.cancel() }
+                return Disposables.create { request.cancel() }
+            } catch {
+                observer(.failure(error))
+                return Disposables.create()
+            }
         }
     }
 
-    // MARK: - Vocabulary for Level
-
-    /// GET /api/levels/{code}/vocabulary — list vocabulary for a BJT level.
-    func vocabulary(token: String, code: String, q: String? = nil, limit: Int = 30, offset: Int = 0) -> Single<[BJTLevelVocabularyItemDTO]> {
-        let url = "\(baseURL)/levels/\(code)/vocabulary"
-        var params: [String: Any] = ["limit": min(limit, 50), "offset": offset]
-        if let q { params["q"] = q }
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, parameters: params, headers: headers)
-                .validate()
-                .responseDecodable(of: [BJTLevelVocabularyItemDTO].self) { response in
-                    switch response.result {
-                    case .success(let items):
-                        observer(.success(items))
-                    case .failure(let error):
-                        observer(.failure(error))
-                    }
-                }
-            return Disposables.create { request.cancel() }
+    private func referenceURL(code: String, kind: String, limit: Int, offset: Int) throws -> URL {
+        guard ["J5", "J4", "J3", "J2", "J1", "J1+"].contains(code),
+              (1...50).contains(limit), offset >= 0 else {
+            throw AppError.invalidInput("Cấp độ hoặc phân trang không hợp lệ.")
         }
+        return try endpoint(["levels", code, kind])
     }
 
-    // MARK: - Kanji for Level
-
-    /// GET /api/levels/{code}/kanji — list kanji for a BJT level.
-    func kanji(token: String, code: String, q: String? = nil, limit: Int = 30, offset: Int = 0) -> Single<[BJTLevelKanjiItemDTO]> {
-        let url = "\(baseURL)/levels/\(code)/kanji"
-        var params: [String: Any] = ["limit": min(limit, 50), "offset": offset]
-        if let q { params["q"] = q }
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, parameters: params, headers: headers)
-                .validate()
-                .responseDecodable(of: [BJTLevelKanjiItemDTO].self) { response in
-                    switch response.result {
-                    case .success(let items):
-                        observer(.success(items))
-                    case .failure(let error):
-                        observer(.failure(error))
-                    }
-                }
-            return Disposables.create { request.cancel() }
+    private func endpoint(_ components: [String]) throws -> URL {
+        guard let url = URL(string: baseURL), let scheme = url.scheme,
+              ["http", "https"].contains(scheme), url.host != nil else {
+            throw URLError(.badURL)
         }
-    }
-
-    // MARK: - Grammar for Level
-
-    /// GET /api/levels/{code}/grammar — list grammar points for a BJT level.
-    func grammar(token: String, code: String, q: String? = nil, limit: Int = 30, offset: Int = 0) -> Single<[BJTLevelGrammarItemDTO]> {
-        let url = "\(baseURL)/levels/\(code)/grammar"
-        var params: [String: Any] = ["limit": min(limit, 50), "offset": offset]
-        if let q { params["q"] = q }
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, parameters: params, headers: headers)
-                .validate()
-                .responseDecodable(of: [BJTLevelGrammarItemDTO].self) { response in
-                    switch response.result {
-                    case .success(let items):
-                        observer(.success(items))
-                    case .failure(let error):
-                        observer(.failure(error))
-                    }
-                }
-            return Disposables.create { request.cancel() }
-        }
+        return components.reduce(url) { $0.appendingPathComponent($1) }
     }
 }

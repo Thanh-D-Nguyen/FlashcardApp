@@ -10,7 +10,7 @@
 import UIKit
 
 protocol StartUpWireframeInterface: WireframeInterface {
-    func navigateToWelcomeSlideShow()
+    func navigateToMain()
 }
 
 final class StartUpWireframe: BaseWireframe<StartUpViewController> {
@@ -28,7 +28,7 @@ final class StartUpWireframe: BaseWireframe<StartUpViewController> {
 
 // MARK: - Extensions -
 extension StartUpWireframe: StartUpWireframeInterface {
-    func navigateToWelcomeSlideShow() {
-        self.navigationController?.setRootWireframe(SlideShowWireframe())
+    func navigateToMain() {
+        self.navigationController?.setRootWireframe(MainWireframe())
     }
 }

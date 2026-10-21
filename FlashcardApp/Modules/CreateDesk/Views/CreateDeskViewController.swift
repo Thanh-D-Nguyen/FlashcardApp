@@ -8,7 +8,6 @@
 
 import UIKit
 import SwipeCellKit
-import Typist
 
 final class CreateDeskViewController: BaseViewController {
     var presenter: CreateDeskPresenterInterface!
@@ -20,7 +19,6 @@ final class CreateDeskViewController: BaseViewController {
     @IBOutlet private weak var doneButton: RoundCornerButton!
     @IBOutlet private weak var closeButton: UIButton!
     
-    private let keyboard = Typist.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,21 +28,21 @@ final class CreateDeskViewController: BaseViewController {
     }
     
     func setupUI() {
+        closeButton.accessibilityIdentifier = "close_deck_editor"
+        doneButton.accessibilityIdentifier = "save_deck"
+        bottomView.accessibilityIdentifier = "deck_keyboard_toolbar"
         deskTableView.keyboardDismissMode = .interactive
         deskTableView.registerNib(cellClass: DeskCell.self)
         deskTableView.registerNib(cellClass: NewCardCell.self)
         deskTableView.registerHeaderFooterNib(aClass: DeskCardHeaderView.self)
         bottomView.updateKeyboardHidden(true)
+        bottomConstraint.isActive = false
+        bottomView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(_:)),
+                                               name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
     func subscribe() {
-        keyboard.toolbar(scrollView: deskTableView).on(event: .willShow, do: { [weak self] options in
-            guard let self else { return }
-            self.updateBottomConstraint(-options.endFrame.height)
-        }).on(event: .willHide, do: { [weak self] _ in
-            guard let self else { return }
-            self.updateBottomConstraint(0)
-        }).start()
         doneButton.rx.tap.subscribe(onNext: { [weak self] in
             guard let self else { return }
             self.presenter.saveDesk()
@@ -91,19 +89,14 @@ final class CreateDeskViewController: BaseViewController {
         
     }
     
-    private func updateBottomConstraint(_ constant: CGFloat) {
-        self.bottomConstraint.constant = constant
-        let isKeyboardHidden = constant == 0
-        if isKeyboardHidden {
-            self.bottomView.setSearchResult(SearchResultEntity(face: .front, cards: []))
-        }
-        bottomView.updateKeyboardHidden(isKeyboardHidden)
-        UIView.animate(withDuration: 0.25) {
-            self.view.layoutIfNeeded()
-            self.bottomView.layoutIfNeeded()
-        }
+    @objc private func keyboardWillChange(_ notification: Notification) {
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let keyboardFrame = view.convert(frame, from: nil)
+        let isHidden = !view.bounds.intersects(keyboardFrame)
+        bottomView.updateKeyboardHidden(isHidden)
+        if isHidden { bottomView.setSearchResult(SearchResultEntity(face: .front, cards: [])) }
     }
-    
+
     @IBAction
     private func bottomTapAction(_ sender: AddDeskBottomView) {
         if sender.action == .next {

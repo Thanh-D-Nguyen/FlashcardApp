@@ -1,94 +1,46 @@
-//
-//  DictionaryPresenter.swift
-//  FlashcardApp
-//
-//  Created by タイン・グエン on 2023/02/19.
-//  
-//
-
 import Foundation
-import UIKit
 import RxRelay
+import RxSwift
 
-enum DictionarySearchType: Int, CaseIterable {
-    case vocalbulary
-    case kanji
-    case grammar
-    case sentence
-    
-    var description: String {
-        switch self {
-            case .vocalbulary:
-                return "Từ vựng"
-            case .kanji:
-                return "Hán tự"
-            case .grammar:
-                return "Ngữ pháp"
-            case .sentence:
-                return "Câu"
-        }
-    }
-    static func all() -> [String] {
-        return self.allCases.map { $0.description }
-    }
+enum DictionaryState: Equatable {
+    case idle, loading
+    case results([BJTSearchResultDTO])
+    case error(String)
 }
 
 protocol DictionaryPresenterInterface: AnyObject {
-    
-    var createdPageControllerRelay: PublishRelay<UIPageViewController> { get }
-    var createdWelcomeControllerRelay: PublishRelay<UIPageViewController> { get }
-
+    var state: BehaviorRelay<DictionaryState> { get }
     func searchText(_ text: String?, withType type: Int)
-    func viewDidLoad()
+    func select(_ row: BJTSearchResultDTO)
 }
 
-class DictionaryPresenter {
-    private let interactor: DictionaryInteractorInterface
+final class DictionaryPresenter: DictionaryPresenterInterface {
     private let wireframe: DictionaryWireframeInterface
-    
-    private var currentSearchText = ""
-    private var currentSearchType: DictionarySearchType = .vocalbulary
-    
-    private let vocalWireFrame = VocabularyWireframe()
-    private var vocalPresenter: VocabularyPresenterInterface {
-        return vocalWireFrame.viewController.presenter
-    }
-    
-    let createdPageControllerRelay = PublishRelay<UIPageViewController>()
-    let createdWelcomeControllerRelay = PublishRelay<UIPageViewController>()
+    private let queries = PublishRelay<(String, DictionarySearchType)>()
+    private let bag = DisposeBag()
+    let state = BehaviorRelay<DictionaryState>(value: .idle)
 
-    init(interactor: DictionaryInteractorInterface, 
-        wireframe: DictionaryWireframeInterface) {
-        self.interactor = interactor
+    init(interactor: DictionaryInteractorInterface, wireframe: DictionaryWireframeInterface) {
         self.wireframe = wireframe
+        queries
+            .flatMapLatest { query, type -> Observable<DictionaryState> in
+                guard !query.isEmpty else { return .just(.idle) }
+                // Delay inside the latest query so changes cancel stale requests immediately.
+                return Observable<Int>.timer(.milliseconds(300), scheduler: MainScheduler.instance)
+                    .flatMap { _ in interactor.search(query, type: type).asObservable() }
+                    .map(DictionaryState.results)
+                    .catch { .just(.error($0.localizedDescription)) }
+                    .startWith(.loading)
+            }
+            .observe(on: MainScheduler.instance)
+            .bind(to: state)
+            .disposed(by: bag)
     }
-    
-    private func createGroupPageView() -> UIPageViewController {
-        let pageView = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
-        pageView.setViewControllers([vocalWireFrame.viewController], direction: .forward, animated: false)
-        return pageView
-    }
-    
-    private func createWelcomeController() -> UIViewController {
-        return UIViewController()
-    }
-}
 
-extension DictionaryPresenter: DictionaryPresenterInterface {
-    
     func searchText(_ text: String?, withType type: Int) {
-        guard let keyword = text, let searchType = DictionarySearchType(rawValue: type) else {
-            return
-        }
-        logger.debug("\(searchType): \(keyword)")
-        
-        if currentSearchText != keyword || searchType != currentSearchType {
-            vocalPresenter.updateSearchKeyword(keyword)
-        }
+        guard let type = DictionarySearchType(rawValue: type) else { return }
+        queries.accept(((text ?? "").trimmingCharacters(in: .whitespacesAndNewlines), type))
     }
-    
-    func viewDidLoad() {
-        let groupPageView = createGroupPageView()
-        createdPageControllerRelay.accept(groupPageView)
-    }
+
+    func select(_ row: BJTSearchResultDTO) { wireframe.showResult(row) }
 }

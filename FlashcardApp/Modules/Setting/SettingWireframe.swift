@@ -3,13 +3,21 @@
 //  FlashcardApp
 //
 //  Created by タイン・グエン on 2023/02/19.
-//  
 //
 
 import UIKit
+import SafariServices
 
 protocol SettingWireframeInterface: AnyObject {
-
+    func showLogoutConfirmation(onConfirm: @escaping () -> Void)
+    func navigateToWelcome()
+    func showError(message: String)
+    func showNotificationDeniedAlert()
+    func openSystemSettings()
+    func showAppearancePicker(current: AppearanceOption, onSelect: @escaping (AppearanceOption) -> Void)
+    func showLanguagePicker()
+    func showPrivacyPolicy()
+    func showAbout()
 }
 
 final class SettingWireframe: BaseWireframe<SettingViewController> {
@@ -19,14 +27,123 @@ final class SettingWireframe: BaseWireframe<SettingViewController> {
     init() {
         let moduleViewController = storyboard.instantiateViewController(ofType: SettingViewController.self)
         super.init(viewController: moduleViewController)
-        moduleViewController.title = MainTabbarName.setting.title
-        moduleViewController.tabBarItem = UITabBarItem(title: MainTabbarName.setting.title, image: MainTabbarName.setting.image, tag: MainTabbarName.setting.rawValue)
-        let interactor = SettingInteractor() 
+        moduleViewController.title = NSLocalizedString("Settings", comment: "")
+        let tabBarItem = UITabBarItem(
+            title: NSLocalizedString("Settings", comment: ""),
+            image: UIImage(systemName: "gearshape"),
+            selectedImage: UIImage(systemName: "gearshape.fill")
+        )
+        tabBarItem.tag = MainTabbarName.setting.rawValue
+        moduleViewController.tabBarItem = tabBarItem
+
+        let interactor = SettingInteractor(
+            preferences: UserDefaultsPreferences.shared
+        )
         let presenter = SettingPresenter(interactor: interactor, wireframe: self)
         moduleViewController.presenter = presenter
-    } 
+    }
 }
 
 extension SettingWireframe: SettingWireframeInterface {
 
+    func showError(message: String) {
+        showAlert(
+            with: NSLocalizedString("Error", comment: ""),
+            message: message
+        )
+    }
+
+    func showLogoutConfirmation(onConfirm: @escaping () -> Void) {
+        let confirmAction = UIAlertAction(
+            title: NSLocalizedString("Log Out", comment: ""),
+            style: .destructive
+        ) { _ in
+            onConfirm()
+        }
+        let cancelAction = UIAlertAction(
+            title: NSLocalizedString("Cancel", comment: ""),
+            style: .cancel
+        )
+        showAlert(
+            with: NSLocalizedString("Log Out", comment: ""),
+            message: NSLocalizedString("Are you sure you want to log out?", comment: ""),
+            actions: [confirmAction, cancelAction]
+        )
+    }
+
+    func showNotificationDeniedAlert() {
+        let settingsAction = UIAlertAction(
+            title: NSLocalizedString("Open Settings", comment: ""),
+            style: .default
+        ) { [weak self] _ in
+            self?.openSystemSettings()
+        }
+        let cancelAction = UIAlertAction(
+            title: NSLocalizedString("Cancel", comment: ""),
+            style: .cancel
+        )
+        showAlert(
+            with: NSLocalizedString("Notifications Disabled", comment: ""),
+            message: NSLocalizedString("Please enable notifications in System Settings to receive study reminders.", comment: ""),
+            actions: [settingsAction, cancelAction]
+        )
+    }
+
+    func openSystemSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
+    }
+
+    func showAppearancePicker(current: AppearanceOption, onSelect: @escaping (AppearanceOption) -> Void) {
+        let alert = UIAlertController(
+            title: NSLocalizedString("Appearance", comment: ""),
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        for option in AppearanceOption.allCases {
+            let action = UIAlertAction(title: option.title, style: .default) { _ in
+                onSelect(option)
+            }
+            if option == current {
+                action.setValue(true, forKey: "checked")
+            }
+            alert.addAction(action)
+        }
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel))
+
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = viewController.view
+            popover.sourceRect = CGRect(x: viewController.view.bounds.midX, y: viewController.view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        viewController.present(alert, animated: true)
+    }
+
+    func showLanguagePicker() {
+        // Currently only English is supported; show an informational alert.
+        showAlert(
+            with: NSLocalizedString("Language", comment: ""),
+            message: NSLocalizedString("English is currently the only supported language.", comment: "")
+        )
+    }
+
+    func showPrivacyPolicy() {
+        guard let url = URL(string: EnvironmentConfig.baseUrl())?.deletingLastPathComponent().appendingPathComponent("vi/privacy") else { return }
+        let safari = SFSafariViewController(url: url)
+        viewController.present(safari, animated: true)
+    }
+
+    func showAbout() {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        let message = String(format: NSLocalizedString("Version %@ (%@)", comment: ""), version, build)
+        showAlert(
+            with: NSLocalizedString("About Flashcard", comment: ""),
+            message: message
+        )
+    }
+
+    func navigateToWelcome() {
+        navigationController?.setRootWireframe(MailLoginWireframe())
+    }
 }

@@ -69,7 +69,6 @@ struct CardDataModel: Equatable {
         return imageRelay.value
     }
     
-    let didSelectImageRelay: PublishRelay<Void>
     
     let focusRelay = BehaviorRelay<Bool>(value: false)
     
@@ -78,7 +77,6 @@ struct CardDataModel: Equatable {
         self.backRelay = BehaviorRelay(value: back)
         self.imageUrlRelay = BehaviorRelay(value: imageUrl)
         self.imageRelay = BehaviorRelay(value: nil)
-        self.didSelectImageRelay = PublishRelay()
     }
     
     func toCardEntity() -> CardEntity? {

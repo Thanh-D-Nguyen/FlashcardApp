@@ -9,12 +9,11 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
   Realm, Swift Package Manager. This is an existing application, not a template.
 - `Modules/<Feature>`: view/controller, presenter, wireframe. `Interactors`:
   use cases. `DataManager/Local`: Realm access. `Entities`: presentation models.
-- `Networks/SwaggerClient`: legacy generated client, with existing manual edits.
-  `Networks/BJTClient`: incomplete migration to nihongo-bjt; see the audit before
-  treating these clients as integrated or production-ready.
-- Contract: `FlashcardApp/FlashcardApp/Networks/BJTClient/openapi.json`.
-  This duplicated directory is the actual checked-in path. Do not bulk-load the
-  one-line spec: parse JSON and select the relevant operations and schema refs.
+- `Networks/BJTClient`: native website session auth, public search and level content.
+  Confirm operations against the running backend and selected schemas; older
+  Keycloak/Swagger contracts do not describe the current Go login flow.
+- `Services/AuthSession.swift`: Keychain session lifecycle and stale-response protection.
+  API results keep backend UUIDs; remote deck/progress synchronization is not implemented.
 - `Services/RealmService.swift`: bundled database bootstrap and schema version.
   Preserve `Storage/Data/flash_card.realm`; it is user-facing offline content.
 - `FlashcardApp.xcodeproj/project.pbxproj` uses explicit file membership. New Swift
@@ -45,7 +44,7 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
    Realm key/schema changes require a migration and upgrade-fixture test, including
    saved decks, card references and favorites. Never invent a DTO from an endpoint
    name; confirm payloads against the contract and a redacted local response.
-8. Local, staging and production use distinct bundle IDs and app sandboxes.
+8. Local and production use distinct bundle IDs and app sandboxes.
    Remote URLs are currently unprovisioned. Never substitute localhost or a made-up
    host for missing remote configuration, and never relax ATS globally.
 9. Add a regression test before a behavior fix. Run relevant XCTest, integration
@@ -76,4 +75,5 @@ If Xcode does not expose subagents, perform the same workflow in the main agent.
 Small changes do not need an agent team. Do not force a model or install tools.
 
 Explain results in Vietnamese unless the user asks otherwise. Report what changed,
-what actually ran, and unresolved release blockers. See `docs/AUDIT-2026-09-06.md`.
+what actually ran, and unresolved release blockers. See `docs/DEVELOPMENT.md`.
+- If using XcodeBuildMCP, use the installed XcodeBuildMCP skill before calling XcodeBuildMCP tools.

@@ -1,78 +1,103 @@
-//
-//  DictionaryViewController.swift
-//  FlashcardApp
-//
-//  Created by タイン・グエン on 2023/02/19.
-//  
-//
-
 import UIKit
+import RxSwift
 
-final class DictionaryViewController: BaseViewController {
+final class DictionaryViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating, UISearchBarDelegate {
     var presenter: DictionaryPresenterInterface!
-    @IBOutlet private weak var welcomeContainerView: UIView!
-    @IBOutlet private weak var groupItemsView: UIView!
-    
-    @IBOutlet private weak var searchTextField: UITextField!
-    @IBOutlet private weak var segmentedControl: RESegmentedControl!
-    
+    private let tableView = UITableView()
+    private let search = UISearchController(searchResultsController: nil)
+    private let message = UILabel()
+    private let spinner = UIActivityIndicatorView(style: .medium)
+    private var rows: [BJTSearchResultDTO] = []
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         subscribe()
-        presenter.viewDidLoad()
     }
 
     func setupUI() {
-        let searchRightView = SearchRightView(frame: .zero)
-        self.searchTextField.rightView = searchRightView
-        self.searchTextField.rightViewMode = .always
-        let searchLeftView = UIImageView(image: UIImage(resource: ImageResource.icSearch))
-        self.searchTextField.leftView = searchLeftView
-        self.searchTextField.leftViewMode = .always
-        self.searchTextField.leftViewRect(forBounds: CGRect(origin: .zero, size: .init(width: 65, height: 44)))
-
-        let titles = DictionarySearchType.all()
-        var segmentItems: [SegmentModel] {
-            return titles.map({ SegmentModel(title: $0.uppercased()) })
-        }
-        let preset = FlashCardPreset(backgroundColor: AppColors.primary, selectedBackgroundColor: AppColors.background, textColor: AppColors.background, selectedTextColor: AppColors.primary, cornerRadius: 4.0)
-        segmentedControl.configure(segmentItems: segmentItems, preset: preset)
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.dataSource = self
+        tableView.delegate = self
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+        tableView.accessibilityIdentifier = "dictionary_results"
+        search.obscuresBackgroundDuringPresentation = false
+        search.searchResultsUpdater = self
+        search.searchBar.delegate = self
+        search.searchBar.placeholder = "Nhập tiếng Nhật hoặc tiếng Việt"
+        search.searchBar.accessibilityIdentifier = "dictionary_search"
+        search.searchBar.scopeButtonTitles = DictionarySearchType.allCases.map(\.title)
+        search.searchBar.showsScopeBar = true
+        navigationItem.searchController = search
+        navigationItem.hidesSearchBarWhenScrolling = false
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: spinner),
+            UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(performSearch))]
+        definesPresentationContext = true
+        message.numberOfLines = 0
+        message.textAlignment = .center
+        message.font = .preferredFont(forTextStyle: .body)
+        message.adjustsFontForContentSizeCategory = true
+        tableView.backgroundView = message
     }
 
     func subscribe() {
-        subscribe(presenter.createdPageControllerRelay, { [weak self] controller in
-            guard let self else { return }
-            self.updatePageController(controller)
-        })
+        presenter.state.subscribe(onNext: { [weak self] in self?.render($0) }).disposed(by: disposeBag)
     }
-    
-    private func updatePageController(_ controller: UIViewController) {
-        groupItemsView.addSubview(controller.view)
-        controller.didMove(toParent: self)
-        self.addChild(controller)
-        controller.view.translatesAutoresizingMaskIntoConstraints = false
-        groupItemsView.topAnchor.constraint(equalTo: controller.view.topAnchor).isActive = true
-        groupItemsView.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor).isActive = true
-        groupItemsView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor).isActive = true
-        groupItemsView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive = true
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    func updateSearchResults(for searchController: UISearchController) { performSearch() }
+    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) { performSearch() }
+
+    @objc private func performSearch() {
+        presenter.searchText(search.searchBar.text, withType: search.searchBar.selectedScopeButtonIndex)
+    }
+
+    private func render(_ state: DictionaryState) {
+        spinner.stopAnimating()
+        rows = []
+        switch state {
+        case .idle: message.text = "Nhập từ khóa để tra cứu."
+        case .loading:
+            message.text = "Đang tìm…"
+            spinner.startAnimating()
+        case .results(let results):
+            rows = results
+            message.text = results.isEmpty ? "Không tìm thấy kết quả." : nil
+        case .error(let reason): message.text = "\(reason)\nNhấn tải lại để thử lại."
+        }
+        tableView.reloadData()
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { rows.count }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "result") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "result")
+        let row = rows[indexPath.row]
+        var content = cell.defaultContentConfiguration()
+        content.text = row.title
+        content.secondaryText = [row.reading, row.description, row.jlptLevel].compactMap { $0 }.joined(separator: "\n")
+        content.secondaryTextProperties.numberOfLines = 0
+        cell.contentConfiguration = content
+        cell.accessoryType = .disclosureIndicator
+        cell.isAccessibilityElement = true
+        cell.accessibilityTraits = .button
+        cell.accessibilityLabel = [row.title, row.reading, row.description, row.jlptLevel]
+            .compactMap { $0 }.joined(separator: ", ")
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        presenter.select(rows[indexPath.row])
     }
 }
-
-extension DictionaryViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        true
-    }
-}
-
-/// Actions
-extension DictionaryViewController {
-    @IBAction private func segmentDictionatyValueChanged() {
-        presenter.searchText(searchTextField.text, withType: segmentedControl.selectedSegmentIndex)
-    }
-    
-    @IBAction private func textFieldValueChaged(_ textField: UITextField) {
-        presenter.searchText(textField.text, withType: segmentedControl.selectedSegmentIndex)
-    }
-}
-

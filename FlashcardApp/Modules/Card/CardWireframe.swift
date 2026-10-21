@@ -10,7 +10,6 @@ import UIKit
 
 protocol CardWireframeInterface: AnyObject {
     func showDeskList()
-    func showCreateNewCard()
     func showCreateNewDesk()
 }
 
@@ -48,7 +47,4 @@ extension CardWireframe: CardWireframeInterface {
         navigationController?.presentWireframe(deskListWireFrame)
     }
     
-    func showCreateNewCard() {
-        
-    }
 }

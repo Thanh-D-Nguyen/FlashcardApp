@@ -12,7 +12,7 @@ protocol AuthTokenManagerInterface: AnyObject {
     var accessToken: String? { get }
     var userId: String? { get }
     func save(accessToken: String, userId: String) throws
-    func clear()
+    func clear() throws
 }
 
 final class KeychainAuthTokenManager: AuthTokenManagerInterface {
@@ -33,13 +33,20 @@ final class KeychainAuthTokenManager: AuthTokenManagerInterface {
     }
 
     func save(accessToken: String, userId: String) throws {
-        try save(value: accessToken, key: tokenKey)
-        try save(value: userId, key: userIdKey)
+        do {
+            try save(value: accessToken, key: tokenKey)
+            try save(value: userId, key: userIdKey)
+        } catch {
+            try? clear()
+            throw error
+        }
     }
 
-    func clear() {
-        delete(key: tokenKey)
-        delete(key: userIdKey)
+    func clear() throws {
+        let statuses = [delete(key: tokenKey), delete(key: userIdKey)]
+        guard statuses.allSatisfy({ $0 == errSecSuccess || $0 == errSecItemNotFound }) else {
+            throw NativeAuthError.storageFailed
+        }
     }
 
     // MARK: - Private
@@ -75,11 +82,12 @@ final class KeychainAuthTokenManager: AuthTokenManagerInterface {
         }
     }
 
-    private func delete(key: String) {
+    @discardableResult
+    private func delete(key: String) -> OSStatus {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key
         ]
-        SecItemDelete(query as CFDictionary)
+        return SecItemDelete(query as CFDictionary)
     }
 }

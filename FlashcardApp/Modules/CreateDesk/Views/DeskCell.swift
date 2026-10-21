@@ -37,6 +37,8 @@ class DeskCell: UITableViewCell {
         // Initialization code
         deskButtonContainerView.isHidden = false
         deskDescContainerView.isHidden = true
+        deskNameTextField.accessibilityIdentifier = "deck_name"
+        deskNameTextField.accessibilityLabel = "Tên bộ thẻ"
         deskNameTextField.inputViewStyle = .borderWith(radius: textFieldBorderWidth)
         deskNameTextField.lineColor = AppColors.primary
         deskNameTextField.editLineColor = AppColors.secondary

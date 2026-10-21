@@ -1,34 +1,33 @@
-//
-//  HomeWireframe.swift
-//  SnackOverflowApp
-//
-//  Created by タイン・グエン on 2023/01/14.
-//  Copyright (c) 2023 ___ORGANIZATIONNAME___. All rights reserved.
-//
-//
-
 import UIKit
 
 protocol HomeWireframeInterface: AnyObject {
-    
+    func showLevel(_ level: BJTLevelDTO)
+    func showMeaning(title: String, message: String)
 }
 
-final class HomeWireframe: BaseWireframe<HomeViewController> {
-
-    private let storyboard = UIStoryboard(name: "Home", bundle: nil)
-
-    // MARK: - Module setup -
-
-    init() {
-        let moduleViewController = storyboard.instantiateViewController(ofType: HomeViewController.self)
-        super.init(viewController: moduleViewController)
-        moduleViewController.title = MainTabbarName.home.title
-        moduleViewController.tabBarItem = UITabBarItem(title: MainTabbarName.home.title, image: MainTabbarName.home.image, tag: MainTabbarName.home.rawValue)
-        let interactor = HomeInteractor()
-        let presenter = HomePresenter(interactor: interactor, wireframe: self)
-        moduleViewController.presenter = presenter
+final class HomeWireframe: BaseWireframe<HomeViewController>, HomeWireframeInterface {
+    init(level: BJTLevelDTO? = nil) {
+        let controller = HomeViewController()
+        super.init(viewController: controller)
+        controller.title = level?.nameVi ?? "Cấp độ"
+        controller.tabBarItem = UITabBarItem(title: MainTabbarName.home.title,
+                                           image: MainTabbarName.home.image, tag: MainTabbarName.home.rawValue)
+        controller.presenter = HomePresenter(interactor: HomeInteractor(), wireframe: self, level: level)
     }
 
-}
-extension HomeWireframe: HomeWireframeInterface {
+    func showLevel(_ level: BJTLevelDTO) {
+        let controller = HomeWireframe(level: level).viewController
+        if let navigationController {
+            navigationController.pushViewController(controller, animated: true)
+        } else {
+            let navigation = UINavigationController(rootViewController: controller)
+            controller.navigationItem.leftBarButtonItem = UIBarButtonItem(systemItem: .close,
+                primaryAction: UIAction { [weak navigation] _ in navigation?.dismiss(animated: true) })
+            viewController.present(navigation, animated: true)
+        }
+    }
+
+    func showMeaning(title: String, message: String) {
+        showAlert(with: title, message: message)
+    }
 }

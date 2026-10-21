@@ -6,18 +6,19 @@
 //
 
 import Foundation
-import FirebaseAuth
 
 struct SocialUserEntity: Codable {
+    var id: String? = nil
     var displayName: String?
     var email: String?
     var phoneNumber: String?
     var photoUrl: URL?
-    
-    init(_ user: User?) {
-        displayName = user?.displayName
-        email = user?.email
-        phoneNumber = user?.phoneNumber
-        photoUrl = user?.photoURL
+
+    init(id: String? = nil, displayName: String? = nil, email: String? = nil, phoneNumber: String? = nil, photoUrl: URL? = nil) {
+        self.id = id
+        self.displayName = displayName
+        self.email = email
+        self.phoneNumber = phoneNumber
+        self.photoUrl = photoUrl
     }
 }

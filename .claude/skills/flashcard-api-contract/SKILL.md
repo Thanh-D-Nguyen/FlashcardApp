@@ -3,14 +3,16 @@ name: flashcard-api-contract
 description: Implement or audit FlashcardApp BJT/Keycloak API integration and DTO-to-Realm mapping against the checked-in OpenAPI contract.
 ---
 
-Read `AGENTS.md` and `docs/AUDIT-2026-09-06.md`. The contract is at
-`FlashcardApp/FlashcardApp/Networks/BJTClient/openapi.json`. Parse JSON and select
-the operation plus referenced schemas; do not print the entire one-line file.
+Read `AGENTS.md` and `docs/DEVELOPMENT.md`. Current API clients live in
+`FlashcardApp/Networks/BJTClient`. The former local OpenAPI path and Keycloak
+login assumptions are obsolete. Confirm each operation using the running backend
+source and redacted local responses; if an OpenAPI file is available, parse JSON
+and select only the operations and referenced schemas you need.
 
-Trace the actual interactor caller. The legacy Swagger client and the new BJT
-client coexist: changing a base URL does not migrate route names, authentication,
-pagination or response envelopes. Do not regenerate over manually edited legacy
-files without a reviewed diff and reproducible generation command.
+The website currently uses POST `/api/auth/login` with email/password and an
+opaque session token, GET `/api/auth/me` and POST `/api/auth/logout`. Authentication
+is owned by `AuthSession` and `NativeAuthAPI`; do not restore social SDKs or a
+parallel bearer-header store. Public search and level APIs need no login.
 
 For each operation check method/path, security, path/query parameters, request
 required fields, nullability, response envelope and error status. Some checked-in
@@ -24,8 +26,7 @@ Resolve session headers at subscription time and reject stale auth completions.
 Do not automatically retry a submitted review without an idempotency contract.
 
 Preserve backend UUID identity. Never use `hashValue`, truncated UUIDs or a constant
-fallback key in persisted models. Existing Realm models use integer IDs; an actual
-sync integration needs a tested identity mapping/migration and preserved favorites.
+fallback key in persisted models. An actual sync integration needs tested identity mapping/migration and preserved favorites.
 Do not discard unknown backend fields by guessing their legacy equivalent.
 
 Add fixture decoding and URLProtocol/request-capture tests for the affected

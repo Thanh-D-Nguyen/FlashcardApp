@@ -1,68 +1,37 @@
-//
-//  BJTSearchAPI.swift
-//  FlashcardApp
-//
-//  Created by Claude on 2026/09/06.
-//
-
 import Alamofire
 import Foundation
 import RxSwift
 
-/// API client for nihongo-bjt Meilisearch-backed search endpoints.
+enum DictionarySearchType: Int, CaseIterable {
+    case vocabulary, kanji, grammar, sentence
+    var title: String { ["Từ vựng", "Hán tự", "Ngữ pháp", "Câu"][rawValue] }
+    var scope: String { ["lexeme", "kanji", "grammar", "example"][rawValue] }
+}
+
 final class BJTSearchAPI {
-
     static let shared = BJTSearchAPI()
+    private let session: Session
+    private let baseURL: String
 
-    private var baseURL: String {
-        let base = ClientAPI.basePath
-        return base.isEmpty ? EnvironmentConfig.baseUrl() : base
+    init(session: Session = .default, baseURL: String = EnvironmentConfig.baseUrl()) {
+        self.session = session
+        self.baseURL = baseURL
     }
 
-    // MARK: - Search
-
-    /// GET /api/search — Meilisearch projection (read-only copy of indexed content).
-    func search(token: String, q: String, limit: Int = 10, scope: String? = nil, level: String? = nil) -> Single<[BJTSearchResultDTO]> {
-        let url = "\(baseURL)/search"
-        var params: [String: Any] = ["q": q, "limit": limit]
-        if let scope { params["scope"] = scope }
-        if let level { params["level"] = level }
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
-        return Single.create { observer in
-            let request = AF.request(url, parameters: params, headers: headers)
-                .validate()
-                .responseDecodable(of: [BJTSearchResultDTO].self) { response in
-                    switch response.result {
-                    case .success(let items):
-                        observer(.success(items))
-                    case .failure(let error):
-                        observer(.failure(error))
-                    }
-                }
-            return Disposables.create { request.cancel() }
+    func search(q: String, scope: DictionarySearchType) -> Single<[BJTSearchResultDTO]> {
+        let query = q.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Go validates bytes: one Japanese character already meets the minimum.
+        guard (2...200).contains(query.utf8.count) else {
+            return .error(AppError.invalidInput("Nhập từ khóa dài từ 2 đến 200 byte."))
         }
-    }
-
-    // MARK: - Suggest
-
-    /// GET /api/search/suggest — lightweight prefix-search suggestions for autocomplete.
-    func suggest(token: String, q: String, limit: Int = 6) -> Single<[BJTSearchSuggestDTO]> {
-        let url = "\(baseURL)/search/suggest"
-        let params: [String: Any] = ["q": q, "limit": limit]
-        let headers: HTTPHeaders = ["Authorization": "Bearer \(token)"]
-
         return Single.create { observer in
-            let request = AF.request(url, parameters: params, headers: headers)
-                .validate()
-                .responseDecodable(of: [BJTSearchSuggestDTO].self) { response in
-                    switch response.result {
-                    case .success(let items):
-                        observer(.success(items))
-                    case .failure(let error):
-                        observer(.failure(error))
-                    }
-                }
+            let request = self.session.request("\(self.baseURL)/search", parameters: [
+                "q": query, "scope": scope.scope, "limit": "30"
+            ])
+            .validate(statusCode: 200..<300)
+            .responseDecodable(of: [BJTSearchResultDTO].self) { response in
+                observer(response.result.mapError { $0 as Error })
+            }
             return Disposables.create { request.cancel() }
         }
     }

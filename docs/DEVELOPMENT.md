@@ -1,107 +1,115 @@
 # Phát triển FlashcardApp
 
-## Claude Agent trong Xcode
+## Phạm vi hiện tại
 
-Mở repo này bằng Xcode và bắt đầu phiên Claude Agent mới để nhận thư mục hướng dẫn
-vừa thêm. `CLAUDE.md` nhập `AGENTS.md`; quy tắc chung chỉ có một nguồn để bảo trì.
-Không cần thay cấu hình Claude toàn máy hay cài thêm plugin.
+App dùng UIKit/storyboard, Swift 5 và iOS 17+. Giữ View → Presenter → Interactor →
+API/local manager; điều hướng trong wireframe. Các màn danh sách mới dùng UIKit
+trực tiếp, các màn thẻ/cài đặt vẫn dùng XIB/storyboard hiện có.
 
-| Thành phần | Dùng khi |
+Bốn tab hoạt động:
+
+- Cấp độ: GET `/api/levels`; chọn J5–J1+ để đọc từ vựng, kanji, ngữ pháp,
+  phân trang 30 mục và xem nghĩa.
+- Từ điển: GET `/api/search`, scope `lexeme`, `kanji`, `grammar`, `example`.
+  Đổi từ khóa hủy request cũ; có trạng thái tải, trống, lỗi và tải lại.
+- Thẻ: bộ thẻ Realm offline, chọn bộ và tạo bộ mới; giữ URL ảnh đã lưu.
+- Cài đặt: giao diện, âm thanh, thông báo và tài khoản của website.
+
+App mở thẳng vào nội dung, không yêu cầu đăng nhập để học offline hoặc đọc API
+công khai. Đăng nhập từ mục tài khoản trong Cài đặt bằng tài khoản website đã có.
+
+## API và tài khoản
+
+Scheme `FlashcardApp-Local` (hoặc `FlashcardApp`) dùng
+`http://localhost:18081/api`. `/vi` là trang web, không phải API base path.
+Backend đang chạy đã chuyển sang phiên đăng nhập Go, nên tài liệu Keycloak cũ
+không còn mô tả đúng luồng đăng nhập này:
+
+1. POST `/api/auth/login` với JSON `email`, `password`, nhận `ok`, `token`.
+2. GET `/api/auth/me` với Bearer để lấy hồ sơ trực tiếp với `id`, `displayName`, `email`.
+3. Lưu token và UUID người dùng vào Keychain sau khi cả hai bước thành công.
+4. POST `/api/auth/logout` thu hồi phiên; xóa phiên local kể cả khi mạng lỗi.
+
+Login/logout gửi `Origin` (scheme/host/port của API) theo CSRF allowlist của server.
+Không lưu cookie website/token vào UserDefaults hoặc log. Hủy request khi màn
+đăng nhập đóng; kết quả đến muộn không được khôi phục phiên đã đăng xuất. Lỗi 401
+khi tải hồ sơ xóa phiên local; lỗi mạng không xóa token đang có. Server quyết định
+hạn phiên; người dùng đăng nhập lại khi phiên hết hạn.
+
+DTO đọc đúng trường backend thực tế: search dùng `id/kind/title/description`, từ
+vựng cấp độ dùng `headword/shortMeaningVi`, cấp độ dùng `nameVi/descriptionVi/vocabCount`.
+Không chuyển UUID server thành `hashValue` hoặc ghi dữ liệu API vào Realm bằng
+mapping suy đoán. Bộ thẻ hiện vẫn local; chưa có đồng bộ tiến độ/bộ thẻ lên server.
+
+Các endpoint tìm kiếm và nội dung được đối chiếu với response local và source của
+backend đang chạy. OpenAPI cũ chưa đủ để khẳng định mọi endpoint đã tích hợp.
+
+## Dependency còn giữ
+
+| Package trực tiếp | Lý do |
 | --- | --- |
-| `flashcard-architect` | Thiết kế thay đổi qua nhiều lớp, migration Realm, auth |
-| `flashcard-reviewer` | Review lỗi chức năng, bảo mật, API và nguy cơ mất dữ liệu |
-| `flashcard-verifier` | Kiểm chứng build/test, phân biệt lỗi app với lỗi công cụ |
-| `/flashcard-feature` | Phát triển/sửa một tính năng UIKit theo cấu trúc hiện có |
-| `/flashcard-api-contract` | Kiểm tra endpoint, payload và mapping BJT |
-| `/flashcard-release` | Kiểm tra môi trường và điều kiện phát hành |
+| RxSwift, bao gồm RxCocoa/RxRelay | Binding và vòng đời request hiện dùng xuyên app |
+| Alamofire | Request API, validation và cancellation |
+| realm-swift | Dữ liệu offline, bộ thẻ và schema đang dùng |
+| Kingfisher | Tải/cache ảnh của thẻ đã lưu và avatar |
+| CollectionViewPagingLayout | Hiệu ứng chuyển thẻ hiện có |
+| SwipeCellKit | Thao tác sửa/xóa/sắp xếp thẻ trong màn tạo bộ |
 
-Ví dụ prompt: “Dùng flashcard-reviewer review diff hiện tại, ưu tiên auth và Realm;
-trả về lỗi có thể tái hiện.” Hoặc “/flashcard-feature sửa lỗi lưu deck; viết regression
-test rồi build/test bằng công cụ Xcode.” Nếu phiên Xcode không hỗ trợ gọi subagent,
-yêu cầu Claude đọc file agent tương ứng và thực hiện trong phiên chính.
+`Package.resolved` gồm các package trên và `realm-core` là dependency bắc cầu.
+Đã bỏ Firebase, Facebook SDK, GoogleSignIn, swift-log, Typist và các product test
+RxBlocking/RxTest không dùng. OSLog, UIRefreshControl, UIKeyboardLayoutGuide thay
+cho các wrapper tương ứng. MMTextView còn được XIB của màn tạo thẻ sử dụng.
 
-Claude Agent dùng môi trường cấu hình riêng trong Xcode; không suy ra việc CLI
-nhận được một skill đồng nghĩa phiên IDE cũng nhận được nó. Kiểm tra menu `/` và
-yêu cầu agent nêu những file hướng dẫn đã đọc trong phiên mới. Bộ file đã được
-kiểm tra cấu trúc; khả năng nạp trong phiên Claude hiện tại cần xác nhận ở IDE.
-Tham khảo [Apple về tùy chỉnh agent](https://developer.apple.com/documentation/Xcode/extending-and-customizing-agents),
-[Claude project agents](https://code.claude.com/docs/en/sub-agents) và
-[Claude project skills](https://code.claude.com/docs/en/skills).
+Đã bỏ các thư viện vendored Disk, VImage, PullToRefresh, RESegmentedControl;
+giao diện snack/carousel mẫu, Quiz rỗng, Vocabulary/DictionaryWelcome mẫu; client
+Swagger phục vụ tìm ảnh và các BJT client/DTO không có caller hoặc sai contract.
+Tìm ảnh Flickr/Pixabay và khóa nhúng trong source đã được gỡ. URL ảnh đã lưu và
+`Storage/Data/flash_card.realm` được giữ. Xóa khóa khỏi source không thu hồi khóa
+ở nhà cung cấp hoặc trong lịch sử Git; chủ tài khoản cần thu hồi khóa cũ.
 
-## Kiến trúc và ranh giới
+## Môi trường
 
-Giữ cấu trúc hiện tại: ViewController render/gửi sự kiện → Presenter điều phối state
-→ Interactor thực hiện use case → API hoặc local manager. Wireframe lắp module và
-điều hướng. Entities/DTO là dữ liệu trao đổi; Realm Object chỉ dùng đúng thread và
-transaction. Không cần thêm framework kiến trúc để đạt chất lượng production.
+| Scheme | Configuration | Bundle ID |
+| --- | --- | --- |
+| FlashcardApp-Local / FlashcardApp | Debug | com.ds.FlashcardApp.dev |
+| FlashcardApp-Production | Release | com.ds.FlashcardApp |
 
-UIKit/storyboard và iOS 17 là nền hiện tại. Dependencies dùng SPM với
-`FlashcardApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
-Giữ lockfile trong Git; nâng phiên bản từng nhóm với build và regression test.
-Không regenerate Swagger đè thay đổi thủ công, không đổi Realm key mà bỏ migration.
+Hai bundle ID tạo sandbox riêng. Không xóa database để sửa lỗi build/migration.
+Bootstrap chép bundle sang file tạm rồi đổi tên khi hoàn tất. Nếu lần chạy trước bị
+dừng, chỉ file ngắn hơn và khớp từng byte với phần đầu bundle mới được chép lại;
+store có bất kỳ thay đổi nào được giữ nguyên. Điều hướng chờ Realm mở thành công.
+Production không có URL mặc định; phase `Validate Environment` chặn build nếu
+chưa cấp API HTTPS hợp lệ. Test action của scheme Production dùng Debug để chạy
+suite local, không xác nhận binary Release đã sẵn sàng phát hành.
 
-Client BJT mới là phần đang chuyển đổi. Luồng chạy vẫn còn sử dụng client legacy.
-Tích hợp từng use case: xác minh contract → fixture test → adapter/persistence →
-interactor → kiểm tra UI. Rollback client/schema phải bảo toàn dữ liệu đã ghi;
-không dùng xóa database như một cách xử lý migration lỗi.
+Đổi URL local bằng `FlashcardApp/Environments/local.local.xcconfig` (đã ignore):
 
-## Local / staging / production
-
-| Scheme | Configuration | Bundle ID | API |
-| --- | --- | --- | --- |
-| FlashcardApp-Local | Debug | com.ds.FlashcardApp.dev | localhost:4000/api |
-| FlashcardApp-Staging | Staging | com.ds.FlashcardApp.staging | Chưa cấu hình |
-| FlashcardApp-Production | Release | com.ds.FlashcardApp | Chưa cấu hình |
-
-Scheme `FlashcardApp` cũ vẫn tương thích: Run Debug, Archive Release.
-Staging có tối ưu tương tự Release và bật testability. Test action của scheme
-Production dùng Staging; đó không phải là phép kiểm thử một binary Release.
-Ba bundle ID tạo sandbox riêng cho database/cache/preferences. Đây là cấu hình
-app; chưa tạo backend, database server, OAuth client hay hạ tầng triển khai.
-
-Để đổi URL, copy file `<environment>.local.xcconfig.example` trong
-`FlashcardApp/Environments` sang `<environment>.local.xcconfig`, rồi điền URL thật.
-File override được ignore. Trong xcconfig, viết `http:/$()/localhost:4000/api`
-để `//` không bị hiểu là comment. Không ghi token hay server secret vào app config.
-CI có thể cấp `PRODUCT_BASE_URL` như một Xcode build setting.
-
-Build phase `Validate Environment` chạy trước Sources, kiểm tra cặp configuration /
-environment / bundle ID và URL. Local chỉ chấp nhận localhost/127.0.0.1; hai môi
-trường còn lại yêu cầu HTTPS, từ chối URL trống, credential/query và host ví dụ.
-ATS chỉ giữ ngoại lệ loopback, không mở HTTP toàn cục. Ngoại lệ không cấp quyền
-truy cập backend từ xa. URL local này dành cho Simulator; localhost trên iPhone
-thật là chính iPhone, cần thiết kế đường kết nối phát triển riêng nếu dùng máy thật.
-
-**Chưa đủ để phát hành:** Firebase hiện có một plist cho bundle production và
-Google/Facebook redirect scheme dùng chung. Phải tạo app/client tương ứng từng môi
-trường, cấp plist/redirect đúng và kiểm tra đăng nhập trước khi phân phối. Không dùng
-Firebase production làm môi trường thử nghiệm. Xem các blocker trong audit.
-
-## Lệnh kiểm chứng
-
-Trong Xcode ưu tiên công cụ build/test/diagnostics có sẵn. Với terminal từ repo root:
-
-```sh
-sh scripts/tests/environment-validation.sh
-xcrun simctl list devices available
-xcodebuild -project FlashcardApp.xcodeproj -scheme FlashcardApp-Local \
-  -configuration Debug -destination 'generic/platform=iOS Simulator' \
-  -disableAutomaticPackageResolution CODE_SIGNING_ALLOWED=NO build
-xcodebuild -project FlashcardApp.xcodeproj -scheme FlashcardApp-Local \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
-  -disableAutomaticPackageResolution -enableCodeCoverage YES \
-  -only-testing:FlashcardAppTests test
+```xcconfig
+PRODUCT_BASE_URL = http:/$()/localhost:18081/api
 ```
 
-Thay destination bằng simulator thực tế nếu tên/runtime khác. Có thể dùng
-`-resultBundlePath /tmp/FlashcardApp-tests.xcresult` với đường dẫn chưa tồn tại để
-giữ evidence và đọc coverage bằng `xcrun xccov view --report <bundle>`.
-Nếu môi trường máy yêu cầu RTK, thêm `rtk proxy` trước lệnh; RTK không phải dependency
-của app hay CI. Lần checkout mới phải resolve đúng lockfile khi có mạng; lệnh
-`-disableAutomaticPackageResolution` sẽ báo lỗi nếu cache/pin chưa sẵn sàng.
+Production dùng file `production.local.xcconfig` với URL HTTPS được cấp thực tế.
+Cú pháp `$()` tránh để `//` bị xcconfig hiểu là comment. ATS chỉ cho HTTP loopback;
+không bật `NSAllowsArbitraryLoads`. `localhost` chỉ dùng với Simulator trên máy
+chạy backend; trên iPhone thật, nó trỏ về chính điện thoại.
 
-Trước phát hành: build Release có signing phù hợp; chạy unit/integration và UI
-journey đăng nhập/logout, offline/error/retry, tạo/sửa/xóa deck/card, relaunch và
-migration dữ liệu cũ. Ghi coverage thực đo (mục tiêu ≥80% logic mới), không suy rộng
-từ test mẫu. Kiểm tra privacy manifests, dependency/security, quyền và accessibility.
-Không upload TestFlight/App Store hoặc sửa backend chỉ vì bước kiểm tra đã đạt.
+## Kiểm chứng
+
+Dùng Xcode hoặc XcodeBuildMCP đã cài. Thay simulator ID bằng thiết bị có sẵn:
+
+```sh
+rtk proxy sh scripts/tests/environment-validation.sh
+rtk proxy xcodebuildmcp simulator test --project-path "$PWD/FlashcardApp.xcodeproj" \
+  --scheme FlashcardApp-Local --simulator-id <SIMULATOR_ID> \
+  --extra-args CODE_SIGNING_ALLOWED=NO -enableCodeCoverage YES \
+  -only-testing:FlashcardAppTests -parallel-testing-enabled NO
+```
+
+`FlashcardAppTests` kiểm tra auth bằng URLProtocol/mocks, contract DTO, input,
+HTTP failure, cancellation, đăng xuất khi request đang chạy, tìm kiếm và phân trang.
+`FlashcardAppUITests` kiểm tra cấp độ/nội dung và tra cứu với backend local đang bật,
+cùng đường vào thẻ offline/cài đặt. Không chạy suite UI khi server local tắt.
+
+Đăng nhập thành công với tài khoản thật, iPhone/iPad thật, migration store cũ và
+phát hành Release cần kiểm tra riêng. Không upload build/push/đổi credential nếu
+chưa được yêu cầu.

@@ -54,10 +54,8 @@ class CreateDeskPresenter {
     private let interactor: CreateDeskInteractorInterface
     private let searchWordInteractor: SearchWordsInteractorInterface
     private let wireframe: CreateDeskWireframeInterface
-    private let imageSearchInteractor: ImageSearchInteractorInterface
     private let deskRepository: DeskRepositoryInterface
 
-    private let dictionaryInteractor: DictionaryInteractorInterface
 
     private let disposeBag = DisposeBag()
 
@@ -72,15 +70,11 @@ class CreateDeskPresenter {
     init(interactor: CreateDeskInteractorInterface,
          wireframe: CreateDeskWireframeInterface,
          deskRepository: DeskRepositoryInterface = DeskManagement.shared,
-         searchWordInteractor: SearchWordsInteractorInterface = SearchWordsInteractor(),
-         imageSearchInteractor: ImageSearchInteractorInterface = ImageSearchInteractor.create(type: .pixabay),
-         dictionaryInteractor: DictionaryInteractorInterface = DictionaryInteractor()) {
+         searchWordInteractor: SearchWordsInteractorInterface = SearchWordsInteractor()) {
         self.interactor = interactor
         self.wireframe = wireframe
         self.deskRepository = deskRepository
         self.searchWordInteractor = searchWordInteractor
-        self.imageSearchInteractor = imageSearchInteractor
-        self.dictionaryInteractor = dictionaryInteractor
         
         desk.cards = [CardDataModel(), CardDataModel()]
         
@@ -125,9 +119,6 @@ class CreateDeskPresenter {
             self.focusIndexRelay.accept(resultString)
         }).disposed(by: disposeBag)
         
-        card.didSelectImageRelay.bind { [unowned self] in
-            self.wireframe.showImageSearch()
-        }.disposed(by: disposeBag)
     }
     
     private func searchText(_ text: String, cardFace: CardFace) {
@@ -189,14 +180,6 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         guard let index = desk.cards.firstIndex(where: { $0 == self.editingCard }) else { return }
         
         desk.cards[index] = self.editingCard
-        imageSearchInteractor.search(query: card.frontText, page: 1, perpage: 10)
-            .subscribe(onSuccess: { [weak self] photos in
-                guard let self else { return }
-                if let imageUrl = photos.compactMap({ $0.url }).first {
-                    self.desk.cards[index].imageUrlRelay.accept(imageUrl)
-                }
-            }).disposed(by: disposeBag)
-            
         deskChangedRelay.accept(.reloadCard(index))
     }
     

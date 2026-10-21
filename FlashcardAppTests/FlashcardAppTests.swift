@@ -1,36 +1,17 @@
-//
-//  FlashcardAppTests.swift
-//  FlashcardAppTests
-//
-//  Created by タイン・グエン on 2023/02/19.
-//
-
 import XCTest
 @testable import FlashcardApp
 
 final class FlashcardAppTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    func testSavedCardKeepsImageAndUUIDAfterRealmRoundTrip() {
+        let card = CardEntity()
+        card.id = "34794e77-e71b-4c29-afdf-996041567096"
+        card.frontText = "日本"
+        card.backText = "Nhật Bản"
+        card.imageUrl = "https://images.test/saved.jpg"
+        let restored = card.toRealm().toEntity()
+        XCTAssertEqual(restored.id, card.id)
+        XCTAssertEqual(restored.imageUrl, card.imageUrl)
+        XCTAssertEqual(restored.frontText, card.frontText)
+        XCTAssertEqual(restored.backText, card.backText)
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
 }

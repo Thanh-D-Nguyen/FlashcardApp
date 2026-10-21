@@ -75,6 +75,7 @@
                                         <color key="tintColor" name="royalBlueColor"/>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vSx-MY-MSi" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
+                                        <accessibility key="accessibilityConfiguration" identifier="create_deck_button" label="Tạo bộ thẻ"/>
                                         <rect key="frame" x="332" y="8" width="50" height="50"/>
                                         <color key="tintColor" name="royalBlueColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>

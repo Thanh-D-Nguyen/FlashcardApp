@@ -1,22 +1,49 @@
-//
-//  HomeInteractor.swift
-//  SnackOverflowApp
-//
-//  Created by タイン・グエン on 2023/01/14.
-//
-
 import Foundation
+import RxSwift
 
-// TODO: [Layer 3 Audit] HomeInteractor is currently empty.
-// HomePresenter.sectionData() is also a no-op.
-// Determine if Home tab is placeholder/dead code or needs implementation.
-// If unused, remove Home module entirely in a future cleanup commit.
 protocol HomeInteractorInterface: AnyObject {
-
+    func listLevels() -> Single<[BJTLevelDTO]>
+    func content(code: String, kind: HomeContentKind, offset: Int) -> Single<[HomeRow]>
 }
-class HomeInteractor {
 
-}
-extension HomeInteractor: HomeInteractorInterface {
+final class HomeInteractor: HomeInteractorInterface {
+    private let api: BJTLevelAPI
 
+    init(api: BJTLevelAPI = .shared) { self.api = api }
+
+    func listLevels() -> Single<[BJTLevelDTO]> { api.list() }
+
+    func content(code: String, kind: HomeContentKind, offset: Int) -> Single<[HomeRow]> {
+        switch kind {
+        case .vocabulary:
+            return api.vocabulary(code: code, offset: offset).map { items in
+                items.map { item in
+                    let meanings = item.senses.compactMap(\.meaningVi)
+                    let summary = item.shortMeaningVi.flatMap { $0.isEmpty ? nil : $0 } ?? meanings.first
+                    let detail = ([item.reading, item.shortMeaningVi].compactMap { $0 } + meanings)
+                        .filter { !$0.isEmpty }.joined(separator: "\n")
+                    return HomeRow(id: item.id, title: item.headword,
+                                   subtitle: [item.reading, summary].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "),
+                                   detail: detail)
+                }
+            }
+        case .kanji:
+            return api.kanji(code: code, offset: offset).map { items in
+                items.map { item in
+                    let readings = [item.onyomi, item.kunyomi].compactMap { $0 }.filter { !$0.isEmpty }
+                    return HomeRow(id: item.id, title: item.character,
+                                   subtitle: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: " · "),
+                                   detail: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: "\n"))
+                }
+            }
+        case .grammar:
+            return api.grammar(code: code, offset: offset).map { items in
+                items.map { item in
+                    HomeRow(id: item.id, title: item.pattern, subtitle: item.meaningVi ?? "",
+                            detail: ([item.meaningVi].compactMap { $0 } + item.details.compactMap(\.explanationVi))
+                                .filter { !$0.isEmpty }.joined(separator: "\n"))
+                }
+            }
+        }
+    }
 }

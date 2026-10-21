@@ -9,7 +9,6 @@
 import UIKit
 
 protocol CreateDeskWireframeInterface: BaseWireframe<CreateDeskViewController> {
-    func showImageSearch()
 }
 
 final class CreateDeskWireframe: BaseWireframe<CreateDeskViewController> {
@@ -27,8 +26,4 @@ final class CreateDeskWireframe: BaseWireframe<CreateDeskViewController> {
 
 extension CreateDeskWireframe: CreateDeskWireframeInterface {
 
-    func showImageSearch() {
-        let imageSearchView = ImageSearchWireframe()
-        self.viewController.show(imageSearchView.viewController, sender: nil)
-    }
 }

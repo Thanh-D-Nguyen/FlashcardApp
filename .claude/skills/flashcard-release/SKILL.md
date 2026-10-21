@@ -3,14 +3,14 @@ name: flashcard-release
 description: Configure or verify FlashcardApp local, staging and production builds, signing prerequisites and release blockers.
 ---
 
-Read `AGENTS.md`, `docs/DEVELOPMENT.md` and the current audit. Inspect actual
+Read `AGENTS.md`, `docs/DEVELOPMENT.md` . Inspect actual
 resolved Xcode settings, not just xcconfig text: target settings override project
-settings. Use the local scheme for routine development, staging for release-like
-QA and production only for release verification.
+settings. Use FlashcardApp-Local for routine development and
+FlashcardApp-Production only for release verification.
 
 Remote endpoints are not provisioned yet. Keep missing remote URL builds blocked.
 Check distinct bundle IDs, app names, ATS policy, configuration inheritance,
-matching Firebase/social-login client registration and redirect schemes. Runtime
+native website authentication and Keychain session behavior. Runtime
 secrets cannot be protected by embedding them in an xcconfig or application bundle.
 Never upload an archive or alter remote credentials without authorization.
 

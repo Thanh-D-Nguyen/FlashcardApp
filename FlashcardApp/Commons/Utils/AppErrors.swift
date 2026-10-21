@@ -8,6 +8,7 @@
 import Foundation
 
 enum AppError: Error {
+    case invalidInput(String)
     case deskNameEmpty
     case flashCardMinimum
     case databaseInitializationFailed(String)
@@ -20,6 +21,7 @@ enum AppError: Error {
 extension AppError: LocalizedError {
     var errorDescription: String? {
         switch self {
+            case .invalidInput(let message): return message
             case .deskNameEmpty:
                 return "Vui lòng nhập tên desk"
             case .flashCardMinimum:
