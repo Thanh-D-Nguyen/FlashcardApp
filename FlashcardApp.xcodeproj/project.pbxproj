@@ -83,7 +83,6 @@
 		9251ECB129A1EAA5006C1D1C /* HomeWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC3929A1EAA5006C1D1C /* HomeWireframe.swift */; };
 		9251ECB229A1EAA5006C1D1C /* HomePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC3A29A1EAA5006C1D1C /* HomePresenter.swift */; };
 		9251ECBC29A1EAA5006C1D1C /* MailLoginWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC4729A1EAA5006C1D1C /* MailLoginWireframe.swift */; };
-		9251ECBD29A1EAA5006C1D1C /* MailLogin.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9251EC4829A1EAA5006C1D1C /* MailLogin.storyboard */; };
 		9251ECBE29A1EAA5006C1D1C /* MailLoginPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC4929A1EAA5006C1D1C /* MailLoginPresenter.swift */; };
 		9251ECBF29A1EAA5006C1D1C /* MailLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC4A29A1EAA5006C1D1C /* MailLoginViewController.swift */; };
 		9251ECC829A1EAA5006C1D1C /* StartUpInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC5629A1EAA5006C1D1C /* StartUpInteractor.swift */; };
@@ -268,7 +267,6 @@
 		9251EC3929A1EAA5006C1D1C /* HomeWireframe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeWireframe.swift; sourceTree = "<group>"; };
 		9251EC3A29A1EAA5006C1D1C /* HomePresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomePresenter.swift; sourceTree = "<group>"; };
 		9251EC4729A1EAA5006C1D1C /* MailLoginWireframe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailLoginWireframe.swift; sourceTree = "<group>"; };
-		9251EC4829A1EAA5006C1D1C /* MailLogin.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MailLogin.storyboard; sourceTree = "<group>"; };
 		9251EC4929A1EAA5006C1D1C /* MailLoginPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailLoginPresenter.swift; sourceTree = "<group>"; };
 		9251EC4A29A1EAA5006C1D1C /* MailLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailLoginViewController.swift; sourceTree = "<group>"; };
 		9251EC5629A1EAA5006C1D1C /* StartUpInteractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartUpInteractor.swift; sourceTree = "<group>"; };
@@ -663,7 +661,6 @@
 			isa = PBXGroup;
 			children = (
 				9251EC4729A1EAA5006C1D1C /* MailLoginWireframe.swift */,
-				9251EC4829A1EAA5006C1D1C /* MailLogin.storyboard */,
 				9251EC4929A1EAA5006C1D1C /* MailLoginPresenter.swift */,
 				9251EC4A29A1EAA5006C1D1C /* MailLoginViewController.swift */,
 			);
@@ -1033,7 +1030,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9251EBD929A1E9A7006C1D1C /* LaunchScreen.storyboard in Resources */,
-				9251ECBD29A1EAA5006C1D1C /* MailLogin.storyboard in Resources */,
 				92D411942AD3D673005A15DC /* VersionFooterView.xib in Resources */,
 				9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */,
 				9251ECE029A1EAA5006C1D1C /* Localizable.xcstrings in Resources */,

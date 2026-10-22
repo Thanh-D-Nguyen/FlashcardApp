@@ -15,12 +15,9 @@ protocol MailLoginWireframeInterface: AnyObject {
 
 final class MailLoginWireframe: BaseWireframe<MailLoginViewController> {
 
-    // MARK: - Private properties -
-    private let storyboard = UIStoryboard(name: "MailLogin", bundle: nil)
-
     // MARK: - Module setup -
     init() {
-        let moduleViewController = storyboard.instantiateViewController(ofType: MailLoginViewController.self)
+        let moduleViewController = MailLoginViewController()
         super.init(viewController: moduleViewController)
         let interactor = MailLoginInteractor()
         let presenter = MailLoginPresenter(interactor: interactor, wireframe: self)

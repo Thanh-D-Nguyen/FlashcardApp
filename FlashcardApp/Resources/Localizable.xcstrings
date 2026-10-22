@@ -2761,30 +2761,6 @@
         }
       }
     },
-    "Login": {
-      "extractionState": "manual",
-      "comment": "Login button",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Login"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Đăng nhập"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ログイン"
-          }
-        }
-      }
-    },
     "Make a deck of your own words and study it offline, anywhere.": {
       "extractionState": "manual",
       "comment": "Empty library message",
@@ -4537,30 +4513,6 @@
         }
       }
     },
-    "Signing in to your website account…": {
-      "extractionState": "manual",
-      "comment": "Login screen message while loading",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Signing in to your website account…"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Đang đăng nhập vào tài khoản website…"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ウェブサイトのアカウントにログイン中…"
-          }
-        }
-      }
-    },
     "Signing in…": {
       "extractionState": "manual",
       "comment": "Login button while loading",
@@ -5569,26 +5521,74 @@
         }
       }
     },
-    "Welcome to Flashcard!": {
+    "Welcome back": {
       "extractionState": "manual",
-      "comment": "Login screen title",
+      "comment": "Login screen headline",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Welcome to Flashcard!"
+            "value": "Welcome back"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chào mừng đến với Flashcard!"
+            "value": "Chào mừng trở lại"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Flashcardへようこそ！"
+            "value": "おかえりなさい"
+          }
+        }
+      }
+    },
+    "Show password": {
+      "extractionState": "manual",
+      "comment": "Login password field: reveals the typed password",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show password"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện mật khẩu"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスワードを表示"
+          }
+        }
+      }
+    },
+    "Hide password": {
+      "extractionState": "manual",
+      "comment": "Login password field: hides the typed password",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide password"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ẩn mật khẩu"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスワードを非表示"
           }
         }
       }
@@ -5829,30 +5829,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "漢字"
-          }
-        }
-      }
-    },
-    "password": {
-      "extractionState": "manual",
-      "comment": "Password placeholder",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "password"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "mật khẩu"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "パスワード"
           }
         }
       }

@@ -113,6 +113,8 @@ enum Design {
         case term
         /// The meaning on the back of a study card.
         case answer
+        /// Screen headline in an editorial serif (New York for Latin and Vietnamese, Hiragino Mincho for kana and kanji).
+        case display
 
         var font: UIFont {
             switch self {
@@ -130,12 +132,13 @@ enum Design {
             case .monogram: return Self.mincho(size: 32, style: .title1, maximum: 40)
             case .term: return UIFontMetrics(forTextStyle: .largeTitle).scaledFont(for: .systemFont(ofSize: 52, weight: .semibold), maximumPointSize: 96)
             case .answer: return .preferredFont(forTextStyle: .title2)
+            case .display: return Self.editorialSerif(.largeTitle)
             }
         }
 
         var color: UIColor {
             switch self {
-            case .title, .headword, .meaning, .explanation, .figure, .term, .answer: return Color.textPrimary
+            case .title, .headword, .meaning, .explanation, .figure, .term, .answer, .display: return Color.textPrimary
             case .reading, .metadata: return Color.textSecondary
             case .mark, .numeral, .monogram: return Color.accent
             case .numeralDisplay: return Color.onHero
@@ -161,6 +164,19 @@ enum Design {
         private static func mincho(size: CGFloat, style: UIFont.TextStyle, maximum: CGFloat) -> UIFont {
             let font = UIFont(name: "HiraMinProN-W6", size: size) ?? serif(size: size)
             return UIFontMetrics(forTextStyle: style).scaledFont(for: font, maximumPointSize: maximum)
+        }
+
+        /// New York for the Latin script with Hiragino Mincho as the cascade for CJK, so one headline
+        /// reads as the same typeface in Vietnamese, English and Japanese.
+        private static func editorialSerif(_ style: UIFont.TextStyle) -> UIFont {
+            let size = baseSize(style)
+            let base = UIFont.systemFont(ofSize: size, weight: .semibold)
+            var descriptor = base.fontDescriptor.withDesign(.serif) ?? base.fontDescriptor
+            if let mincho = UIFont(name: "HiraMinProN-W6", size: size) {
+                descriptor = descriptor.addingAttributes([.cascadeList: [mincho.fontDescriptor]])
+            }
+            return UIFontMetrics(forTextStyle: style).scaledFont(for: UIFont(descriptor: descriptor, size: size),
+                                                                  maximumPointSize: 56)
         }
 
         private static func serif(size: CGFloat) -> UIFont {

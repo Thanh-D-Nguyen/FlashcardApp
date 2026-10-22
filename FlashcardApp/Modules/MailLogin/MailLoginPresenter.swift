@@ -20,8 +20,8 @@ enum MailLoginViewState: Equatable {
 
 protocol MailLoginPresenterInterface: AnyObject {
     var mailPlaceHolderAttributedText: NSAttributedString { get }
-    var passPlaceHolderAttributedText: NSAttributedString { get }
     var titleText: String { get }
+    var subtitleText: String { get }
     var loginButtonText: String { get }
     var viewState: BehaviorRelay<MailLoginViewState> { get }
 
@@ -43,18 +43,16 @@ final class MailLoginPresenter {
             attributes: [.foregroundColor: AppColors.placeholderText])
     }
     
-    var passPlaceHolderAttributedText: NSAttributedString {
-        NSAttributedString(
-            string: NSLocalizedString("password", comment: ""),
-            attributes: [.foregroundColor: AppColors.placeholderText])
-    }
-    
     var titleText: String {
-        NSLocalizedString("Welcome to Flashcard!", comment: "")
+        NSLocalizedString("Welcome back", comment: "Login screen headline")
     }
-    
+
+    var subtitleText: String {
+        NSLocalizedString("Use your existing website account, or continue without login to study offline.", comment: "")
+    }
+
     var loginButtonText: String {
-        NSLocalizedString("Login", comment: "")
+        NSLocalizedString("Sign In", comment: "")
     }
     
     init(
