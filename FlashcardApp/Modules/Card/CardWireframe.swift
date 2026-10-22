@@ -9,16 +9,16 @@
 import UIKit
 
 protocol CardWireframeInterface: AnyObject {
-    func showDeskList()
-    func showCreateNewDesk()
+    func showEditor(deckId: String?, onFinish: @escaping () -> Void)
+    func showStudy(deckId: String)
+    func confirmDelete(deckName: String, onConfirm: @escaping () -> Void)
+    func showAlert(with title: String?, message: String?)
 }
 
 final class CardWireframe: BaseWireframe<CardViewController> {
 
-    private let storyboard = UIStoryboard(name: "Card", bundle: nil)
-
     init() {
-        let moduleViewController = storyboard.instantiateViewController(ofType: CardViewController.self)
+        let moduleViewController = CardViewController()
         super.init(viewController: moduleViewController)
         moduleViewController.title = MainTabbarName.card.title
         moduleViewController.tabBarItem = MainTabbarName.card.tabBarItem
@@ -31,20 +31,23 @@ final class CardWireframe: BaseWireframe<CardViewController> {
 }
 
 extension CardWireframe: CardWireframeInterface {
-    
-    func showCreateNewDesk() {
-        let createDeskWireframe = CreateDeskWireframe()
-        navigationController?.presentWireframe(createDeskWireframe)
+
+    func showEditor(deckId: String?, onFinish: @escaping () -> Void) {
+        let editor = CreateDeskWireframe(deckId: deckId, onFinish: onFinish)
+        let navigation = UINavigationController(rootViewController: editor.viewController)
+        viewController.present(navigation, animated: true)
     }
-    
-    func showDeskList() {
-        let deskListWireFrame = DeskListWireframe()
-        deskListWireFrame.didSelectDeskIndex = { [weak self] index in
-            if let self, let index = index {
-                self.viewController.presenter.didSelectDeskAtIndex(index)
-            }
-        }
-        navigationController?.presentWireframe(deskListWireFrame)
+
+    func showStudy(deckId: String) {
+        navigationController?.pushWireframe(CardStudyWireframe(deckId: deckId))
     }
-    
+
+    func confirmDelete(deckName: String, onConfirm: @escaping () -> Void) {
+        let message = String.localizedStringWithFormat(
+            NSLocalizedString("“%@” and all of its cards will be deleted from this device. This can't be undone.", comment: "Delete deck confirmation"),
+            deckName)
+        let delete = UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive) { _ in onConfirm() }
+        let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)
+        showAlert(with: NSLocalizedString("Delete this deck?", comment: ""), message: message, actions: [delete, cancel])
+    }
 }

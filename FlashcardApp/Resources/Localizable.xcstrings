@@ -1,6 +1,54 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%1$lld of %2$lld": {
+      "extractionState": "manual",
+      "comment": "Study progress: position of total",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld of %2$lld"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld / %2$lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$lld枚中%1$lld枚目"
+          }
+        }
+      }
+    },
+    "%1$lld of %2$lld correct (%3$@)": {
+      "extractionState": "manual",
+      "comment": "Quiz result",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld of %2$lld correct (%3$@)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đúng %1$lld/%2$lld (%3$@)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$lld問中%1$lld問正解（%3$@）"
+          }
+        }
+      }
+    },
     "%@\nTap refresh to try again.": {
       "extractionState": "manual",
       "comment": "Dictionary error; %@ is the reason",
@@ -97,6 +145,126 @@
         }
       }
     },
+    "%lld decks": {
+      "extractionState": "manual",
+      "comment": "Number of decks in the library",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld deck"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld decks"
+                }
+              }
+            }
+          }
+        },
+        "vi": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld bộ thẻ"
+                }
+              }
+            }
+          }
+        },
+        "ja": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld個のデッキ"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "A card in this deck already belongs to another deck.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A card in this deck already belongs to another deck."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Một thẻ trong bộ này đã thuộc về bộ khác."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデッキのカードの1枚がすでに別のデッキに属しています。"
+          }
+        }
+      }
+    },
+    "A deck can hold up to %lld cards.": {
+      "extractionState": "manual",
+      "comment": "Deck size limit",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A deck can hold up to %lld cards."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Một bộ thẻ có tối đa %lld thẻ."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1つのデッキには最大%lld枚まで入れられます。"
+          }
+        }
+      }
+    },
+    "A picture is still being added. Save again in a moment.": {
+      "extractionState": "manual",
+      "comment": "Alert message when saving while a picture loads",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A picture is still being added. Save again in a moment."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh vẫn đang được thêm. Hãy lưu lại sau giây lát."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像をまだ追加中です。しばらくしてからもう一度保存してください。"
+          }
+        }
+      }
+    },
     "About": {
       "extractionState": "manual",
       "comment": "Section header",
@@ -169,6 +337,102 @@
         }
       }
     },
+    "Add": {
+      "extractionState": "manual",
+      "comment": "Alert button: add the picture address",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "追加"
+          }
+        }
+      }
+    },
+    "Add a back to this card.": {
+      "extractionState": "manual",
+      "comment": "Inline validation",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a back to this card."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy thêm mặt sau cho thẻ này."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このカードの裏面を入力してください。"
+          }
+        }
+      }
+    },
+    "Add a front to this card.": {
+      "extractionState": "manual",
+      "comment": "Inline validation",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a front to this card."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy thêm mặt trước cho thẻ này."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このカードの表面を入力してください。"
+          }
+        }
+      }
+    },
+    "Add at least %lld cards with a front and a back.": {
+      "extractionState": "manual",
+      "comment": "Deck validation",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add at least %lld cards with a front and a back."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm ít nhất %lld thẻ có mặt trước và mặt sau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表面と裏面のあるカードを%lld枚以上追加してください。"
+          }
+        }
+      }
+    },
     "Add at least 2 cards.": {
       "extractionState": "manual",
       "comment": "Validation error",
@@ -189,6 +453,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "カードを2枚以上追加してください。"
+          }
+        }
+      }
+    },
+    "Add card": {
+      "extractionState": "manual",
+      "comment": "Button: add a card in the editor",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add card"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードを追加"
+          }
+        }
+      }
+    },
+    "Add note": {
+      "extractionState": "manual",
+      "comment": "VoiceOver label of the add-note chip",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add note"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm ghi chú"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メモを追加"
+          }
+        }
+      }
+    },
+    "Add picture": {
+      "extractionState": "manual",
+      "comment": "VoiceOver label of the picture chip when the card has none",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add picture"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm ảnh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を追加"
+          }
+        }
+      }
+    },
+    "Add reading": {
+      "extractionState": "manual",
+      "comment": "VoiceOver label of the add-reading chip",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add reading"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm cách đọc"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読みを追加"
           }
         }
       }
@@ -289,6 +649,30 @@
         }
       }
     },
+    "Back": {
+      "extractionState": "manual",
+      "comment": "Card field (the answer side)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mặt sau"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裏面"
+          }
+        }
+      }
+    },
     "Cancel": {
       "extractionState": "manual",
       "comment": "Alert button",
@@ -309,6 +693,174 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャンセル"
+          }
+        }
+      }
+    },
+    "Card %1$lld of %2$lld": {
+      "extractionState": "manual",
+      "comment": "Position while typing",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card %1$lld of %2$lld"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thẻ %1$lld/%2$lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード %1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "Card %lld": {
+      "extractionState": "manual",
+      "comment": "Card number in the editor",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card %lld"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thẻ %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード %lld"
+          }
+        }
+      }
+    },
+    "Card %lld needs a back.": {
+      "extractionState": "manual",
+      "comment": "Save error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card %lld needs a back."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thẻ %lld cần có mặt sau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード%lldに裏面がありません。"
+          }
+        }
+      }
+    },
+    "Card %lld needs a front.": {
+      "extractionState": "manual",
+      "comment": "Save error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card %lld needs a front."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thẻ %lld cần có mặt trước."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード%lldに表面がありません。"
+          }
+        }
+      }
+    },
+    "Card direction": {
+      "extractionState": "manual",
+      "comment": "Which language is on the front",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card direction"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiều thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードの向き"
+          }
+        }
+      }
+    },
+    "Card direction: %@": {
+      "extractionState": "manual",
+      "comment": "VoiceOver label; %@ is the direction",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card direction: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiều thẻ: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードの向き：%@"
+          }
+        }
+      }
+    },
+    "Card options": {
+      "extractionState": "manual",
+      "comment": "Button label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card options"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tùy chọn thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードのオプション"
           }
         }
       }
@@ -337,6 +889,30 @@
         }
       }
     },
+    "Change picture": {
+      "extractionState": "manual",
+      "comment": "Chip title when a card has a picture",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change picture"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đổi ảnh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を変更"
+          }
+        }
+      }
+    },
     "Characters": {
       "extractionState": "manual",
       "comment": "Dictionary search scope for kanji",
@@ -357,6 +933,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "漢字"
+          }
+        }
+      }
+    },
+    "Choose an answer": {
+      "extractionState": "manual",
+      "comment": "Disabled primary button in quiz",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an answer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn một đáp án"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "答えを選んでください"
+          }
+        }
+      }
+    },
+    "Choose from Photos": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose from Photos"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn từ Ảnh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真から選ぶ"
           }
         }
       }
@@ -429,6 +1053,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "ログインせずに続ける"
+          }
+        }
+      }
+    },
+    "Correct": {
+      "extractionState": "manual",
+      "comment": "Quiz feedback",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Correct"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chính xác"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正解"
+          }
+        }
+      }
+    },
+    "Correct answer": {
+      "extractionState": "manual",
+      "comment": "VoiceOver suffix",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Correct answer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đáp án đúng"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正しい答え"
+          }
+        }
+      }
+    },
+    "Couldn't add the picture": {
+      "extractionState": "manual",
+      "comment": "Alert title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't add the picture"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể thêm ảnh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を追加できませんでした"
+          }
+        }
+      }
+    },
+    "Couldn't download the picture: %@": {
+      "extractionState": "manual",
+      "comment": "Error; %@ is the reason",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't download the picture: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể tải ảnh: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像をダウンロードできませんでした：%@"
           }
         }
       }
@@ -577,6 +1297,30 @@
         }
       }
     },
+    "Couldn't save the picture: %@": {
+      "extractionState": "manual",
+      "comment": "Error; %@ is the reason",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't save the picture: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể lưu ảnh: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を保存できませんでした：%@"
+          }
+        }
+      }
+    },
     "Create Deck": {
       "extractionState": "manual",
       "comment": "Title of the deck editor; also VoiceOver label of the add-deck button",
@@ -601,6 +1345,30 @@
         }
       }
     },
+    "Create your first deck": {
+      "extractionState": "manual",
+      "comment": "Empty library action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create your first deck"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tạo bộ thẻ đầu tiên"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初のデッキを作成"
+          }
+        }
+      }
+    },
     "Dark": {
       "extractionState": "manual",
       "comment": "Appearance option",
@@ -621,6 +1389,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "ダーク"
+          }
+        }
+      }
+    },
+    "Deck complete": {
+      "extractionState": "manual",
+      "comment": "Study summary title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deck complete"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã học xong bộ thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキ完了"
+          }
+        }
+      }
+    },
+    "Deck details": {
+      "extractionState": "manual",
+      "comment": "Editor toolbar when no card is focused",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deck details"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thông tin bộ thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキの情報"
           }
         }
       }
@@ -697,6 +1513,78 @@
         }
       }
     },
+    "Delete card %lld?": {
+      "extractionState": "manual",
+      "comment": "Confirmation title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete card %lld?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa thẻ %lld?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード%lldを削除しますか？"
+          }
+        }
+      }
+    },
+    "Delete deck": {
+      "extractionState": "manual",
+      "comment": "Editor menu item (existing deck)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete deck"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xoá bộ thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキを削除"
+          }
+        }
+      }
+    },
+    "Delete this deck?": {
+      "extractionState": "manual",
+      "comment": "Confirmation title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this deck?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa bộ thẻ này?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデッキを削除しますか？"
+          }
+        }
+      }
+    },
     "Description": {
       "extractionState": "manual",
       "comment": "Button that adds a deck description",
@@ -717,6 +1605,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "説明"
+          }
+        }
+      }
+    },
+    "Description (optional)": {
+      "extractionState": "manual",
+      "comment": "Placeholder",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Description (optional)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mô tả (không bắt buộc)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "説明（任意）"
           }
         }
       }
@@ -745,6 +1657,78 @@
         }
       }
     },
+    "Discard changes": {
+      "extractionState": "manual",
+      "comment": "Destructive alert action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard changes"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bỏ thay đổi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変更を破棄"
+          }
+        }
+      }
+    },
+    "Discard draft": {
+      "extractionState": "manual",
+      "comment": "Alert action: throw away the recovered draft",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard draft"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bỏ bản nháp"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下書きを破棄"
+          }
+        }
+      }
+    },
+    "Discard your changes?": {
+      "extractionState": "manual",
+      "comment": "Alert title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard your changes?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bỏ các thay đổi?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変更を破棄しますか？"
+          }
+        }
+      }
+    },
     "Done": {
       "extractionState": "manual",
       "comment": "Button",
@@ -765,6 +1749,126 @@
           "stringUnit": {
             "state": "translated",
             "value": "完了"
+          }
+        }
+      }
+    },
+    "Done reordering": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done reordering"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xong sắp xếp"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "並べ替えを完了"
+          }
+        }
+      }
+    },
+    "Double-tap to flip the card": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double-tap to flip the card"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạm hai lần để lật thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダブルタップでカードを裏返す"
+          }
+        }
+      }
+    },
+    "Duplicate": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duplicate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhân bản"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製"
+          }
+        }
+      }
+    },
+    "Edit": {
+      "extractionState": "manual",
+      "comment": "Swipe/menu action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sửa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編集"
+          }
+        }
+      }
+    },
+    "Edit deck": {
+      "extractionState": "manual",
+      "comment": "Title and menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit deck"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sửa bộ thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキを編集"
           }
         }
       }
@@ -813,6 +1917,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "メールアドレスまたはパスワードが正しくありません。"
+          }
+        }
+      }
+    },
+    "Enter a deck name.": {
+      "extractionState": "manual",
+      "comment": "Inline validation",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a deck name."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy nhập tên bộ thẻ."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキ名を入力してください。"
           }
         }
       }
@@ -985,6 +2113,30 @@
         }
       }
     },
+    "Enter a valid web address for the picture.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid web address for the picture."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy nhập địa chỉ web hợp lệ của ảnh."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像の有効なWebアドレスを入力してください。"
+          }
+        }
+      }
+    },
     "Enter your password.": {
       "extractionState": "manual",
       "comment": "Login validation",
@@ -1029,6 +2181,78 @@
           "stringUnit": {
             "state": "translated",
             "value": "エラー"
+          }
+        }
+      }
+    },
+    "Finish": {
+      "extractionState": "manual",
+      "comment": "Primary button on the last card",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finish"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoàn thành"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了"
+          }
+        }
+      }
+    },
+    "Flip cards": {
+      "extractionState": "manual",
+      "comment": "Study mode",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flip cards"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lật thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードをめくる"
+          }
+        }
+      }
+    },
+    "Front": {
+      "extractionState": "manual",
+      "comment": "Card field (the question side)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Front"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mặt trước"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表面"
           }
         }
       }
@@ -1081,6 +2305,150 @@
         }
       }
     },
+    "Hide keyboard": {
+      "extractionState": "manual",
+      "comment": "Button label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide keyboard"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ẩn bàn phím"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーボードを閉じる"
+          }
+        }
+      }
+    },
+    "Import": {
+      "extractionState": "manual",
+      "comment": "Button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取り込む"
+          }
+        }
+      }
+    },
+    "Import cards": {
+      "extractionState": "manual",
+      "comment": "Sheet title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import cards"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードを取り込む"
+          }
+        }
+      }
+    },
+    "Import cards…": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import cards…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập thẻ…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードを取り込む…"
+          }
+        }
+      }
+    },
+    "Its text and picture will be removed from this deck.": {
+      "extractionState": "manual",
+      "comment": "Confirmation message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Its text and picture will be removed from this deck."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nội dung và ảnh của thẻ sẽ bị xóa khỏi bộ thẻ này."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このカードの文字と画像がデッキから削除されます。"
+          }
+        }
+      }
+    },
+    "Japanese": {
+      "extractionState": "manual",
+      "comment": "Language name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Japanese"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Nhật"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語"
+          }
+        }
+      }
+    },
     "Japanese - Vietnamese": {
       "extractionState": "manual",
       "comment": "Card direction segment",
@@ -1105,6 +2473,30 @@
         }
       }
     },
+    "Japanese – Vietnamese": {
+      "extractionState": "manual",
+      "comment": "Card direction option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Japanese – Vietnamese"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhật – Việt"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語 – ベトナム語"
+          }
+        }
+      }
+    },
     "Kanji": {
       "extractionState": "manual",
       "comment": "Content kind / segmented control title",
@@ -1125,6 +2517,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "漢字"
+          }
+        }
+      }
+    },
+    "Keep editing": {
+      "extractionState": "manual",
+      "comment": "Alert action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep editing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếp tục chỉnh sửa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編集を続ける"
           }
         }
       }
@@ -1225,6 +2641,54 @@
         }
       }
     },
+    "Line %lld has a picture address that is not https.": {
+      "extractionState": "manual",
+      "comment": "Import error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line %lld has a picture address that is not https."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng %lld có địa chỉ ảnh không phải https."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld行目の画像アドレスがhttpsではありません。"
+          }
+        }
+      }
+    },
+    "Line %lld is not valid. Use: front | back": {
+      "extractionState": "manual",
+      "comment": "Import error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line %lld is not valid. Use: front | back"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dòng %lld không hợp lệ. Dùng: mặt trước | mặt sau"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld行目が正しくありません。「表面 | 裏面」の形式で入力してください。"
+          }
+        }
+      }
+    },
     "Load 30 more": {
       "extractionState": "manual",
       "comment": "Footer row that loads the next page",
@@ -1321,6 +2785,30 @@
         }
       }
     },
+    "Make a deck of your own words and study it offline, anywhere.": {
+      "extractionState": "manual",
+      "comment": "Empty library message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make a deck of your own words and study it offline, anywhere."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tạo bộ thẻ từ vựng của riêng bạn và học ngoại tuyến mọi lúc, mọi nơi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分の単語でデッキを作り、いつでもどこでもオフラインで学習できます。"
+          }
+        }
+      }
+    },
     "Meaning": {
       "extractionState": "manual",
       "comment": "Placeholder of the back side of a card",
@@ -1345,6 +2833,54 @@
         }
       }
     },
+    "Mode": {
+      "extractionState": "manual",
+      "comment": "Menu title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mode"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chế độ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "モード"
+          }
+        }
+      }
+    },
+    "More": {
+      "extractionState": "manual",
+      "comment": "Button label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その他"
+          }
+        }
+      }
+    },
     "More levels": {
       "extractionState": "manual",
       "comment": "Section header above the remaining levels",
@@ -1365,6 +2901,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "ほかのレベル"
+          }
+        }
+      }
+    },
+    "Most cards": {
+      "extractionState": "manual",
+      "comment": "Deck sort option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Most cards"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhiều thẻ nhất"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード数が多い順"
           }
         }
       }
@@ -1417,6 +2977,30 @@
         }
       }
     },
+    "Name": {
+      "extractionState": "manual",
+      "comment": "Deck sort option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名前"
+          }
+        }
+      }
+    },
     "Network error: %@": {
       "extractionState": "manual",
       "comment": "Error; %@ is the reason",
@@ -1437,6 +3021,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "ネットワークエラー: %@"
+          }
+        }
+      }
+    },
+    "New deck": {
+      "extractionState": "manual",
+      "comment": "Editor title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New deck"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bộ thẻ mới"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新規デッキ"
+          }
+        }
+      }
+    },
+    "Next card": {
+      "extractionState": "manual",
+      "comment": "Button and VoiceOver label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next card"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thẻ tiếp theo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次のカード"
+          }
+        }
+      }
+    },
+    "Next field": {
+      "extractionState": "manual",
+      "comment": "Button label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next field"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ô tiếp theo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次の項目"
+          }
+        }
+      }
+    },
+    "Next question": {
+      "extractionState": "manual",
+      "comment": "Primary button in quiz",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next question"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Câu tiếp theo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次の問題"
           }
         }
       }
@@ -1489,6 +3169,30 @@
         }
       }
     },
+    "No decks yet": {
+      "extractionState": "manual",
+      "comment": "Empty library title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No decks yet"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có bộ thẻ nào"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキはまだありません"
+          }
+        }
+      }
+    },
     "No levels yet.": {
       "extractionState": "manual",
       "comment": "Empty state of the level list",
@@ -1509,6 +3213,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "レベルはまだありません。"
+          }
+        }
+      }
+    },
+    "No matching decks": {
+      "extractionState": "manual",
+      "comment": "Search without results",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matching decks"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có bộ thẻ phù hợp"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一致するデッキがありません"
           }
         }
       }
@@ -1557,6 +3285,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "結果が見つかりません。"
+          }
+        }
+      }
+    },
+    "Not quite. The answer is %@.": {
+      "extractionState": "manual",
+      "comment": "Quiz feedback",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not quite. The answer is %@."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa đúng. Đáp án là %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "おしい！答えは%@です。"
+          }
+        }
+      }
+    },
+    "Note": {
+      "extractionState": "manual",
+      "comment": "Card field",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghi chú"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メモ"
+          }
+        }
+      }
+    },
+    "Note: %@": {
+      "extractionState": "manual",
+      "comment": "VoiceOver text",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghi chú: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メモ：%@"
+          }
+        }
+      }
+    },
+    "Nothing matches “%@”.": {
+      "extractionState": "manual",
+      "comment": "Search without results; %@ is the query",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing matches “%@”."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có gì khớp với “%@”."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」に一致するものはありません。"
           }
         }
       }
@@ -1629,6 +3453,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
+          }
+        }
+      }
+    },
+    "One card per line: front | back, or front, back and a picture address (https) separated by a tab or |. Up to %lld cards.": {
+      "extractionState": "manual",
+      "comment": "Bulk import help",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One card per line: front | back, or front, back and a picture address (https) separated by a tab or |. Up to %lld cards."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mỗi dòng một thẻ: mặt trước | mặt sau, hoặc mặt trước, mặt sau và địa chỉ ảnh (https) cách nhau bằng tab hoặc |. Tối đa %lld thẻ."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1行に1枚：「表面 | 裏面」、または表面・裏面・画像アドレス（https）をタブか | で区切ります。最大%lld枚。"
           }
         }
       }
@@ -1729,6 +3577,30 @@
         }
       }
     },
+    "Options for card %lld": {
+      "extractionState": "manual",
+      "comment": "VoiceOver label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Options for card %lld"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tùy chọn cho thẻ %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード%lldのオプション"
+          }
+        }
+      }
+    },
     "Password": {
       "extractionState": "manual",
       "comment": "Login field accessibility label",
@@ -1749,6 +3621,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "パスワード"
+          }
+        }
+      }
+    },
+    "Paste the https address of a JPEG, PNG, HEIC, WebP or GIF picture. It is saved on this device.": {
+      "extractionState": "manual",
+      "comment": "Alert message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste the https address of a JPEG, PNG, HEIC, WebP or GIF picture. It is saved on this device."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dán địa chỉ https của ảnh JPEG, PNG, HEIC, WebP hoặc GIF. Ảnh được lưu trên thiết bị này."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JPEG、PNG、HEIC、WebP、GIF画像のhttpsアドレスを貼り付けてください。画像はこのデバイスに保存されます。"
           }
         }
       }
@@ -1777,6 +3673,150 @@
         }
       }
     },
+    "Picture": {
+      "extractionState": "manual",
+      "comment": "Chip title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像"
+          }
+        }
+      }
+    },
+    "Picture addresses must start with https://.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture addresses must start with https://."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Địa chỉ ảnh phải bắt đầu bằng https://."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像のアドレスはhttps://で始まる必要があります。"
+          }
+        }
+      }
+    },
+    "Picture for %@": {
+      "extractionState": "manual",
+      "comment": "VoiceOver label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture for %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh cho %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@の画像"
+          }
+        }
+      }
+    },
+    "Picture for card %lld": {
+      "extractionState": "manual",
+      "comment": "VoiceOver label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture for card %lld"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh của thẻ %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カード%lldの画像"
+          }
+        }
+      }
+    },
+    "Picture from the web": {
+      "extractionState": "manual",
+      "comment": "Alert title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture from the web"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh từ web"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webの画像"
+          }
+        }
+      }
+    },
+    "Picture unavailable. Tap to try again.": {
+      "extractionState": "manual",
+      "comment": "Image failed to load",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture unavailable. Tap to try again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có ảnh. Chạm để thử lại."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を表示できません。タップして再試行"
+          }
+        }
+      }
+    },
     "Please enter a deck name.": {
       "extractionState": "manual",
       "comment": "Validation error",
@@ -1797,6 +3837,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "デッキ名を入力してください。"
+          }
+        }
+      }
+    },
+    "Please wait": {
+      "extractionState": "manual",
+      "comment": "Alert title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please wait"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vui lòng đợi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お待ちください"
           }
         }
       }
@@ -1849,6 +3913,30 @@
         }
       }
     },
+    "Previous card": {
+      "extractionState": "manual",
+      "comment": "Button and VoiceOver label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous card"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thẻ trước"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前のカード"
+          }
+        }
+      }
+    },
     "Privacy Policy": {
       "extractionState": "manual",
       "comment": "Settings row",
@@ -1873,6 +3961,222 @@
         }
       }
     },
+    "Quiz": {
+      "extractionState": "manual",
+      "comment": "Study mode",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quiz"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trắc nghiệm"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クイズ"
+          }
+        }
+      }
+    },
+    "Read aloud": {
+      "extractionState": "manual",
+      "comment": "Button label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read aloud"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đọc to"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み上げ"
+          }
+        }
+      }
+    },
+    "Read aloud automatically": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read aloud automatically"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tự động đọc to"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動で読み上げ"
+          }
+        }
+      }
+    },
+    "Reading": {
+      "extractionState": "manual",
+      "comment": "Card field",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cách đọc"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み"
+          }
+        }
+      }
+    },
+    "Reading: %@": {
+      "extractionState": "manual",
+      "comment": "VoiceOver text",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cách đọc: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み：%@"
+          }
+        }
+      }
+    },
+    "Recently created": {
+      "extractionState": "manual",
+      "comment": "Deck sort option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recently created"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mới tạo gần đây"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作成日が新しい順"
+          }
+        }
+      }
+    },
+    "Remove picture": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove picture"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa ảnh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を削除"
+          }
+        }
+      }
+    },
+    "Reorder cards": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reorder cards"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sắp xếp thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カードを並べ替え"
+          }
+        }
+      }
+    },
+    "Restore draft": {
+      "extractionState": "manual",
+      "comment": "Alert action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore draft"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khôi phục bản nháp"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下書きを復元"
+          }
+        }
+      }
+    },
     "Retry": {
       "extractionState": "manual",
       "comment": "Retry button",
@@ -1893,6 +4197,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "再試行"
+          }
+        }
+      }
+    },
+    "Save": {
+      "extractionState": "manual",
+      "comment": "Button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lưu"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
+    },
+    "Search decks and cards": {
+      "extractionState": "manual",
+      "comment": "Search placeholder",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search decks and cards"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tìm bộ thẻ và thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキとカードを検索"
           }
         }
       }
@@ -1969,6 +4321,30 @@
         }
       }
     },
+    "See results": {
+      "extractionState": "manual",
+      "comment": "Primary button on the last quiz question",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See results"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xem kết quả"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結果を見る"
+          }
+        }
+      }
+    },
     "Sentences": {
       "extractionState": "manual",
       "comment": "Dictionary search scope for example sentences",
@@ -2013,6 +4389,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定"
+          }
+        }
+      }
+    },
+    "Show answer": {
+      "extractionState": "manual",
+      "comment": "Primary button on the front of a card",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show answer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện đáp án"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "答えを見る"
+          }
+        }
+      }
+    },
+    "Show pictures": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show pictures"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện ảnh"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を表示"
+          }
+        }
+      }
+    },
+    "Show reading": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show reading"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện cách đọc"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読みを表示"
+          }
+        }
+      }
+    },
+    "Shuffle": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shuffle"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xáo trộn"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シャッフル"
           }
         }
       }
@@ -2113,6 +4585,54 @@
         }
       }
     },
+    "Sort by": {
+      "extractionState": "manual",
+      "comment": "Menu title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort by"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sắp xếp theo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "並べ替え"
+          }
+        }
+      }
+    },
+    "Sort decks": {
+      "extractionState": "manual",
+      "comment": "Button label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort decks"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sắp xếp bộ thẻ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デッキを並べ替え"
+          }
+        }
+      }
+    },
     "Sounds & Haptics": {
       "extractionState": "manual",
       "comment": "Settings row",
@@ -2157,6 +4677,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "ここから始める"
+          }
+        }
+      }
+    },
+    "Start over": {
+      "extractionState": "manual",
+      "comment": "Study menu item: restart the session",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start over"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bắt đầu lại"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初からやり直す"
           }
         }
       }
@@ -2233,6 +4777,102 @@
         }
       }
     },
+    "Study": {
+      "extractionState": "manual",
+      "comment": "Context menu action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Study"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Học"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習"
+          }
+        }
+      }
+    },
+    "Study again": {
+      "extractionState": "manual",
+      "comment": "Button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Study again"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Học lại"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "もう一度学習"
+          }
+        }
+      }
+    },
+    "Study options": {
+      "extractionState": "manual",
+      "comment": "Button label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Study options"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tùy chọn học"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学習オプション"
+          }
+        }
+      }
+    },
+    "Study this deck": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Study this deck"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Học bộ thẻ này"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデッキを学習"
+          }
+        }
+      }
+    },
     "System": {
       "extractionState": "manual",
       "comment": "Appearance option: follow the system",
@@ -2277,6 +4917,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "タップしてデッキを作成…"
+          }
+        }
+      }
+    },
+    "That address is not a JPEG, PNG, HEIC, WebP or GIF picture.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That address is not a JPEG, PNG, HEIC, WebP or GIF picture."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Địa chỉ đó không phải ảnh JPEG, PNG, HEIC, WebP hoặc GIF."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "そのアドレスはJPEG、PNG、HEIC、WebP、GIF画像ではありません。"
+          }
+        }
+      }
+    },
+    "That file could not be read as a picture.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That file could not be read as a picture."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể đọc tệp đó như một ảnh."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "そのファイルは画像として読み込めませんでした。"
           }
         }
       }
@@ -2353,6 +5041,30 @@
         }
       }
     },
+    "The changes to this deck have not been saved.": {
+      "extractionState": "manual",
+      "comment": "Alert message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The changes to this deck have not been saved."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các thay đổi của bộ thẻ này chưa được lưu."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデッキの変更はまだ保存されていません。"
+          }
+        }
+      }
+    },
     "The level or page is invalid.": {
       "extractionState": "manual",
       "comment": "Validation error for a level request",
@@ -2373,6 +5085,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "レベルまたはページが正しくありません。"
+          }
+        }
+      }
+    },
+    "The picture is larger than %lld MB.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The picture is larger than %lld MB."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh lớn hơn %lld MB."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像が%lld MBを超えています。"
+          }
+        }
+      }
+    },
+    "The picture's resolution is too high. Choose a smaller picture.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The picture's resolution is too high. Choose a smaller picture."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Độ phân giải của ảnh quá cao. Hãy chọn ảnh nhỏ hơn."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像の解像度が高すぎます。小さい画像を選んでください。"
+          }
+        }
+      }
+    },
+    "The server answered with error %lld.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server answered with error %lld."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy chủ trả về lỗi %lld."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サーバーがエラー%lldを返しました。"
+          }
+        }
+      }
+    },
+    "This deck already exists.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This deck already exists."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bộ thẻ này đã tồn tại."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデッキはすでに存在します。"
           }
         }
       }
@@ -2473,6 +5281,78 @@
         }
       }
     },
+    "Unsaved draft found": {
+      "extractionState": "manual",
+      "comment": "Alert title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unsaved draft found"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tìm thấy bản nháp chưa lưu"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未保存の下書きがあります"
+          }
+        }
+      }
+    },
+    "Use a JPEG, PNG, HEIC, WebP or GIF picture.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use a JPEG, PNG, HEIC, WebP or GIF picture."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy dùng ảnh JPEG, PNG, HEIC, WebP hoặc GIF."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JPEG、PNG、HEIC、WebP、GIFの画像を使ってください。"
+          }
+        }
+      }
+    },
+    "Use a web address…": {
+      "extractionState": "manual",
+      "comment": "Menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use a web address…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dùng địa chỉ web…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webアドレスを使う…"
+          }
+        }
+      }
+    },
     "Use your existing website account, or continue without login to study offline.": {
       "extractionState": "manual",
       "comment": "Login screen message",
@@ -2569,6 +5449,30 @@
         }
       }
     },
+    "Vietnamese": {
+      "extractionState": "manual",
+      "comment": "Language name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vietnamese"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Việt"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ベトナム語"
+          }
+        }
+      }
+    },
     "Vietnamese - Japanese": {
       "extractionState": "manual",
       "comment": "Card direction segment",
@@ -2589,6 +5493,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "ベトナム語 - 日本語"
+          }
+        }
+      }
+    },
+    "Vietnamese – Japanese": {
+      "extractionState": "manual",
+      "comment": "Card direction option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vietnamese – Japanese"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Việt – Nhật"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ベトナム語 – 日本語"
           }
         }
       }
@@ -2665,6 +5593,78 @@
         }
       }
     },
+    "You appear to be offline. Check the connection and try again.": {
+      "extractionState": "manual",
+      "comment": "Error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You appear to be offline. Check the connection and try again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có vẻ bạn đang ngoại tuyến. Hãy kiểm tra kết nối và thử lại."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフラインのようです。接続を確認して、もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "You have unsaved changes from an earlier session. Restore them?": {
+      "extractionState": "manual",
+      "comment": "Alert message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have unsaved changes from an earlier session. Restore them?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bạn có thay đổi chưa lưu từ phiên trước. Khôi phục chúng?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前回の未保存の変更があります。復元しますか？"
+          }
+        }
+      }
+    },
+    "You went through %@.": {
+      "extractionState": "manual",
+      "comment": "Flip session result; %@ is a card count",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You went through %@."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bạn đã học qua %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を学習しました。"
+          }
+        }
+      }
+    },
     "You're in the middle of entering data. Stop and go back?": {
       "extractionState": "manual",
       "comment": "Alert message when closing the deck editor with unsaved input",
@@ -2685,6 +5685,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "入力の途中です。入力をやめて前の画面に戻りますか？"
+          }
+        }
+      }
+    },
+    "Your answer, incorrect": {
+      "extractionState": "manual",
+      "comment": "VoiceOver suffix",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your answer, incorrect"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Câu bạn chọn, sai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたの答え（不正解）"
           }
         }
       }
@@ -2853,6 +5877,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "単語"
+          }
+        }
+      }
+    },
+    "“%@” and all of its cards will be deleted from this device. This can't be undone.": {
+      "extractionState": "manual",
+      "comment": "Delete deck confirmation; %@ is the deck name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” and all of its cards will be deleted from this device. This can't be undone."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” và toàn bộ thẻ trong đó sẽ bị xóa khỏi thiết bị này. Không thể hoàn tác."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」とそのカードすべてがこのデバイスから削除されます。この操作は取り消せません。"
           }
         }
       }

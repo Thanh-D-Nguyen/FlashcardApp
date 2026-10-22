@@ -69,6 +69,7 @@ extension DeskEntity {
         desk.name = name
         desk.desc = description
         desk.imageNamed = imageNamed
+        desk.sortingLanguage = sortingLanguage.rawValue
         let cards = cards.compactMap({ $0.toRealm() })
         let list = List<RCard>()
         list.append(objectsIn: cards)

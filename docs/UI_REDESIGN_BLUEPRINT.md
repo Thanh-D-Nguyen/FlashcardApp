@@ -111,7 +111,7 @@ giao diện, cỡ chữ ghi trong tên/bảng bên dưới); ảnh P0/P1 để s
 
 ## 8. Việc còn lại
 
-1. **Thẻ**: tiêu đề nhỏ, ô chọn bộ thẻ trống không nhãn, viền ô `AppColors`; học thẻ/tạo bộ thẻ chưa thiết kế.
+1. ~~**Thẻ**~~ — đã làm lại (thư viện, trình soạn, học thẻ): xem `docs/ui-redesign/cards/README.md`. `AppColors` (asset cũ) không còn được màn Thẻ dùng.
 2. ~~**Cài đặt**~~ — đã làm lại, xem §10.
 3. **Từ điển**: hàng kết quả vẫn dùng kiểu mặc định; `StateView` thay `message`.
 4. Kanji: chưa có trang chi tiết (chạm vẫn mở hộp thoại nghĩa); furigana chưa có trong dữ liệu API.

@@ -11,15 +11,6 @@
       }
     },
     {
-      "identity" : "collectionviewpaginglayout",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/amirdew/CollectionViewPagingLayout.git",
-      "state" : {
-        "revision" : "4bdec327535470c8d9765d190625b13e99b87db5",
-        "version" : "1.1.0"
-      }
-    },
-    {
       "identity" : "kingfisher",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher.git",
@@ -53,15 +44,6 @@
       "state" : {
         "revision" : "b4307ba0b6425c0ba4178e138799946c3da594f8",
         "version" : "6.5.0"
-      }
-    },
-    {
-      "identity" : "swipecellkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwipeCellKit/SwipeCellKit.git",
-      "state" : {
-        "revision" : "7219cad3098637176ace311510d11467dbfb9bb0",
-        "version" : "2.7.1"
       }
     }
   ],

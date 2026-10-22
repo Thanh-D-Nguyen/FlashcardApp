@@ -6,6 +6,8 @@ final class StateView: UIView {
     enum State: Equatable {
         case loading(String)
         case empty(title: String, message: String?)
+        /// An empty screen with one clear next step (e.g. "Create your first deck").
+        case call(symbol: String, title: String, message: String?, actionTitle: String)
         case error(message: String, retryTitle: String)
     }
 
@@ -64,6 +66,14 @@ final class StateView: UIView {
             titleLabel.textColor = Design.Color.textPrimary
             messageLabel.text = message
             messageLabel.isHidden = message == nil
+        case .call(let symbol, let title, let message, let actionTitle):
+            show(symbol: symbol, tint: Design.Color.accent)
+            titleLabel.text = title
+            titleLabel.textColor = Design.Color.textPrimary
+            messageLabel.text = message
+            messageLabel.isHidden = message == nil
+            retryButton.configuration = Design.Button.primary(title: actionTitle)
+            retryButton.isHidden = false
         case .error(let message, let retryTitle):
             show(symbol: "exclamationmark.triangle", tint: Design.Color.error)
             titleLabel.text = message

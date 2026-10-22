@@ -7,6 +7,9 @@ final class FlashcardAppUITests: XCTestCase {
     private func makeApp(language: String = "vi", locale: String = "vi_VN") -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(\(language))", "-AppleLocale", locale]
+        // Study preferences persist between runs; pin the ones the tests depend on.
+        app.launchArguments += ["-com.flashcardapp.study.mode", "flip", "-com.flashcardapp.study.shuffled", "NO",
+                                "-com.flashcardapp.study.autoSpeak", "NO"]
         return app
     }
 
@@ -49,7 +52,7 @@ final class FlashcardAppUITests: XCTestCase {
         let cards = app.tabBars.buttons["tab_cards"]
         XCTAssertTrue(cards.waitForExistence(timeout: 40))
         cards.tap()
-        XCTAssertTrue(app.collectionViews.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 10))
         app.tabBars.buttons["tab_settings"].tap()
         XCTAssertTrue(app.tables.firstMatch.waitForExistence(timeout: 5))
     }
@@ -70,7 +73,7 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(toolbar.exists)
         XCTAssertLessThanOrEqual(toolbar.frame.maxY, app.keyboards.firstMatch.frame.minY + 2)
         app.buttons["close_deck_editor"].tap()
-        let discard = app.alerts.buttons["Đồng ý"]
+        let discard = app.alerts.buttons["Bỏ thay đổi"]
         XCTAssertTrue(discard.waitForExistence(timeout: 5))
         discard.tap()
         XCTAssertTrue(app.tabBars.buttons["tab_cards"].waitForExistence(timeout: 5))
@@ -239,6 +242,218 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(signIn.waitForExistence(timeout: 10))
         signIn.tap()
         XCTAssertTrue(app.buttons["website_login_button"].waitForExistence(timeout: 5))
+    }
+
+    // MARK: Cards: create, study, edit, persist, delete
+
+    /// The whole learner journey on real UI and the real Realm store: make a deck, study it (flip, quiz, summary),
+    /// add a card to it, relaunch the app and find the change, then delete it.
+    func testDeckCanBeCreatedStudiedEditedPersistedAndDeleted() {
+        let app = makeApp()
+        app.launch()
+        let name = "UI \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openCards(app)
+
+        // Create
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "dog", back: "cho")
+        fillCard(app, index: 1, front: "cat", back: "meo")
+        attachScreenshot(app, name: "editor-filled")
+        app.buttons["save_deck"].tap()
+        let row = deckRow(app, named: name)
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "The saved deck appears in the library")
+
+        // Study: flip, next, finish, summary
+        row.tap()
+        let card = app.buttons["study_card"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        XCTAssertTrue(card.label.contains("dog"))
+        app.buttons["study_primary"].tap()
+        XCTAssertTrue(waitForLabel(card, containing: "cho"), "The card flipped to its back")
+        app.buttons["study_primary"].tap()
+        XCTAssertTrue(waitForLabel(card, containing: "cat"))
+        app.buttons["study_primary"].tap()
+        app.buttons["study_primary"].tap()
+        XCTAssertTrue(app.otherElements["study_summary"].waitForExistence(timeout: 5))
+        attachScreenshot(app, name: "study-summary")
+        app.buttons["study_restart"].tap()
+        XCTAssertTrue(app.buttons["study_card"].waitForExistence(timeout: 5))
+
+        // Quiz: the right option is accepted, the primary button then moves on
+        app.buttons["study_options"].tap()
+        app.buttons["Trắc nghiệm"].tap()
+        let correct = app.buttons["study_option_0"].label == "cho" ? app.buttons["study_option_0"] : app.buttons["study_option_1"]
+        XCTAssertTrue(correct.waitForExistence(timeout: 5))
+        correct.tap()
+        XCTAssertTrue(app.staticTexts["study_feedback"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["study_feedback"].label, "Chính xác")
+        attachScreenshot(app, name: "quiz-answered")
+
+        // Edit from the study screen: the stored values are loaded, an added card is saved
+        app.buttons["study_options"].tap()
+        app.buttons["Sửa bộ thẻ"].tap()
+        let editedName = app.textViews["deck_name"]
+        XCTAssertTrue(editedName.waitForExistence(timeout: 5))
+        XCTAssertEqual(editedName.value as? String, name)
+        XCTAssertEqual(app.textViews.matching(identifier: "card_front").element(boundBy: 0).value as? String, "dog")
+        app.cells["add_card"].tap()
+        let newFront = app.textViews.matching(identifier: "card_front").element(boundBy: 2)
+        XCTAssertTrue(newFront.waitForExistence(timeout: 5))
+        newFront.typeText("bird")
+        app.textViews.matching(identifier: "card_back").element(boundBy: 2).tap()
+        app.textViews.matching(identifier: "card_back").element(boundBy: 2).typeText("chim")
+        app.buttons["save_deck"].tap()
+        XCTAssertTrue(app.buttons["study_card"].waitForExistence(timeout: 5), "Saving returns to the study screen")
+
+        // The edit survives a relaunch of the app
+        app.terminate()
+        app.launch()
+        openCards(app)
+        let reloaded = deckRow(app, named: name)
+        XCTAssertTrue(reloaded.waitForExistence(timeout: 10), "The deck is still there after relaunch")
+        XCTAssertTrue(reloaded.label.contains("3 thẻ"), "The added card was saved: \(reloaded.label)")
+
+        // Delete
+        deleteDeckIfPresent(named: name, orNamed: name)
+        app.terminate()
+        app.launch()
+        openCards(app)
+        XCTAssertFalse(deckRow(app, named: name).waitForExistence(timeout: 3), "The deleted deck is gone after a relaunch")
+    }
+
+    /// With no matching deck the library says so instead of showing an empty table.
+    func testSearchWithoutMatchesShowsAMessage() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        let name = "UI \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "a", back: "b")
+        fillCard(app, index: 1, front: "c", back: "d")
+        app.buttons["save_deck"].tap()
+        XCTAssertTrue(deckRow(app, named: name).waitForExistence(timeout: 10))
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("zzzz-no-such-deck")
+        attachScreenshot(app, name: "search-no-results")
+        XCTAssertTrue(app.staticTexts["Không có bộ thẻ phù hợp"].waitForExistence(timeout: 5), "A search without results says so")
+        XCTAssertTrue(app.staticTexts["Không có gì khớp với “zzzz-no-such-deck”."].exists, "The message names the search that found nothing")
+        // Clearing the search brings the deck back (and lets the cleanup in teardown reach its row).
+        search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "zzzz-no-such-deck".count))
+        XCTAssertTrue(deckRow(app, named: name).waitForExistence(timeout: 5), "Clearing the search lists the deck again")
+    }
+
+    /// Saving without a name or cards shows what is missing and keeps the editor open.
+    func testSavingAnEmptyDeckShowsInlineProblems() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        openNewDeckEditor(app)
+        XCTAssertTrue(app.buttons["save_deck"].waitForExistence(timeout: 5))
+        app.buttons["save_deck"].tap()
+        XCTAssertTrue(app.staticTexts["Hãy nhập tên bộ thẻ."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["save_deck"].exists, "The editor stays open")
+        attachScreenshot(app, name: "editor-problems")
+        app.buttons["close_deck_editor"].tap()
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5), "A clean editor closes without a prompt")
+    }
+
+    /// Unsaved work from an earlier run is offered back; these tests want a blank editor.
+    private func openNewDeckEditor(_ app: XCUIApplication) {
+        app.buttons["create_deck_button"].tap()
+        let prompt = app.alerts["Tìm thấy bản nháp chưa lưu"]
+        if prompt.waitForExistence(timeout: 2) { prompt.buttons["Bỏ bản nháp"].tap() }
+    }
+
+    /// Typing is autosaved as a draft; after the app is killed the editor offers it back and restores it.
+    func testUnsavedDeckIsRecoveredAfterTheAppIsKilled() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        openNewDeckEditor(app)
+        let name = "Draft \(UUID().uuidString.prefix(6))"
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "dog", back: "cho")
+        sleep(2)   // the draft is written shortly after the last keystroke
+        app.terminate()
+        app.launch()
+        openCards(app)
+        app.buttons["create_deck_button"].tap()
+        let prompt = app.alerts["Tìm thấy bản nháp chưa lưu"]
+        XCTAssertTrue(prompt.waitForExistence(timeout: 5), "The unsaved draft is offered after a relaunch")
+        attachScreenshot(app, name: "draft-offer")
+        prompt.buttons["Khôi phục bản nháp"].tap()
+        XCTAssertEqual(app.textViews["deck_name"].value as? String, name)
+        XCTAssertEqual(app.textViews.matching(identifier: "card_front").element(boundBy: 0).value as? String, "dog")
+        // Leave without saving and without leaving a draft behind for the next run.
+        app.buttons["close_deck_editor"].tap()
+        app.alerts.buttons["Bỏ thay đổi"].tap()
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5))
+    }
+
+    private func openCards(_ app: XCUIApplication) {
+        let cards = app.tabBars.buttons["tab_cards"]
+        XCTAssertTrue(cards.waitForExistence(timeout: 40))
+        cards.tap()
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 10))
+    }
+
+    private func waitForLabel(_ element: XCUIElement, containing text: String, timeout: TimeInterval = 5) -> Bool {
+        let predicate = NSPredicate(format: "label CONTAINS %@", text)
+        return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: element)], timeout: timeout) == .completed
+    }
+
+    private func fillCard(_ app: XCUIApplication, index: Int, front: String, back: String) {
+        let frontField = app.textViews.matching(identifier: "card_front").element(boundBy: index)
+        if !frontField.isHittable { app.tables["deck_editor_table"].swipeUp() }
+        frontField.tap()
+        frontField.typeText(front)
+        let backField = app.textViews.matching(identifier: "card_back").element(boundBy: index)
+        backField.tap()
+        backField.typeText(back)
+    }
+
+    private func deckRow(_ app: XCUIApplication, named name: String) -> XCUIElement {
+        app.cells.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@", "deck_row_", name)).firstMatch
+    }
+
+    /// Cleans up the deck a test made (whichever name it ended with) through the editor's "Delete deck", so runs do not
+    /// accumulate decks. Best effort: it only acts when the library is on screen.
+    private func deleteDeckIfPresent(named first: String, orNamed second: String) {
+        let app = XCUIApplication()
+        guard app.state == .runningForeground else { return }
+        if !app.tables["deck_library"].exists, app.tabBars.buttons["tab_cards"].exists { app.tabBars.buttons["tab_cards"].tap() }
+        guard app.tables["deck_library"].waitForExistence(timeout: 3) else { return }
+        for name in first == second ? [first] : [first, second] {
+            let row = deckRow(app, named: name)
+            guard row.waitForExistence(timeout: 2) else { continue }
+            // Bring the list to its top (the large title / search field overlap a scrolled list), then tap the row's centre.
+            app.tables["deck_library"].swipeDown()
+            row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            guard app.buttons["study_options"].waitForExistence(timeout: 5) else { continue }
+            app.buttons["study_options"].tap()
+            app.buttons["Sửa bộ thẻ"].tap()
+            guard app.buttons["deck_more"].waitForExistence(timeout: 5) else { continue }
+            app.buttons["deck_more"].tap()
+            app.buttons["Xoá bộ thẻ"].tap()
+            let confirm = app.alerts.buttons["Xoá"]
+            if confirm.waitForExistence(timeout: 3) { confirm.tap() }
+            _ = app.tables["deck_library"].waitForExistence(timeout: 5)
+        }
     }
 
     private func attachScreenshot(_ app: XCUIApplication, name: String) {

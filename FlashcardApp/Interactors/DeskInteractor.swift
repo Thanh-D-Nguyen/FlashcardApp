@@ -12,55 +12,44 @@ protocol DeskInteractorInterface: AnyObject {
 
     var desks: [DeskEntity] { get }
 
-    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int) throws
-    func updateDesk(_ desk: DeskEntity) throws
+    func desk(withId id: String) -> DeskEntity?
+    func deleteDesk(withId id: String) throws
 }
 
 class DeskInteractor {
     private let repository: DeskRepositoryInterface
+    private let maintenance: CardMediaMaintenance
+    private let drafts: DeckDraftStoreInterface
 
-    init(repository: DeskRepositoryInterface = DeskManagement.shared) {
+    init(repository: DeskRepositoryInterface = DeskManagement.shared,
+         maintenance: CardMediaMaintenance = CardMediaMaintenance(),
+         drafts: DeckDraftStoreInterface = DeckDraftStore.shared) {
         self.repository = repository
+        self.maintenance = maintenance
+        self.drafts = drafts
     }
 
     var desks: [DeskEntity] {
         return repository.getAll()
     }
-
-    private var deskCount: Int {
-        return desks.count
-    }
 }
 
 extension DeskInteractor: DeskInteractorInterface {
-    func addDeskName(_ name: String?, description: String?, sortingLanguage: Int) throws {
-        let newId = deskCount + 1
-        let choiceName: String
-        if let name = name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty {
-            choiceName = name
-        } else {
-            choiceName = "Desk \(newId)"
-        }
-        let desk = DeskEntity()
-        desk.id = UUID().uuidString
-        desk.name = choiceName
-        desk.description = description ?? ""
-        desk.imageNamed = ""
-        desk.sortingLanguage = LanguageSortingType(rawValue: sortingLanguage) ?? .normal
-        desk.cards = []
-        desk.date = Date()
-        do {
-            try repository.add(desk)
-        } catch {
-            throw AppError.databaseWriteFailed(error.localizedDescription)
-        }
+    func desk(withId id: String) -> DeskEntity? {
+        repository.desk(withId: id)
     }
 
-    func updateDesk(_ desk: DeskEntity) throws {
+    func deleteDesk(withId id: String) throws {
+        guard let desk = repository.desk(withId: id) else {
+            throw AppError.entityNotFound(NSLocalizedString("deck", comment: ""))
+        }
         do {
-            try repository.update(desk)
+            try repository.delete(desk)
         } catch {
             throw AppError.databaseWriteFailed(error.localizedDescription)
         }
+        // Unsaved edits of a deck that no longer exists can never be restored; drop them so their pictures are collected too.
+        drafts.discard(forDeckId: id)
+        maintenance.collectGarbage()
     }
 }

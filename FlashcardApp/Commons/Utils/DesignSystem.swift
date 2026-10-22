@@ -109,6 +109,10 @@ enum Design {
         case eyebrow
         /// Initial of a person's name inside the account avatar; Mincho like the level numerals.
         case monogram
+        /// The word on a study card: the largest text on the screen, so it reads at arm's length.
+        case term
+        /// The meaning on the back of a study card.
+        case answer
 
         var font: UIFont {
             switch self {
@@ -124,12 +128,14 @@ enum Design {
             case .numeralDisplay: return Self.mincho(size: 96, style: .largeTitle, maximum: 150)
             case .eyebrow: return .preferredFont(forTextStyle: .caption1).withWeight(.semibold)
             case .monogram: return Self.mincho(size: 32, style: .title1, maximum: 40)
+            case .term: return UIFontMetrics(forTextStyle: .largeTitle).scaledFont(for: .systemFont(ofSize: 52, weight: .semibold), maximumPointSize: 96)
+            case .answer: return .preferredFont(forTextStyle: .title2)
             }
         }
 
         var color: UIColor {
             switch self {
-            case .title, .headword, .meaning, .explanation, .figure: return Color.textPrimary
+            case .title, .headword, .meaning, .explanation, .figure, .term, .answer: return Color.textPrimary
             case .reading, .metadata: return Color.textSecondary
             case .mark, .numeral, .monogram: return Color.accent
             case .numeralDisplay: return Color.onHero

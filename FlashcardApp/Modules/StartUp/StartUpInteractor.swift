@@ -24,6 +24,11 @@ final class StartUpInteractor {
 
 extension StartUpInteractor: StartUpInteractorInterface {
     func prepareDatabase(onComplete: @escaping () -> Void, onError: @escaping (AppError) -> Void) {
-        realmService.configuration(onComplete: onComplete, onError: onError)
+        realmService.configuration(onComplete: {
+            #if DEBUG
+            DebugFixtures.seedCardsIfRequested()
+            #endif
+            onComplete()
+        }, onError: onError)
     }
 }

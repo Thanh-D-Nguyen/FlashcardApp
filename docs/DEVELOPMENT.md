@@ -12,7 +12,7 @@ Bốn tab hoạt động:
   phân trang 30 mục và xem nghĩa.
 - Từ điển: GET `/api/search`, scope `lexeme`, `kanji`, `grammar`, `example`.
   Đổi từ khóa hủy request cũ; có trạng thái tải, trống, lỗi và tải lại.
-- Thẻ: bộ thẻ Realm offline, chọn bộ và tạo bộ mới; giữ URL ảnh đã lưu.
+- Thẻ: thư viện bộ thẻ Realm offline (tìm, sắp xếp, sửa, xoá), trình soạn bộ thẻ (cách đọc, ghi chú, ảnh từ Ảnh hoặc `https`, nhập hàng loạt, bản nháp) và màn học (lật, xáo trộn, trắc nghiệm, đọc to). Ảnh của thẻ nằm cục bộ vì backend Go chưa lưu ảnh cho thẻ; chi tiết, ma trận tương đương web và bằng chứng ở `docs/ui-redesign/cards/README.md`.
 - Cài đặt: giao diện, âm thanh, thông báo và tài khoản của website.
 
 Giao diện có ba ngôn ngữ: Tiếng Việt, English, 日本語 (`Localizable.xcstrings`; chọn ngôn ngữ ở
@@ -64,13 +64,11 @@ backend đang chạy. OpenAPI cũ chưa đủ để khẳng định mọi endpoi
 | Alamofire | Request API, validation và cancellation |
 | realm-swift | Dữ liệu offline, bộ thẻ và schema đang dùng |
 | Kingfisher | Tải/cache ảnh của thẻ đã lưu và avatar |
-| CollectionViewPagingLayout | Hiệu ứng chuyển thẻ hiện có |
-| SwipeCellKit | Thao tác sửa/xóa/sắp xếp thẻ trong màn tạo bộ |
 
 `Package.resolved` gồm các package trên và `realm-core` là dependency bắc cầu.
 Đã bỏ Firebase, Facebook SDK, GoogleSignIn, swift-log, Typist và các product test
 RxBlocking/RxTest không dùng. OSLog, UIRefreshControl, UIKeyboardLayoutGuide thay
-cho các wrapper tương ứng. MMTextView còn được XIB của màn tạo thẻ sử dụng.
+cho các wrapper tương ứng. Màn Thẻ viết lại không còn dùng MMTextView, SwipeCellKit hay CollectionViewPagingLayout nên đã gỡ cả ba.
 
 Đã bỏ các thư viện vendored Disk, VImage, PullToRefresh, RESegmentedControl;
 giao diện snack/carousel mẫu, Quiz rỗng, Vocabulary/DictionaryWelcome mẫu; client
