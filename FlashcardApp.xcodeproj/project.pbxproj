@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A7C0DE22F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A7C0DE12F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift */; };
 		1BE087530645B7FBA386BAC7 /* HomeCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81651ED770FBD884568B4B44 /* HomeCells.swift */; };
 		3809A6AD49199CB7D07DBA0F /* SettingPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9CAB3FBED0EBD7CB069327 /* SettingPresenterTests.swift */; };
 		5E7A11C0D2B94A6F8C3E0A01 /* SettingsRowCellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7A11C0D2B94A6F8C3E0A02 /* SettingsRowCellTests.swift */; };
@@ -199,6 +200,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A7C0DE12F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartUpPresenterTests.swift; sourceTree = "<group>"; };
 		1235E8CD5F0FDD150A00D51E /* AuthSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSession.swift; sourceTree = "<group>"; };
 		4479E6D17205D798B73B194A /* SettingsPrototypes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsPrototypes.swift; sourceTree = "<group>"; };
 		4A421E34481835A9483C8B14 /* NativeAuthAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAuthAPI.swift; sourceTree = "<group>"; };
@@ -547,6 +549,7 @@
 				9F9CAB3FBED0EBD7CB069327 /* SettingPresenterTests.swift */,
 				5E7A11C0D2B94A6F8C3E0A02 /* SettingsRowCellTests.swift */,
 				8E96D68F982120FDBA7412A1 /* RealmBootstrapTests.swift */,
+				5A7C0DE12F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift */,
 				9251EBE329A1E9A7006C1D1C /* FlashcardAppTests.swift */,
 			);
 			path = FlashcardAppTests;
@@ -1258,6 +1261,7 @@
 				3809A6AD49199CB7D07DBA0F /* SettingPresenterTests.swift in Sources */,
 				5E7A11C0D2B94A6F8C3E0A01 /* SettingsRowCellTests.swift in Sources */,
 				A0BCF8E413F8AC623DDB6D83 /* RealmBootstrapTests.swift in Sources */,
+				5A7C0DE22F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift in Sources */,
 				9251EBE429A1E9A7006C1D1C /* FlashcardAppTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

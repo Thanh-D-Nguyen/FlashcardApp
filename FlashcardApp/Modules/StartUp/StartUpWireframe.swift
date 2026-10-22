@@ -10,7 +10,8 @@
 import UIKit
 
 protocol StartUpWireframeInterface: WireframeInterface {
-    func navigateToMain()
+    /// Replaces the start-up screen with the app. `animated` cross-fades; the default hand-off is an invisible cut.
+    func navigateToMain(animated: Bool)
 }
 
 final class StartUpWireframe: BaseWireframe<StartUpViewController> {
@@ -26,9 +27,16 @@ final class StartUpWireframe: BaseWireframe<StartUpViewController> {
     }
 }
 
-// MARK: - Extensions -
 extension StartUpWireframe: StartUpWireframeInterface {
-    func navigateToMain() {
-        self.navigationController?.setRootWireframe(MainWireframe())
+    func navigateToMain(animated: Bool) {
+        guard let navigationController else { return }
+        let main = MainWireframe()
+        guard animated, !UIAccessibility.isReduceMotionEnabled else {
+            navigationController.setRootWireframe(main, animated: false)
+            return
+        }
+        UIView.transition(with: navigationController.view, duration: 0.3, options: .transitionCrossDissolve) {
+            navigationController.setRootWireframe(main, animated: false)
+        }
     }
 }

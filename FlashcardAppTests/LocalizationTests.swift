@@ -58,7 +58,7 @@ final class LocalizationTests: XCTestCase {
     func test_japaneseCopyIsActuallyJapaneseAndVietnameseKeepsItsDiacritics() throws {
         let japanese = try table("ja")
         let kana = CharacterSet(charactersIn: "\u{3040}"..."\u{30FF}").union(CharacterSet(charactersIn: "\u{4E00}"..."\u{9FFF}"))
-        let latinOnlyAllowed: Set<String> = ["email@domain.com", "OK", "Preparing Data..."]
+        let latinOnlyAllowed: Set<String> = ["email@domain.com", "OK"]
         for (key, value) in japanese where !latinOnlyAllowed.contains(key) {
             XCTAssertNotNil(value.unicodeScalars.first(where: kana.contains), "ja: \(key) → \(value) has no Japanese characters")
         }

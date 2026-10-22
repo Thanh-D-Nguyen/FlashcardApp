@@ -1825,26 +1825,26 @@
         }
       }
     },
-    "Preparing Data...": {
+    "Preparing your offline lessons…": {
       "extractionState": "manual",
-      "comment": "Start-up progress; %@ is the progress, e.g. 12.0/100.0",
+      "comment": "Start-up loading text on first launch while the bundled lessons are installed",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing Data...(%@)"
+            "value": "Preparing your offline lessons…"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Đang chuẩn bị dữ liệu...(%@)"
+            "value": "Đang chuẩn bị bài học ngoại tuyến…"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "データを準備中...(%@)"
+            "value": "オフライン教材を準備しています…"
           }
         }
       }

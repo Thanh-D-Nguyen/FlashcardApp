@@ -22,6 +22,14 @@ từ API hiện chỉ có tiếng Việt. UI test ghim `-AppleLanguages (vi)`.
 App mở thẳng vào nội dung, không yêu cầu đăng nhập để học offline hoặc đọc API
 công khai. Đăng nhập từ mục tài khoản trong Cài đặt bằng tài khoản website đã có.
 
+## Khởi động
+
+Launch screen hệ thống chỉ là một màn trống màu `LaunchBackground` (giấy washi / gần đen), trùng
+`Design.Color.background`; không logo, chữ hay animation. `StartUp` không phải màn splash: nó chỉ
+mở cơ sở dữ liệu offline qua `StartUpInteractor` rồi chuyển thẳng vào `Main`. Chỉ khi việc chuẩn bị
+kéo dài quá 0,4 giây (cài đặt lần đầu, sao chép ~120 MB) mới hiện trạng thái tải; lỗi mở dữ liệu hiện
+màn lỗi có nút Thử lại. Không có độ trễ giả. Chi tiết và ảnh chụp: `docs/ui-redesign/splash/`.
+
 ## API và tài khoản
 
 Scheme `FlashcardApp-Local` (hoặc `FlashcardApp`) dùng
