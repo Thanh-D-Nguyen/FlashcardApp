@@ -49,11 +49,12 @@ extension MainPresenter: MainPresenterInterface {
         let dictionary = DictionaryWireframe()
         let dictionaryNav = BaseNavigationController(rootViewController: dictionary.viewController)
         let setting = SettingWireframe()
+        let settingNav = BaseNavigationController(rootViewController: setting.viewController)
         home.viewController.tabBarItem.accessibilityIdentifier = "tab_levels"
         dictionary.viewController.tabBarItem.accessibilityIdentifier = "tab_dictionary"
         card.viewController.tabBarItem.accessibilityIdentifier = "tab_cards"
         setting.viewController.tabBarItem.accessibilityIdentifier = "tab_settings"
-        let viewControllers = [homeNav, dictionaryNav, cardNav, setting.viewController]
+        let viewControllers = [homeNav, dictionaryNav, cardNav, settingNav]
         tabbarController.viewControllers = viewControllers
         return tabbarController
     }

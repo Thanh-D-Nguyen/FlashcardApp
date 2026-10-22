@@ -128,6 +128,43 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.segmentedControls["level_content_kind"].buttons["Ngữ pháp"].isSelected)
     }
 
+    /// Appearance is a pop-up menu on the row; the choice is shown immediately and restored afterwards.
+    func testSettingsAppearanceMenuChangesSelection() {
+        let app = XCUIApplication()
+        app.launch()
+        let settings = app.tabBars.buttons["tab_settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 40))
+        settings.tap()
+        let menu = app.buttons["Giao diện"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 10))
+        // The choice is persisted in the app's defaults; put it back even if an assertion below fails.
+        addTeardownBlock {
+            guard app.state == .runningForeground, app.buttons["Giao diện"].exists,
+                  app.buttons["Giao diện"].value as? String != "Theo hệ thống" else { return }
+            app.buttons["Giao diện"].tap()
+            app.buttons["Theo hệ thống"].tap()
+        }
+        menu.tap()
+        app.buttons["Tối"].tap()
+        XCTAssertEqual(app.buttons["Giao diện"].value as? String, "Tối")
+        app.buttons["Giao diện"].tap()
+        app.buttons["Theo hệ thống"].tap()
+        XCTAssertEqual(app.buttons["Giao diện"].value as? String, "Theo hệ thống")
+    }
+
+    /// Signed out, the account header carries the one primary action and it opens the login screen.
+    func testSettingsSignInButtonOpensLogin() {
+        let app = XCUIApplication()
+        app.launch()
+        let settings = app.tabBars.buttons["tab_settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 40))
+        settings.tap()
+        let signIn = app.buttons["setting_sign_in"]
+        XCTAssertTrue(signIn.waitForExistence(timeout: 10))
+        signIn.tap()
+        XCTAssertTrue(app.buttons["website_login_button"].waitForExistence(timeout: 5))
+    }
+
     private func attachScreenshot(_ app: XCUIApplication, name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name

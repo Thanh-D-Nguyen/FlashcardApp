@@ -20,6 +20,10 @@ protocol SettingInteractorInterface: AnyObject {
     func getNotificationEnabled() -> Bool
     func setNotificationEnabled(_ enabled: Bool)
     func getNotificationAuthorizationStatus() -> UNAuthorizationStatus
+    /// Keeps the cached system answer in step with what the permission prompt just returned.
+    func setNotificationAuthorizationStatus(_ status: UNAuthorizationStatus)
+    /// Shows the system prompt (once per install); `completion` runs on the main thread.
+    func requestNotificationPermission(completion: @escaping (Bool) -> Void)
     func getSoundEnabled() -> Bool
     func setSoundEnabled(_ enabled: Bool)
 }
@@ -81,6 +85,16 @@ final class SettingInteractor: SettingInteractorInterface {
         // Synchronous read is not available; presenter should check async if needed.
         // For section building we cache last known status in preferences.
         return preferences.notificationAuthorizationStatus
+    }
+
+    func setNotificationAuthorizationStatus(_ status: UNAuthorizationStatus) {
+        preferences.notificationAuthorizationStatus = status
+    }
+
+    func requestNotificationPermission(completion: @escaping (Bool) -> Void) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+            DispatchQueue.main.async { completion(granted) }
+        }
     }
 
     // MARK: - Sound

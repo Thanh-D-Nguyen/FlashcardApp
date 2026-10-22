@@ -56,6 +56,9 @@ enum Design {
         /// Deep indigo block that carries the single primary entry point of a screen.
         static let hero = dynamic(light: 0x23406B, dark: 0x24406E)
         /// Paper-colored text and controls on `hero` (≥ 8:1 in both appearances).
+        /// Text/icons on an accent-filled control: white on the light-mode indigo, near-black on the dark-mode light blue
+        /// (white on `#8FB4F0` is only about 2:1).
+        static let onAccent = dynamic(light: 0xFFFFFF, dark: 0x0F0F10)
         /// Foreground for paper-colored controls placed on `hero`.
         static let heroDeep = rgb(0x1B2F52)
         static let onHero = rgb(0xF6F3ED)
@@ -104,6 +107,8 @@ enum Design {
         case numeralDisplay
         /// Short label above a heading ("Bắt đầu từ đây").
         case eyebrow
+        /// Initial of a person's name inside the account avatar; Mincho like the level numerals.
+        case monogram
 
         var font: UIFont {
             switch self {
@@ -118,6 +123,7 @@ enum Design {
             case .numeral: return Self.mincho(size: 44, style: .title1, maximum: 72)
             case .numeralDisplay: return Self.mincho(size: 96, style: .largeTitle, maximum: 150)
             case .eyebrow: return .preferredFont(forTextStyle: .caption1).withWeight(.semibold)
+            case .monogram: return Self.mincho(size: 32, style: .title1, maximum: 40)
             }
         }
 
@@ -125,7 +131,7 @@ enum Design {
             switch self {
             case .title, .headword, .meaning, .explanation, .figure: return Color.textPrimary
             case .reading, .metadata: return Color.textSecondary
-            case .mark, .numeral: return Color.accent
+            case .mark, .numeral, .monogram: return Color.accent
             case .numeralDisplay: return Color.onHero
             case .eyebrow: return Color.textSecondary
             }
@@ -172,6 +178,7 @@ enum Design {
             configuration.cornerStyle = .capsule
             configuration.buttonSize = .large
             configuration.baseBackgroundColor = Color.accent
+            configuration.baseForegroundColor = Color.onAccent
             return configuration
         }
 

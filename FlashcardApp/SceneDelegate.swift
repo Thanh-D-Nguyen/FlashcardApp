@@ -14,6 +14,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
+        // The Settings choice is persisted; apply it from the first frame, not only while Settings is used.
+        window?.overrideUserInterfaceStyle = AppearanceOption.resolve(UserDefaultsPreferences.shared.appearance).userInterfaceStyle
         let initialViewController = BaseNavigationController()
         let startUpWireFrame = StartUpWireframe()
         initialViewController.setRootWireframe(startUpWireFrame)

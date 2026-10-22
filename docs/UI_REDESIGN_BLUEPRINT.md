@@ -112,7 +112,7 @@ giao diện, cỡ chữ ghi trong tên/bảng bên dưới); ảnh P0/P1 để s
 ## 8. Việc còn lại
 
 1. **Thẻ**: tiêu đề nhỏ, ô chọn bộ thẻ trống không nhãn, viền ô `AppColors`; học thẻ/tạo bộ thẻ chưa thiết kế.
-2. **Cài đặt**: toàn bộ chuỗi tiếng Anh (Preferences, Sign In…), icon màu hệ thống; cần String Catalog.
+2. ~~**Cài đặt**~~ — đã làm lại, xem §10.
 3. **Từ điển**: hàng kết quả vẫn dùng kiểu mặc định; `StateView` thay `message`.
 4. Kanji: chưa có trang chi tiết (chạm vẫn mở hộp thoại nghĩa); furigana chưa có trong dữ liệu API.
 5. Fixture backend local (`audit141 lexeme …`) hiển thị ở từ vựng J5; là dữ liệu, không phải lỗi UI.
@@ -145,3 +145,45 @@ không tìm thấy cell container" không xảy ra (8/8).
 J5 xuất hiện chỉ ở hero nên mất lối vào Kanji/Ngữ pháp trực tiếp (vẫn một chạm sau khi mở). (2) *Học tập*: không có tiến độ nên "bắt đầu từ đây" chỉ
 là cấp độ đầu tiên có nội dung, không phải gợi ý; cần dữ liệu thật mới làm "tiếp tục học". (3) *Accessibility*: cấu trúc VoiceOver đúng theo mã, chưa nghe
 bằng VoiceOver thật. (4) *UIKit*: không file mới, không đổi kiến trúc; `ActionableView` là điểm duy nhất cần theo dõi khi thêm hành động.
+
+## 10. Màn Cài đặt (milestone tiếp theo)
+
+Cùng hệ thống với Home: nền washi, chàm 藍, đường kẻ mảnh, tiêu đề lớn native; không thẻ nổi, không khối màu thứ hai.
+
+**Vấn đề đã sửa** (ảnh trước: `docs/ui-redesign/settings/before_p1_settings_light.png`):
+
+| Vấn đề | Cách xử lý |
+| --- | --- |
+| Toàn bộ chuỗi tiếng Anh (`NSLocalizedString` với khoá tiếng Anh, không có bản dịch); "Ngôn ngữ: English (Japan)" sai sự thật | Chuỗi tiếng Việt viết thẳng như các màn khác; "Ngôn ngữ: Tiếng Việt", chạm hiện giải thích (app chỉ có một ngôn ngữ). Chưa dùng String Catalog vì chưa có ngôn ngữ thứ hai |
+| Tab Cài đặt không nằm trong `UINavigationController` (`navigationController` thực ra là nav gốc của app) nên không có tiêu đề | Bọc trong `BaseNavigationController` như 3 tab kia; đăng xuất/đăng nhập vẫn thay root của nav gốc (`navigationController?.navigationController`) |
+| Công tắc Thông báo bị khoá khi quyền ở `notDetermined`, mà đây là nơi duy nhất xin quyền → không bao giờ bật được | Công tắc dùng được; bật sẽ hiện hộp xin quyền, kết quả được cache lại (nếu không công tắc nhảy về Tắt); bị từ chối → giải thích + hàng "Mở Cài đặt hệ thống" |
+| Lựa chọn Giao diện **không được áp dụng khi mở app** (chỉ áp dụng lúc đang chạy) | `SceneDelegate` áp dụng giá trị đã lưu ngay từ khung hình đầu; giá trị lạ → theo hệ thống |
+| Giao diện là action sheet giữa màn hình | Menu pop-up trên chính hàng (một chạm, có dấu chọn); ở cỡ chữ accessibility giá trị chuyển xuống dưới tiêu đề |
+| Hint VoiceOver "xem chi tiết tài khoản" không dẫn đi đâu | Bỏ hint; hàng tài khoản đã đăng nhập chỉ đọc "tên, email" |
+| Nút chính ở Dark Mode: chữ trắng trên xanh nhạt (~2:1) | Token `onAccent` (trắng ở Light, gần đen ở Dark) trong `Design.Button.primary`; dùng chung cả nút Thử lại |
+| Icon `.label`/`systemBlue`, đỏ hệ thống | Icon đơn sắc chàm, nguy hiểm dùng `Design.Color.error` |
+
+**Bố cục**: header tài khoản (avatar vòng chàm với chữ cái đầu bằng Mincho hoặc ảnh; đăng nhập rồi thì chỉ tên + email, chưa đăng nhập
+thì thêm nút "Đăng nhập" — hành động chính duy nhất của màn) → Tuỳ chọn → Chung → Giới thiệu → (đã đăng nhập) Đăng xuất. Hàng dựng bằng
+`UIListContentConfiguration` (Dynamic Type, lề, VoiceOver như danh sách hệ thống); công tắc và nút menu là accessory view.
+
+**Kiến trúc**: `SettingItem.choice` mới (presenter: `selectChoice`, wireframe bỏ `showAppearancePicker`); xin quyền thông báo đi qua
+`SettingInteractor.requestNotificationPermission` nên kiểm thử được. Xoá `ToggleCell`, `CommonCell`(→ `SettingsRowCell`), `AccountCell.xib`,
+`CommonCell.xib` (đã sửa `project.pbxproj`). `Prototypes/SettingsPrototypes.swift` (SwiftUI preview 3 hướng từ trước) giữ nguyên, không
+dùng.
+
+**Kết quả** (iPhone 17e, iOS 26.5; backend local bật): build SUCCEEDED; chạy gộp unit+UI **110/110** (100 unit, trong đó 12 test Cài đặt mới/sửa; 10 UI,
+trong đó 2 mới: menu Giao diện, nút Đăng nhập mở màn đăng nhập). Coverage dòng (unit+UI): SettingPresenter 89,7% · SettingViewController 91,6% ·
+SettingsRowCell 92,4% · AccountCell 78,0% · SettingInteractor 57,4% · **SettingWireframe 20,4%** (alert/Safari không có test) · SceneDelegate 55,9%.
+Ảnh thật trong `docs/ui-redesign/settings/`: Light, menu Giao diện, Dark (áp dụng từ lựa chọn đã lưu khi thiết bị đang Light), AX-XXXL (đầu + cuộn).
+Review độc lập (agent `flashcard-reviewer`, chỉ đọc mã): không lỗi crash/điều hướng/pbxproj; 6 điểm nhỏ đã sửa (VoiceOver sau khi tái sử dụng
+cell, đăng ký theo dõi cỡ chữ trong `init`, viền avatar theo Light/Dark, `provisional/ephemeral`, test UI trả lại giao diện, gọi
+`viewWillDisappear`). Ảnh được chụp trước các sửa nhỏ đó (không đổi bố cục nhìn thấy); chưa chụp lại.
+
+**Chưa làm / cần quyết định sản phẩm**:
+1. **Công tắc Thông báo và "Âm thanh và rung" chỉ lưu `UserDefaults`; không có mã nào đọc chúng** (không có nhắc học, không có âm/rung). UI vẫn như cũ để
+   giữ hành vi; cần quyết định xoá hai hàng hay làm tính năng thật. Chữ trong hộp thoại "nhận nhắc nhở học tập" cũng đang hứa điều chưa có.
+2. Hàng tài khoản đã đăng nhập chưa kiểm tra bằng ảnh (cần tài khoản thật); đăng nhập thành công với tài khoản thật vẫn chưa kiểm chứng.
+3. Chính sách quyền riêng tư mở `<baseURL>/vi/privacy` trong Safari; production chưa có URL nên chỉ chạy được với backend local.
+4. Refresh hồ sơ có thể chạy hai lần mỗi lần hiện màn (có sẵn từ trước: `viewWillAppear` + callback quyền thông báo).
+5. VoiceOver thật, Increase Contrast, iPad, thiết bị thật chưa kiểm chứng.

@@ -31,8 +31,8 @@
                         <constraints>
                             <constraint firstItem="OCG-a5-JmL" firstAttribute="leading" secondItem="3pi-N7-nbV" secondAttribute="leading" id="EEf-WD-Tr7"/>
                             <constraint firstItem="3pi-N7-nbV" firstAttribute="trailing" secondItem="OCG-a5-JmL" secondAttribute="trailing" id="ZHs-vh-dlD"/>
-                            <constraint firstItem="OCG-a5-JmL" firstAttribute="top" secondItem="3pi-N7-nbV" secondAttribute="top" id="j7x-CR-Sts"/>
-                            <constraint firstItem="3pi-N7-nbV" firstAttribute="bottom" secondItem="OCG-a5-JmL" secondAttribute="bottom" id="yim-Lx-ty2"/>
+                            <constraint firstItem="OCG-a5-JmL" firstAttribute="top" secondItem="Z2g-4m-atm" secondAttribute="top" id="j7x-CR-Sts"/>
+                            <constraint firstItem="Z2g-4m-atm" firstAttribute="bottom" secondItem="OCG-a5-JmL" secondAttribute="bottom" id="yim-Lx-ty2"/>
                         </constraints>
                     </view>
                     <connections>

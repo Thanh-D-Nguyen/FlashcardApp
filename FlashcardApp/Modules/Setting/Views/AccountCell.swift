@@ -2,7 +2,8 @@
 //  AccountCell.swift
 //  FlashcardApp
 //
-//  Created by タイン・グエン on 2023/02/19.
+//  Account header of the Settings screen. Signed in: monogram or photo, name, email.
+//  Signed out: the same layout plus the screen's one primary action, "Đăng nhập".
 //
 
 import UIKit
@@ -10,60 +11,163 @@ import Kingfisher
 
 final class AccountCell: UITableViewCell {
 
-    @IBOutlet private weak var accountImageView: RoundedImageView!
-    @IBOutlet private weak var nameLabel: UILabel!
-    @IBOutlet private weak var emailLabel: UILabel!
+    static let reuseIdentifier = "account_cell"
+    private static let avatarSize: CGFloat = 64
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        selectionStyle = .default
-        backgroundColor = .systemBackground
-        accountImageView.contentMode = .scaleAspectFill
-        accountImageView.clipsToBounds = true
-        nameLabel.font = .preferredFont(forTextStyle: .headline)
-        nameLabel.adjustsFontForContentSizeCategory = true
-        emailLabel.font = .preferredFont(forTextStyle: .subheadline)
-        emailLabel.adjustsFontForContentSizeCategory = true
-        emailLabel.textColor = .secondaryLabel
+    var onSignIn: (() -> Void)?
+
+    private let avatarView = UIView()
+    private let photoView = UIImageView()
+    private let monogramLabel = UILabel()
+    private let glyphView = UIImageView()
+    private let nameLabel = UILabel()
+    private let detailLabel = UILabel()
+    private let infoView = UIView()
+    private let signInButton = UIButton(configuration: Design.Button.primary(title: "Đăng nhập"))
+    private let headerStack = UIStackView()
+    private let rootStack = UIStackView()
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .clear
+        configurationUpdateHandler = { cell, state in
+            var background = UIBackgroundConfiguration.clear()
+            if state.isHighlighted || state.isSelected { background.backgroundColor = Design.Color.highlight }
+            cell.backgroundConfiguration = background
+        }
+
+        avatarView.layer.cornerRadius = Self.avatarSize / 2
+        avatarView.layer.borderWidth = 1
+        avatarView.layer.borderColor = Design.Color.accent.resolvedColor(with: traitCollection).cgColor
+        avatarView.clipsToBounds = true
+        avatarView.translatesAutoresizingMaskIntoConstraints = false
+        avatarView.isAccessibilityElement = false
+        photoView.contentMode = .scaleAspectFill
+        monogramLabel.apply(.monogram)
+        monogramLabel.numberOfLines = 1
+        monogramLabel.textAlignment = .center
+        glyphView.image = UIImage(systemName: "person")
+        glyphView.tintColor = Design.Color.accent
+        glyphView.contentMode = .scaleAspectFit
+        for view in [photoView, monogramLabel, glyphView] {
+            view.translatesAutoresizingMaskIntoConstraints = false
+            avatarView.addSubview(view)
+        }
+        NSLayoutConstraint.activate([
+            avatarView.widthAnchor.constraint(equalToConstant: Self.avatarSize),
+            avatarView.heightAnchor.constraint(equalToConstant: Self.avatarSize),
+            photoView.topAnchor.constraint(equalTo: avatarView.topAnchor),
+            photoView.bottomAnchor.constraint(equalTo: avatarView.bottomAnchor),
+            photoView.leadingAnchor.constraint(equalTo: avatarView.leadingAnchor),
+            photoView.trailingAnchor.constraint(equalTo: avatarView.trailingAnchor),
+            monogramLabel.centerXAnchor.constraint(equalTo: avatarView.centerXAnchor),
+            monogramLabel.centerYAnchor.constraint(equalTo: avatarView.centerYAnchor),
+            glyphView.centerXAnchor.constraint(equalTo: avatarView.centerXAnchor),
+            glyphView.centerYAnchor.constraint(equalTo: avatarView.centerYAnchor),
+            glyphView.widthAnchor.constraint(equalToConstant: 28),
+            glyphView.heightAnchor.constraint(equalToConstant: 28)
+        ])
+
+        nameLabel.apply(.title)
+        nameLabel.font = UIFontMetrics(forTextStyle: .title3).scaledFont(for: .systemFont(ofSize: 20, weight: .semibold))
+        detailLabel.apply(.reading)
+        let textStack = UIStackView(arrangedSubviews: [nameLabel, detailLabel])
+        textStack.axis = .vertical
+        textStack.spacing = Design.Spacing.xs
+        textStack.translatesAutoresizingMaskIntoConstraints = false
+        infoView.addSubview(textStack)
+        NSLayoutConstraint.activate([
+            textStack.topAnchor.constraint(equalTo: infoView.topAnchor),
+            textStack.bottomAnchor.constraint(equalTo: infoView.bottomAnchor),
+            textStack.leadingAnchor.constraint(equalTo: infoView.leadingAnchor),
+            textStack.trailingAnchor.constraint(equalTo: infoView.trailingAnchor)
+        ])
+        infoView.isAccessibilityElement = true
+
+        headerStack.spacing = Design.Spacing.l
+        headerStack.alignment = .center
+        [avatarView, infoView].forEach(headerStack.addArrangedSubview)
+
+        signInButton.accessibilityIdentifier = "setting_sign_in"
+        signInButton.addAction(UIAction { [weak self] _ in self?.onSignIn?() }, for: .primaryActionTriggered)
+
+        rootStack.axis = .vertical
+        rootStack.spacing = Design.Spacing.l
+        rootStack.translatesAutoresizingMaskIntoConstraints = false
+        [headerStack, signInButton].forEach(rootStack.addArrangedSubview)
+        contentView.addSubview(rootStack)
+        NSLayoutConstraint.activate([
+            rootStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Design.Spacing.s),
+            rootStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Design.Spacing.l),
+            rootStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Design.Spacing.gutter),
+            rootStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Design.Spacing.gutter)
+        ])
+        updateAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: AccountCell, _) in
+            cell.updateAxis()
+        }
+        // CGColor does not follow appearance by itself; resolve it again when light/dark changes.
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (cell: AccountCell, _) in
+            cell.avatarView.layer.borderColor = Design.Color.accent.resolvedColor(with: cell.traitCollection).cgColor
+        }
     }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        accountImageView.kf.cancelDownloadTask()
-        accountImageView.image = nil
-        nameLabel.text = nil
-        emailLabel.text = nil
-        accessoryType = .none
+        photoView.kf.cancelDownloadTask()
+        photoView.image = nil
+        onSignIn = nil
+    }
+
+    /// Avatar beside the text at regular sizes; above it at accessibility sizes.
+    private func updateAxis() {
+        let large = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        headerStack.axis = large ? .vertical : .horizontal
+        headerStack.alignment = large ? .leading : .center
     }
 
     func configure(with user: SocialUserEntity?) {
-        if let user = user {
-            nameLabel.text = user.displayName ?? NSLocalizedString("User", comment: "")
-            emailLabel.text = user.email ?? ""
-            emailLabel.isHidden = emailLabel.text?.isEmpty ?? true
-            accessoryType = .disclosureIndicator
-
+        photoView.kf.cancelDownloadTask()
+        photoView.image = nil
+        photoView.isHidden = true
+        if let user {
+            let name = user.displayName ?? user.email ?? ""
+            nameLabel.text = user.displayName ?? "Người dùng"
+            detailLabel.text = user.email
+            detailLabel.isHidden = (user.email ?? "").isEmpty
+            let initial = name.first.map { String($0).uppercased() }
+            monogramLabel.text = initial
+            monogramLabel.isHidden = initial == nil
+            glyphView.isHidden = initial != nil
+            signInButton.isHidden = true
+            selectionStyle = .none
+            infoView.accessibilityLabel = [nameLabel.text, user.email].compactMap { $0 }.joined(separator: ", ")
+            infoView.accessibilityTraits = .staticText
             if let photoUrl = user.photoUrl {
-                accountImageView.kf.setImage(
-                    with: photoUrl,
-                    placeholder: UIImage(systemName: "person.circle.fill"),
-                    options: [.transition(.fade(0.2))]
-                )
-            } else {
-                accountImageView.image = UIImage(systemName: "person.circle.fill")
+                photoView.kf.setImage(with: photoUrl, options: [.transition(.fade(0.2))]) { [weak self] result in
+                    // Keep the monogram if the photo cannot be loaded.
+                    if case .success = result {
+                        self?.photoView.isHidden = false
+                        self?.monogramLabel.isHidden = true
+                        self?.glyphView.isHidden = true
+                    }
+                }
             }
-            accountImageView.tintColor = .systemBlue
-            accessibilityLabel = nameLabel.text
-            accessibilityHint = NSLocalizedString("Double tap to view account details", comment: "")
         } else {
-            nameLabel.text = NSLocalizedString("Sign In", comment: "")
-            emailLabel.text = NSLocalizedString("Use your existing website account", comment: "")
-            emailLabel.isHidden = false
-            accountImageView.image = UIImage(systemName: "person.crop.circle.badge.plus")
-            accountImageView.tintColor = .systemBlue
-            accessoryType = .disclosureIndicator
-            accessibilityLabel = NSLocalizedString("Sign In", comment: "")
-            accessibilityHint = NSLocalizedString("Double tap to sign in", comment: "")
+            nameLabel.text = "Tài khoản"
+            detailLabel.text = "Dùng tài khoản website của bạn để đăng nhập."
+            detailLabel.isHidden = false
+            monogramLabel.isHidden = true
+            glyphView.isHidden = false
+            signInButton.isHidden = false
+            selectionStyle = .default
+            infoView.accessibilityLabel = [nameLabel.text, detailLabel.text].compactMap { $0 }.joined(separator: ". ")
+            infoView.accessibilityTraits = .staticText
         }
+        // Container cell: the text and the sign-in button are separate VoiceOver elements.
+        isAccessibilityElement = false
+        accessibilityElements = user == nil ? [infoView, signInButton] : [infoView]
     }
 }

@@ -14,7 +14,6 @@ protocol SettingWireframeInterface: AnyObject {
     func showError(message: String)
     func showNotificationDeniedAlert()
     func openSystemSettings()
-    func showAppearancePicker(current: AppearanceOption, onSelect: @escaping (AppearanceOption) -> Void)
     func showLanguagePicker()
     func showPrivacyPolicy()
     func showAbout()
@@ -42,43 +41,43 @@ extension SettingWireframe: SettingWireframeInterface {
 
     func showError(message: String) {
         showAlert(
-            with: NSLocalizedString("Error", comment: ""),
+            with: "Lỗi",
             message: message
         )
     }
 
     func showLogoutConfirmation(onConfirm: @escaping () -> Void) {
         let confirmAction = UIAlertAction(
-            title: NSLocalizedString("Log Out", comment: ""),
+            title: "Đăng xuất",
             style: .destructive
         ) { _ in
             onConfirm()
         }
         let cancelAction = UIAlertAction(
-            title: NSLocalizedString("Cancel", comment: ""),
+            title: "Huỷ",
             style: .cancel
         )
         showAlert(
-            with: NSLocalizedString("Log Out", comment: ""),
-            message: NSLocalizedString("Are you sure you want to log out?", comment: ""),
+            with: "Đăng xuất",
+            message: "Bạn có chắc muốn đăng xuất không?",
             actions: [confirmAction, cancelAction]
         )
     }
 
     func showNotificationDeniedAlert() {
         let settingsAction = UIAlertAction(
-            title: NSLocalizedString("Open Settings", comment: ""),
+            title: "Mở Cài đặt",
             style: .default
         ) { [weak self] _ in
             self?.openSystemSettings()
         }
         let cancelAction = UIAlertAction(
-            title: NSLocalizedString("Cancel", comment: ""),
+            title: "Huỷ",
             style: .cancel
         )
         showAlert(
-            with: NSLocalizedString("Notifications Disabled", comment: ""),
-            message: NSLocalizedString("Please enable notifications in System Settings to receive study reminders.", comment: ""),
+            with: "Thông báo đang tắt",
+            message: "Hãy bật thông báo trong Cài đặt hệ thống để nhận nhắc nhở học tập.",
             actions: [settingsAction, cancelAction]
         )
     }
@@ -88,36 +87,11 @@ extension SettingWireframe: SettingWireframeInterface {
         UIApplication.shared.open(url)
     }
 
-    func showAppearancePicker(current: AppearanceOption, onSelect: @escaping (AppearanceOption) -> Void) {
-        let alert = UIAlertController(
-            title: NSLocalizedString("Appearance", comment: ""),
-            message: nil,
-            preferredStyle: .actionSheet
-        )
-        for option in AppearanceOption.allCases {
-            let action = UIAlertAction(title: option.title, style: .default) { _ in
-                onSelect(option)
-            }
-            if option == current {
-                action.setValue(true, forKey: "checked")
-            }
-            alert.addAction(action)
-        }
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel))
-
-        if let popover = alert.popoverPresentationController {
-            popover.sourceView = viewController.view
-            popover.sourceRect = CGRect(x: viewController.view.bounds.midX, y: viewController.view.bounds.midY, width: 0, height: 0)
-            popover.permittedArrowDirections = []
-        }
-        viewController.present(alert, animated: true)
-    }
-
     func showLanguagePicker() {
-        // Currently only English is supported; show an informational alert.
+        // The app has a single language; say so instead of offering a picker.
         showAlert(
-            with: NSLocalizedString("Language", comment: ""),
-            message: NSLocalizedString("English is currently the only supported language.", comment: "")
+            with: "Ngôn ngữ",
+            message: "Ứng dụng hiện chỉ có tiếng Việt."
         )
     }
 
@@ -130,14 +104,17 @@ extension SettingWireframe: SettingWireframeInterface {
     func showAbout() {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        let message = String(format: NSLocalizedString("Version %@ (%@)", comment: ""), version, build)
+        let message = "Phiên bản \(version) (\(build))"
         showAlert(
-            with: NSLocalizedString("About Flashcard", comment: ""),
+            with: "Về Flashcard",
             message: message
         )
     }
 
     func navigateToWelcome() {
-        navigationController?.setRootWireframe(MailLoginWireframe())
+        // Settings sits in its own navigation controller inside the tab bar; the login screen replaces the
+        // app-level root (which hosts the tab bar), exactly as before the tab got its own navigation stack.
+        let appRoot = navigationController?.navigationController ?? navigationController
+        appRoot?.setRootWireframe(MailLoginWireframe())
     }
 }

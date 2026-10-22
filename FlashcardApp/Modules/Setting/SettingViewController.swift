@@ -26,21 +26,34 @@ final class SettingViewController: BaseViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
         refreshNotificationStatus()
         presenter.viewWillAppear()
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        presenter.viewWillDisappear()
+    }
+
     func setupUI() {
-        settingTableView.registerNib(cellClass: AccountCell.self)
-        settingTableView.registerNib(cellClass: CommonCell.self)
-        settingTableView.register(ToggleCell.self, forCellReuseIdentifier: ToggleCell.reuseIdentifier)
+        settingTableView.register(AccountCell.self, forCellReuseIdentifier: AccountCell.reuseIdentifier)
+        settingTableView.register(SettingsRowCell.self, forCellReuseIdentifier: SettingsRowCell.reuseIdentifier)
+        settingTableView.register(SectionHeaderView.self, forHeaderFooterViewReuseIdentifier: SectionHeaderView.reuseIdentifier)
         settingTableView.dataSource = self
         settingTableView.delegate = self
         settingTableView.rowHeight = UITableView.automaticDimension
-        settingTableView.estimatedRowHeight = 60
+        settingTableView.estimatedRowHeight = 56
+        settingTableView.estimatedSectionHeaderHeight = 32
+        settingTableView.sectionHeaderTopPadding = 0
         settingTableView.backgroundColor = Design.Color.background
         settingTableView.separatorStyle = .singleLine
+        settingTableView.separatorColor = Design.Color.separator
+        // Hairlines start under the text, past the 28 pt icon column.
         settingTableView.separatorInset = UIEdgeInsets(top: 0, left: 56, bottom: 0, right: 0)
+        settingTableView.accessibilityIdentifier = "settings_list"
+        view.backgroundColor = Design.Color.background
+        navigationItem.largeTitleDisplayMode = .always
     }
 
     func subscribe() {
@@ -71,10 +84,6 @@ extension SettingViewController: UITableViewDataSource {
         presenter.sectionsRelay.value.count
     }
 
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        presenter.sectionsRelay.value[section].title
-    }
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         presenter.sectionsRelay.value[section].items.count
     }
@@ -84,44 +93,56 @@ extension SettingViewController: UITableViewDataSource {
 
         switch item {
         case .account(let user):
-            let cell: AccountCell = tableView.dequeueResuableCell(forIndexPath: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: AccountCell.reuseIdentifier, for: indexPath) as! AccountCell
             cell.configure(with: user)
+            cell.onSignIn = { [weak self] in self?.presenter.didSelectItem(at: indexPath) }
+            cell.accessibilityIdentifier = "setting_account"
             return cell
 
         case .toggle(let config):
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: ToggleCell.reuseIdentifier, for: indexPath) as? ToggleCell else {
-                return UITableViewCell()
-            }
-            cell.configure(with: config)
-            cell.onToggleChanged = { [weak self] isOn in
+            let cell = rowCell(tableView, indexPath)
+            cell.configureToggle(title: config.title, subtitle: config.subtitle, iconName: config.iconName,
+                                 isOn: config.isOn, isEnabled: config.isEnabled)
+            cell.onToggle = { [weak self] isOn in
                 switch config.id {
-                case "notification":
-                    self?.presenter.toggleNotification(to: isOn)
-                case "sound":
-                    self?.presenter.toggleSound(to: isOn)
-                default:
-                    break
+                case "notification": self?.presenter.toggleNotification(to: isOn)
+                case "sound": self?.presenter.toggleSound(to: isOn)
+                default: break
                 }
             }
+            cell.accessibilityIdentifier = "setting_\(config.id)"
             return cell
 
-        case .navigation(let config), .destructive(let config):
-            let cell: CommonCell = tableView.dequeueResuableCell(forIndexPath: indexPath)
-            let isDestructive: Bool
-            if case .destructive = item {
-                isDestructive = true
-            } else {
-                isDestructive = false
+        case .choice(let config):
+            let cell = rowCell(tableView, indexPath)
+            let actions = config.options.map { option in
+                UIAction(title: option.title, state: option.id == config.selectedID ? .on : .off) { [weak self] _ in
+                    self?.presenter.selectChoice(id: config.id, optionID: option.id)
+                }
             }
-            cell.updateCell(
-                title: config.title,
-                subText: config.subText,
-                iconName: config.iconName,
-                showDisclosure: config.disclosure,
-                isDestructive: isDestructive
-            )
+            cell.configureChoice(title: config.title, iconName: config.iconName, selectedTitle: config.selectedTitle,
+                                 menu: UIMenu(title: config.title, options: .singleSelection, children: actions))
+            cell.accessibilityIdentifier = "setting_\(config.id)"
+            return cell
+
+        case .navigation(let config):
+            let cell = rowCell(tableView, indexPath)
+            cell.configureNavigation(title: config.title, iconName: config.iconName, value: config.subText,
+                                     disclosure: config.disclosure)
+            cell.accessibilityIdentifier = "setting_\(config.id)"
+            return cell
+
+        case .destructive(let config):
+            let cell = rowCell(tableView, indexPath)
+            cell.configureNavigation(title: config.title, iconName: config.iconName, value: config.subText,
+                                     disclosure: config.disclosure, destructive: true)
+            cell.accessibilityIdentifier = "setting_\(config.id)"
             return cell
         }
+    }
+
+    private func rowCell(_ tableView: UITableView, _ indexPath: IndexPath) -> SettingsRowCell {
+        tableView.dequeueReusableCell(withIdentifier: SettingsRowCell.reuseIdentifier, for: indexPath) as! SettingsRowCell
     }
 }
 
@@ -138,21 +159,23 @@ extension SettingViewController: UITableViewDelegate {
             presenter.handleNavigationTap(config: config)
         case .account:
             presenter.didSelectItem(at: indexPath)
-        case .toggle:
+        case .toggle, .choice:
             break
         }
     }
 
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        // Minimal footer spacing; version info moved to About row.
-        return UITableView.automaticDimension
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let title = presenter.sectionsRelay.value[section].title else { return nil }
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SectionHeaderView.reuseIdentifier) as! SectionHeaderView
+        header.configure(title: title)
+        return header
     }
 
-    func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        return 8
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        presenter.sectionsRelay.value[section].title == nil ? Design.Spacing.s : UITableView.automaticDimension
     }
 
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return nil
-    }
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat { .leastNormalMagnitude }
+
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? { nil }
 }

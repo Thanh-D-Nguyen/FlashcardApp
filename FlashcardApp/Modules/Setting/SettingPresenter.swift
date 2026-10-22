@@ -20,9 +20,9 @@ enum AppearanceOption: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .system: return NSLocalizedString("System", comment: "")
-        case .light: return NSLocalizedString("Light", comment: "")
-        case .dark: return NSLocalizedString("Dark", comment: "")
+        case .system: return "Theo hệ thống"
+        case .light: return "Sáng"
+        case .dark: return "Tối"
         }
     }
 
@@ -32,6 +32,11 @@ enum AppearanceOption: String, CaseIterable {
         case .light: return .light
         case .dark: return .dark
         }
+    }
+
+    /// Stored preference → option; anything unrecognised means "follow the system".
+    static func resolve(_ stored: String) -> AppearanceOption {
+        AppearanceOption(rawValue: stored) ?? .system
     }
 
     static func from(userInterfaceStyle: UIUserInterfaceStyle) -> AppearanceOption {
@@ -51,6 +56,8 @@ struct SettingSection {
 enum SettingItem {
     case account(SocialUserEntity?)
     case toggle(ToggleConfig)
+    /// One value picked from a short list (appearance); the view shows it as a pop-up menu.
+    case choice(ChoiceConfig)
     case navigation(NavigationConfig)
     case destructive(NavigationConfig)
 }
@@ -71,6 +78,21 @@ struct ToggleConfig {
         self.isEnabled = isEnabled
         self.subtitle = subtitle
     }
+}
+
+struct ChoiceOption: Equatable {
+    let id: String
+    let title: String
+}
+
+struct ChoiceConfig {
+    let id: String
+    let title: String
+    let iconName: String
+    let options: [ChoiceOption]
+    let selectedID: String
+
+    var selectedTitle: String { options.first { $0.id == selectedID }?.title ?? "" }
 }
 
 struct NavigationConfig {
@@ -101,6 +123,7 @@ protocol SettingPresenterInterface: AnyObject {
     func toggleDarkMode(to value: Bool)
     func toggleNotification(to value: Bool)
     func toggleSound(to value: Bool)
+    func selectChoice(id: String, optionID: String)
     func requestLogout()
     func handleNavigationTap(config: NavigationConfig)
 }
@@ -164,7 +187,7 @@ extension SettingPresenter {
             if user == nil {
                 wireframe.navigateToWelcome()
             }
-        case .toggle:
+        case .toggle, .choice:
             break
         case .navigation(let config):
             handleNavigationTap(config: config)
@@ -181,24 +204,31 @@ extension SettingPresenter {
     }
 
     func toggleNotification(to value: Bool) {
-        if value {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, _ in
-                DispatchQueue.main.async {
-                    self?.interactor.setNotificationEnabled(granted)
-                    if !granted {
-                        self?.wireframe.showNotificationDeniedAlert()
-                    }
-                    self?.reloadSections()
-                }
-            }
-        } else {
+        guard value else {
             interactor.setNotificationEnabled(false)
             reloadSections()
+            return
+        }
+        interactor.requestNotificationPermission { [weak self] granted in
+            guard let self else { return }
+            self.interactor.setNotificationAuthorizationStatus(granted ? .authorized : .denied)
+            self.interactor.setNotificationEnabled(granted)
+            if !granted {
+                self.wireframe.showNotificationDeniedAlert()
+            }
+            self.reloadSections()
         }
     }
 
     func toggleSound(to value: Bool) {
         interactor.setSoundEnabled(value)
+        reloadSections()
+    }
+
+    func selectChoice(id: String, optionID: String) {
+        guard id == "appearance", let option = AppearanceOption(rawValue: optionID) else { return }
+        interactor.setAppearance(option.rawValue)
+        applyAppearance(option)
         reloadSections()
     }
 
@@ -228,13 +258,6 @@ extension SettingPresenter {
         switch config.id {
         case "logout":
             requestLogout()
-        case "appearance":
-            wireframe.showAppearancePicker(current: currentAppearance()) { [weak self] selected in
-                guard let self else { return }
-                self.interactor.setAppearance(selected.rawValue)
-                self.applyAppearance(selected)
-                self.reloadSections()
-            }
         case "notifications_system":
             wireframe.openSystemSettings()
         case "language":
@@ -261,11 +284,7 @@ private extension SettingPresenter {
     }
 
     func currentAppearance() -> AppearanceOption {
-        let stored = interactor.getAppearance()
-        if let option = AppearanceOption(rawValue: stored) {
-            return option
-        }
-        return .system
+        AppearanceOption.resolve(interactor.getAppearance())
     }
 
     func applyAppearance(_ option: AppearanceOption) {
@@ -292,89 +311,86 @@ private extension SettingPresenter {
 
         var preferencesItems: [SettingItem] = []
 
-        // Appearance
-        preferencesItems.append(.navigation(NavigationConfig(
+        preferencesItems.append(.choice(ChoiceConfig(
             id: "appearance",
-            title: NSLocalizedString("Appearance", comment: ""),
-            iconName: "paintbrush.fill",
-            subText: appearance.title
+            title: "Giao diện",
+            iconName: "circle.lefthalf.filled",
+            options: AppearanceOption.allCases.map { ChoiceOption(id: $0.rawValue, title: $0.title) },
+            selectedID: appearance.rawValue
         )))
 
-        // Notifications
+        // Notifications. Before the system prompt has been answered the switch must stay usable:
+        // turning it on is the only place the permission is requested.
         let notificationStatus = interactor.getNotificationAuthorizationStatus()
-        let notificationEnabled = interactor.getNotificationEnabled() && notificationStatus == .authorized
+        let isAuthorized = [.authorized, .provisional, .ephemeral].contains(notificationStatus)
+        let notificationEnabled = interactor.getNotificationEnabled() && isAuthorized
         let notificationSubtitle: String?
         let notificationIsEnabled: Bool
         switch notificationStatus {
         case .notDetermined:
-            notificationSubtitle = NSLocalizedString("Not determined", comment: "")
-            notificationIsEnabled = false
+            notificationSubtitle = "Bật để cấp quyền thông báo"
+            notificationIsEnabled = true
         case .denied:
-            notificationSubtitle = NSLocalizedString("Disabled in System Settings", comment: "")
+            notificationSubtitle = "Đã tắt trong Cài đặt hệ thống"
             notificationIsEnabled = false
         case .authorized, .provisional, .ephemeral:
             notificationSubtitle = nil
-            notificationIsEnabled = notificationEnabled
+            notificationIsEnabled = true
         @unknown default:
             notificationSubtitle = nil
-            notificationIsEnabled = notificationEnabled
+            notificationIsEnabled = true
         }
 
         preferencesItems.append(.toggle(ToggleConfig(
             id: "notification",
-            title: NSLocalizedString("Notifications", comment: ""),
-            iconName: "bell.fill",
-            isOn: notificationIsEnabled,
-            isEnabled: notificationStatus != .denied && notificationStatus != .notDetermined,
+            title: "Thông báo",
+            iconName: "bell",
+            isOn: notificationEnabled,
+            isEnabled: notificationIsEnabled,
             subtitle: notificationSubtitle
         )))
 
         if notificationStatus == .denied {
             preferencesItems.append(.navigation(NavigationConfig(
                 id: "notifications_system",
-                title: NSLocalizedString("Open System Settings", comment: ""),
-                iconName: "gear",
-                subText: ""
+                title: "Mở Cài đặt hệ thống",
+                iconName: "gearshape"
             )))
         }
 
-        // Sound
         preferencesItems.append(.toggle(ToggleConfig(
             id: "sound",
-            title: NSLocalizedString("Sounds & Haptics", comment: ""),
-            iconName: "speaker.wave.2.fill",
+            title: "Âm thanh và rung",
+            iconName: "speaker.wave.2",
             isOn: interactor.getSoundEnabled()
         )))
 
-        let preferencesSection = SettingSection(
-            title: NSLocalizedString("Preferences", comment: ""),
-            items: preferencesItems
-        )
+        let preferencesSection = SettingSection(title: "Tuỳ chọn", items: preferencesItems)
 
         let generalSection = SettingSection(
-            title: NSLocalizedString("General", comment: ""),
+            title: "Chung",
             items: [
                 .navigation(NavigationConfig(
                     id: "language",
-                    title: NSLocalizedString("Language", comment: ""),
+                    title: "Ngôn ngữ",
                     iconName: "globe",
-                    subText: Locale.current.localizedString(forIdentifier: Locale.current.identifier) ?? NSLocalizedString("English", comment: "")
+                    subText: "Tiếng Việt"
                 )),
                 .navigation(NavigationConfig(
                     id: "privacy",
-                    title: NSLocalizedString("Privacy Policy", comment: ""),
-                    iconName: "hand.raised.fill"
+                    title: "Chính sách quyền riêng tư",
+                    iconName: "hand.raised"
                 ))
             ]
         )
 
         let aboutSection = SettingSection(
-            title: NSLocalizedString("About", comment: ""),
+            title: "Giới thiệu",
             items: [
                 .navigation(NavigationConfig(
                     id: "about",
-                    title: NSLocalizedString("About Flashcard", comment: ""),
-                    iconName: "info.circle.fill",
+                    title: "Về Flashcard",
+                    iconName: "info.circle",
                     subText: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
                 ))
             ]
@@ -383,18 +399,17 @@ private extension SettingPresenter {
         var sections = [accountSection, preferencesSection, generalSection, aboutSection]
 
         if user != nil {
-            let logoutSection = SettingSection(
+            sections.append(SettingSection(
                 title: nil,
                 items: [
                     .destructive(NavigationConfig(
                         id: "logout",
-                        title: NSLocalizedString("Log Out", comment: ""),
+                        title: "Đăng xuất",
                         iconName: "rectangle.portrait.and.arrow.right",
                         disclosure: false
                     ))
                 ]
-            )
-            sections.append(logoutSection)
+            ))
         }
 
         return sections

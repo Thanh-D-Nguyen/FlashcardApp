@@ -31,6 +31,13 @@ final class MockSettingInteractor: SettingInteractorInterface {
     func getAppearance() -> String { appearance }
     func setAppearance(_ value: String) { appearance = value }
     func getNotificationAuthorizationStatus() -> UNAuthorizationStatus { notificationStatus }
+    func setNotificationAuthorizationStatus(_ status: UNAuthorizationStatus) { notificationStatus = status }
+    var permissionGranted = true
+    var permissionRequests = 0
+    func requestNotificationPermission(completion: @escaping (Bool) -> Void) {
+        permissionRequests += 1
+        completion(permissionGranted)
+    }
 
     func getNotificationEnabled() -> Bool { notificationEnabled }
     func setNotificationEnabled(_ enabled: Bool) { notificationEnabled = enabled }
@@ -55,9 +62,9 @@ final class MockSettingWireframe: SettingWireframeInterface {
         lastErrorMessage = message
     }
 
-    func showNotificationDeniedAlert() {}
+    var deniedAlertCount = 0
+    func showNotificationDeniedAlert() { deniedAlertCount += 1 }
     func openSystemSettings() {}
-    func showAppearancePicker(current: AppearanceOption, onSelect: @escaping (AppearanceOption) -> Void) {}
     func showLanguagePicker() {}
     func showPrivacyPolicy() {}
     func showAbout() {}
@@ -113,10 +120,10 @@ final class SettingPresenterTests: XCTestCase {
         let sections = presenter.sectionsRelay.value
         let prefItems = sections[1].items
         guard prefItems.count == 3 else { return XCTFail("Expected three preferences") }
-        guard case .navigation(let appearance) = prefItems[0],
+        guard case .choice(let appearance) = prefItems[0],
               case .toggle(let notifications) = prefItems[1],
               case .toggle(let sound) = prefItems[2] else {
-            return XCTFail("Expected appearance navigation, notifications toggle and sound toggle")
+            return XCTFail("Expected appearance choice, notifications toggle and sound toggle")
         }
         XCTAssertEqual(appearance.id, "appearance")
         XCTAssertEqual(notifications.id, "notification")
@@ -131,10 +138,11 @@ final class SettingPresenterTests: XCTestCase {
         presenter.viewDidLoad()
 
         let items = presenter.sectionsRelay.value[1].items
-        guard items.count == 3, case .navigation(let appearance) = items[0] else {
-            return XCTFail("Expected appearance navigation")
+        guard items.count == 3, case .choice(let appearance) = items[0] else {
+            return XCTFail("Expected appearance choice")
         }
-        XCTAssertEqual(appearance.subText, AppearanceOption.dark.title)
+        XCTAssertEqual(appearance.selectedTitle, AppearanceOption.dark.title)
+        XCTAssertEqual(appearance.selectedID, "dark")
         let toggles = items.compactMap { item -> ToggleConfig? in
             if case .toggle(let config) = item { return config }
             return nil
@@ -142,6 +150,135 @@ final class SettingPresenterTests: XCTestCase {
         guard toggles.count == 2 else { return XCTFail("Expected two toggles") }
         XCTAssertFalse(toggles[0].isOn, "Notification should be off")
         XCTAssertTrue(toggles[1].isOn, "Sound should be on")
+    }
+
+    // MARK: - Appearance choice
+
+    func test_appearanceChoiceOffersSystemLightAndDarkInOrder() {
+        presenter.viewDidLoad()
+
+        guard case .choice(let appearance) = presenter.sectionsRelay.value[1].items[0] else {
+            return XCTFail("Expected appearance choice")
+        }
+        XCTAssertEqual(appearance.id, "appearance")
+        XCTAssertEqual(appearance.options.map(\.id), ["system", "light", "dark"])
+        XCTAssertEqual(appearance.selectedID, "system")
+    }
+
+    func test_selectChoicePersistsAppearanceAndReloadsSelection() {
+        presenter.viewDidLoad()
+
+        presenter.selectChoice(id: "appearance", optionID: "light")
+
+        XCTAssertEqual(mockInteractor.appearance, "light")
+        guard case .choice(let appearance) = presenter.sectionsRelay.value[1].items[0] else {
+            return XCTFail("Expected appearance choice")
+        }
+        XCTAssertEqual(appearance.selectedID, "light")
+    }
+
+    func test_selectChoiceIgnoresUnknownChoiceOrOption() {
+        presenter.viewDidLoad()
+
+        presenter.selectChoice(id: "appearance", optionID: "sepia")
+        presenter.selectChoice(id: "unknown", optionID: "dark")
+
+        XCTAssertEqual(mockInteractor.appearance, "system")
+    }
+
+    func test_storedAppearanceIsResolvedToItsInterfaceStyleAndUnknownFallsBackToSystem() {
+        XCTAssertEqual(AppearanceOption.resolve("dark").userInterfaceStyle, .dark)
+        XCTAssertEqual(AppearanceOption.resolve("light").userInterfaceStyle, .light)
+        XCTAssertEqual(AppearanceOption.resolve("system").userInterfaceStyle, .unspecified)
+        XCTAssertEqual(AppearanceOption.resolve("sepia"), .system, "A corrupt stored value must not force a style")
+        XCTAssertEqual(AppearanceOption.resolve(""), .system)
+    }
+
+    // MARK: - Notification permission
+
+    func test_notDeterminedNotificationToggleIsEnabledSoPermissionCanBeRequested() {
+        mockInteractor.notificationStatus = .notDetermined
+
+        presenter.viewDidLoad()
+
+        guard case .toggle(let notifications) = presenter.sectionsRelay.value[1].items[1] else {
+            return XCTFail("Expected notifications toggle")
+        }
+        XCTAssertTrue(notifications.isEnabled, "A disabled switch can never trigger the system permission prompt")
+        XCTAssertFalse(notifications.isOn)
+    }
+
+    func test_deniedNotificationToggleIsOffAndOffersSystemSettings() {
+        mockInteractor.notificationStatus = .denied
+        mockInteractor.notificationEnabled = true
+
+        presenter.viewDidLoad()
+
+        let items = presenter.sectionsRelay.value[1].items
+        guard case .toggle(let notifications) = items[1] else { return XCTFail("Expected notifications toggle") }
+        XCTAssertFalse(notifications.isEnabled)
+        XCTAssertFalse(notifications.isOn)
+        guard case .navigation(let system) = items[2] else { return XCTFail("Expected system settings row") }
+        XCTAssertEqual(system.id, "notifications_system")
+    }
+
+    func test_enablingNotificationsRequestsPermissionAndKeepsSwitchOnWhenGranted() {
+        mockInteractor.notificationStatus = .notDetermined
+        mockInteractor.notificationEnabled = false
+        mockInteractor.permissionGranted = true
+        presenter.viewDidLoad()
+
+        presenter.toggleNotification(to: true)
+
+        XCTAssertEqual(mockInteractor.permissionRequests, 1)
+        XCTAssertEqual(mockInteractor.notificationStatus, .authorized, "The cached status must follow the answer, or the switch snaps back off")
+        guard case .toggle(let notifications) = presenter.sectionsRelay.value[1].items[1] else {
+            return XCTFail("Expected notifications toggle")
+        }
+        XCTAssertTrue(notifications.isOn)
+        XCTAssertTrue(notifications.isEnabled)
+        XCTAssertEqual(mockWireframe.deniedAlertCount, 0)
+    }
+
+    func test_enablingNotificationsDeniedExplainsAndKeepsSwitchOff() {
+        mockInteractor.notificationStatus = .notDetermined
+        mockInteractor.notificationEnabled = false
+        mockInteractor.permissionGranted = false
+        presenter.viewDidLoad()
+
+        presenter.toggleNotification(to: true)
+
+        XCTAssertEqual(mockInteractor.notificationStatus, .denied)
+        XCTAssertEqual(mockWireframe.deniedAlertCount, 1)
+        let items = presenter.sectionsRelay.value[1].items
+        guard case .toggle(let notifications) = items[1] else { return XCTFail("Expected notifications toggle") }
+        XCTAssertFalse(notifications.isOn)
+        XCTAssertFalse(notifications.isEnabled)
+        guard case .navigation(let system) = items[2] else { return XCTFail("Expected system settings row") }
+        XCTAssertEqual(system.id, "notifications_system")
+    }
+
+    func test_provisionalNotificationAuthorizationCountsAsOnWhenEnabled() {
+        mockInteractor.notificationStatus = .provisional
+        mockInteractor.notificationEnabled = true
+
+        presenter.viewDidLoad()
+
+        guard case .toggle(let notifications) = presenter.sectionsRelay.value[1].items[1] else {
+            return XCTFail("Expected notifications toggle")
+        }
+        XCTAssertTrue(notifications.isOn)
+        XCTAssertTrue(notifications.isEnabled)
+    }
+
+    func test_disablingNotificationsNeverRequestsPermission() {
+        mockInteractor.notificationEnabled = true
+        presenter.viewDidLoad()
+
+        presenter.toggleNotification(to: false)
+
+        XCTAssertEqual(mockInteractor.permissionRequests, 0)
+        XCTAssertFalse(mockInteractor.notificationEnabled)
     }
 
     // MARK: - Toggle actions

@@ -14,7 +14,6 @@
 		60ED6A921E261C7B283249CE /* HomePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFA59B81BB08C36B46B31F5 /* HomePresenterTests.swift */; };
 		72796A297CC9F326ADC45E12 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C8CD127C27AAC201C95FD0 /* UserPreferences.swift */; };
 		862184A154A58EB864D04742 /* StateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AFC78D9266C6D8BE5ABCAE /* StateView.swift */; };
-		878EA29241DB6866C669B6A1 /* ToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9292D78650A0EB91C2533CD9 /* ToggleCell.swift */; };
 		87941E1FA68F7D98F1400D0C /* MailLoginPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9321F46D68635E10E86F8D4A /* MailLoginPresenterTests.swift */; };
 		8A0F67C0D739AAAFBE62B0BC /* AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1235E8CD5F0FDD150A00D51E /* AuthSession.swift */; };
 		9209760D29A787C100ECF29C /* RDesk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760C29A787C100ECF29C /* RDesk.swift */; };
@@ -107,9 +106,7 @@
 		9251ED1829A20040006C1D1C /* SettingInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1329A20040006C1D1C /* SettingInteractor.swift */; };
 		9251ED1929A20040006C1D1C /* SettingWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1429A20040006C1D1C /* SettingWireframe.swift */; };
 		9251ED1D29A20341006C1D1C /* AccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1B29A20341006C1D1C /* AccountCell.swift */; };
-		9251ED1E29A20341006C1D1C /* AccountCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9251ED1C29A20341006C1D1C /* AccountCell.xib */; };
-		9251ED2129A2074D006C1D1C /* CommonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1F29A2074D006C1D1C /* CommonCell.swift */; };
-		9251ED2229A2074D006C1D1C /* CommonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9251ED2029A2074D006C1D1C /* CommonCell.xib */; };
+		9251ED2129A2074D006C1D1C /* SettingsRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1F29A2074D006C1D1C /* SettingsRowCell.swift */; };
 		9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */; };
 		9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3129A212E9006C1D1C /* CardPresenter.swift */; };
 		9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3229A212E9006C1D1C /* CardViewController.swift */; };
@@ -303,9 +300,7 @@
 		9251ED1329A20040006C1D1C /* SettingInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingInteractor.swift; sourceTree = "<group>"; };
 		9251ED1429A20040006C1D1C /* SettingWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingWireframe.swift; sourceTree = "<group>"; };
 		9251ED1B29A20341006C1D1C /* AccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCell.swift; sourceTree = "<group>"; };
-		9251ED1C29A20341006C1D1C /* AccountCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountCell.xib; sourceTree = "<group>"; };
-		9251ED1F29A2074D006C1D1C /* CommonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonCell.swift; sourceTree = "<group>"; };
-		9251ED2029A2074D006C1D1C /* CommonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CommonCell.xib; sourceTree = "<group>"; };
+		9251ED1F29A2074D006C1D1C /* SettingsRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowCell.swift; sourceTree = "<group>"; };
 		9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImageView.swift; sourceTree = "<group>"; };
 		9251ED3129A212E9006C1D1C /* CardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPresenter.swift; sourceTree = "<group>"; };
 		9251ED3229A212E9006C1D1C /* CardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewController.swift; sourceTree = "<group>"; };
@@ -325,7 +320,6 @@
 		9291705929AB672800894551 /* AppImages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
 		9291706829B45FB700894551 /* SwipeCellSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellSupport.swift; sourceTree = "<group>"; };
 		9291706A29B62D0A00894551 /* DeskDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskDataModel.swift; sourceTree = "<group>"; };
-		9292D78650A0EB91C2533CD9 /* ToggleCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToggleCell.swift; sourceTree = "<group>"; };
 		929C4DB629A7332D007651E9 /* Card.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Card.storyboard; sourceTree = "<group>"; };
 		929C4DB829A73358007651E9 /* CardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCell.swift; sourceTree = "<group>"; };
 		929C4DBC29A733A2007651E9 /* CardEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardEntity.swift; sourceTree = "<group>"; };
@@ -776,12 +770,9 @@
 			isa = PBXGroup;
 			children = (
 				9251ED1B29A20341006C1D1C /* AccountCell.swift */,
-				9251ED1C29A20341006C1D1C /* AccountCell.xib */,
-				9251ED1F29A2074D006C1D1C /* CommonCell.swift */,
-				9251ED2029A2074D006C1D1C /* CommonCell.xib */,
+				9251ED1F29A2074D006C1D1C /* SettingsRowCell.swift */,
 				92D411912AD3D652005A15DC /* VersionFooterView.swift */,
 				92D411932AD3D673005A15DC /* VersionFooterView.xib */,
-				9292D78650A0EB91C2533CD9 /* ToggleCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1047,7 +1038,6 @@
 				929C4DC129A73412007651E9 /* CardView.xib in Resources */,
 				9251EBD929A1E9A7006C1D1C /* LaunchScreen.storyboard in Resources */,
 				924052DE29AB398C00B47E09 /* CreateDesk.storyboard in Resources */,
-				9251ED1E29A20341006C1D1C /* AccountCell.xib in Resources */,
 				9251ECBD29A1EAA5006C1D1C /* MailLogin.storyboard in Resources */,
 				924052E729AB3ADD00B47E09 /* DeskCell.xib in Resources */,
 				923744632A0E377B0013C450 /* DeskListCell.xib in Resources */,
@@ -1057,7 +1047,6 @@
 				9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */,
 				92B2EBEF29AB5A63008833D4 /* AddDeskBottomView.xib in Resources */,
 				929C4DB729A7332D007651E9 /* Card.storyboard in Resources */,
-				9251ED2229A2074D006C1D1C /* CommonCell.xib in Resources */,
 				9283B4DE2BE4C7F300C6EF8F /* DeskGridCell.xib in Resources */,
 				92777FB029AB4415002891DB /* DeskCardHeaderView.xib in Resources */,
 				9251ECE029A1EAA5006C1D1C /* Localizable.strings in Resources */,
@@ -1122,7 +1111,7 @@
 				929C4DC329A74103007651E9 /* GradientView.swift in Sources */,
 				9251ECD129A1EAA5006C1D1C /* MainWireframe.swift in Sources */,
 				929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */,
-				9251ED2129A2074D006C1D1C /* CommonCell.swift in Sources */,
+				9251ED2129A2074D006C1D1C /* SettingsRowCell.swift in Sources */,
 				92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */,
 				9229029C2A3461D600CB94A8 /* CardEmbededCell.swift in Sources */,
 				92B3A16F2C01B71600013599 /* Image.swift in Sources */,
@@ -1236,7 +1225,6 @@
 				929C4DD629A76442007651E9 /* DeskListViewController.swift in Sources */,
 				923800B229C97CA500FECD23 /* LineLeftRightView.swift in Sources */,
 				9226D80929D00C1B0042F6DA /* PlaceholderView.swift in Sources */,
-				878EA29241DB6866C669B6A1 /* ToggleCell.swift in Sources */,
 				72796A297CC9F326ADC45E12 /* UserPreferences.swift in Sources */,
 				B7D044161C7EB7E739C30D8C /* SettingsPrototypes.swift in Sources */,
 				862184A154A58EB864D04742 /* StateView.swift in Sources */,
