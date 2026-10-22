@@ -1,0 +1,259 @@
+import Alamofire
+import RxSwift
+import XCTest
+@testable import FlashcardApp
+
+/// Request shape, status mapping and failure semantics of the authenticated learner API. The response fixtures
+/// mirror the JSON tags of the Go handlers (`handler_flashcard_deck.go`, `flashcarddeck/store.go`).
+final class BJTLearnerAPITests: XCTestCase {
+    private var session: Session!
+    private var api: BJTLearnerAPI!
+    private var bag: DisposeBag!
+    private var token: String? = "opaque-session-token"
+    private let deckId = "11111111-2222-4333-8444-555555555555"
+
+    override func setUp() {
+        super.setUp()
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [LearnerURLProtocol.self]
+        session = Session(configuration: config)
+        api = BJTLearnerAPI(session: session, baseURL: { "https://api.test/api" }, token: { [unowned self] in token })
+        bag = DisposeBag()
+        LearnerURLProtocol.handler = nil
+        LearnerURLProtocol.onStop = nil
+        LearnerURLProtocol.requests = []
+    }
+
+    override func tearDown() {
+        bag = nil
+        session.session.invalidateAndCancel()
+        LearnerURLProtocol.handler = nil
+        LearnerURLProtocol.onStop = nil
+        super.tearDown()
+    }
+
+    private func result<T>(_ single: Single<T>, timeout: TimeInterval = 3) -> Result<T, Error> {
+        var outcome: Result<T, Error>?
+        let done = expectation(description: "request")
+        single.subscribe(onSuccess: { outcome = .success($0); done.fulfill() },
+                         onFailure: { outcome = .failure($0); done.fulfill() }).disposed(by: bag)
+        wait(for: [done], timeout: timeout)
+        return outcome ?? .failure(LearnerAPIError.invalidResponse)
+    }
+
+    private func failure<T>(_ single: Single<T>) -> LearnerAPIError? {
+        if case .failure(let error) = result(single) { return error as? LearnerAPIError }
+        return nil
+    }
+
+    private var request: DeckGenerationRequest {
+        DeckGenerationRequest(name: "  N5 Vocabulary ", level: .n5, contentTypes: [.vocabulary, .grammar], direction: .both, count: 30)
+    }
+
+    // MARK: Request shape
+
+    func test_generateSendsTheBearerTokenAndTheApisOwnOriginWithTheVerifiedBody() throws {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 201, json: #"{"id":"\#(self.deckId)","titleVi":"N5 Vocabulary","cardCount":30,"status":"active"}"#) }
+        let deck = try result(api.generateDeck(request)).get()
+        XCTAssertEqual(deck, BJTGeneratedDeckDTO(id: deckId, titleVi: "N5 Vocabulary", cardCount: 30))
+        let sent = try XCTUnwrap(LearnerURLProtocol.requests.first)
+        XCTAssertEqual(sent.method, "POST")
+        XCTAssertEqual(sent.url.path, "/api/flashcards/decks/generate")
+        XCTAssertEqual(sent.headers["Authorization"], "Bearer opaque-session-token")
+        XCTAssertEqual(sent.headers["Origin"], "https://api.test", "The API's own origin (scheme + host), never a made-up one")
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: sent.body) as? [String: Any])
+        XCTAssertEqual(body["name"] as? String, "N5 Vocabulary")
+        XCTAssertEqual(body["levels"] as? [String], ["J5"])
+        XCTAssertEqual(body["sourceTypes"] as? [String], ["lexeme", "grammar"])
+        XCTAssertEqual(body["direction"] as? String, "both")
+        XCTAssertEqual(body["limit"] as? Int, 30)
+        XCTAssertEqual(Set(body.keys), ["name", "levels", "sourceTypes", "direction", "limit"], "Unsupported options such as topic are never sent")
+    }
+
+    func test_previewSendsOnlyLevelsAndSourceTypesAndReadsTheCount() throws {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 200, json: #"{"availableCount":1240}"#) }
+        let count = try result(api.previewGeneration(level: .n3, contentTypes: [.kanji])).get()
+        XCTAssertEqual(count, 1240)
+        let sent = try XCTUnwrap(LearnerURLProtocol.requests.first)
+        XCTAssertEqual(sent.url.path, "/api/flashcards/decks/generate/preview")
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: sent.body) as? [String: Any])
+        XCTAssertEqual(body["levels"] as? [String], ["J3"])
+        XCTAssertEqual(body["sourceTypes"] as? [String], ["kanji"])
+        XCTAssertEqual(body.count, 2)
+    }
+
+    func test_deckDetailDecodesCardsWithTheirDeckCardIds() throws {
+        LearnerURLProtocol.handler = { request, proto in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/flashcards/decks/\(self.deckId)")
+            proto.respond(status: 200, json: Self.deckJSON(self.deckId))
+        }
+        let deck = try result(api.deck(id: deckId)).get()
+        XCTAssertEqual(deck.id, deckId)
+        // Decoding keeps the server's order; the interactor sorts by `position`.
+        XCTAssertEqual(deck.cards.map(\.id), ["aaaaaaaa-0000-4000-8000-000000000002", "aaaaaaaa-0000-4000-8000-000000000001"])
+        XCTAssertEqual(deck.cards.map(\.position), [1, 0])
+        XCTAssertEqual(deck.cards[1].card.frontText, "食べる")
+        XCTAssertEqual(deck.cards[1].card.reading, "たべる")
+        XCTAssertNil(deck.cards[0].card.reading)
+    }
+
+    func test_imageSearchSendsTheQueryAndLimitAndReadsTheImages() throws {
+        LearnerURLProtocol.handler = { _, proto in
+            proto.respond(status: 200, json: #"{"images":[{"id":"1","thumbUrl":"https://i.test/t.jpg","fullUrl":"https://i.test/f.jpg","source":"unsplash"}]}"#)
+        }
+        let images = try result(api.searchImages(query: " con chó ", limit: 6)).get()
+        XCTAssertEqual(images, [BJTImageResultDTO(id: "1", thumbUrl: "https://i.test/t.jpg", fullUrl: "https://i.test/f.jpg", source: "unsplash")])
+        let sent = try XCTUnwrap(LearnerURLProtocol.requests.first)
+        XCTAssertEqual(sent.url.path, "/api/media/search-images")
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: sent.body) as? [String: Any])
+        XCTAssertEqual(body["query"] as? String, "con chó")
+        XCTAssertEqual(body["limit"] as? Int, 6)
+    }
+
+    // MARK: Requests that never reach the network
+
+    func test_noSessionMeansSignInRequiredWithoutAnyRequest() {
+        token = nil
+        LearnerURLProtocol.handler = { _, _ in XCTFail("A signed-out learner must not send a request") }
+        XCTAssertEqual(failure(api.previewGeneration(level: .n5, contentTypes: [.vocabulary])), .signInRequired)
+        XCTAssertEqual(failure(api.generateDeck(request)), .signInRequired)
+        XCTAssertTrue(LearnerURLProtocol.requests.isEmpty)
+    }
+
+    func test_invalidInputIsRejectedLocally() {
+        LearnerURLProtocol.handler = { _, _ in XCTFail("invalid input must not reach the network") }
+        var empty = request; empty.name = "  "
+        XCTAssertEqual(failure(api.generateDeck(empty)), .invalidRequest(nil))
+        var none = request; none.contentTypes = []
+        XCTAssertEqual(failure(api.generateDeck(none)), .invalidRequest(nil))
+        var huge = request; huge.count = 5000
+        XCTAssertEqual(failure(api.generateDeck(huge)), .invalidRequest(nil), "The server would silently fall back to 50 cards")
+        XCTAssertEqual(failure(api.deck(id: "../../admin")), .invalidRequest(nil), "Only a UUID may become a path segment")
+        XCTAssertEqual(failure(api.searchImages(query: "a", limit: 6)), .invalidRequest(nil))
+        XCTAssertEqual(failure(api.searchImages(query: "ab", limit: 0)), .invalidRequest(nil))
+    }
+
+    // MARK: Status handling
+
+    func test_statusCodesMapToWhatTheLearnerCanDo() {
+        let cases: [(Int, String, LearnerAPIError)] = [
+            (400, #"{"error":"name is required"}"#, .invalidRequest(nil)),
+            (401, #"{"error":"unauthorized"}"#, .signInRequired),
+            (403, #"{"error":"forbidden: untrusted origin"}"#, .originRejected),
+            (403, #"{"error":"forbidden: missing origin"}"#, .originRejected),
+            (403, #"{"error":"not owner"}"#, .forbidden("not owner")),
+            (404, #"{"error":"not found"}"#, .notFound),
+            (429, #"{"error":"too many requests"}"#, .rateLimited),
+            (503, #"{"error":"image search unavailable: Go API provider integration is missing"}"#,
+             .serviceUnavailable("image search unavailable: Go API provider integration is missing")),
+            (500, #"{"error":"internal error"}"#, .server(500)),
+            (502, "<html>bad gateway</html>", .server(502))
+        ]
+        for (status, body, expected) in cases {
+            LearnerURLProtocol.handler = { _, proto in proto.respond(status: status, json: body) }
+            XCTAssertEqual(failure(api.previewGeneration(level: .n5, contentTypes: [.vocabulary])), expected, "HTTP \(status)")
+        }
+    }
+
+    func test_aMalformedSuccessIsAnInvalidResponse() {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 200, json: #"{"unexpected":true}"#) }
+        XCTAssertEqual(failure(api.previewGeneration(level: .n5, contentTypes: [.vocabulary])), .invalidResponse)
+    }
+
+    func test_aConnectionThatNeverOpenedIsOfflineButOneThatBrokeMidWayIsUnknown() {
+        LearnerURLProtocol.handler = { _, proto in proto.fail(URLError(.notConnectedToInternet)) }
+        XCTAssertEqual(failure(api.generateDeck(request)), .offline)
+        LearnerURLProtocol.handler = { _, proto in proto.fail(URLError(.timedOut)) }
+        XCTAssertEqual(failure(api.generateDeck(request)), .interrupted)
+        LearnerURLProtocol.handler = { _, proto in proto.fail(URLError(.networkConnectionLost)) }
+        XCTAssertEqual(failure(api.generateDeck(request)), .interrupted)
+    }
+
+    func test_aFailedGenerationIsSentExactlyOnce() {
+        LearnerURLProtocol.handler = { _, proto in proto.fail(URLError(.timedOut)) }
+        _ = failure(api.generateDeck(request))
+        XCTAssertEqual(LearnerURLProtocol.requests.count, 1, "Creating a deck has no idempotency key, so it is never retried")
+    }
+
+    // MARK: Session safety and cancellation
+
+    func test_aResultThatArrivesAfterLogoutIsDiscarded() {
+        LearnerURLProtocol.handler = { [unowned self] _, proto in
+            self.token = nil // the learner signs out while the request is in flight
+            proto.respond(status: 201, json: #"{"id":"\#(self.deckId)","titleVi":"x","cardCount":1}"#)
+        }
+        XCTAssertEqual(failure(api.generateDeck(request)), .staleSession)
+    }
+
+    func test_aResultThatArrivesAfterAnAccountSwitchIsDiscarded() {
+        LearnerURLProtocol.handler = { [unowned self] _, proto in
+            self.token = "another-accounts-token"
+            proto.respond(status: 200, json: #"{"availableCount":3}"#)
+        }
+        XCTAssertEqual(failure(api.previewGeneration(level: .n5, contentTypes: [.vocabulary])), .staleSession)
+    }
+
+    func test_disposingTheSubscriptionCancelsTheRequest() {
+        let started = expectation(description: "started")
+        let stopped = expectation(description: "cancelled")
+        LearnerURLProtocol.handler = { _, _ in started.fulfill() }
+        LearnerURLProtocol.onStop = { stopped.fulfill() }
+        let subscription = api.previewGeneration(level: .n5, contentTypes: [.vocabulary]).subscribe()
+        wait(for: [started], timeout: 3)
+        subscription.dispose()
+        wait(for: [stopped], timeout: 3)
+    }
+
+    // MARK: Fixtures
+
+    static func deckJSON(_ id: String) -> String {
+        """
+        {"id":"\(id)","ownerUserId":"u","titleVi":"N5 Vocabulary","titleJa":null,"descriptionVi":null,"descriptionJa":null,
+         "visibility":"private","status":"active","cardCount":2,"_count":{"cards":2},"createdAt":"2026-10-22T10:00:00Z","updatedAt":"2026-10-22T10:00:00Z",
+         "cards":[
+          {"id":"aaaaaaaa-0000-4000-8000-000000000002","position":1,"card":{"id":"bbbbbbbb-0000-4000-8000-000000000002","frontText":"猫","backText":"mèo","reading":null,"sourceId":"s2","sourceType":"lexeme"}},
+          {"id":"aaaaaaaa-0000-4000-8000-000000000001","position":0,"card":{"id":"bbbbbbbb-0000-4000-8000-000000000001","frontText":"食べる","backText":"ăn","reading":"たべる","sourceId":"s1","sourceType":"lexeme"}}
+         ]}
+        """
+    }
+}
+
+final class LearnerURLProtocol: URLProtocol {
+    struct Sent { let method: String; let url: URL; let headers: [String: String]; let body: Data }
+    static var handler: ((URLRequest, LearnerURLProtocol) -> Void)?
+    static var onStop: (() -> Void)?
+    static var requests: [Sent] = []
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        var body = request.httpBody ?? Data()
+        if body.isEmpty, let stream = request.httpBodyStream {
+            stream.open()
+            var buffer = [UInt8](repeating: 0, count: 4096)
+            while stream.hasBytesAvailable {
+                let read = stream.read(&buffer, maxLength: buffer.count)
+                if read <= 0 { break }
+                body.append(buffer, count: read)
+            }
+            stream.close()
+        }
+        Self.requests.append(Sent(method: request.httpMethod ?? "", url: request.url!, headers: request.allHTTPHeaderFields ?? [:], body: body))
+        Self.handler?(request, self)
+    }
+
+    override func stopLoading() { Self.onStop?() }
+
+    func respond(status: Int, json: String) {
+        let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: ["Content-Type": "application/json"])!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data(json.utf8))
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    func fail(_ error: URLError) {
+        client?.urlProtocol(self, didFailWithError: error)
+    }
+}

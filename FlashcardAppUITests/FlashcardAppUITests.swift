@@ -64,6 +64,7 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(cards.waitForExistence(timeout: 40))
         cards.tap()
         app.buttons["create_deck_button"].tap()
+        app.buttons["new_deck_manual"].tap()
         let name = app.textViews["deck_name"]
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.tap()
@@ -466,8 +467,10 @@ final class FlashcardAppUITests: XCTestCase {
     /// Unsaved work from an earlier run is offered back; these tests want a blank editor.
     private func openNewDeckEditor(_ app: XCUIApplication) {
         app.buttons["create_deck_button"].tap()
+        XCTAssertTrue(app.buttons["new_deck_manual"].waitForExistence(timeout: 5), "Creating a deck first offers typing it or generating it")
+        app.buttons["new_deck_manual"].tap()
         let prompt = app.alerts["Tìm thấy bản nháp chưa lưu"]
-        if prompt.waitForExistence(timeout: 2) { prompt.buttons["Bỏ bản nháp"].tap() }
+        if prompt.waitForExistence(timeout: 4) { prompt.buttons["Bỏ bản nháp"].tap() }
     }
 
     /// Typing is autosaved as a draft; after the app is killed the editor offers it back and restores it.
@@ -487,6 +490,7 @@ final class FlashcardAppUITests: XCTestCase {
         app.launch()
         openCards(app)
         app.buttons["create_deck_button"].tap()
+        app.buttons["new_deck_manual"].tap()
         let prompt = app.alerts["Tìm thấy bản nháp chưa lưu"]
         XCTAssertTrue(prompt.waitForExistence(timeout: 5), "The unsaved draft is offered after a relaunch")
         attachScreenshot(app, name: "draft-offer")
@@ -497,6 +501,85 @@ final class FlashcardAppUITests: XCTestCase {
         app.buttons["close_deck_editor"].tap()
         app.alerts.buttons["Bỏ thay đổi"].tap()
         XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5))
+    }
+
+    // MARK: Deck creation: two methods, dictionary suggestions, picture search
+
+    /// The two creation methods are offered side by side, and auto-generate opens its own screen with every choice.
+    func testCreatingADeckOffersTypingOrGeneratingAndTheGeneratorShowsItsChoices() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        app.buttons["create_deck_button"].tap()
+        XCTAssertTrue(app.buttons["new_deck_manual"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["new_deck_auto"].exists)
+        attachScreenshot(app, name: "new-deck-options")
+        app.buttons["new_deck_auto"].tap()
+        XCTAssertTrue(app.segmentedControls["generator_level"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.segmentedControls["generator_level"].buttons.count, 5, "N5 to N1")
+        for type in ["lexeme", "kanji", "grammar"] { XCTAssertTrue(app.buttons["generator_type_\(type)"].exists, type) }
+        XCTAssertTrue(app.buttons["generator_direction"].exists)
+        XCTAssertTrue(app.sliders["generator_count"].exists)
+        XCTAssertTrue(app.buttons["generate_deck"].exists)
+        // Signed out the primary action is disabled and the summary offers signing in; signed in it waits for the count.
+        let summary = app.otherElements["generator_summary"]
+        XCTAssertTrue(summary.waitForExistence(timeout: 10))
+        attachScreenshot(app, name: "generator")
+        app.buttons["close_generator"].tap()
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5), "Closing the generator returns to the library")
+    }
+
+    /// Typing a Japanese word offers dictionary entries; choosing one fills the card, and a field the learner already
+    /// wrote is left alone.
+    func testTypingAJapaneseWordOffersDictionaryEntriesThatFillTheCard() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        let name = "UI \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        let front = app.textViews.matching(identifier: "card_front").element(boundBy: 0)
+        front.tap()
+        front.typeText("犬")
+        let suggestion = app.buttons["dictionary_suggestion_1"]
+        XCTAssertTrue(suggestion.waitForExistence(timeout: 10), "The offline dictionary answers immediately")
+        attachScreenshot(app, name: "dictionary-suggestions")
+        suggestion.tap()
+        let back = app.textViews.matching(identifier: "card_back").element(boundBy: 0)
+        XCTAssertFalse((back.value as? String ?? "").isEmpty, "The meaning was filled in")
+        XCTAssertTrue((front.value as? String ?? "").contains("犬"), "The Japanese word stays on the front")
+        XCTAssertFalse(app.buttons["dictionary_suggestion_1"].exists, "The bar clears after choosing")
+        attachScreenshot(app, name: "dictionary-applied")
+        app.buttons["close_deck_editor"].tap()
+        app.alerts.buttons["Bỏ thay đổi"].tap()
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5))
+    }
+
+    /// Picture search is reachable from a card, says honestly when it cannot help, and never blocks the editor.
+    func testPictureSearchOpensFromACardAndCanBeClosed() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        openNewDeckEditor(app)
+        let front = app.textViews.matching(identifier: "card_front").element(boundBy: 0)
+        XCTAssertTrue(front.waitForExistence(timeout: 5))
+        front.tap()
+        front.typeText("chó")
+        app.buttons.matching(identifier: "card_picture").element(boundBy: 0).tap()
+        let find = app.buttons["Tìm ảnh…"]
+        XCTAssertTrue(find.waitForExistence(timeout: 5), "The picture menu offers a search next to Photos and a web address")
+        find.tap()
+        XCTAssertTrue(app.otherElements["picture_search_state"].waitForExistence(timeout: 10)
+                      || app.collectionViews["picture_search_results"].waitForExistence(timeout: 1))
+        attachScreenshot(app, name: "picture-search")
+        app.buttons["picture_search_close"].tap()
+        XCTAssertTrue(app.buttons["save_deck"].waitForExistence(timeout: 5), "Editing continues after the search is closed")
+        app.buttons["close_deck_editor"].tap()
+        app.alerts.buttons["Bỏ thay đổi"].tap()
     }
 
     private func openCards(_ app: XCUIApplication) {

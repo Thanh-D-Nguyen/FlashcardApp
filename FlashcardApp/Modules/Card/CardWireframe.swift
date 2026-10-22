@@ -10,6 +10,10 @@ import UIKit
 
 protocol CardWireframeInterface: AnyObject {
     func showEditor(deckId: String?, onFinish: @escaping () -> Void)
+    /// The choice between typing a deck and generating one; the sheet closes before `onChoose` runs.
+    func showNewDeckOptions(onChoose: @escaping (NewDeckMethod) -> Void)
+    /// `onImported` runs with the local deck id after the generator has closed.
+    func showDeckGenerator(onImported: @escaping (String) -> Void)
     func showStudy(deckId: String)
     func confirmDelete(deckName: String, onConfirm: @escaping () -> Void)
     func showAlert(with title: String?, message: String?)
@@ -35,6 +39,24 @@ extension CardWireframe: CardWireframeInterface {
     func showEditor(deckId: String?, onFinish: @escaping () -> Void) {
         let editor = CreateDeskWireframe(deckId: deckId, onFinish: onFinish)
         let navigation = UINavigationController(rootViewController: editor.viewController)
+        viewController.present(navigation, animated: true)
+    }
+
+    func showNewDeckOptions(onChoose: @escaping (NewDeckMethod) -> Void) {
+        let options = NewDeckOptionsViewController(onChoose: onChoose)
+        options.modalPresentationStyle = .pageSheet
+        if let sheet = options.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+        viewController.present(options, animated: true)
+    }
+
+    func showDeckGenerator(onImported: @escaping (String) -> Void) {
+        let generator = DeckGeneratorWireframe(onImported: onImported)
+        let navigation = UINavigationController(rootViewController: generator.viewController)
+        navigation.modalPresentationStyle = .pageSheet
+        navigation.sheetPresentationController?.detents = [.large()]
         viewController.present(navigation, animated: true)
     }
 

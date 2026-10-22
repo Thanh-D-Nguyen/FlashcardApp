@@ -175,9 +175,11 @@ final class CardStudyPresenter {
 
     // MARK: Speech
 
-    /// The language each side of a card is written in, from the deck's direction setting.
-    private func languageCode(front: Bool) -> String {
-        let japaneseOnFront = deck?.sortingLanguage != .opposite
+    /// The language a side of a card is written in. When exactly one side holds kana or kanji that side is Japanese,
+    /// whatever the deck's direction says (a generated deck can mix directions card by card); otherwise the deck's
+    /// direction setting decides.
+    private func languageCode(for card: StudyCard, front: Bool) -> String {
+        let japaneseOnFront = JapaneseText.japaneseIsOnFront(front: card.front, back: card.back, deckHasJapaneseOnFront: deck?.sortingLanguage != .opposite)
         return (front == japaneseOnFront) ? "ja-JP" : "vi-VN"
     }
 
@@ -255,7 +257,7 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
         guard let card = session.current else { return }
         let showingBack = session.mode == .flip && session.isFlipped
         let text = showingBack ? card.back : card.front
-        speech.speak(text, languageCode: languageCode(front: !showingBack))
+        speech.speak(text, languageCode: languageCode(for: card, front: !showingBack))
     }
 
     func restart() {

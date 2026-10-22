@@ -31,6 +31,15 @@ final class AuthSession {
         return profile ?? SocialUserEntity(id: id)
     }
 
+    /// The opaque session token for an authenticated request; nil once signed out or if the stored value is malformed.
+    /// Read it when the request starts and again when it finishes to detect a logout or account change in between.
+    var bearerToken: String? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !isSignedOut, let token = tokens.accessToken, NativeAuthAPI.isValidToken(token) else { return nil }
+        return token
+    }
+
     init(tokens: AuthTokenManagerInterface = KeychainAuthTokenManager.shared,
          api: NativeAuthAPIInterface = NativeAuthAPI()) {
         self.tokens = tokens

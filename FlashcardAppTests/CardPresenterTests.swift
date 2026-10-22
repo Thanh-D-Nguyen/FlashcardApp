@@ -96,11 +96,26 @@ final class CardPresenterTests: XCTestCase {
     func test_createAndEditOpenTheEditorAndReloadWhenItFinishes() {
         interactor.decks = [desk("a", "A")]
         presenter.createDeck()
+        XCTAssertEqual(wireframe.optionSheets, 1, "Creating a deck first offers typing it or generating it")
+        XCTAssertTrue(wireframe.editors.isEmpty)
+        wireframe.choose(.manual)
         presenter.editDeck(id: "a")
         XCTAssertEqual(wireframe.editors, [nil, "a"])
         let before = view.states.count
         wireframe.finishEditor()
         XCTAssertEqual(view.states.count, before + 1)
+    }
+
+    func test_generatingADeckListsItAndOpensItInTheEditor() {
+        interactor.decks = [desk("generated", "N5")]
+        presenter.createDeck()
+        wireframe.choose(.automatic)
+        XCTAssertEqual(wireframe.generators, 1)
+        XCTAssertTrue(wireframe.editors.isEmpty, "The editor opens only once a deck was imported")
+        let before = view.states.count
+        wireframe.finishGenerator(deckId: "generated")
+        XCTAssertEqual(wireframe.editors, ["generated"])
+        XCTAssertGreaterThan(view.states.count, before, "The library lists the imported deck right away")
     }
 
     func test_deleteAsksFirstAndOnlyDeletesAfterConfirmation() {
@@ -151,6 +166,15 @@ final class FakeCardWireframe: CardWireframeInterface {
     private var deleteConfirmation: (() -> Void)?
 
     func showEditor(deckId: String?, onFinish: @escaping () -> Void) { editors.append(deckId); editorFinish = onFinish }
+    var optionSheets = 0
+    var generators = 0
+    private var chooseMethod: ((NewDeckMethod) -> Void)?
+    private var generatorFinish: ((String) -> Void)?
+
+    func showNewDeckOptions(onChoose: @escaping (NewDeckMethod) -> Void) { optionSheets += 1; chooseMethod = onChoose }
+    func showDeckGenerator(onImported: @escaping (String) -> Void) { generators += 1; generatorFinish = onImported }
+    func choose(_ method: NewDeckMethod) { chooseMethod?(method) }
+    func finishGenerator(deckId: String) { generatorFinish?(deckId) }
     func showStudy(deckId: String) { studied.append(deckId) }
     func confirmDelete(deckName: String, onConfirm: @escaping () -> Void) { deleteRequests.append(deckName); deleteConfirmation = onConfirm }
     func showAlert(with title: String?, message: String?) { alerts.append(message) }

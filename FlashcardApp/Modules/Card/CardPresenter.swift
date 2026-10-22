@@ -162,7 +162,20 @@ extension CardPresenter: CardPresenterInterface {
     }
 
     func createDeck() {
-        wireframe.showEditor(deckId: nil) { [weak self] in self?.reload() }
+        wireframe.showNewDeckOptions { [weak self] method in
+            guard let self else { return }
+            switch method {
+            case .manual:
+                self.wireframe.showEditor(deckId: nil) { [weak self] in self?.reload() }
+            case .automatic:
+                self.wireframe.showDeckGenerator { [weak self] deckId in
+                    guard let self else { return }
+                    // The deck is already stored on the device: list it, then open it for review and editing.
+                    self.reload()
+                    self.wireframe.showEditor(deckId: deckId) { [weak self] in self?.reload() }
+                }
+            }
+        }
     }
 
     func studyDeck(id: String) {

@@ -25,7 +25,7 @@ final class BJTSearchAPI {
         self.baseURL = baseURL
     }
 
-    func search(q: String, scope: DictionarySearchType) -> Single<[BJTSearchResultDTO]> {
+    func search(q: String, scope: DictionarySearchType, limit: Int = 30) -> Single<[BJTSearchResultDTO]> {
         let query = q.trimmingCharacters(in: .whitespacesAndNewlines)
         // Go validates bytes: one Japanese character already meets the minimum.
         guard (2...200).contains(query.utf8.count) else {
@@ -33,7 +33,7 @@ final class BJTSearchAPI {
         }
         return Single.create { observer in
             let request = self.session.request("\(self.baseURL)/search", parameters: [
-                "q": query, "scope": scope.scope, "limit": "30"
+                "q": query, "scope": scope.scope, "limit": String(min(max(limit, 1), 50))
             ])
             .validate(statusCode: 200..<300)
             .responseDecodable(of: [BJTSearchResultDTO].self) { response in

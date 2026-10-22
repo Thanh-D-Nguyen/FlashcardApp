@@ -14,9 +14,13 @@ protocol MailLoginWireframeInterface: AnyObject {
 }
 
 final class MailLoginWireframe: BaseWireframe<MailLoginViewController> {
+    /// Set when the screen is presented over another one (a feature that needs an account): leaving it then dismisses it
+    /// and tells the caller, instead of replacing the app's root with the main tabs.
+    private let onFinish: (() -> Void)?
 
     // MARK: - Module setup -
-    init() {
+    init(onFinish: (() -> Void)? = nil) {
+        self.onFinish = onFinish
         let moduleViewController = MailLoginViewController()
         super.init(viewController: moduleViewController)
         let interactor = MailLoginInteractor()
@@ -28,6 +32,10 @@ final class MailLoginWireframe: BaseWireframe<MailLoginViewController> {
 // MARK: - Extensions -
 extension MailLoginWireframe: MailLoginWireframeInterface {
     func showMain() {
+        if let onFinish {
+            viewController.dismiss(animated: true) { onFinish() }
+            return
+        }
         navigationController?.setRootWireframe(MainWireframe())
     }
 }

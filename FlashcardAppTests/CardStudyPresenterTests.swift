@@ -120,6 +120,25 @@ final class CardStudyPresenterTests: XCTestCase {
         XCTAssertEqual(speech.spoken.last?.1, "vi-VN")
     }
 
+    func test_aCardWrittenInJapaneseOnOneSideIsSpokenAsJapaneseWhicheverWayTheDeckPoints() {
+        // A generated deck can mix directions: the second card has Vietnamese on the front of a Japanese-first deck.
+        let deck = makeDeck(2)
+        deck.cards[0].frontText = "犬"; deck.cards[0].backText = "chó"
+        deck.cards[1].frontText = "mèo"; deck.cards[1].backText = "猫"
+        interactor.deck = deck
+        start()
+        presenter.speakCurrent()
+        XCTAssertEqual(speech.spoken.last?.1, "ja-JP")
+        presenter.next()
+        presenter.speakCurrent()
+        XCTAssertEqual(speech.spoken.last?.0, "mèo")
+        XCTAssertEqual(speech.spoken.last?.1, "vi-VN", "The front of this card is Vietnamese even though the deck says Japanese first")
+        presenter.flip()
+        presenter.speakCurrent()
+        XCTAssertEqual(speech.spoken.last?.0, "猫")
+        XCTAssertEqual(speech.spoken.last?.1, "ja-JP")
+    }
+
     func test_aReversedDeckSpeaksVietnameseOnTheFront() {
         interactor.deck = makeDeck(2, direction: .opposite)
         start()

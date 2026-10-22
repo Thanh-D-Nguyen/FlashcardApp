@@ -22,11 +22,13 @@ final class CardEditorCell: UITableViewCell, UITextViewDelegate {
     private let errorLabel = ErrorMessageLabel()
     private let stack = UIStackView()
 
-    var onTextChange: ((CardField, String) -> Void)?
+    /// Field, its text, and whether an IME composition (marked text) is still open in it.
+    var onTextChange: ((CardField, String, Bool) -> Void)?
     var onBeginEditing: ((CardField) -> Void)?
     var onHeightChange: (() -> Void)?
     var onReveal: ((CardField) -> Void)?
     private var revealed = Set<CardField>()
+    private var composingField: CardField?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -206,8 +208,17 @@ final class CardEditorCell: UITableViewCell, UITextViewDelegate {
     private func field(of textView: UITextView) -> CardField { CardField(rawValue: textView.tag) ?? .front }
 
     func textViewDidChange(_ textView: UITextView) {
-        onTextChange?(field(of: textView), textView.text)
+        composingField = textView.markedTextRange != nil ? field(of: textView) : nil
+        onTextChange?(field(of: textView), textView.text, textView.markedTextRange != nil)
         onHeightChange?()
+    }
+
+    /// Accepting a composition unchanged (kana confirmed as typed) may not report a text change; the selection still moves.
+    /// Announce the committed text so the lookup for it is not left waiting for the next keystroke.
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        guard composingField == field(of: textView), textView.markedTextRange == nil else { return }
+        composingField = nil
+        onTextChange?(field(of: textView), textView.text, false)
     }
 
     func textViewDidBeginEditing(_ textView: UITextView) {

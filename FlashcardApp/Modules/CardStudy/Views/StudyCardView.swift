@@ -96,7 +96,7 @@ final class StudyCardView: UIView {
     /// Lays out the visible side. `isFlip` cards show front or back; quiz cards show only the prompt (front).
     func configure(card: StudyCardState, direction: LanguageSortingType, showingBack: Bool, isQuiz: Bool = false,
                    readingVisible: Bool, imagesVisible: Bool) {
-        let japaneseOnFront = direction != .opposite
+        let japaneseOnFront = JapaneseText.japaneseIsOnFront(front: card.front, back: card.back, deckHasJapaneseOnFront: direction != .opposite)
         let japaneseVisible = showingBack ? !japaneseOnFront : japaneseOnFront
         eyebrowLabel.text = languageName(japanese: japaneseVisible).uppercased(with: AppLanguage.current.locale)
         let text = showingBack ? card.back : card.front

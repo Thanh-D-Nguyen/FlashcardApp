@@ -23,7 +23,12 @@ protocol CreateDeskInteractorInterface: AnyObject {
     /// Validates, downsamples and stores picked picture bytes off the main thread; emits the stored reference.
     func storePicture(data: Data) -> Single<String>
     /// Downloads a picture from an https address and stores it locally; emits the stored reference.
-    func downloadPicture(from url: URL) -> Single<String>
+    /// `attribution` (for a picture found through the picture search) is kept with the stored file.
+    func downloadPicture(from url: URL, attribution: ImageAttribution?) -> Single<String>
+}
+
+extension CreateDeskInteractorInterface {
+    func downloadPicture(from url: URL) -> Single<String> { downloadPicture(from: url, attribution: nil) }
 }
 
 class CreateDeskInteractor {
@@ -108,10 +113,15 @@ extension CreateDeskInteractor: CreateDeskInteractorInterface {
         }
     }
 
-    func downloadPicture(from url: URL) -> Single<String> {
-        remote.fetch(url).flatMap { [weak self] data in
+    func downloadPicture(from url: URL, attribution: ImageAttribution?) -> Single<String> {
+        let stored: Single<String> = remote.fetch(url).flatMap { [weak self] (data: Data) -> Single<String> in
             guard let self else { return .error(CardImageError.unreadable) }
             return self.storePicture(data: data)
+        }
+        return stored.map { [images] (reference: String) -> String in
+            // The picture is stored; failing to note its source must not discard it.
+            if let attribution { try? images.saveAttribution(attribution, for: reference) }
+            return reference
         }
     }
 }

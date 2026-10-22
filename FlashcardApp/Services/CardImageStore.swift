@@ -159,7 +159,27 @@ final class CardImageStore {
         return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary).map { UIImage(cgImage: $0) }
     }
 
-    /// Deletes every stored picture whose reference is not in `referenced`. Returns the removed file names.
+    // MARK: Attribution
+
+    static let attributionSuffix = ".attribution.json"
+
+    /// Records where a downloaded picture came from, next to the picture file.
+    func saveAttribution(_ attribution: ImageAttribution, for reference: String) throws {
+        guard case .local(let name) = CardImageReference(reference) else { return }
+        do {
+            try JSONEncoder().encode(attribution).write(to: directory.appendingPathComponent(name + Self.attributionSuffix), options: .atomic)
+        } catch {
+            throw CardImageError.writeFailed(error.localizedDescription)
+        }
+    }
+
+    func attribution(for reference: String) -> ImageAttribution? {
+        guard case .local(let name) = CardImageReference(reference),
+              let data = try? Data(contentsOf: directory.appendingPathComponent(name + Self.attributionSuffix)) else { return nil }
+        return try? JSONDecoder().decode(ImageAttribution.self, from: data)
+    }
+
+    /// Deletes every stored picture whose reference is not in `referenced`, with its attribution record. Returns the removed file names.
     @discardableResult
     func removeUnreferenced(keeping referenced: Set<String>) -> [String] {
         let kept = Set(referenced.compactMap { raw -> String? in
@@ -168,7 +188,9 @@ final class CardImageStore {
         })
         guard let files = try? fileManager.contentsOfDirectory(atPath: directory.path) else { return [] }
         var removed: [String] = []
-        for name in files where !kept.contains(name) {
+        for name in files {
+            let owner = name.hasSuffix(Self.attributionSuffix) ? String(name.dropLast(Self.attributionSuffix.count)) : name
+            guard !kept.contains(owner) else { continue }
             if (try? fileManager.removeItem(at: directory.appendingPathComponent(name))) != nil { removed.append(name) }
         }
         return removed

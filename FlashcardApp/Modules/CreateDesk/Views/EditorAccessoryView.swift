@@ -14,7 +14,6 @@ final class EditorAccessoryView: UIInputView {
     private let nextButton = UIButton(configuration: .plain())
     private let addButton = UIButton(configuration: .plain())
     private let dismissButton = UIButton(configuration: .plain())
-    private var suggestions: [CardSuggestion] = []
 
     init() {
         super.init(frame: CGRect(x: 0, y: 0, width: 0, height: 52), inputViewStyle: .keyboard)
@@ -59,7 +58,9 @@ final class EditorAccessoryView: UIInputView {
             suggestionStack.bottomAnchor.constraint(equalTo: suggestionScroll.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.xs),
             suggestionStack.leadingAnchor.constraint(equalTo: suggestionScroll.contentLayoutGuide.leadingAnchor, constant: Design.Spacing.l),
             suggestionStack.trailingAnchor.constraint(equalTo: suggestionScroll.contentLayoutGuide.trailingAnchor, constant: -Design.Spacing.l),
-            suggestionScroll.heightAnchor.constraint(equalToConstant: 44)
+            // The bar is as tall as its (two-line, Dynamic Type scaled) chips instead of a fixed height that clips them.
+            suggestionScroll.heightAnchor.constraint(equalTo: suggestionScroll.contentLayoutGuide.heightAnchor),
+            suggestionScroll.heightAnchor.constraint(lessThanOrEqualToConstant: 96)
         ])
         suggestionScroll.isHidden = true
 
@@ -80,20 +81,88 @@ final class EditorAccessoryView: UIInputView {
 
     func setPosition(_ text: String) { positionLabel.text = text }
 
-    func setSuggestions(_ newSuggestions: [CardSuggestion]) {
-        suggestions = newSuggestions
+    /// Shows what the dictionary lookup is doing: chips to pick from, or one line of status.
+    func setState(_ state: SuggestionsState) {
         suggestionStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        for suggestion in newSuggestions {
-            var configuration = UIButton.Configuration.gray()
-            configuration.title = suggestion.title
-            configuration.cornerStyle = .capsule
-            configuration.buttonSize = .medium
-            let chip = ChipButton(configuration: configuration)
-            chip.accessibilityLabel = suggestion.title
-            chip.addAction(UIAction { [weak self] _ in self?.onSelectSuggestion?(suggestion) }, for: .primaryActionTriggered)
-            suggestionStack.addArrangedSubview(chip)
-        }
-        suggestionScroll.isHidden = newSuggestions.isEmpty
         suggestionScroll.contentOffset = .zero
+        switch state {
+        case .hidden:
+            suggestionScroll.isHidden = true
+            return
+        case .searching(let partial):
+            partial.enumerated().forEach { suggestionStack.addArrangedSubview(chip(for: $1, number: $0 + 1)) }
+            suggestionStack.addArrangedSubview(statusView(partial.isEmpty ? NSLocalizedString("Searching the dictionary…", comment: "") : nil, spinning: true))
+        case .results(let suggestions):
+            suggestions.enumerated().forEach { suggestionStack.addArrangedSubview(chip(for: $1, number: $0 + 1)) }
+        case .empty:
+            suggestionStack.addArrangedSubview(statusView(NSLocalizedString("No dictionary match", comment: ""), spinning: false))
+        case .unavailable:
+            suggestionStack.addArrangedSubview(statusView(NSLocalizedString("Online dictionary unavailable. Check your connection.", comment: ""), spinning: false))
+        }
+        suggestionScroll.isHidden = suggestionStack.arrangedSubviews.isEmpty
+    }
+
+    private func chip(for suggestion: CardSuggestion, number: Int) -> UIView {
+        var configuration = UIButton.Configuration.gray()
+        // A dictionary meaning can list dozens of glosses: the chip shows the beginning, the card gets the full text.
+        let headword = Self.clipped(suggestion.japanese, 24)
+        configuration.title = suggestion.reading.isEmpty ? headword : "\(headword)  \(Self.clipped(suggestion.reading, 24))"
+        var detail = Self.clipped(suggestion.vietnamese, 34)
+        if let level = Self.displayLevel(suggestion.jlptLevel) { detail += " · \(level)" }
+        configuration.subtitle = detail
+        configuration.titleLineBreakMode = .byTruncatingTail
+        configuration.cornerStyle = .capsule
+        configuration.titleAlignment = .leading
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 14, bottom: 4, trailing: 14)
+        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
+            var attributes = attributes
+            attributes.font = Design.TextRole.reading.font.withWeight(.semibold)
+            return attributes
+        }
+        configuration.subtitleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
+            var attributes = attributes
+            attributes.font = Design.TextRole.metadata.font
+            return attributes
+        }
+        let chip = ChipButton(configuration: configuration)
+        chip.titleLabel?.numberOfLines = 1
+        chip.widthAnchor.constraint(lessThanOrEqualToConstant: 280).isActive = true
+        chip.accessibilityLabel = [suggestion.japanese, suggestion.reading, suggestion.vietnamese].filter { !$0.isEmpty }.joined(separator: ", ")
+        chip.accessibilityIdentifier = "dictionary_suggestion_\(number)"
+        chip.addAction(UIAction { [weak self] _ in self?.onSelectSuggestion?(suggestion) }, for: .primaryActionTriggered)
+        return chip
+    }
+
+    private func statusView(_ text: String?, spinning: Bool) -> UIView {
+        let row = UIStackView()
+        row.spacing = Design.Spacing.s
+        row.alignment = .center
+        if spinning {
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            spinner.isAccessibilityElement = false
+            row.addArrangedSubview(spinner)
+        }
+        if let text {
+            let label = UILabel()
+            label.apply(.metadata)
+            label.textColor = Design.Color.textSecondary
+            label.text = text
+            label.numberOfLines = 1
+            label.accessibilityIdentifier = "dictionary_suggestion_status"
+            row.addArrangedSubview(label)
+        }
+        return row
+    }
+
+    static func clipped(_ text: String, _ length: Int) -> String {
+        let single = text.replacingOccurrences(of: "\n", with: " ")
+        return single.count > length ? String(single.prefix(length)).trimmingCharacters(in: .whitespaces) + "…" : single
+    }
+
+    /// "N5" from the service's "N5" or "J5"; anything else is not shown.
+    static func displayLevel(_ level: String?) -> String? {
+        guard let level = level?.uppercased(), level.count == 2, "NJ".contains(level.first!), "12345".contains(level.last!) else { return nil }
+        return "N" + level.dropFirst()
     }
 }

@@ -13,12 +13,15 @@ final class CreateDeskPresenterTests: XCTestCase {
         interactor = FakeEditorInteractor()
         wireframe = FakeEditorWireframe()
         view = SpyEditorView()
+        suggestions = FakeSuggestions()
         finished = 0
     }
 
-    private func makePresenter(deckId: String? = nil, search: SearchWordsInteractorInterface = FakeSearch()) -> CreateDeskPresenter {
+    private var suggestions: FakeSuggestions!
+
+    private func makePresenter(deckId: String? = nil, suggestionDelay: DispatchTimeInterval = .milliseconds(40)) -> CreateDeskPresenter {
         let presenter = CreateDeskPresenter(interactor: interactor, wireframe: wireframe, deckId: deckId, onFinish: { [unowned self] in finished += 1 },
-                                            searchWordInteractor: search, draftSaveDelay: .milliseconds(0), suggestionDelay: .milliseconds(0))
+                                            suggestionInteractor: suggestions, draftSaveDelay: .milliseconds(0), suggestionDelay: suggestionDelay)
         presenter.view = view
         presenter.viewDidLoad()
         return presenter
@@ -376,45 +379,231 @@ final class CreateDeskPresenterTests: XCTestCase {
 
     // MARK: Suggestions
 
-    func test_typingJapaneseOffersDictionarySuggestionsWithTheirReading() {
-        let search = FakeSearch()
-        search.japanese = [makeCard(front: "犬", reading: "いぬ", back: "chó")]
-        let presenter = makePresenter(search: search)
-        presenter.updateField(.front, ofCardAt: 0, text: "犬")
-        let wait = expectation(description: "debounced search")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { wait.fulfill() }
-        waitForExpectations(timeout: 2)
-        XCTAssertEqual(view.suggestions.last, [CardSuggestion(japanese: "犬", reading: "いぬ", vietnamese: "chó", typedJapanese: true)])
+    /// Lets the debounce (40 ms) fire and the asynchronous pipeline deliver.
+    private func settle(_ seconds: TimeInterval = 0.2) {
+        let done = expectation(description: "settle")
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { done.fulfill() }
+        wait(for: [done], timeout: seconds + 2)
     }
 
-    func test_applyingASuggestionNeverOverwritesWhatTheLearnerAlreadyWrote() {
+    private func entry(_ japanese: String = "犬", reading: String = "いぬ", _ vietnamese: String = "chó", typedJapanese: Bool = true) -> CardSuggestion {
+        CardSuggestion(japanese: japanese, reading: reading, vietnamese: vietnamese, typedJapanese: typedJapanese)
+    }
+
+    func test_aBurstOfKeystrokesLooksUpOnlyTheFinalText() {
+        let presenter = makePresenter()
+        for text in ["食", "食べ", "食べる"] { presenter.updateField(.front, ofCardAt: 0, text: text) }
+        settle()
+        XCTAssertEqual(suggestions.queries.map(\.text), ["食べる"], "Debounced: one lookup, for what the learner ended up typing")
+        XCTAssertEqual(suggestions.queries.first?.isJapanese, true)
+    }
+
+    func test_aNewKeystrokeCancelsTheLookupStillRunning() {
         let presenter = makePresenter()
         presenter.updateField(.front, ofCardAt: 0, text: "犬")
-        presenter.updateField(.back, ofCardAt: 0, text: "my own meaning")
-        presenter.apply(CardSuggestion(japanese: "犬", reading: "いぬ", vietnamese: "chó", typedJapanese: true), toCardAt: 0)
-        XCTAssertEqual(presenter.draft.cards[0].back, "my own meaning")
+        settle()
+        XCTAssertEqual(suggestions.disposed, [])
+        presenter.updateField(.front, ofCardAt: 0, text: "犬小屋")
+        settle()
+        XCTAssertEqual(suggestions.queries.map(\.text), ["犬", "犬小屋"])
+        XCTAssertEqual(suggestions.disposed, [0], "The older lookup is disposed, which cancels its network request")
+    }
+
+    func test_aLateAnswerForOlderTextNeverOverwritesTheLatest() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        settle()
+        presenter.updateField(.front, ofCardAt: 0, text: "猫")
+        settle()
+        suggestions.subjects[1].onNext(.results([entry("猫", reading: "ねこ", "mèo")]))
+        suggestions.subjects[0].onNext(.results([entry()]))
+        settle(0.05)
+        XCTAssertEqual(view.suggestions.last, .results([entry("猫", reading: "ねこ", "mèo")]))
+    }
+
+    func test_anAnswerThatArrivesAfterTheTextWasClearedIsDropped() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        settle()
+        presenter.updateField(.front, ofCardAt: 0, text: "")
+        suggestions.subjects[0].onNext(.results([entry()]))
+        XCTAssertEqual(view.suggestions.last, .hidden)
+        XCTAssertFalse(view.suggestions.contains(.results([entry()])))
+    }
+
+    func test_nothingIsLookedUpWhileAJapaneseCompositionIsOpen() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "た", isComposing: true)
+        presenter.updateField(.front, ofCardAt: 0, text: "たべ", isComposing: true)
+        settle()
+        XCTAssertTrue(suggestions.queries.isEmpty, "Marked (uncommitted) text is not a word yet")
+        XCTAssertEqual(view.suggestions.last, .hidden)
+        presenter.updateField(.front, ofCardAt: 0, text: "食べ", isComposing: false)
+        settle()
+        XCTAssertEqual(suggestions.queries.map(\.text), ["食べ"])
+    }
+
+    func test_aCompositionStartedAfterATypedWordWithdrawsItsPendingLookup() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "食", isComposing: false)
+        presenter.updateField(.front, ofCardAt: 0, text: "食べ", isComposing: true)
+        settle()
+        XCTAssertTrue(suggestions.queries.isEmpty)
+    }
+
+    func test_oneLatinLetterAndWholeSentencesAreNotLookedUp() {
+        let presenter = makePresenter()
+        presenter.updateField(.back, ofCardAt: 0, text: "a")
+        settle()
+        presenter.updateField(.back, ofCardAt: 0, text: String(repeating: "đi học ", count: 10))
+        settle()
+        XCTAssertTrue(suggestions.queries.isEmpty)
+        XCTAssertNotNil(SuggestionQuery("犬"), "One Japanese character is already a word")
+    }
+
+    func test_theScriptTypedDecidesTheLookupNotTheDeckDirection() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "ăn cơm")
+        settle()
+        XCTAssertEqual(suggestions.queries.last?.isJapanese, false, "Vietnamese typed on the front of a Japanese–Vietnamese deck")
+    }
+
+    func test_choosingAnOfflineEntryWhileTheOnlineLookupRunsKeepsItsLateAnswerOut() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        settle()
+        suggestions.subjects[0].onNext(.searching(partial: [entry()]))
+        settle(0.05)
+        presenter.apply(entry(), toCardAt: 0)
+        suggestions.subjects[0].onNext(.results([entry("犬小屋", reading: "いぬごや", "cũi chó")]))
+        settle(0.05)
+        XCTAssertEqual(view.suggestions.last, .hidden, "The bar stays closed after a choice")
+    }
+
+    func test_focusMovingToAnotherFieldWithdrawsTheSuggestions() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        settle()
+        presenter.suggestionsNotNeeded()
+        suggestions.subjects[0].onNext(.results([entry()]))
+        XCTAssertEqual(view.suggestions.last, .hidden)
+    }
+
+    func test_applyingAJapaneseEntryFillsExpressionReadingAndMeaning() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        presenter.apply(entry(), toCardAt: 0)
+        XCTAssertEqual(presenter.draft.cards[0].front, "犬")
         XCTAssertEqual(presenter.draft.cards[0].reading, "いぬ")
-        presenter.apply(CardSuggestion(japanese: "犬", reading: "いぬ", vietnamese: "chó", typedJapanese: true), toCardAt: 1)
-        XCTAssertEqual(presenter.draft.cards[1].front, "犬")
-        XCTAssertEqual(presenter.draft.cards[1].back, "chó")
+        XCTAssertEqual(presenter.draft.cards[0].back, "chó")
+        XCTAssertTrue(wireframe.replacements.isEmpty, "Filling empty fields never asks")
     }
 
-    func test_inAReversedDeckTheVietnameseSideIsTheFront() {
+    func test_japaneseTypedOnTheBackPutsTheReadingWithTheAnswer() {
         let presenter = makePresenter()
-        presenter.setDirection(.opposite)
-        presenter.apply(CardSuggestion(japanese: "犬", reading: "いぬ", vietnamese: "chó", typedJapanese: false), toCardAt: 0)
+        presenter.updateField(.back, ofCardAt: 0, text: "犬")
+        presenter.apply(entry(), toCardAt: 0)
+        XCTAssertEqual(presenter.draft.cards[0].back, "犬")
+        XCTAssertEqual(presenter.draft.cards[0].front, "chó")
+        XCTAssertEqual(presenter.draft.cards[0].note, "いぬ", "The front is Vietnamese here, so the reading belongs with the Japanese answer")
+        XCTAssertEqual(presenter.draft.cards[0].reading, "")
+    }
+
+    func test_vietnameseTypedOnTheFrontCompletesItAndFillsTheJapaneseSide() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "chó")
+        presenter.apply(entry(typedJapanese: false), toCardAt: 0)
         XCTAssertEqual(presenter.draft.cards[0].front, "chó")
         XCTAssertEqual(presenter.draft.cards[0].back, "犬")
-        XCTAssertEqual(presenter.draft.cards[0].reading, "", "The reading belongs to the front, which is Vietnamese here")
+        XCTAssertEqual(presenter.draft.cards[0].note, "いぬ")
     }
 
-    private func makeCard(front: String, reading: String = "", back: String) -> CardEntity {
-        let card = CardEntity()
-        card.frontText = front
-        card.frontExtraText = reading
-        card.backText = back
-        return card
+    func test_aSuggestionNeverReplacesAnEditedFieldWithoutConfirmation() {
+        let presenter = makePresenter()
+        presenter.updateField(.back, ofCardAt: 0, text: "my own meaning")
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        presenter.apply(entry(), toCardAt: 0)
+        XCTAssertEqual(presenter.draft.cards[0].front, "犬")
+        XCTAssertEqual(presenter.draft.cards[0].reading, "いぬ", "Empty fields are still filled")
+        XCTAssertEqual(presenter.draft.cards[0].back, "my own meaning", "The learner's own text stays until they confirm")
+        XCTAssertEqual(wireframe.replacements.first, [ReplacementProposal(field: .back, current: "my own meaning", proposed: "chó")])
+        wireframe.confirmReplacement?()
+        XCTAssertEqual(presenter.draft.cards[0].back, "chó")
     }
+
+    func test_keepingMyTextLeavesTheCardAsItWas() {
+        let presenter = makePresenter()
+        presenter.updateField(.back, ofCardAt: 0, text: "my own meaning")
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        presenter.apply(entry(), toCardAt: 0)
+        // The alert's "Keep mine" does nothing: no callback runs.
+        XCTAssertEqual(presenter.draft.cards[0].back, "my own meaning")
+    }
+
+    func test_textThatAlreadyMatchesTheEntryIsNotAConflict() {
+        let presenter = makePresenter()
+        presenter.updateField(.back, ofCardAt: 0, text: " chó ")
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        presenter.apply(entry(), toCardAt: 0)
+        XCTAssertTrue(wireframe.replacements.isEmpty)
+    }
+
+    func test_aConfirmationForACardThatWasDeletedMeanwhileDoesNothing() {
+        let presenter = makePresenter()
+        presenter.updateField(.back, ofCardAt: 0, text: "mine")
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        presenter.apply(entry(), toCardAt: 0)
+        presenter.deleteCard(at: 0)
+        wireframe.confirmReplacement?()
+        XCTAssertEqual(presenter.draft.cards.count, 1)
+        XCTAssertNotEqual(presenter.draft.cards[0].back, "chó")
+    }
+
+    func test_withoutATypedFieldTheDeckDirectionDecidesWhichSideIsJapanese() {
+        let presenter = makePresenter()
+        presenter.setDirection(.opposite)
+        presenter.apply(entry(typedJapanese: false), toCardAt: 0)
+        XCTAssertEqual(presenter.draft.cards[0].front, "chó")
+        XCTAssertEqual(presenter.draft.cards[0].back, "犬")
+        XCTAssertEqual(presenter.draft.cards[0].reading, "", "The front is Vietnamese in this deck")
+    }
+
+    // MARK: Picture search
+
+    func test_theSearchTermIsTheDictionaryMeaningOfAFilledCard() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "食べる")
+        presenter.apply(entry("食べる", reading: "たべる", "ăn; dùng bữa"), toCardAt: 0)
+        presenter.findPictures(forCardAt: 0)
+        XCTAssertEqual(wireframe.pictureTerms, ["ăn"])
+    }
+
+    func test_withoutADictionaryEntryTheNonJapaneseSideIsTheTermThenTheJapanese() {
+        XCTAssertEqual(PictureSearchTerm.make(front: "犬", back: "chó, con chó", applied: nil), "chó")
+        XCTAssertEqual(PictureSearchTerm.make(front: "犬", back: "", applied: nil), "犬")
+        XCTAssertEqual(PictureSearchTerm.make(front: "", back: "", applied: nil), "")
+        let edited = entry("犬", reading: "いぬ", "chó")
+        XCTAssertEqual(PictureSearchTerm.make(front: "犬", back: "my own words", applied: edited), "my own words",
+                       "A meaning the learner replaced is no longer the dictionary's")
+    }
+
+    func test_aChosenPictureIsDownloadedWithItsSourceAndAttachedToTheCard() {
+        let presenter = makePresenter()
+        presenter.updateField(.front, ofCardAt: 0, text: "犬")
+        presenter.findPictures(forCardAt: 0)
+        let picture = PictureSuggestion(BJTImageResultDTO(id: "p1", thumbUrl: "https://img.test/t.jpg", fullUrl: "https://img.test/f.jpg", source: "unsplash"))!
+        wireframe.pickPicture?(picture)
+        XCTAssertEqual(interactor.downloaded, [URL(string: "https://img.test/f.jpg")!])
+        XCTAssertEqual(interactor.attributions, [ImageAttribution(source: "unsplash", sourceID: "p1", imageURL: "https://img.test/f.jpg")])
+        XCTAssertEqual(presenter.draft.cards[0].imageReference, "local-image:x.jpg")
+    }
+
+    func test_pictureSuggestionsOnlyAcceptSecureAddresses() {
+        XCTAssertNil(PictureSuggestion(BJTImageResultDTO(id: "p", thumbUrl: "http://img.test/t.jpg", fullUrl: "https://img.test/f.jpg", source: "x")))
+        XCTAssertNil(PictureSuggestion(BJTImageResultDTO(id: "p", thumbUrl: "https://img.test/t.jpg", fullUrl: "file:///etc/passwd", source: "x")))
+        XCTAssertNil(PictureSuggestion(BJTImageResultDTO(id: "", thumbUrl: "https://img.test/t.jpg", fullUrl: "https://img.test/f.jpg", source: "x")))
+    }
+
 }
 
 // MARK: - Doubles
@@ -425,12 +614,17 @@ private final class PublishSubjectBox {
     func succeed(_ value: String) { subject.onNext(value); subject.onCompleted() }
 }
 
-private final class FakeSearch: SearchWordsInteractorInterface {
-    var japanese: [CardEntity] = []
-    var vietnamese: [CardEntity] = []
-    func searchText(_ text: String?, cardFace: CardFace) -> SearchResultEntity {
-        guard let text, !text.isEmpty else { return SearchResultEntity(face: cardFace, cards: []) }
-        return SearchResultEntity(face: cardFace, cards: cardFace == .front ? japanese : vietnamese)
+private final class FakeSuggestions: DictionarySuggestionInteractorInterface {
+    var queries: [SuggestionQuery] = []
+    var subjects: [PublishSubject<SuggestionsState>] = []
+    var disposed: [Int] = []
+
+    func suggestions(for query: SuggestionQuery) -> Observable<SuggestionsState> {
+        queries.append(query)
+        let index = queries.count - 1
+        let subject = PublishSubject<SuggestionsState>()
+        subjects.append(subject)
+        return subject.do(onDispose: { [weak self] in self?.disposed.append(index) })
     }
 }
 
@@ -447,6 +641,7 @@ private final class FakeEditorInteractor: CreateDeskInteractorInterface {
     var storeResult: Single<String> = .just("local-image:x.jpg")
     var downloadResult: Single<String> = .just("local-image:x.jpg")
     var downloaded: [URL] = []
+    var attributions: [ImageAttribution] = []
 
     func deck(withId id: String) -> DeskEntity? { decks[id] }
     func savedDraft(forDeckId deckId: String?) -> DeckDraft? { draft }
@@ -462,7 +657,11 @@ private final class FakeEditorInteractor: CreateDeskInteractorInterface {
         deleted.append(id)
     }
     func storePicture(data: Data) -> Single<String> { storeResult }
-    func downloadPicture(from url: URL) -> Single<String> { downloaded.append(url); return downloadResult }
+    func downloadPicture(from url: URL, attribution: ImageAttribution?) -> Single<String> {
+        downloaded.append(url)
+        if let attribution { attributions.append(attribution) }
+        return downloadResult
+    }
 }
 
 private final class FakeEditorWireframe: CreateDeskWireframeInterface {
@@ -477,12 +676,24 @@ private final class FakeEditorWireframe: CreateDeskWireframeInterface {
     var declineRestore: (() -> Void)?
     var deleteDeckPrompts: [String] = []
     var confirmDeleteDeck: (() -> Void)?
+    var replacements: [[ReplacementProposal]] = []
+    var confirmReplacement: (() -> Void)?
+    var pictureTerms: [String] = []
+    var pickPicture: ((PictureSuggestion) -> Void)?
 
     func showAlert(with title: String?, message: String?) { alerts.append(message) }
     func close() { closeCount += 1 }
     func confirmDiscard(onDiscard: @escaping () -> Void) { discardPrompts += 1; confirmDiscard = onDiscard }
     func confirmDeleteCard(number: Int, onDelete: @escaping () -> Void) { deleteCardPrompts.append(number); confirmDeleteCard = onDelete }
     func confirmDeleteDeck(named name: String, onDelete: @escaping () -> Void) { deleteDeckPrompts.append(name); confirmDeleteDeck = onDelete }
+    func confirmReplace(_ proposals: [ReplacementProposal], onReplace: @escaping () -> Void) {
+        replacements.append(proposals)
+        confirmReplacement = onReplace
+    }
+    func showPictureSearch(term: String, onPick: @escaping (PictureSuggestion) -> Void) {
+        pictureTerms.append(term)
+        pickPicture = onPick
+    }
     func offerDraftRestore(restore: @escaping () -> Void, discard: @escaping () -> Void) {
         restoreOffers += 1
         self.restore = restore
@@ -498,7 +709,7 @@ private final class SpyEditorView: CreateDeskViewInterface {
     var issues: [(issues: [DeckValidationIssue], reveal: Bool)] = []
     var saving: [Bool] = []
     var dirty: [Bool] = []
-    var suggestions: [[CardSuggestion]] = []
+    var suggestions: [SuggestionsState] = []
     var focused: [(index: Int, field: CardField)] = []
 
     func reload() { reloads += 1 }
@@ -510,6 +721,6 @@ private final class SpyEditorView: CreateDeskViewInterface {
     func showIssues(_ issues: [DeckValidationIssue], reveal: Bool) { self.issues.append((issues, reveal)) }
     func setSaving(_ saving: Bool) { self.saving.append(saving) }
     func setDirty(_ dirty: Bool) { self.dirty.append(dirty) }
-    func showSuggestions(_ suggestions: [CardSuggestion]) { self.suggestions.append(suggestions) }
+    func showSuggestions(_ state: SuggestionsState) { suggestions.append(state) }
     func focus(cardIndex: Int, field: CardField) { focused.append((cardIndex, field)) }
 }

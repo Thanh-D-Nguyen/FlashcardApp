@@ -92,11 +92,14 @@ final class CreateDeskViewController: BaseViewController, CreateDeskViewInterfac
         ])
         accessory.onNext = { [weak self] in self?.focusNextField() }
         accessory.onAddCard = { [weak self] in self?.addCardFromToolbar() }
-        accessory.onDismissKeyboard = { [weak self] in self?.view.endEditing(true) }
+        accessory.onDismissKeyboard = { [weak self] in
+            self?.view.endEditing(true)
+            self?.presenter.suggestionsNotNeeded()
+        }
         accessory.onSelectSuggestion = { [weak self] suggestion in
             guard let self, let focused = self.focusedCard, let index = self.index(ofCard: focused.id) else { return }
             self.presenter.apply(suggestion, toCardAt: index)
-            self.accessory.setSuggestions([])
+            self.accessory.setState(.hidden)
         }
     }
 
@@ -203,8 +206,8 @@ final class CreateDeskViewController: BaseViewController, CreateDeskViewInterfac
         navigationController?.isModalInPresentation = dirty
     }
 
-    func showSuggestions(_ suggestions: [CardSuggestion]) {
-        accessory.setSuggestions(focusedCard == nil ? [] : suggestions)
+    func showSuggestions(_ state: SuggestionsState) {
+        accessory.setState(focusedCard == nil ? .hidden : state)
     }
 
     func focus(cardIndex: Int, field: CardField) {
@@ -352,6 +355,11 @@ final class CreateDeskViewController: BaseViewController, CreateDeskViewInterfac
 
     private func pictureMenu(forCard id: String, hasPicture: Bool) -> UIMenu {
         var actions: [UIMenuElement] = [
+            UIAction(title: NSLocalizedString("Find a picture…", comment: ""), image: UIImage(systemName: "magnifyingglass")) { [weak self] _ in
+                guard let self, let index = self.index(ofCard: id) else { return }
+                self.view.endEditing(true)
+                self.presenter.findPictures(forCardAt: index)
+            },
             UIAction(title: NSLocalizedString("Choose from Photos", comment: ""), image: UIImage(systemName: "photo.on.rectangle")) { [weak self] _ in
                 self?.pictureTargetId = id
                 self?.showPhotoPicker()
@@ -445,15 +453,19 @@ extension CreateDeskViewController: UITableViewDataSource, UITableViewDelegate {
                        isBusy: presenter.busyCardIds.contains(card.id), problem: problem(forCardAt: indexPath.row),
                        optionsMenu: optionsMenu(forCard: card.id), pictureMenu: pictureMenu(forCard: card.id, hasPicture: !card.imageReference.isEmpty))
         let id = card.id
-        cell.onTextChange = { [weak self] field, text in
+        cell.onTextChange = { [weak self] field, text, isComposing in
             guard let self, let index = self.index(ofCard: id) else { return }
-            self.presenter.updateField(field, ofCardAt: index, text: text)
+            self.presenter.updateField(field, ofCardAt: index, text: text, isComposing: isComposing)
         }
         cell.onBeginEditing = { [weak self] field in
             guard let self else { return }
             self.focusedCard = (id, field)
             self.updateAccessoryPosition()
-            if let index = self.index(ofCard: id) { self.presenter.suggestionsNeeded(cardIndex: index, field: field) }
+            if field == .front || field == .back, let index = self.index(ofCard: id) {
+                self.presenter.suggestionsNeeded(cardIndex: index, field: field)
+            } else {
+                self.presenter.suggestionsNotNeeded()
+            }
         }
         cell.onHeightChange = { [weak self, weak cell] in
             guard let self, let cell else { return }
@@ -486,7 +498,7 @@ extension CreateDeskViewController: UITableViewDataSource, UITableViewDelegate {
             cell.onHeightChange = { [weak self] in UIView.performWithoutAnimation { self?.tableView.performBatchUpdates(nil) } }
             cell.onBeginEditing = { [weak self] in
                 self?.focusedCard = nil
-                self?.accessory.setSuggestions([])
+                self?.presenter.suggestionsNotNeeded()
                 self?.updateAccessoryPosition()
             }
             cell.textView.inputAccessoryView = accessory

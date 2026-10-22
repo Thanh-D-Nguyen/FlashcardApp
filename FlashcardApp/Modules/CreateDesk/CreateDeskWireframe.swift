@@ -15,6 +15,10 @@ protocol CreateDeskWireframeInterface: AnyObject {
     func confirmDeleteCard(number: Int, onDelete: @escaping () -> Void)
     func confirmDeleteDeck(named name: String, onDelete: @escaping () -> Void)
     func offerDraftRestore(restore: @escaping () -> Void, discard: @escaping () -> Void)
+    /// Asks before replacing text the learner wrote with a dictionary entry's.
+    func confirmReplace(_ proposals: [ReplacementProposal], onReplace: @escaping () -> Void)
+    /// Presents the picture search; `onPick` runs once with the picture the learner chose.
+    func showPictureSearch(term: String, onPick: @escaping (PictureSuggestion) -> Void)
 }
 
 final class CreateDeskWireframe: BaseWireframe<CreateDeskViewController> {
@@ -60,5 +64,27 @@ extension CreateDeskWireframe: CreateDeskWireframeInterface {
         showAlert(with: NSLocalizedString("Unsaved draft found", comment: ""),
                   message: NSLocalizedString("You have unsaved changes from an earlier session. Restore them?", comment: ""),
                   actions: [restoreAction, discardAction])
+    }
+
+    func confirmReplace(_ proposals: [ReplacementProposal], onReplace: @escaping () -> Void) {
+        guard let first = proposals.first else { return }
+        let message: String
+        if proposals.count == 1 {
+            message = String.localizedStringWithFormat(NSLocalizedString("This card already says “%1$@”. Replace it with “%2$@” from the dictionary?", comment: ""), first.current, first.proposed)
+        } else {
+            message = String.localizedStringWithFormat(NSLocalizedString("%1$lld fields on this card already have text, for example “%2$@”. Replace them with the dictionary entry?", comment: ""), proposals.count, first.current)
+        }
+        let replace = UIAlertAction(title: NSLocalizedString("Replace", comment: ""), style: .default) { _ in onReplace() }
+        let keep = UIAlertAction(title: NSLocalizedString("Keep mine", comment: ""), style: .cancel)
+        showAlert(with: NSLocalizedString("Replace what you wrote?", comment: ""), message: message, actions: [replace, keep])
+    }
+
+    func showPictureSearch(term: String, onPick: @escaping (PictureSuggestion) -> Void) {
+        let search = PictureSearchWireframe(term: term, onPick: onPick)
+        let navigation = UINavigationController(rootViewController: search.viewController)
+        navigation.modalPresentationStyle = .pageSheet
+        navigation.sheetPresentationController?.detents = [.medium(), .large()]
+        navigation.sheetPresentationController?.prefersGrabberVisible = true
+        viewController.present(navigation, animated: true)
     }
 }
