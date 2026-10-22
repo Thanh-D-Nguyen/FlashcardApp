@@ -38,7 +38,7 @@ final class SettingViewController: BaseViewController {
         settingTableView.delegate = self
         settingTableView.rowHeight = UITableView.automaticDimension
         settingTableView.estimatedRowHeight = 60
-        settingTableView.backgroundColor = .systemGroupedBackground
+        settingTableView.backgroundColor = Design.Color.background
         settingTableView.separatorStyle = .singleLine
         settingTableView.separatorInset = UIEdgeInsets(top: 0, left: 56, bottom: 0, right: 0)
     }

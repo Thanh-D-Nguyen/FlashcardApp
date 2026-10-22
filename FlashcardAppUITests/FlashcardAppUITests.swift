@@ -103,6 +103,31 @@ final class FlashcardAppUITests: XCTestCase {
         attachScreenshot(app, name: "content-ax-xxxl")
     }
 
+    /// The featured level's primary action opens its vocabulary.
+    func testFeaturedStartOpensVocabulary() {
+        let app = XCUIApplication()
+        app.launch()
+        let start = app.buttons["home_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 40))
+        start.tap()
+        XCTAssertTrue(app.tables["level_content"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.segmentedControls["level_content_kind"].buttons["Từ vựng"].isSelected)
+    }
+
+    /// A level's count opens that kind directly, skipping the kind chooser.
+    func testLevelCountOpensItsKindDirectly() {
+        let app = XCUIApplication()
+        app.launch()
+        let levels = app.tables["home_levels"]
+        XCTAssertTrue(levels.waitForExistence(timeout: 40))
+        let grammar = app.buttons["home_kind_J4_grammar"]
+        XCTAssertTrue(grammar.waitForExistence(timeout: 15))
+        if !grammar.isHittable { levels.swipeUp() }
+        grammar.tap()
+        XCTAssertTrue(app.tables["level_content"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.segmentedControls["level_content_kind"].buttons["Ngữ pháp"].isSelected)
+    }
+
     private func attachScreenshot(_ app: XCUIApplication, name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name

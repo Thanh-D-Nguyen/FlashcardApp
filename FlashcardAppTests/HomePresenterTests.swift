@@ -44,6 +44,72 @@ final class HomePresenterTests: XCTestCase {
         XCTAssertEqual(HomePresenter.levelRow(dashed).counts.map(\.value), [0, 0, 3])
     }
 
+    func testLevelRowCarriesKanjiNumeralForEachJLPTLevel() {
+        func numeral(_ code: String) -> String? {
+            HomePresenter.levelRow(BJTLevelDTO(code: code, nameVi: code, descriptionVi: "", vocabCount: 1, kanjiCount: 0, grammarCount: 0)).numeral
+        }
+        XCTAssertEqual(["J5", "J4", "J3", "J2", "J1", "J1+"].map(numeral), ["五", "四", "三", "二", "一", "一+"])
+        XCTAssertNil(numeral("X9"), "An unknown code must fall back to the code mark, never an invented numeral")
+    }
+
+    func testFeaturedLevelIsFirstLevelWithContent() {
+        let empty = BJTLevelDTO(code: "J1+", nameVi: "J1+", descriptionVi: "", vocabCount: 0, kanjiCount: 0, grammarCount: 0)
+        let interactor = LevelHomeInteractorStub()
+        interactor.levels = .just([empty, level])
+        let presenter = HomePresenter(interactor: interactor, wireframe: LevelHomeWireframeSpy())
+        XCTAssertNil(presenter.featuredIndex)
+        presenter.viewDidLoad()
+        XCTAssertEqual(presenter.featuredIndex, 1)
+        let contentPresenter = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: LevelHomeWireframeSpy(), level: level)
+        XCTAssertNil(contentPresenter.featuredIndex)
+    }
+
+    func testSectionsFollowFeaturedLevelEvenWhenNotFirst() {
+        let empty = BJTLevelDTO(code: "J1+", nameVi: "J1+", descriptionVi: "", vocabCount: 0, kanjiCount: 0, grammarCount: 0)
+        let interactor = LevelHomeInteractorStub()
+        interactor.levels = .just([empty, level, empty])
+        let presenter = HomePresenter(interactor: interactor, wireframe: LevelHomeWireframeSpy())
+        XCTAssertEqual(HomeViewController.makeSections(presenter: presenter, hasStatus: false), [])
+        presenter.viewDidLoad()
+        XCTAssertEqual(HomeViewController.makeSections(presenter: presenter, hasStatus: false),
+                       [.featured(1), .levels([0, 2])])
+        presenter.selectRow(at: 1, kind: .kanji)
+        XCTAssertEqual(presenter.featuredIndex, 1, "The index handed to the presenter is the row index, not the table row")
+    }
+
+    func testSectionsWithoutAnyContentHaveNoFeaturedLevelAndContentModeIsOneSection() {
+        let empty = BJTLevelDTO(code: "J1+", nameVi: "J1+", descriptionVi: "", vocabCount: 0, kanjiCount: 0, grammarCount: 0)
+        let interactor = LevelHomeInteractorStub()
+        interactor.levels = .just([empty])
+        let presenter = HomePresenter(interactor: interactor, wireframe: LevelHomeWireframeSpy())
+        presenter.viewDidLoad()
+        XCTAssertEqual(HomeViewController.makeSections(presenter: presenter, hasStatus: true), [.levels([0]), .status])
+        let content = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: LevelHomeWireframeSpy(), level: level)
+        XCTAssertEqual(HomeViewController.makeSections(presenter: content, hasStatus: true), [.content, .status])
+    }
+
+    func testSelectingLevelWithKindOpensThatKind() {
+        let interactor = LevelHomeInteractorStub()
+        interactor.levels = .just([level])
+        let wireframe = LevelHomeWireframeSpy()
+        let presenter = HomePresenter(interactor: interactor, wireframe: wireframe)
+        presenter.viewDidLoad()
+        presenter.selectRow(at: 0, kind: .grammar)
+        XCTAssertEqual(wireframe.openedLevel?.code, "J5")
+        XCTAssertEqual(wireframe.openedKind, .grammar)
+        presenter.selectRow(at: 0)
+        XCTAssertEqual(wireframe.openedKind, .vocabulary, "Opening a level without a chosen kind starts at vocabulary")
+    }
+
+    func testOpenLevelStartsInRequestedKindAndLoadsIt() {
+        let interactor = LevelHomeInteractorStub()
+        let presenter = HomePresenter(interactor: interactor, wireframe: LevelHomeWireframeSpy(), level: level, kind: .kanji)
+        XCTAssertEqual(presenter.kind, .kanji)
+        XCTAssertEqual(presenter.kindTotal, 10)
+        presenter.viewDidLoad()
+        XCTAssertEqual(interactor.kinds, [.kanji])
+    }
+
     func testKindTotalFollowsSelectedKindOfOpenLevel() {
         let presenter = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: LevelHomeWireframeSpy(), level: level)
         XCTAssertEqual(presenter.kindTotal, 60)
@@ -147,6 +213,7 @@ private final class LevelHomeInteractorStub: HomeInteractorInterface {
 private final class LevelHomeWireframeSpy: HomeWireframeInterface {
     var openedLevel: BJTLevelDTO?
     var detail: String?
-    func showLevel(_ level: BJTLevelDTO) { openedLevel = level }
+    var openedKind: HomeContentKind?
+    func showLevel(_ level: BJTLevelDTO, kind: HomeContentKind) { openedLevel = level; openedKind = kind }
     func showMeaning(title: String, message: String) { detail = message }
 }

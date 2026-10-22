@@ -24,6 +24,13 @@ enum Design {
         static let gutter: CGFloat = 16
     }
 
+    // MARK: Shape
+
+    enum Radius {
+        /// The one raised panel on a screen (the featured level). Continuous curve, concentric with the device corners.
+        static let panel: CGFloat = 28
+    }
+
     // MARK: Colors
 
     enum Color {
@@ -45,6 +52,14 @@ enum Design {
         static let error = dynamic(light: 0xB3261E, dark: UIColor.systemRed)
         static let success = dynamic(light: 0x1E6B34, dark: UIColor.systemGreen)
         static let warning = dynamic(light: 0x8A4B00, dark: UIColor.systemOrange)
+
+        /// Deep indigo block that carries the single primary entry point of a screen.
+        static let hero = dynamic(light: 0x23406B, dark: 0x24406E)
+        /// Paper-colored text and controls on `hero` (≥ 8:1 in both appearances).
+        /// Foreground for paper-colored controls placed on `hero`.
+        static let heroDeep = rgb(0x1B2F52)
+        static let onHero = rgb(0xF6F3ED)
+        static let onHeroSecondary = rgb(0xF6F3ED).withAlphaComponent(0.78)
 
         private static func dynamic(light: UInt32, dark: UInt32) -> UIColor {
             dynamic(light: light, dark: rgb(dark))
@@ -83,6 +98,12 @@ enum Design {
         case mark
         /// Numeric values in running metadata; tabular so counts align across rows.
         case figure
+        /// Kanji numeral of a level (五) in a list row; Mincho, the typographic anchor of the row.
+        case numeral
+        /// The same numeral at display size for the featured level.
+        case numeralDisplay
+        /// Short label above a heading ("Bắt đầu từ đây").
+        case eyebrow
 
         var font: UIFont {
             switch self {
@@ -94,6 +115,9 @@ enum Design {
             case .metadata: return .preferredFont(forTextStyle: .footnote)
             case .mark: return Self.serif(.largeTitle, weight: .semibold)
             case .figure: return Self.tabular(.footnote, weight: .semibold)
+            case .numeral: return Self.mincho(size: 44, style: .title1, maximum: 72)
+            case .numeralDisplay: return Self.mincho(size: 96, style: .largeTitle, maximum: 150)
+            case .eyebrow: return .preferredFont(forTextStyle: .caption1).withWeight(.semibold)
             }
         }
 
@@ -101,7 +125,9 @@ enum Design {
             switch self {
             case .title, .headword, .meaning, .explanation, .figure: return Color.textPrimary
             case .reading, .metadata: return Color.textSecondary
-            case .mark: return Color.accent
+            case .mark, .numeral: return Color.accent
+            case .numeralDisplay: return Color.onHero
+            case .eyebrow: return Color.textSecondary
             }
         }
 
@@ -116,6 +142,18 @@ enum Design {
             let base = UIFont.systemFont(ofSize: baseSize(style), weight: weight)
             let descriptor = base.fontDescriptor.withDesign(.serif) ?? base.fontDescriptor
             return UIFontMetrics(forTextStyle: style).scaledFont(for: UIFont(descriptor: descriptor, size: base.pointSize))
+        }
+
+        /// Hiragino Mincho gives kanji numerals a printed, editorial stroke contrast; the system
+        /// serif (New York) has no CJK glyphs. Falls back to the system serif if the face is missing.
+        private static func mincho(size: CGFloat, style: UIFont.TextStyle, maximum: CGFloat) -> UIFont {
+            let font = UIFont(name: "HiraMinProN-W6", size: size) ?? serif(size: size)
+            return UIFontMetrics(forTextStyle: style).scaledFont(for: font, maximumPointSize: maximum)
+        }
+
+        private static func serif(size: CGFloat) -> UIFont {
+            let base = UIFont.systemFont(ofSize: size, weight: .semibold)
+            return UIFont(descriptor: base.fontDescriptor.withDesign(.serif) ?? base.fontDescriptor, size: size)
         }
 
         private static func tabular(_ style: UIFont.TextStyle, weight: UIFont.Weight) -> UIFont {
@@ -134,6 +172,22 @@ enum Design {
             configuration.cornerStyle = .capsule
             configuration.buttonSize = .large
             configuration.baseBackgroundColor = Color.accent
+            return configuration
+        }
+
+        /// Primary action on the `hero` block: paper-colored capsule with indigo text.
+        static func hero(title: String) -> UIButton.Configuration {
+            var configuration = UIButton.Configuration.filled()
+            configuration.cornerStyle = .capsule
+            configuration.buttonSize = .large
+            configuration.baseBackgroundColor = Color.onHero
+            configuration.baseForegroundColor = Color.heroDeep
+            var text = AttributedString(title)
+            text.font = UIFont.preferredFont(forTextStyle: .headline)
+            configuration.attributedTitle = text
+            configuration.image = UIImage(systemName: "arrow.right")
+            configuration.imagePlacement = .trailing
+            configuration.imagePadding = Design.Spacing.s
             return configuration
         }
     }
@@ -156,5 +210,13 @@ extension UILabel {
         textColor = role.color
         adjustsFontForContentSizeCategory = true
         numberOfLines = 0
+    }
+}
+
+extension UIFont {
+    /// Same face and size with another weight; keeps Dynamic Type scaling of the source font.
+    func withWeight(_ weight: UIFont.Weight) -> UIFont {
+        let descriptor = fontDescriptor.addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: weight]])
+        return UIFont(descriptor: descriptor, size: pointSize)
     }
 }

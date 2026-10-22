@@ -36,7 +36,8 @@ final class HomeInteractor: HomeInteractorInterface {
                                    subtitle: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: " · "),
                                    detail: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: "\n"),
                                    reading: readings.isEmpty ? nil : readings.joined(separator: " · "),
-                                   meaning: item.meaningVi.flatMap { $0.isEmpty ? nil : $0 })
+                                   meaning: item.meaningVi.flatMap { $0.isEmpty ? nil : $0 },
+                                   isGlyph: true)
                 }
             }
         case .grammar:

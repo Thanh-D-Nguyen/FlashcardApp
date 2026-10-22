@@ -6,8 +6,8 @@ final class HomeViewController: BaseViewController {
     private let stateView = StateView()
     private let kindControl = UISegmentedControl(items: HomeContentKind.allCases.map(\.title))
     private let totalLabel = UILabel()
-    private let introLabel = UILabel()
     private let headerView = UIView()
+    private var sections: [Section] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,10 +42,14 @@ final class HomeViewController: BaseViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 120
+        tableView.estimatedRowHeight = 160
+        tableView.estimatedSectionHeaderHeight = 32
         tableView.separatorColor = Design.Color.separator
         tableView.separatorInset = UIEdgeInsets(top: 0, left: Design.Spacing.gutter, bottom: 0, right: 0)
         tableView.register(LevelCell.self, forCellReuseIdentifier: LevelCell.reuseIdentifier)
+        tableView.register(FeaturedLevelCell.self, forCellReuseIdentifier: FeaturedLevelCell.reuseIdentifier)
+        tableView.register(SectionHeaderView.self, forHeaderFooterViewReuseIdentifier: SectionHeaderView.reuseIdentifier)
+        tableView.sectionHeaderTopPadding = 0
         tableView.register(ContentRowCell.self, forCellReuseIdentifier: ContentRowCell.reuseIdentifier)
         tableView.accessibilityIdentifier = presenter.isContent ? "level_content" : "home_levels"
         tableView.backgroundView = stateView
@@ -56,7 +60,7 @@ final class HomeViewController: BaseViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        buildHeader()
+        if presenter.isContent { buildHeader() }
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: HomeViewController, _) in
             controller.render()
         }
@@ -68,7 +72,8 @@ final class HomeViewController: BaseViewController {
 
     // MARK: Header
 
-    /// Levels: one line telling what a level contains. Level content: the kind switch and its total.
+    /// Level content: the kind switch and its total. The level list has no header; its first
+    /// section is the featured level.
     private func buildHeader() {
         headerView.directionalLayoutMargins = NSDirectionalEdgeInsets(
             top: Design.Spacing.s, leading: Design.Spacing.gutter, bottom: Design.Spacing.l, trailing: Design.Spacing.gutter)
@@ -83,24 +88,19 @@ final class HomeViewController: BaseViewController {
             stack.leadingAnchor.constraint(equalTo: headerView.layoutMarginsGuide.leadingAnchor),
             stack.trailingAnchor.constraint(equalTo: headerView.layoutMarginsGuide.trailingAnchor)
         ])
-        if presenter.isContent {
-            kindControl.selectedSegmentIndex = presenter.kind.rawValue
-            kindControl.accessibilityIdentifier = "level_content_kind"
-            kindControl.addAction(UIAction { [weak self] _ in
-                guard let self, let kind = HomeContentKind(rawValue: self.kindControl.selectedSegmentIndex) else { return }
-                self.presenter.selectKind(kind)
-            }, for: .valueChanged)
-            totalLabel.apply(.metadata)
-            [kindControl, totalLabel].forEach(stack.addArrangedSubview)
-        } else {
-            introLabel.apply(.reading)
-            introLabel.text = "Chọn cấp độ để xem từ vựng, kanji và ngữ pháp."
-            stack.addArrangedSubview(introLabel)
-        }
+        kindControl.selectedSegmentIndex = presenter.kind.rawValue
+        kindControl.accessibilityIdentifier = "level_content_kind"
+        kindControl.addAction(UIAction { [weak self] _ in
+            guard let self, let kind = HomeContentKind(rawValue: self.kindControl.selectedSegmentIndex) else { return }
+            self.presenter.selectKind(kind)
+        }, for: .valueChanged)
+        totalLabel.apply(.metadata)
+        [kindControl, totalLabel].forEach(stack.addArrangedSubview)
         tableView.tableHeaderView = headerView
     }
 
     private func sizeHeaderToFit() {
+        guard presenter.isContent else { return }
         let width = tableView.bounds.width
         guard width > 0 else { return }
         let height = headerView.systemLayoutSizeFitting(
@@ -114,13 +114,21 @@ final class HomeViewController: BaseViewController {
     // MARK: Rendering
 
     private func render() {
-        if presenter.isContent { renderKindChooser() }
+        if presenter.isContent { renderKindChooser() } else { renderSubtitle() }
+        sections = Self.makeSections(presenter: presenter, hasStatus: statusText != nil)
         stateView.configure(screenState ?? .empty(title: "", message: nil), onRetry: { [weak self] in self?.presenter.retry() })
         stateView.isHidden = screenState == nil
         stateView.accessibilityIdentifier = "home_status"
         tableView.reloadData()
         // The header's content (kind chooser, total) can change without a view layout pass.
         view.setNeedsLayout()
+    }
+
+    /// One line under the large title. Static text (never data-dependent) so the title keeps its height
+    /// when rows arrive; dropped at accessibility sizes, where the system would truncate it.
+    private func renderSubtitle() {
+        let large = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        navigationItem.subtitle = large ? nil : "Chọn cấp độ JLPT để bắt đầu học"
     }
 
     /// Segmented control at regular sizes; the system menu from the bar once text no longer fits three segments.
@@ -167,30 +175,102 @@ final class HomeViewController: BaseViewController {
     }
 }
 
+extension HomeViewController {
+    /// What a table section shows. Level list: featured level, then the other levels; content: its rows.
+    enum Section: Equatable {
+        case featured(Int)
+        case levels([Int])
+        case content
+        case status
+    }
+
+    static func makeSections(presenter: HomePresenterInterface, hasStatus: Bool) -> [Section] {
+        var sections: [Section] = []
+        if presenter.isContent {
+            sections.append(.content)
+        } else if !presenter.rows.isEmpty {
+            let featured = presenter.featuredIndex
+            if let featured { sections.append(.featured(featured)) }
+            let others = presenter.rows.indices.filter { $0 != featured }
+            if !others.isEmpty { sections.append(.levels(others)) }
+        }
+        if hasStatus { sections.append(.status) }
+        return sections
+    }
+
+    /// The level's numeral inside the visible cell; the zoom transition grows out of it.
+    func transitionSourceView(forLevelCode code: String) -> UIView? {
+        let numerals: [UILabel] = tableView.visibleCells
+            .filter { $0.accessibilityIdentifier == "home_row_\(code)" }
+            .compactMap { ($0 as? LevelCell)?.numeralLabel ?? ($0 as? FeaturedLevelCell)?.numeralLabel }
+        // A level without a numeral hides its label; zooming from a hidden view would look broken.
+        return numerals.first { !$0.isHidden }
+    }
+}
+
 extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int { 2 }
+    func numberOfSections(in tableView: UITableView) -> Int { sections.count }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        section == 0 ? presenter.rows.count : (statusText == nil ? 0 : 1)
+        switch sections[section] {
+        case .featured: return 1
+        case .levels(let indices): return indices.count
+        case .content: return presenter.rows.count
+        case .status: return 1
+        }
+    }
+
+    /// Presenter row index behind a table position, nil for the status footer.
+    private func rowIndex(at indexPath: IndexPath) -> Int? {
+        switch sections[indexPath.section] {
+        case .featured(let index): return index
+        case .levels(let indices): return indices[indexPath.row]
+        case .content: return indexPath.row
+        case .status: return nil
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard indexPath.section == 0 else { return statusCell(for: tableView) }
-        let row = presenter.rows[indexPath.row]
+        guard let index = rowIndex(at: indexPath) else { return statusCell(for: tableView) }
+        let row = presenter.rows[index]
         let cell: UITableViewCell
-        if presenter.isContent {
+        switch sections[indexPath.section] {
+        case .featured:
+            let featured = tableView.dequeueReusableCell(withIdentifier: FeaturedLevelCell.reuseIdentifier) as! FeaturedLevelCell
+            featured.configure(with: row)
+            featured.onStart = { [weak self] in self?.presenter.selectRow(at: index, kind: .vocabulary) }
+            cell = featured
+        case .levels:
+            let level = tableView.dequeueReusableCell(withIdentifier: LevelCell.reuseIdentifier) as! LevelCell
+            level.configure(with: row)
+            level.onSelectKind = { [weak self] kind in self?.presenter.selectRow(at: index, kind: kind) }
+            level.setActivation { [weak self] in self?.presenter.selectRow(at: index) }
+            cell = level
+        default:
             let content = tableView.dequeueReusableCell(withIdentifier: ContentRowCell.reuseIdentifier) as! ContentRowCell
             content.configure(with: row)
             cell = content
-        } else {
-            let level = tableView.dequeueReusableCell(withIdentifier: LevelCell.reuseIdentifier) as! LevelCell
-            level.configure(with: row)
-            cell = level
         }
         cell.accessibilityIdentifier = "home_row_\(row.id)"
-        cell.accessibilityTraits = .button
+        if case .content = sections[indexPath.section] { cell.accessibilityTraits = .button }
         return cell
     }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard case .levels = sections[section] else { return nil }
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SectionHeaderView.reuseIdentifier) as! SectionHeaderView
+        header.configure(title: "Các cấp độ tiếp theo")
+        return header
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if case .levels = sections[section] { return UITableView.automaticDimension }
+        return .leastNormalMagnitude
+    }
+
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? { nil }
+
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat { .leastNormalMagnitude }
 
     private func statusCell(for tableView: UITableView) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "home_status_cell")
@@ -225,8 +305,8 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.section == 0 {
-            presenter.selectRow(at: indexPath.row)
+        if let index = rowIndex(at: indexPath) {
+            presenter.selectRow(at: index)
         } else if presenter.errorMessage != nil {
             presenter.retry()
         } else {

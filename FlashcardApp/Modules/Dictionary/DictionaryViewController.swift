@@ -7,6 +7,11 @@ final class DictionaryViewController: BaseViewController, UITableViewDataSource,
     private let search = UISearchController(searchResultsController: nil)
     private let message = UILabel()
     private let spinner = UIActivityIndicatorView(style: .medium)
+    private lazy var refreshItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(performSearch))
+    private lazy var spinnerItem: UIBarButtonItem = {
+        spinner.accessibilityLabel = "Đang tìm"
+        return UIBarButtonItem(customView: spinner)
+    }()
     private var rows: [BJTSearchResultDTO] = []
 
     override func viewDidLoad() {
@@ -38,8 +43,7 @@ final class DictionaryViewController: BaseViewController, UITableViewDataSource,
         search.searchBar.showsScopeBar = true
         navigationItem.searchController = search
         navigationItem.hidesSearchBarWhenScrolling = false
-        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: spinner),
-            UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(performSearch))]
+        navigationItem.rightBarButtonItem = refreshItem
         definesPresentationContext = true
         message.numberOfLines = 0
         message.textAlignment = .center
@@ -66,12 +70,15 @@ final class DictionaryViewController: BaseViewController, UITableViewDataSource,
 
     private func render(_ state: DictionaryState) {
         spinner.stopAnimating()
+        // One trailing item at a time: a glass pill holding only an idle spinner reads as an empty button.
+        navigationItem.rightBarButtonItem = refreshItem
         rows = []
         switch state {
         case .idle: message.text = "Nhập từ khóa để tra cứu."
         case .loading:
             message.text = "Đang tìm…"
             spinner.startAnimating()
+            navigationItem.rightBarButtonItem = spinnerItem
         case .results(let results):
             rows = results
             message.text = results.isEmpty ? "Không tìm thấy kết quả." : nil
