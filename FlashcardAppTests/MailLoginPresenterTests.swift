@@ -151,6 +151,19 @@ final class MailLoginPresenterTests: XCTestCase {
         XCTAssertEqual(wireframe.showMainCount, 0)
     }
 
+    func testMalformedEmailAndOversizedPasswordAreRejectedBeforeInteractor() {
+        presenter.loginWithEmail(email: "reader@example", password: "secret")
+        guard case .error = presenter.viewState.value else {
+            return XCTFail("An address without a domain suffix must be rejected")
+        }
+
+        presenter.loginWithEmail(email: "reader@example.com", password: String(repeating: "a", count: 1025))
+        guard case .error = presenter.viewState.value else {
+            return XCTFail("A password exceeding the API limit must be rejected")
+        }
+        XCTAssertTrue(interactor.credentials.isEmpty)
+    }
+
     func testSynchronousFailureDoesNotBlockRetry() {
         interactor.immediateResult = .failure(LoginFailure.rejected)
 

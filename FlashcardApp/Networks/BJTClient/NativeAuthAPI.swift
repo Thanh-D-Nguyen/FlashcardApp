@@ -18,12 +18,13 @@ private struct NativeLogoutResponse: Decodable {
 }
 
 enum NativeAuthError: Error, LocalizedError {
-    case invalidInput, invalidCredentials, unauthorized, invalidResponse, unavailable, staleSession, storageFailed
+    case invalidInput, invalidCredentials, rateLimited, unauthorized, invalidResponse, unavailable, staleSession, storageFailed
 
     var errorDescription: String? {
         switch self {
         case .invalidInput: return NSLocalizedString("Enter a valid email address and password.", comment: "")
         case .invalidCredentials: return NSLocalizedString("Email or password is incorrect.", comment: "")
+        case .rateLimited: return NSLocalizedString("Too many sign-in attempts. Please try again later.", comment: "")
         case .unauthorized: return NSLocalizedString("Your session has expired. Please log in again.", comment: "")
         case .invalidResponse: return NSLocalizedString("The account service returned an invalid response.", comment: "")
         case .unavailable: return NSLocalizedString("The account service is unavailable. Please try again.", comment: "")
@@ -112,6 +113,8 @@ final class NativeAuthAPI: NativeAuthAPIInterface {
                     case .failure(let error):
                         if response.response?.statusCode == 401 {
                             observer(.failure(NativeAuthError.unauthorized))
+                        } else if path == "login", response.response?.statusCode == 429 {
+                            observer(.failure(NativeAuthError.rateLimited))
                         } else if error.isResponseSerializationError {
                             observer(.failure(NativeAuthError.invalidResponse))
                         } else {

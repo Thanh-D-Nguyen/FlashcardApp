@@ -4945,6 +4945,30 @@
         }
       }
     },
+    "Too many sign-in attempts. Please try again later." : {
+      "comment" : "Auth rate limit error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many sign-in attempts. Please try again later."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau."
+          }
+        }
+      }
+    },
     "The account service returned an invalid response.": {
       "extractionState": "manual",
       "comment": "Auth error",

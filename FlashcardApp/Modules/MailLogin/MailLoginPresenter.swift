@@ -84,14 +84,16 @@ extension MailLoginPresenter: MailLoginPresenterInterface {
     func loginWithEmail(email: String, password: String) {
         guard loginRequest == nil else { return }
         let email = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        let components = email.split(separator: "@", omittingEmptySubsequences: false)
-        guard components.count == 2, components.allSatisfy({ !$0.isEmpty }),
-              email.rangeOfCharacter(from: .whitespacesAndNewlines) == nil else {
+        guard email.range(of: #"^[^\s@]+@[^\s@]+\.[^\s@]+$"#, options: .regularExpression) != nil else {
             viewState.accept(.error(NSLocalizedString("Enter a valid email address.", comment: "")))
             return
         }
         guard !password.isEmpty else {
             viewState.accept(.error(NSLocalizedString("Enter your password.", comment: "")))
+            return
+        }
+        guard password.utf8.count <= 1024 else {
+            viewState.accept(.error(NSLocalizedString("Enter a valid email address and password.", comment: "")))
             return
         }
 

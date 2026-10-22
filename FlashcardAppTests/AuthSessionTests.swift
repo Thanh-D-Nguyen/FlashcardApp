@@ -313,6 +313,23 @@ final class NativeAuthAPITests: XCTestCase {
         wait(for: [done], timeout: 3)
     }
 
+    func testLoginRateLimitIsNotReportedAsServiceOutage() {
+        let done = expectation(description: "rate limited login")
+        AuthURLProtocol.handler = { _, transport in
+            transport.reply(status: 429, body: #"{"error":"too many requests"}"#)
+        }
+        api.login(email: "user@example.com", password: "test")
+            .subscribe(onSuccess: { _ in
+                XCTFail("Accepted rate-limited login")
+                done.fulfill()
+            }, onFailure: { error in
+                XCTAssertEqual(error.localizedDescription,
+                               NSLocalizedString("Too many sign-in attempts. Please try again later.", comment: ""))
+                done.fulfill()
+            }).disposed(by: bag)
+        wait(for: [done], timeout: 3)
+    }
+
     func testMeResolvesBearerOnSubscription() {
         let done = expectation(description: "profile")
         var token = "old-test-token"
