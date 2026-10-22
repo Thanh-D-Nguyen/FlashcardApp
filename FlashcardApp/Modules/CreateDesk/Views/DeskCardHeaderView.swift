@@ -11,6 +11,7 @@ import RxSwift
 class DeskCardHeaderView: UITableViewHeaderFooterView {
     private let disposeBag = DisposeBag()
     @IBOutlet private weak var languageSegmented: UISegmentedControl!
+    @IBOutlet private weak var titleLabel: UILabel!
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -18,6 +19,13 @@ class DeskCardHeaderView: UITableViewHeaderFooterView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        titleLabel.text = NSLocalizedString("Cards", comment: "")
+        languageSegmented.setTitle(NSLocalizedString("Japanese - Vietnamese", comment: ""), forSegmentAt: 0)
+        languageSegmented.setTitle(NSLocalizedString("Vietnamese - Japanese", comment: ""), forSegmentAt: 1)
     }
     
     func updateSortingLanguage(_ desk: DeskDataModel) {

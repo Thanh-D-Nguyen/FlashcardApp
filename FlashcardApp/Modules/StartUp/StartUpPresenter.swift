@@ -43,7 +43,7 @@ extension StartUpPresenter: StartUpPresenterInterface {
         }, onError: { [weak self] error in
             guard let self else { return }
             logger.error("Database initialization failed: \(error.localizedDescription)")
-            self.wireframe.showAlert(with: "Lỗi", message: error.errorDescription)
+            self.wireframe.showAlert(with: NSLocalizedString("Error", comment: ""), message: error.errorDescription)
         })
     }
 }

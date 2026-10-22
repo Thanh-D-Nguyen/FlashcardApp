@@ -34,6 +34,8 @@ class NewCardCell: SwipeTableViewCell {
         super.awakeFromNib()
         // Initialization code
         
+        wordTextField.placeholder = NSLocalizedString("Enter a keyword", comment: "")
+        meanTextField.placeholder = NSLocalizedString("Meaning", comment: "")
         wordTextField.inputViewStyle = .borderWith(radius: textFieldBorderWidth)
         wordTextField.lineColor = AppColors.highlightYellow
         wordTextField.editLineColor = AppColors.secondary

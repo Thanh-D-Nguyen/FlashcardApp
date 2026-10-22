@@ -87,7 +87,7 @@ final class LevelKindStrip: UIStackView {
         for (index, (button, count)) in zip(buttons, counts).enumerated() {
             button.accessibilityIdentifier = "\(identifierPrefix)_\(String(describing: HomeContentKind(rawValue: index) ?? .vocabulary))"
             var configuration = button.configuration ?? .plain()
-            var figure = AttributedString(count.value.formatted(.number.locale(Locale(identifier: "vi_VN"))))
+            var figure = AttributedString(count.value.formatted(.number.locale(AppLanguage.current.locale)))
             figure.font = Design.TextRole.figure.font
             figure.foregroundColor = Design.Color.accent
             var unit = AttributedString(count.label)
@@ -103,7 +103,7 @@ final class LevelKindStrip: UIStackView {
             button.contentHorizontalAlignment = .leading
             button.isEnabled = count.value > 0
             button.accessibilityLabel = "\(count.value) \(count.label)"
-            button.accessibilityHint = count.value > 0 ? "Mở \(count.label) của cấp độ này" : nil
+            button.accessibilityHint = count.value > 0 ? String(format: NSLocalizedString("Open %@ for this level", comment: ""), count.label) : nil
         }
     }
 }
@@ -139,7 +139,7 @@ final class LevelCell: UITableViewCell {
         nameLabel.apply(.title)
         summaryLabel.apply(.reading)
         emptyLabel.apply(.metadata)
-        emptyLabel.text = "Chưa có nội dung"
+        emptyLabel.text = NSLocalizedString("No content yet", comment: "")
         chevron.tintColor = .tertiaryLabel
         chevron.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .footnote, scale: .small)
         chevron.setContentHuggingPriority(.required, for: .horizontal)
@@ -219,9 +219,9 @@ final class LevelCell: UITableViewCell {
         stripContainer.isHidden = row.counts.isEmpty
         strip.configure(with: row.counts, identifierPrefix: "home_kind_\(row.id)")
         headerView.accessibilityLabel = ([row.mark, row.name ?? row.title, row.summary].compactMap { $0 }
-            + (row.counts.isEmpty ? ["Chưa có nội dung"] : []))
+            + (row.counts.isEmpty ? [NSLocalizedString("No content yet", comment: "")] : []))
             .joined(separator: ", ")
-        headerView.accessibilityHint = "Mở cấp độ"
+        headerView.accessibilityHint = NSLocalizedString("Open level", comment: "")
         // The cell is a container: header and each count are separate VoiceOver elements.
         isAccessibilityElement = false
         accessibilityElements = [headerView] + (row.counts.isEmpty ? [] : strip.arrangedSubviews)
@@ -235,7 +235,7 @@ final class LevelCell: UITableViewCell {
 /// the screen asks the user to start; everything else is an alternative.
 final class FeaturedLevelCell: UITableViewCell {
     static let reuseIdentifier = "featured_level_cell"
-    private static let startTitle = "Bắt đầu học từ vựng"
+    private static let startTitle = NSLocalizedString("Start studying vocabulary", comment: "")
 
     let numeralLabel = UILabel()
     var onStart: (() -> Void)?
@@ -263,7 +263,7 @@ final class FeaturedLevelCell: UITableViewCell {
 
         eyebrowLabel.apply(.eyebrow)
         eyebrowLabel.textColor = Design.Color.onHeroSecondary
-        eyebrowLabel.text = "Bắt đầu từ đây"
+        eyebrowLabel.text = NSLocalizedString("Start here", comment: "")
         numeralLabel.apply(.numeralDisplay)
         numeralLabel.numberOfLines = 1
         numeralLabel.setContentHuggingPriority(.required, for: .horizontal)
@@ -382,7 +382,7 @@ final class FeaturedLevelCell: UITableViewCell {
             + row.counts.map { "\($0.value) \($0.label)" }).joined(separator: ", ")
         isAccessibilityElement = false
         accessibilityElements = [infoView, startButton]
-        startButton.accessibilityLabel = "Bắt đầu học từ vựng \(row.mark ?? row.name ?? "")"
+        startButton.accessibilityLabel = String(format: NSLocalizedString("Start studying vocabulary, %@", comment: ""), row.mark ?? row.name ?? "")
     }
 }
 
@@ -395,11 +395,11 @@ extension LevelCell {
         let figure: [NSAttributedString.Key: Any] = [
             .font: Design.TextRole.figure.font,
             .foregroundColor: onHero ? Design.Color.onHero : Design.TextRole.figure.color]
-        guard !counts.isEmpty else { return NSAttributedString(string: "Chưa có nội dung", attributes: unit) }
+        guard !counts.isEmpty else { return NSAttributedString(string: NSLocalizedString("No content yet", comment: ""), attributes: unit) }
         let text = NSMutableAttributedString()
         for (index, count) in counts.enumerated() {
             if index > 0 { text.append(NSAttributedString(string: stacked ? "\n" : "  ·  ", attributes: unit)) }
-            text.append(NSAttributedString(string: count.value.formatted(.number.locale(Locale(identifier: "vi_VN"))), attributes: figure))
+            text.append(NSAttributedString(string: count.value.formatted(.number.locale(AppLanguage.current.locale)), attributes: figure))
             text.append(NSAttributedString(string: " \(count.label)", attributes: unit))
         }
         return text

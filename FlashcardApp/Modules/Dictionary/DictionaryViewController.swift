@@ -9,7 +9,7 @@ final class DictionaryViewController: BaseViewController, UITableViewDataSource,
     private let spinner = UIActivityIndicatorView(style: .medium)
     private lazy var refreshItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(performSearch))
     private lazy var spinnerItem: UIBarButtonItem = {
-        spinner.accessibilityLabel = "Đang tìm"
+        spinner.accessibilityLabel = NSLocalizedString("Searching", comment: "")
         return UIBarButtonItem(customView: spinner)
     }()
     private var rows: [BJTSearchResultDTO] = []
@@ -37,7 +37,7 @@ final class DictionaryViewController: BaseViewController, UITableViewDataSource,
         search.obscuresBackgroundDuringPresentation = false
         search.searchResultsUpdater = self
         search.searchBar.delegate = self
-        search.searchBar.placeholder = "Nhập tiếng Nhật hoặc tiếng Việt"
+        search.searchBar.placeholder = NSLocalizedString("Search in Japanese or Vietnamese", comment: "")
         search.searchBar.accessibilityIdentifier = "dictionary_search"
         search.searchBar.scopeButtonTitles = DictionarySearchType.allCases.map(\.title)
         search.searchBar.showsScopeBar = true
@@ -74,15 +74,15 @@ final class DictionaryViewController: BaseViewController, UITableViewDataSource,
         navigationItem.rightBarButtonItem = refreshItem
         rows = []
         switch state {
-        case .idle: message.text = "Nhập từ khóa để tra cứu."
+        case .idle: message.text = NSLocalizedString("Enter a keyword to look up.", comment: "")
         case .loading:
-            message.text = "Đang tìm…"
+            message.text = NSLocalizedString("Searching…", comment: "")
             spinner.startAnimating()
             navigationItem.rightBarButtonItem = spinnerItem
         case .results(let results):
             rows = results
-            message.text = results.isEmpty ? "Không tìm thấy kết quả." : nil
-        case .error(let reason): message.text = "\(reason)\nNhấn tải lại để thử lại."
+            message.text = results.isEmpty ? NSLocalizedString("No results found.", comment: "") : nil
+        case .error(let reason): message.text = String(format: NSLocalizedString("%@\nTap refresh to try again.", comment: ""), reason)
         }
         tableView.reloadData()
     }

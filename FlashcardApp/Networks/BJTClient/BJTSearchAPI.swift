@@ -4,7 +4,14 @@ import RxSwift
 
 enum DictionarySearchType: Int, CaseIterable {
     case vocabulary, kanji, grammar, sentence
-    var title: String { ["Từ vựng", "Hán tự", "Ngữ pháp", "Câu"][rawValue] }
+    var title: String {
+        switch self {
+        case .vocabulary: return NSLocalizedString("Vocabulary", comment: "")
+        case .kanji: return NSLocalizedString("Characters", comment: "")
+        case .grammar: return NSLocalizedString("Grammar", comment: "")
+        case .sentence: return NSLocalizedString("Sentences", comment: "")
+        }
+    }
     var scope: String { ["lexeme", "kanji", "grammar", "example"][rawValue] }
 }
 
@@ -22,7 +29,7 @@ final class BJTSearchAPI {
         let query = q.trimmingCharacters(in: .whitespacesAndNewlines)
         // Go validates bytes: one Japanese character already meets the minimum.
         guard (2...200).contains(query.utf8.count) else {
-            return .error(AppError.invalidInput("Nhập từ khóa dài từ 2 đến 200 byte."))
+            return .error(AppError.invalidInput(NSLocalizedString("Enter a keyword between 2 and 200 bytes.", comment: "")))
         }
         return Single.create { observer in
             let request = self.session.request("\(self.baseURL)/search", parameters: [

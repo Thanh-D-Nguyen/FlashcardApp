@@ -15,6 +15,10 @@ Bốn tab hoạt động:
 - Thẻ: bộ thẻ Realm offline, chọn bộ và tạo bộ mới; giữ URL ảnh đã lưu.
 - Cài đặt: giao diện, âm thanh, thông báo và tài khoản của website.
 
+Giao diện có ba ngôn ngữ: Tiếng Việt, English, 日本語 (`Localizable.xcstrings`; chọn ngôn ngữ ở
+Cài đặt iOS ▸ FlashcardApp ▸ Ngôn ngữ). Tên và mô tả cấp độ theo ngôn ngữ; nghĩa từ vựng/kanji/ngữ pháp
+từ API hiện chỉ có tiếng Việt. UI test ghim `-AppleLanguages (vi)`.
+
 App mở thẳng vào nội dung, không yêu cầu đăng nhập để học offline hoặc đọc API
 công khai. Đăng nhập từ mục tài khoản trong Cài đặt bằng tài khoản website đã có.
 

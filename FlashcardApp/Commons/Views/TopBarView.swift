@@ -9,9 +9,10 @@ import UIKit
 
 class TopBarView: UIView {
 
+    /// Localization key (the English text); storyboards set it, the label shows the translation.
     @IBInspectable var title: String = "Screen Name" {
         didSet {
-            titleLabel.text = title
+            titleLabel.text = NSLocalizedString(title, comment: "")
         }
     }
     /// Overrides the nib's white title for bars placed on a light background.

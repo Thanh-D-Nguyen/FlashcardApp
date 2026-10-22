@@ -117,17 +117,34 @@ final class SettingsRowCell: UITableViewCell {
         configuration.baseForegroundColor = Design.Color.textSecondary
         configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: Design.Spacing.s,
                                                               bottom: Design.Spacing.s, trailing: 0)
+        // One line, cut at the end if the row is too narrow; never wrapped into a tall, thin button.
+        configuration.titleLineBreakMode = .byTruncatingTail
         menuButton.configuration = configuration
         menuButton.menu = menu
         menuButton.accessibilityLabel = title
         menuButton.accessibilityValue = selectedTitle
-        menuButton.sizeToFit()
         accessoryView = menuButton
+        fitMenuButton()
         accessoryType = .none
         selectionStyle = .none
         isAccessibilityElement = false
         accessibilityElements = [menuButton]
         choiceState = (title, iconName, selectedTitle, menu)
+    }
+
+    /// An accessory view is sized by its frame, not by Auto Layout. `sizeToFit()` measures against the button's
+    /// current bounds, so a longer value replacing a shorter one wrapped inside the old width; measure against
+    /// unlimited space instead and keep the value to at most 60% of the row so the title is not squeezed out.
+    private func fitMenuButton() {
+        let natural = menuButton.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude,
+                                                     height: CGFloat.greatestFiniteMagnitude))
+        let limit = bounds.width > 0 ? bounds.width * 0.6 : natural.width
+        menuButton.bounds = CGRect(x: 0, y: 0, width: ceil(min(natural.width, limit)), height: ceil(natural.height))
+    }
+
+    override func layoutSubviews() {
+        if accessoryView === menuButton { fitMenuButton() }
+        super.layoutSubviews()
     }
 
     /// Last choice configuration, re-applied when the text size changes while the row is on screen.

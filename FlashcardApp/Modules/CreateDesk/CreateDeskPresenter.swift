@@ -187,7 +187,7 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         saveDesk(onComplete: { [weak self] in
             self?.wireframe.close()
         }, onError: { [weak self] error in
-            self?.wireframe.showAlert(with: "Error", message: error.errorDescription)
+            self?.wireframe.showAlert(with: NSLocalizedString("Error", comment: ""), message: error.errorDescription)
         })
     }
     
@@ -196,11 +196,11 @@ extension CreateDeskPresenter: CreateDeskPresenterInterface {
         do {
             try validateDesk(deskEntity)
         } catch {
-            let okAction = UIAlertAction(title: "Đồng ý", style: .default) { [weak self] _ in
+            let okAction = UIAlertAction(title: NSLocalizedString("Leave", comment: ""), style: .default) { [weak self] _ in
                 self?.wireframe.close()
             }
-            let cancelAction = UIAlertAction(title: "Ở lại", style: .cancel)
-            self.wireframe.showAlert(with: "Cảnh báo", message: "Bạn đang trong quá trình nhập dữ liệu, bạn muốn dừng nhập và trở về màn hình trước?", actions: [okAction, cancelAction])
+            let cancelAction = UIAlertAction(title: NSLocalizedString("Stay", comment: ""), style: .cancel)
+            self.wireframe.showAlert(with: NSLocalizedString("Warning", comment: ""), message: NSLocalizedString("You're in the middle of entering data. Stop and go back?", comment: ""), actions: [okAction, cancelAction])
         }
     }
     

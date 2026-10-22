@@ -46,6 +46,7 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="languageSegmented" destination="Lma-QQ-A2m" id="02b-Nb-PCs"/>
+                <outlet property="titleLabel" destination="mUN-mR-ftB" id="3Gh-Wn-Rt2"/>
             </connections>
             <point key="canvasLocation" x="-63.358778625954194" y="181.69014084507043"/>
         </view>

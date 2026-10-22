@@ -187,3 +187,45 @@ cell, đăng ký theo dõi cỡ chữ trong `init`, viền avatar theo Light/Dar
 3. Chính sách quyền riêng tư mở `<baseURL>/vi/privacy` trong Safari; production chưa có URL nên chỉ chạy được với backend local.
 4. Refresh hồ sơ có thể chạy hai lần mỗi lần hiện màn (có sẵn từ trước: `viewWillAppear` + callback quyền thông báo).
 5. VoiceOver thật, Increase Contrast, iPad, thiết bị thật chưa kiểm chứng.
+
+### 10.1 Sửa lỗi bố cục "Theo hệ thống" xuống dòng
+
+Giá trị của hàng Giao diện là nút menu đặt làm `accessoryView`, mà accessory được cell bố trí theo **frame**, không theo Auto Layout.
+`sizeToFit()` đo theo bounds hiện tại của nút, nên khi giá trị dài hơn thay giá trị ngắn ("Tối" → "Theo hệ thống") chữ bị bẻ nhiều dòng trong
+bề rộng cũ. Tái hiện bằng unit test trước khi sửa (`SettingsRowCellTests`: nút rộng 44 pt, cao 158 pt). Sửa: đo theo không gian không giới hạn
+(`sizeThatFits`), giới hạn bề rộng 60% hàng, một dòng cắt đuôi. Các test UI qua công tắc Thông báo/Âm thanh trên iOS 26.5 và 27.0 không bắt được
+lỗi này; test mức cell mới là bằng chứng.
+
+## 11. Ngôn ngữ: Tiếng Việt, English, 日本語 (bắt buộc)
+
+**Cơ chế**: ngôn ngữ do iOS chọn (Cài đặt ▸ FlashcardApp ▸ Ngôn ngữ, hoặc ngôn ngữ hệ thống); hàng "Ngôn ngữ" trong Cài đặt hiển thị ngôn ngữ đang
+dùng bằng chính ngôn ngữ đó và mở trang cài đặt của app. Không có bộ chọn trong app: đổi ngôn ngữ lúc chạy phải can thiệp bundle, không phải
+cơ chế được hỗ trợ, và iOS đã khởi động lại app khi đổi ngôn ngữ theo app. Ngôn ngữ không hỗ trợ → English (development language).
+
+**Nguồn chuỗi**: `FlashcardApp/Resources/Localizable.xcstrings` (String Catalog, 118 khoá, đủ vi/en/ja, thay `Localizable.strings` cũ chỉ có khoá không dùng). Khoá
+là chữ tiếng Anh; số ít/số nhiều của "N cards" dùng biến thể plural. Mã dùng `NSLocalizedString`; không viết cứng chuỗi (AGENTS.md).
+`AppLanguage` (vi/en/ja) chỉ phản chiếu lựa chọn của bundle cho những việc bundle không làm được: chọn tên/mô tả cấp độ và định dạng số theo ngôn
+ngữ app (không theo vùng thiết bị: 1.538 ở vi, 1,538 ở en/ja).
+
+**Nội dung từ backend**: tên và mô tả cấp độ đã có `nameEn/nameJa/descriptionEn/descriptionJa` nên đổi theo ngôn ngữ (thiếu/rỗng → tiếng Việt).
+**Nghĩa của từ vựng, kanji, ngữ pháp và kết quả tìm kiếm chỉ có tiếng Việt** (`meaningVi`, `shortMeaningVi`, `explanationVi`, `description`):
+người dùng English/日本語 vẫn đọc nghĩa tiếng Việt. Đây là giới hạn của API, cần backend bổ sung trường (hoặc tham số ngôn ngữ) rồi mới sửa được ở app.
+
+**IB**: chuỗi trong storyboard/xib được đưa ra mã qua IBOutlet mới (nút mô tả, tiêu đề header thẻ, nút thêm bộ thẻ, nút xong, nút chọn bộ thẻ) hoặc khoá tiếng Anh
+trong runtime attribute `title` của `TopBarView` (thanh tra khoá khi hiển thị). Màn tạo bộ thẻ có placeholder "Nhập tên", "Nhập từ khoá", "Ý nghĩa" cũng đã dịch.
+
+**Kiểm thử**: `LocalizationTests` đọc bảng đã biên dịch trong app bundle: đúng 3 ngôn ngữ, cùng tập khoá, không rỗng, không còn nguyên văn tiếng Anh ở vi/ja,
+cùng placeholder (`%@`, `%lld`, `%1$@`), bản ja có ký tự Nhật; thêm test `AppLanguage`, định dạng số, tên/mô tả cấp độ theo ngôn ngữ. UI test chạy cố định `-AppleLanguages (vi)`
+(`makeApp()`), cộng `testInterfaceFollowsTheAppLanguage` cho en và ja.
+
+**Kết quả**: build SUCCEEDED; chạy gộp unit+UI **126/126** (113 unit gồm 7 `LocalizationTests`, 3 `SettingsRowCellTests`; 13 UI gồm `testInterfaceFollowsTheAppLanguage`).
+
+**Ảnh thật** (`docs/ui-redesign/i18n/`, mỗi ảnh ghép vi | en | ja, iPhone 17 / iOS 27.0): Cấp độ, nội dung, Từ điển, Thẻ, tạo bộ thẻ, Cài đặt, đăng nhập (và hộp thoại cảnh báo đã xem trong phiên).
+
+**Đã xác nhận với backend thật** (2026-10-22): `/api/levels` trả `nameEn/nameJa/descriptionEn/descriptionJa` cho cả 6 cấp độ (khoá bằng `LevelAPITests`);
+`/vi|en|ja/privacy` đều 200 nên Chính sách quyền riêng tư mở trang theo ngôn ngữ app. Nhãn VoiceOver của nút vuốt (chuyển lên/xuống/xoá) trong trình tạo bộ thẻ
+đã có và được dịch (trước đó chỉ có icon).
+
+**Chưa làm / cần người bản ngữ**: bản dịch tiếng Anh và tiếng Nhật do tôi viết, chưa được người bản ngữ rà soát (đặc biệt thuật ngữ JLPT và văn phong tiếng Nhật);
+chưa kiểm tra cỡ chữ accessibility, Dark Mode và iPad ở en/ja; chưa kiểm tra hàng "Ngôn ngữ" mở đúng trang ngôn ngữ trên thiết bị thật; `SettingsPrototypes.swift`
+(SwiftUI preview cũ) vẫn dùng khoá riêng, không thuộc app.

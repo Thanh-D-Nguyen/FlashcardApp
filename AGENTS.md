@@ -59,6 +59,12 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
     Ask before publishing, pushing, merging, uploading builds, modifying remote
     data, or changing credentials, unless the user already authorized that action.
 
+12. The UI ships in Vietnamese, English and Japanese. Never hard-code user-visible text:
+    use `NSLocalizedString` with the English text as key and add vi/en/ja values to
+    `FlashcardApp/Resources/Localizable.xcstrings` (`LocalizationTests` fails otherwise).
+    Format numbers with `AppLanguage.current.locale`; backend text that exists in several
+    languages must follow `AppLanguage.current`. See `docs/UI_REDESIGN_BLUEPRINT.md` §11.
+
 ## Workflow routing
 
 - **All implementation tasks:** follow `docs/ENGINEERING_GUARDRAILS.md` for

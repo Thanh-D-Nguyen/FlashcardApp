@@ -23,6 +23,7 @@ class DeskCell: UITableViewCell {
     private var disposeBag = DisposeBag()
     
     @IBOutlet private weak var deskButtonContainerView: UIView!
+    @IBOutlet private weak var descriptionButton: UIButton!
     @IBOutlet private weak var deskDescContainerView: UIView!
     
     @IBOutlet private weak var deskNameTextField: MMTextView!
@@ -37,8 +38,11 @@ class DeskCell: UITableViewCell {
         // Initialization code
         deskButtonContainerView.isHidden = false
         deskDescContainerView.isHidden = true
+        descriptionButton.setTitle(NSLocalizedString("Description", comment: ""), for: .normal)
+        deskNameTextField.placeholder = NSLocalizedString("Enter a name", comment: "")
+        deskDescTextField.placeholder = NSLocalizedString("Enter a description", comment: "")
         deskNameTextField.accessibilityIdentifier = "deck_name"
-        deskNameTextField.accessibilityLabel = "Tên bộ thẻ"
+        deskNameTextField.accessibilityLabel = NSLocalizedString("Deck name", comment: "")
         deskNameTextField.inputViewStyle = .borderWith(radius: textFieldBorderWidth)
         deskNameTextField.lineColor = AppColors.primary
         deskNameTextField.editLineColor = AppColors.secondary

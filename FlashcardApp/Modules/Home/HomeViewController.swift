@@ -128,7 +128,7 @@ final class HomeViewController: BaseViewController {
     /// when rows arrive; dropped at accessibility sizes, where the system would truncate it.
     private func renderSubtitle() {
         let large = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
-        navigationItem.subtitle = large ? nil : "Chọn cấp độ JLPT để bắt đầu học"
+        navigationItem.subtitle = large ? nil : NSLocalizedString("Pick a JLPT level to start studying", comment: "")
     }
 
     /// Segmented control at regular sizes; the system menu from the bar once text no longer fits three segments.
@@ -137,7 +137,7 @@ final class HomeViewController: BaseViewController {
         kindControl.isHidden = large
         kindControl.selectedSegmentIndex = presenter.kind.rawValue
         if let total = presenter.kindTotal, total > 0 {
-            totalLabel.text = "\(total.formatted(.number.locale(Locale(identifier: "vi_VN")))) \(presenter.kind.title.lowercased())"
+            totalLabel.text = "\(total.formatted(.number.locale(AppLanguage.current.locale))) \(presenter.kind.unit)"
         } else {
             totalLabel.text = nil
         }
@@ -151,8 +151,8 @@ final class HomeViewController: BaseViewController {
                 self?.presenter.selectKind(kind)
             }
         }
-        let item = UIBarButtonItem(title: presenter.kind.title, menu: UIMenu(title: "Nội dung", children: actions))
-        item.accessibilityLabel = "Loại nội dung: \(presenter.kind.title)"
+        let item = UIBarButtonItem(title: presenter.kind.title, menu: UIMenu(title: NSLocalizedString("Content", comment: ""), children: actions))
+        item.accessibilityLabel = String(format: NSLocalizedString("Content type: %@", comment: ""), presenter.kind.title)
         item.accessibilityIdentifier = "level_content_kind"
         navigationItem.rightBarButtonItem = item
     }
@@ -160,17 +160,17 @@ final class HomeViewController: BaseViewController {
     /// Full-area state while there is nothing to list yet.
     private var screenState: StateView.State? {
         guard presenter.rows.isEmpty else { return nil }
-        if presenter.isLoading { return .loading("Đang tải…") }
-        if let message = presenter.errorMessage { return .error(message: message, retryTitle: "Thử lại") }
-        return .empty(title: presenter.isContent ? "Chưa có nội dung ở mục này." : "Chưa có cấp độ nào.", message: nil)
+        if presenter.isLoading { return .loading(NSLocalizedString("Loading…", comment: "")) }
+        if let message = presenter.errorMessage { return .error(message: message, retryTitle: NSLocalizedString("Retry", comment: "")) }
+        return .empty(title: presenter.isContent ? NSLocalizedString("No content in this section yet.", comment: "") : NSLocalizedString("No levels yet.", comment: ""), message: nil)
     }
 
     /// Footer row once rows exist: loading more, failed page (tap to retry) or "load more".
     private var statusText: String? {
         guard !presenter.rows.isEmpty else { return nil }
-        if presenter.isLoading { return "Đang tải…" }
-        if let message = presenter.errorMessage { return "\(message)\nChạm để thử lại." }
-        if presenter.canLoadMore { return "Tải thêm 30 mục" }
+        if presenter.isLoading { return NSLocalizedString("Loading…", comment: "") }
+        if let message = presenter.errorMessage { return String(format: NSLocalizedString("%@\nTap to retry.", comment: ""), message) }
+        if presenter.canLoadMore { return NSLocalizedString("Load 30 more", comment: "") }
         return nil
     }
 }
@@ -259,7 +259,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard case .levels = sections[section] else { return nil }
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SectionHeaderView.reuseIdentifier) as! SectionHeaderView
-        header.configure(title: "Các cấp độ tiếp theo")
+        header.configure(title: NSLocalizedString("More levels", comment: ""))
         return header
     }
 

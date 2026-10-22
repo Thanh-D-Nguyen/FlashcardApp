@@ -3,7 +3,22 @@ import RxSwift
 
 enum HomeContentKind: Int, CaseIterable {
     case vocabulary, kanji, grammar
-    var title: String { ["Từ vựng", "Kanji", "Ngữ pháp"][rawValue] }
+    var title: String {
+        switch self {
+        case .vocabulary: return NSLocalizedString("Vocabulary", comment: "")
+        case .kanji: return NSLocalizedString("Kanji", comment: "")
+        case .grammar: return NSLocalizedString("Grammar", comment: "")
+        }
+    }
+
+    /// Unit written after a count: "574 words", "79 kanji", "194 grammar".
+    var unit: String {
+        switch self {
+        case .vocabulary: return NSLocalizedString("vocabulary words", comment: "")
+        case .kanji: return NSLocalizedString("kanji characters", comment: "")
+        case .grammar: return NSLocalizedString("grammar points", comment: "")
+        }
+    }
 }
 
 struct HomeCount: Equatable {
@@ -108,7 +123,7 @@ final class HomePresenter: HomePresenterInterface {
         } else {
             let row = rows[index]
             wireframe.showMeaning(title: row.title,
-                                  message: row.detail.isEmpty ? "Chưa có nghĩa tiếng Việt." : row.detail)
+                                  message: row.detail.isEmpty ? NSLocalizedString("No meaning available yet.", comment: "") : row.detail)
         }
     }
 
@@ -159,39 +174,44 @@ final class HomePresenter: HomePresenterInterface {
                 .subscribe(onSuccess: { [weak self] levels in
                     guard let self else { return }
                     self.levels = levels
-                    self.rows = levels.map(Self.levelRow)
+                    self.rows = levels.map { Self.levelRow($0) }
                     self.hasLoaded = true
                     self.finishLoading()
                 }, onFailure: { [weak self] _ in self?.failedLoading() })
         }
     }
 
-    static func levelRow(_ level: BJTLevelDTO) -> HomeRow {
-        let counts = [HomeCount(value: level.vocabCount, label: "từ vựng"),
-                      HomeCount(value: level.kanjiCount, label: "kanji"),
-                      HomeCount(value: level.grammarCount, label: "ngữ pháp")]
+    static func levelRow(_ level: BJTLevelDTO, language: AppLanguage = .current) -> HomeRow {
+        let counts = [HomeCount(value: level.vocabCount, label: HomeContentKind.vocabulary.unit),
+                      HomeCount(value: level.kanjiCount, label: HomeContentKind.kanji.unit),
+                      HomeCount(value: level.grammarCount, label: HomeContentKind.grammar.unit)]
         // A level without any item (e.g. J1+ today) states that instead of printing three zeros.
         let hasContent = counts.contains { $0.value > 0 }
-        return HomeRow(id: level.code, title: level.nameVi,
-                       subtitle: "\(level.descriptionVi)\nTừ vựng: \(level.vocabCount) · Kanji: \(level.kanjiCount) · Ngữ pháp: \(level.grammarCount)",
-                       detail: level.descriptionVi,
-                       mark: level.code, numeral: numerals[level.code], name: displayName(level), summary: level.descriptionVi,
-                       counts: hasContent ? counts : [])
+        let summary = level.localizedDescription(for: language)
+        let countsLine = counts
+            .map { "\($0.value.formatted(.number.locale(language.locale))) \($0.label)" }
+            .joined(separator: " · ")
+        return HomeRow(id: level.code, title: level.localizedName(for: language),
+                       subtitle: "\(summary)\n\(countsLine)",
+                       detail: summary,
+                       mark: level.code, numeral: numerals[level.code], name: displayName(level, language: language),
+                       summary: summary, counts: hasContent ? counts : [])
     }
 
     /// JLPT level → kanji numeral (N5 is 五). Unknown codes get none and keep the plain code mark.
     private static let numerals = ["J5": "五", "J4": "四", "J3": "三", "J2": "二", "J1": "一", "J1+": "一+"]
 
-    /// The backend sends "J5 — Sơ cấp"; the code is shown separately as the row mark.
-    static func displayName(_ level: BJTLevelDTO) -> String {
-        for separator in [" — ", " – ", " - "] where level.nameVi.hasPrefix(level.code + separator) {
-            return String(level.nameVi.dropFirst(level.code.count + separator.count))
+    /// The backend sends "J5 — Lower beginner"; the code is shown separately as the row mark.
+    static func displayName(_ level: BJTLevelDTO, language: AppLanguage = .current) -> String {
+        let full = level.localizedName(for: language)
+        for separator in [" — ", " – ", " - "] where full.hasPrefix(level.code + separator) {
+            return String(full.dropFirst(level.code.count + separator.count))
         }
-        return level.nameVi
+        return full
     }
 
     private func failedLoading() {
-        errorMessage = "Không thể tải dữ liệu. Kiểm tra kết nối và thử lại."
+        errorMessage = NSLocalizedString("Couldn't load data. Check your connection and try again.", comment: "")
         finishLoading()
     }
 

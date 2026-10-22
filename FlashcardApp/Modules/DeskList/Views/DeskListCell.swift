@@ -25,7 +25,7 @@ class DeskListCell: UICollectionViewCell {
     func updateDesk(_ desk: DeskEntity) {
         deskTitle.text = desk.name
         deskSubTitle.text = desk.description
-        numOfCardsButton.setTitle("\(desk.cards.count) thẻ", for: .normal)
+        numOfCardsButton.setTitle(String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), desk.cards.count), for: .normal)
         updateCards(desk.cards)
         logger.debug("\(desk.cards.map({ $0.frontText + " : " + $0.backText }).joined())")
     }
@@ -42,7 +42,7 @@ class DeskListCell: UICollectionViewCell {
                     return
                 } else if isGreaterThanThree {
                     cardView.isHidden = false
-                    cardView.frontText = "Còn nữa..."
+                    cardView.frontText = NSLocalizedString("And more…", comment: "")
                     return
                 }
             }

@@ -83,7 +83,7 @@ final class BJTLevelAPI {
     private func referenceURL(code: String, kind: String, limit: Int, offset: Int) throws -> URL {
         guard ["J5", "J4", "J3", "J2", "J1", "J1+"].contains(code),
               (1...50).contains(limit), offset >= 0 else {
-            throw AppError.invalidInput("Cấp độ hoặc phân trang không hợp lệ.")
+            throw AppError.invalidInput(NSLocalizedString("The level or page is invalid.", comment: ""))
         }
         return try endpoint(["levels", code, kind])
     }

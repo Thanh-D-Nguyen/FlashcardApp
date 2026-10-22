@@ -24,7 +24,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="390" height="68"/>
                                         <color key="backgroundColor" name="whiteSmokeColor"/>
                                         <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="Thẻ"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="Cards"/>
                                             <userDefinedRuntimeAttribute type="color" keyPath="titleColor">
                                                 <color key="value" systemColor="darkTextColor"/>
                                             </userDefinedRuntimeAttribute>
@@ -78,7 +78,7 @@
                                         <color key="tintColor" name="royalBlueColor"/>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vSx-MY-MSi" customClass="RoundCornerButton" customModule="FlashcardApp" customModuleProvider="target">
-                                        <accessibility key="accessibilityConfiguration" identifier="create_deck_button" label="Tạo bộ thẻ"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="create_deck_button"/>
                                         <rect key="frame" x="332" y="8" width="50" height="50"/>
                                         <color key="tintColor" name="royalBlueColor"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
@@ -159,6 +159,7 @@
                     </view>
                     <connections>
                         <outlet property="cardCollectionView" destination="Dz9-Ys-Sge" id="uHn-GV-6os"/>
+                        <outlet property="addDeskButton" destination="vSx-MY-MSi" id="Ab1-Cd-2Ef"/>
                         <outlet property="deskButton" destination="g45-jZ-ttQ" id="qOb-Lz-nfe"/>
                     </connections>
                 </viewController>

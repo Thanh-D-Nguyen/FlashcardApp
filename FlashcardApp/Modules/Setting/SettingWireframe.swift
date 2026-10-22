@@ -14,7 +14,6 @@ protocol SettingWireframeInterface: AnyObject {
     func showError(message: String)
     func showNotificationDeniedAlert()
     func openSystemSettings()
-    func showLanguagePicker()
     func showPrivacyPolicy()
     func showAbout()
 }
@@ -41,43 +40,43 @@ extension SettingWireframe: SettingWireframeInterface {
 
     func showError(message: String) {
         showAlert(
-            with: "Lỗi",
+            with: NSLocalizedString("Error", comment: ""),
             message: message
         )
     }
 
     func showLogoutConfirmation(onConfirm: @escaping () -> Void) {
         let confirmAction = UIAlertAction(
-            title: "Đăng xuất",
+            title: NSLocalizedString("Log Out", comment: ""),
             style: .destructive
         ) { _ in
             onConfirm()
         }
         let cancelAction = UIAlertAction(
-            title: "Huỷ",
+            title: NSLocalizedString("Cancel", comment: ""),
             style: .cancel
         )
         showAlert(
-            with: "Đăng xuất",
-            message: "Bạn có chắc muốn đăng xuất không?",
+            with: NSLocalizedString("Log Out", comment: ""),
+            message: NSLocalizedString("Are you sure you want to log out?", comment: ""),
             actions: [confirmAction, cancelAction]
         )
     }
 
     func showNotificationDeniedAlert() {
         let settingsAction = UIAlertAction(
-            title: "Mở Cài đặt",
+            title: NSLocalizedString("Open Settings", comment: ""),
             style: .default
         ) { [weak self] _ in
             self?.openSystemSettings()
         }
         let cancelAction = UIAlertAction(
-            title: "Huỷ",
+            title: NSLocalizedString("Cancel", comment: ""),
             style: .cancel
         )
         showAlert(
-            with: "Thông báo đang tắt",
-            message: "Hãy bật thông báo trong Cài đặt hệ thống để nhận nhắc nhở học tập.",
+            with: NSLocalizedString("Notifications Are Off", comment: ""),
+            message: NSLocalizedString("Turn on notifications in System Settings to receive study reminders.", comment: ""),
             actions: [settingsAction, cancelAction]
         )
     }
@@ -87,16 +86,8 @@ extension SettingWireframe: SettingWireframeInterface {
         UIApplication.shared.open(url)
     }
 
-    func showLanguagePicker() {
-        // The app has a single language; say so instead of offering a picker.
-        showAlert(
-            with: "Ngôn ngữ",
-            message: "Ứng dụng hiện chỉ có tiếng Việt."
-        )
-    }
-
     func showPrivacyPolicy() {
-        guard let url = URL(string: EnvironmentConfig.baseUrl())?.deletingLastPathComponent().appendingPathComponent("vi/privacy") else { return }
+        guard let url = URL(string: EnvironmentConfig.baseUrl())?.deletingLastPathComponent().appendingPathComponent("\(AppLanguage.current.rawValue)/privacy") else { return }
         let safari = SFSafariViewController(url: url)
         viewController.present(safari, animated: true)
     }
@@ -104,9 +95,9 @@ extension SettingWireframe: SettingWireframeInterface {
     func showAbout() {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        let message = "Phiên bản \(version) (\(build))"
+        let message = String(format: NSLocalizedString("Version %1$@ (%2$@)", comment: ""), version, build)
         showAlert(
-            with: "Về Flashcard",
+            with: NSLocalizedString("About Flashcard", comment: ""),
             message: message
         )
     }

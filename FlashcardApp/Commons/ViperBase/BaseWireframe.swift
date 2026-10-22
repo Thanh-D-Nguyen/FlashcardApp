@@ -29,7 +29,7 @@ class BaseWireframe<ViewController> where ViewController: BaseVC {
 
 extension BaseWireframe: WireframeInterface {
     func showAlert(with title: String?, message: String?) {
-        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: nil)
         showAlert(with: title, message: message, actions: [okAction])
     }
     

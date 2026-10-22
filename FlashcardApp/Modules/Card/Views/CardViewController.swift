@@ -18,10 +18,12 @@ final class CardViewController: BaseViewController, CardViewInterface {
     }
     
     @IBOutlet private weak var deskButton: UIButton!
+    @IBOutlet private weak var addDeskButton: UIButton!
     @IBOutlet private weak var cardCollectionView: UICollectionView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        addDeskButton.accessibilityLabel = NSLocalizedString("Create Deck", comment: "")
         setupUI()
         subscribe()
     }
@@ -54,7 +56,7 @@ final class CardViewController: BaseViewController, CardViewInterface {
     
     private func updateCurrentDesk() {
         let desk = presenter.selectingDesk
-        deskButton.setTitle(desk?.name, for: .normal)
+        deskButton.setTitle(desk?.name ?? NSLocalizedString("Tap to create a deck…", comment: ""), for: .normal)
     }
 }
 

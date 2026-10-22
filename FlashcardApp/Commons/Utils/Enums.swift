@@ -21,15 +21,15 @@ enum MainTabbarName: Int {
     var title: String {
         switch self {
             case .home:
-                return "Cấp độ"
+                return NSLocalizedString("Levels", comment: "")
             case .desk:
-                return "Bộ thẻ"
+                return NSLocalizedString("Decks", comment: "")
             case .card:
-                return "Thẻ"
+                return NSLocalizedString("Cards", comment: "")
             case .dictionary:
-                return "Từ điển"
+                return NSLocalizedString("Dictionary", comment: "")
             case .setting:
-                return "Cài đặt"
+                return NSLocalizedString("Settings", comment: "")
         }
     }
     

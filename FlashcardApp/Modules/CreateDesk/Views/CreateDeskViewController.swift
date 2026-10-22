@@ -29,6 +29,7 @@ final class CreateDeskViewController: BaseViewController {
     
     func setupUI() {
         closeButton.accessibilityIdentifier = "close_deck_editor"
+        doneButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
         doneButton.accessibilityIdentifier = "save_deck"
         bottomView.accessibilityIdentifier = "deck_keyboard_toolbar"
         deskTableView.keyboardDismissMode = .interactive
@@ -280,6 +281,7 @@ extension CreateDeskViewController {
     private func configure(action: SwipeAction, with descriptor: ActionDescriptor) {
         let buttonStyle = ButtonStyle.circular
         action.title = descriptor.title(forDisplayMode: .imageOnly)
+        action.accessibilityLabel = descriptor.accessibilityLabel
         action.image = descriptor.image(forStyle: buttonStyle, displayMode: .imageOnly)
         action.backgroundColor = AppColors.cardBackground
         action.textColor = descriptor.color(forStyle: buttonStyle)

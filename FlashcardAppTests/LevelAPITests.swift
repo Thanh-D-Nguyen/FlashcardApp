@@ -41,6 +41,14 @@ final class LevelAPITests: XCTestCase {
             XCTAssertEqual(levels.first?.vocabCount, 574)
             XCTAssertEqual(levels.first?.kanjiCount, 79)
             XCTAssertEqual(levels.first?.grammarCount, 194)
+            // The same level in the two other UI languages, exactly as the backend sends it.
+            XCTAssertEqual(levels.first?.nameEn, "J5 — Lower beginner")
+            XCTAssertEqual(levels.first?.nameJa, "J5 — 初級前半")
+            XCTAssertEqual(levels.first?.descriptionEn, "Handle basic greetings and self-introductions, and read simple workplace signs.")
+            XCTAssertEqual(levels.first?.descriptionJa, "基本的な挨拶、自己紹介、職場の簡単な表示の読解。")
+            XCTAssertEqual(levels.first?.localizedName(for: .japanese), "J5 — 初級前半")
+            XCTAssertEqual(levels.first?.localizedDescription(for: .english),
+                           "Handle basic greetings and self-introductions, and read simple workplace signs.")
         }
     }
 
@@ -181,7 +189,7 @@ final class LevelAPITests: XCTestCase {
     }
 
     // Public localhost responses, captured 2026-10-21; no credentials or learner data.
-    private static let levelFixture = #"[{"code":"J5","nameVi":"J5 — Sơ cấp","descriptionVi":"Giao tiếp cơ bản: chào hỏi, tự giới thiệu, đọc biển hiệu đơn giản tại nơi làm việc.","vocabCount":574,"kanjiCount":79,"grammarCount":194}]"#
+    private static let levelFixture = #"[{"code":"J5","nameVi":"J5 — Sơ cấp","descriptionVi":"Giao tiếp cơ bản: chào hỏi, tự giới thiệu, đọc biển hiệu đơn giản tại nơi làm việc.","vocabCount":574,"kanjiCount":79,"grammarCount":194,"nameEn":"J5 — Lower beginner","nameJa":"J5 — 初級前半","descriptionEn":"Handle basic greetings and self-introductions, and read simple workplace signs.","descriptionJa":"基本的な挨拶、自己紹介、職場の簡単な表示の読解。"}]"#
     private static let vocabularyFixture = #"[{"id":"de165483-5065-45c3-a4be-f2607727c587","senses":[{"pos":"n","meaningVi":"cơm hộp"},{"pos":"n","meaningVi":"cơm trưa"}],"reading":"おべんとう","headword":"お弁当","jlptLevel":"N5","shortMeaningVi":"cơm hộp; cơm trưa"}]"#
     private static let kanjiFixture = #"[{"id":"38ebde58-b3c7-4935-ae49-9c72cf634f64","character":"日","meaningVi":"NHẬT, NHỰT","onyomi":"ニチ ジツ","kunyomi":"ひ -び -か","level":5}]"#
     private static let grammarFixture = #"[{"id":"130a49b5-661f-4db4-ad90-c6491125ad61","pattern":"いつも","meaningVi":"Lúc nào cũng/Luôn...","details":[{"explanationVi":"『いつも』diễn tả một hành động, một thói quen thường xuyên xảy ra."}]}]"#

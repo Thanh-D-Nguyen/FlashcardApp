@@ -9,7 +9,7 @@ final class HomeWireframe: BaseWireframe<HomeViewController>, HomeWireframeInter
     init(level: BJTLevelDTO? = nil, kind: HomeContentKind = .vocabulary) {
         let controller = HomeViewController()
         super.init(viewController: controller)
-        controller.title = level?.nameVi ?? "Cấp độ"
+        controller.title = level?.localizedName(for: .current) ?? NSLocalizedString("Levels", comment: "")
         controller.tabBarItem = MainTabbarName.home.tabBarItem
         controller.presenter = HomePresenter(interactor: HomeInteractor(), wireframe: self, level: level, kind: kind)
     }

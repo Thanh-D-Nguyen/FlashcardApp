@@ -23,19 +23,19 @@ extension AppError: LocalizedError {
         switch self {
             case .invalidInput(let message): return message
             case .deskNameEmpty:
-                return "Vui lòng nhập tên desk"
+                return NSLocalizedString("Please enter a deck name.", comment: "")
             case .flashCardMinimum:
-                return "Vui lòng nhập ít nhất 2 flashcard"
+                return NSLocalizedString("Add at least 2 cards.", comment: "")
             case .databaseInitializationFailed(let reason):
-                return "Không thể khởi tạo cơ sở dữ liệu: \(reason)"
+                return String(format: NSLocalizedString("Couldn't initialize the database: %@", comment: ""), reason)
             case .databaseWriteFailed(let reason):
-                return "Không thể lưu dữ liệu: \(reason)"
+                return String(format: NSLocalizedString("Couldn't save data: %@", comment: ""), reason)
             case .entityNotFound(let entityType):
-                return "Không tìm thấy \(entityType) trong cơ sở dữ liệu"
+                return String(format: NSLocalizedString("Couldn't find %@ in the database.", comment: ""), entityType)
             case .authenticationFailed(let reason):
-                return "Lỗi xác thực: \(reason)"
+                return String(format: NSLocalizedString("Authentication error: %@", comment: ""), reason)
             case .networkRequestFailed(let reason):
-                return "Lỗi kết nối: \(reason)"
+                return String(format: NSLocalizedString("Network error: %@", comment: ""), reason)
         }
     }
 }

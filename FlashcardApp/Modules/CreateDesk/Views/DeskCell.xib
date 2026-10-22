@@ -140,6 +140,7 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="deskButtonContainerView" destination="0er-cB-diL" id="bty-gk-XhT"/>
+                <outlet property="descriptionButton" destination="1fk-P0-gpE" id="7Dq-Lc-Kx1"/>
                 <outlet property="deskDescContainerView" destination="PmV-ef-Xnd" id="Hnj-xr-m3J"/>
                 <outlet property="deskDescTextField" destination="VPU-HD-a19" id="0Ax-DW-ip2"/>
                 <outlet property="deskNameTextField" destination="KLj-Iw-mgJ" id="Ql1-Zo-Tc4"/>

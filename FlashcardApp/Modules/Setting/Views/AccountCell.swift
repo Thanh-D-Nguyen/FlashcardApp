@@ -23,7 +23,7 @@ final class AccountCell: UITableViewCell {
     private let nameLabel = UILabel()
     private let detailLabel = UILabel()
     private let infoView = UIView()
-    private let signInButton = UIButton(configuration: Design.Button.primary(title: "Đăng nhập"))
+    private let signInButton = UIButton(configuration: Design.Button.primary(title: NSLocalizedString("Sign In", comment: "")))
     private let headerStack = UIStackView()
     private let rootStack = UIStackView()
 
@@ -134,7 +134,7 @@ final class AccountCell: UITableViewCell {
         photoView.isHidden = true
         if let user {
             let name = user.displayName ?? user.email ?? ""
-            nameLabel.text = user.displayName ?? "Người dùng"
+            nameLabel.text = user.displayName ?? NSLocalizedString("User", comment: "")
             detailLabel.text = user.email
             detailLabel.isHidden = (user.email ?? "").isEmpty
             let initial = name.first.map { String($0).uppercased() }
@@ -156,8 +156,8 @@ final class AccountCell: UITableViewCell {
                 }
             }
         } else {
-            nameLabel.text = "Tài khoản"
-            detailLabel.text = "Dùng tài khoản website của bạn để đăng nhập."
+            nameLabel.text = NSLocalizedString("Account", comment: "")
+            detailLabel.text = NSLocalizedString("Use your website account to sign in.", comment: "")
             detailLabel.isHidden = false
             monogramLabel.isHidden = true
             glyphView.isHidden = false

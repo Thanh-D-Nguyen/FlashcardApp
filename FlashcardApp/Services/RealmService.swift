@@ -10,7 +10,7 @@ final class RealmService {
 
     func copyBundleData(completion: @escaping (URL) -> Void, onError: ((AppError) -> Void)? = nil) {
         guard let source = Bundle.main.url(forResource: databaseName, withExtension: nil) else {
-            onError?(.databaseInitializationFailed("Không tìm thấy dữ liệu offline đi kèm."))
+            onError?(.databaseInitializationFailed(NSLocalizedString("The bundled offline data was not found.", comment: "")))
             return
         }
         let destination = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
@@ -26,7 +26,7 @@ final class RealmService {
             } catch {
                 logger.error("Database copy failed: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    onError?(.databaseInitializationFailed("Không thể chuẩn bị dữ liệu offline. Dữ liệu hiện có được giữ nguyên."))
+                    onError?(.databaseInitializationFailed(NSLocalizedString("Couldn't prepare the offline data. Existing data was kept.", comment: "")))
                 }
             }
         }
@@ -62,7 +62,7 @@ final class RealmService {
                 onComplete()
             } catch {
                 logger.error("Database open failed: \(error.localizedDescription)")
-                onError?(.databaseInitializationFailed("Không thể mở dữ liệu offline. Dữ liệu hiện có được giữ nguyên."))
+                onError?(.databaseInitializationFailed(NSLocalizedString("Couldn't open the offline data. Existing data was kept.", comment: "")))
             }
         }, onError: onError)
     }

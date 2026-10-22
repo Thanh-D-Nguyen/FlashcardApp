@@ -64,8 +64,8 @@ final class MockSettingWireframe: SettingWireframeInterface {
 
     var deniedAlertCount = 0
     func showNotificationDeniedAlert() { deniedAlertCount += 1 }
-    func openSystemSettings() {}
-    func showLanguagePicker() {}
+    var openSystemSettingsCount = 0
+    func openSystemSettings() { openSystemSettingsCount += 1 }
     func showPrivacyPolicy() {}
     func showAbout() {}
 }
@@ -192,6 +192,18 @@ final class SettingPresenterTests: XCTestCase {
         XCTAssertEqual(AppearanceOption.resolve("system").userInterfaceStyle, .unspecified)
         XCTAssertEqual(AppearanceOption.resolve("sepia"), .system, "A corrupt stored value must not force a style")
         XCTAssertEqual(AppearanceOption.resolve(""), .system)
+    }
+
+    func test_languageRowShowsTheAppLanguageAndOpensSystemSettings() throws {
+        presenter.viewDidLoad()
+        let general = presenter.sectionsRelay.value[2].items
+        guard case .navigation(let language) = try XCTUnwrap(general.first) else { return XCTFail("Expected the language row") }
+        XCTAssertEqual(language.id, "language")
+        XCTAssertEqual(language.subText, AppLanguage.current.nativeName, "The value is the language in its own words")
+
+        presenter.handleNavigationTap(config: language)
+
+        XCTAssertEqual(mockWireframe.openSystemSettingsCount, 1, "iOS owns the per-app language; the row hands over to Settings")
     }
 
     // MARK: - Notification permission

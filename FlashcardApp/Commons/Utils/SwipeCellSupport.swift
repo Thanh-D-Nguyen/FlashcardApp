@@ -24,10 +24,20 @@ enum ActionDescriptor {
         guard displayMode != .imageOnly else { return nil }
         
         switch self {
-            case .up: return "Up"
-            case .down: return "Down"
-            case .trash: return "Trash"
+            case .up: return NSLocalizedString("Move up", comment: "")
+            case .down: return NSLocalizedString("Move down", comment: "")
+            case .trash: return NSLocalizedString("Delete", comment: "")
             default: return ""
+        }
+    }
+
+    /// Spoken name of the swipe action; the buttons show only an icon, so VoiceOver relies on this.
+    var accessibilityLabel: String? {
+        switch self {
+            case .up: return NSLocalizedString("Move up", comment: "")
+            case .down: return NSLocalizedString("Move down", comment: "")
+            case .trash: return NSLocalizedString("Delete", comment: "")
+            default: return nil
         }
     }
     

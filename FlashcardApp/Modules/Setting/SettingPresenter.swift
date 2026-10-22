@@ -20,9 +20,9 @@ enum AppearanceOption: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .system: return "Theo hệ thống"
-        case .light: return "Sáng"
-        case .dark: return "Tối"
+        case .system: return NSLocalizedString("System", comment: "")
+        case .light: return NSLocalizedString("Light", comment: "")
+        case .dark: return NSLocalizedString("Dark", comment: "")
         }
     }
 
@@ -261,7 +261,8 @@ extension SettingPresenter {
         case "notifications_system":
             wireframe.openSystemSettings()
         case "language":
-            wireframe.showLanguagePicker()
+            // iOS keeps the per-app language (Settings ▸ FlashcardApp ▸ Language); there is no in-app picker.
+            wireframe.openSystemSettings()
         case "privacy":
             wireframe.showPrivacyPolicy()
         case "about":
@@ -313,7 +314,7 @@ private extension SettingPresenter {
 
         preferencesItems.append(.choice(ChoiceConfig(
             id: "appearance",
-            title: "Giao diện",
+            title: NSLocalizedString("Appearance", comment: ""),
             iconName: "circle.lefthalf.filled",
             options: AppearanceOption.allCases.map { ChoiceOption(id: $0.rawValue, title: $0.title) },
             selectedID: appearance.rawValue
@@ -328,10 +329,10 @@ private extension SettingPresenter {
         let notificationIsEnabled: Bool
         switch notificationStatus {
         case .notDetermined:
-            notificationSubtitle = "Bật để cấp quyền thông báo"
+            notificationSubtitle = NSLocalizedString("Turn on to allow notifications", comment: "")
             notificationIsEnabled = true
         case .denied:
-            notificationSubtitle = "Đã tắt trong Cài đặt hệ thống"
+            notificationSubtitle = NSLocalizedString("Turned off in System Settings", comment: "")
             notificationIsEnabled = false
         case .authorized, .provisional, .ephemeral:
             notificationSubtitle = nil
@@ -343,7 +344,7 @@ private extension SettingPresenter {
 
         preferencesItems.append(.toggle(ToggleConfig(
             id: "notification",
-            title: "Thông báo",
+            title: NSLocalizedString("Notifications", comment: ""),
             iconName: "bell",
             isOn: notificationEnabled,
             isEnabled: notificationIsEnabled,
@@ -353,43 +354,43 @@ private extension SettingPresenter {
         if notificationStatus == .denied {
             preferencesItems.append(.navigation(NavigationConfig(
                 id: "notifications_system",
-                title: "Mở Cài đặt hệ thống",
+                title: NSLocalizedString("Open System Settings", comment: ""),
                 iconName: "gearshape"
             )))
         }
 
         preferencesItems.append(.toggle(ToggleConfig(
             id: "sound",
-            title: "Âm thanh và rung",
+            title: NSLocalizedString("Sounds & Haptics", comment: ""),
             iconName: "speaker.wave.2",
             isOn: interactor.getSoundEnabled()
         )))
 
-        let preferencesSection = SettingSection(title: "Tuỳ chọn", items: preferencesItems)
+        let preferencesSection = SettingSection(title: NSLocalizedString("Preferences", comment: ""), items: preferencesItems)
 
         let generalSection = SettingSection(
-            title: "Chung",
+            title: NSLocalizedString("General", comment: ""),
             items: [
                 .navigation(NavigationConfig(
                     id: "language",
-                    title: "Ngôn ngữ",
+                    title: NSLocalizedString("Language", comment: ""),
                     iconName: "globe",
-                    subText: "Tiếng Việt"
+                    subText: AppLanguage.current.nativeName
                 )),
                 .navigation(NavigationConfig(
                     id: "privacy",
-                    title: "Chính sách quyền riêng tư",
+                    title: NSLocalizedString("Privacy Policy", comment: ""),
                     iconName: "hand.raised"
                 ))
             ]
         )
 
         let aboutSection = SettingSection(
-            title: "Giới thiệu",
+            title: NSLocalizedString("About", comment: ""),
             items: [
                 .navigation(NavigationConfig(
                     id: "about",
-                    title: "Về Flashcard",
+                    title: NSLocalizedString("About Flashcard", comment: ""),
                     iconName: "info.circle",
                     subText: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
                 ))
@@ -404,7 +405,7 @@ private extension SettingPresenter {
                 items: [
                     .destructive(NavigationConfig(
                         id: "logout",
-                        title: "Đăng xuất",
+                        title: NSLocalizedString("Log Out", comment: ""),
                         iconName: "rectangle.portrait.and.arrow.right",
                         disclosure: false
                     ))

@@ -28,9 +28,9 @@ final class HomePresenterTests: XCTestCase {
         XCTAssertEqual(row?.mark, "J5")
         XCTAssertEqual(row?.name, "Sơ cấp")
         XCTAssertEqual(row?.summary, "Cơ bản")
-        XCTAssertEqual(row?.counts, [HomeCount(value: 60, label: "từ vựng"),
-                                     HomeCount(value: 10, label: "kanji"),
-                                     HomeCount(value: 20, label: "ngữ pháp")])
+        XCTAssertEqual(row?.counts, [HomeCount(value: 60, label: HomeContentKind.vocabulary.unit),
+                                     HomeCount(value: 10, label: HomeContentKind.kanji.unit),
+                                     HomeCount(value: 20, label: HomeContentKind.grammar.unit)])
         XCTAssertEqual(row?.title, "J5 — Sơ cấp")
     }
 
@@ -108,6 +108,31 @@ final class HomePresenterTests: XCTestCase {
         XCTAssertEqual(presenter.kindTotal, 10)
         presenter.viewDidLoad()
         XCTAssertEqual(interactor.kinds, [.kanji])
+    }
+
+    func testLevelNameAndDescriptionFollowTheAppLanguageWithVietnameseFallback() {
+        let multilingual = BJTLevelDTO(code: "J5", nameVi: "J5 — Sơ cấp", descriptionVi: "Giao tiếp cơ bản.",
+                                       vocabCount: 1, kanjiCount: 1, grammarCount: 1,
+                                       nameEn: "J5 — Lower beginner", nameJa: "J5 — 初級前半",
+                                       descriptionEn: "Handle basic greetings.", descriptionJa: "基本的な挨拶。")
+        let vi = HomePresenter.levelRow(multilingual, language: .vietnamese)
+        let en = HomePresenter.levelRow(multilingual, language: .english)
+        let ja = HomePresenter.levelRow(multilingual, language: .japanese)
+        XCTAssertEqual([vi.name, en.name, ja.name], ["Sơ cấp", "Lower beginner", "初級前半"])
+        XCTAssertEqual([vi.summary, en.summary, ja.summary], ["Giao tiếp cơ bản.", "Handle basic greetings.", "基本的な挨拶。"])
+        XCTAssertEqual(en.title, "J5 — Lower beginner", "The full name keeps its code prefix for the navigation title")
+        XCTAssertEqual(ja.mark, "J5")
+
+        let viOnly = BJTLevelDTO(code: "J4", nameVi: "J4 — Sơ trung cấp", descriptionVi: "Hội thoại đơn giản.",
+                                 vocabCount: 1, kanjiCount: 0, grammarCount: 0, nameEn: "", descriptionEn: "  ")
+        XCTAssertEqual(HomePresenter.levelRow(viOnly, language: .english).name, "Sơ trung cấp", "Blank translations fall back to Vietnamese")
+        XCTAssertEqual(HomePresenter.levelRow(viOnly, language: .japanese).summary, "Hội thoại đơn giản.")
+    }
+
+    func testCountsAreFormattedForTheAppLanguage() {
+        let big = BJTLevelDTO(code: "J3", nameVi: "J3 — Trung cấp", descriptionVi: "", vocabCount: 1538, kanjiCount: 0, grammarCount: 0)
+        XCTAssertTrue(HomePresenter.levelRow(big, language: .vietnamese).subtitle.contains("1.538"))
+        XCTAssertTrue(HomePresenter.levelRow(big, language: .english).subtitle.contains("1,538"))
     }
 
     func testKindTotalFollowsSelectedKindOfOpenLevel() {

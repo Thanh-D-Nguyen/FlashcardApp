@@ -3,8 +3,15 @@ import XCTest
 final class FlashcardAppUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
-    func testLiveLevelsAndContentCanBeBrowsedWithoutLogin() {
+    /// The assertions below read Vietnamese and English copy; pin the app language instead of trusting the simulator's.
+    private func makeApp(language: String = "vi", locale: String = "vi_VN") -> XCUIApplication {
         let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(\(language))", "-AppleLocale", locale]
+        return app
+    }
+
+    func testLiveLevelsAndContentCanBeBrowsedWithoutLogin() {
+        let app = makeApp()
         app.launch()
         let levels = app.tables["home_levels"]
         XCTAssertTrue(levels.waitForExistence(timeout: 40))
@@ -20,7 +27,7 @@ final class FlashcardAppUITests: XCTestCase {
     }
 
     func testLiveDictionarySearchDisplaysJapaneseAndVietnamese() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let dictionary = app.tabBars.buttons["tab_dictionary"]
         XCTAssertTrue(dictionary.waitForExistence(timeout: 40))
@@ -37,7 +44,7 @@ final class FlashcardAppUITests: XCTestCase {
     }
 
     func testOfflineCardsAndAccountEntryRemainReachable() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let cards = app.tabBars.buttons["tab_cards"]
         XCTAssertTrue(cards.waitForExistence(timeout: 40))
@@ -48,7 +55,7 @@ final class FlashcardAppUITests: XCTestCase {
     }
 
     func testCardEditorKeepsToolbarAboveKeyboardAndCanDiscard() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let cards = app.tabBars.buttons["tab_cards"]
         XCTAssertTrue(cards.waitForExistence(timeout: 40))
@@ -70,7 +77,7 @@ final class FlashcardAppUITests: XCTestCase {
     }
 
     func testWebsiteLoginValidatesEmptyFormAndAllowsGuestReturn() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let settings = app.tabBars.buttons["tab_settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 40))
@@ -79,14 +86,14 @@ final class FlashcardAppUITests: XCTestCase {
         let login = app.buttons["website_login_button"]
         XCTAssertTrue(login.waitForExistence(timeout: 5))
         login.tap()
-        XCTAssertTrue(app.staticTexts["Enter a valid email address."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Nhập địa chỉ email hợp lệ."].waitForExistence(timeout: 5))
         app.buttons["continueWithoutLoginButton"].tap()
         XCTAssertTrue(app.tabBars.buttons["tab_levels"].waitForExistence(timeout: 5))
     }
 
     /// Levels and a level's content stay reachable at the largest accessibility text size.
     func testLevelsAndContentRemainUsableAtAccessibilityTextSize() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
         app.launch()
         let levels = app.tables["home_levels"]
@@ -105,7 +112,7 @@ final class FlashcardAppUITests: XCTestCase {
 
     /// The featured level's primary action opens its vocabulary.
     func testFeaturedStartOpensVocabulary() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let start = app.buttons["home_start"]
         XCTAssertTrue(start.waitForExistence(timeout: 40))
@@ -116,7 +123,7 @@ final class FlashcardAppUITests: XCTestCase {
 
     /// A level's count opens that kind directly, skipping the kind chooser.
     func testLevelCountOpensItsKindDirectly() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let levels = app.tables["home_levels"]
         XCTAssertTrue(levels.waitForExistence(timeout: 40))
@@ -130,7 +137,7 @@ final class FlashcardAppUITests: XCTestCase {
 
     /// Appearance is a pop-up menu on the row; the choice is shown immediately and restored afterwards.
     func testSettingsAppearanceMenuChangesSelection() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let settings = app.tabBars.buttons["tab_settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 40))
@@ -152,9 +159,78 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertEqual(app.buttons["Giao diện"].value as? String, "Theo hệ thống")
     }
 
+    /// A longer value replacing a shorter one ("Tối" → "Theo hệ thống") must stay on one line, flush with the trailing edge.
+    func testSettingsAppearanceValueStaysOneLineWhenSelectionChanges() {
+        let app = makeApp()
+        app.launch()
+        let settings = app.tabBars.buttons["tab_settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 40))
+        settings.tap()
+        let menu = app.buttons["Giao diện"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 10))
+        addTeardownBlock {
+            guard app.state == .runningForeground, app.buttons["Giao diện"].exists,
+                  app.buttons["Giao diện"].value as? String != "Theo hệ thống" else { return }
+            app.buttons["Giao diện"].tap()
+            app.buttons["Theo hệ thống"].tap()
+        }
+        let before = menu.frame
+        menu.tap()
+        app.buttons["Tối"].tap()
+        let short = app.buttons["Giao diện"].frame
+        XCTAssertLessThan(short.width, before.width, "Precondition: the shorter value gives a narrower button")
+        app.buttons["Giao diện"].tap()
+        app.buttons["Theo hệ thống"].tap()
+        let after = app.buttons["Giao diện"].frame
+        XCTAssertEqual(after.height, before.height, accuracy: 1, "Value wrapped onto a second line")
+        XCTAssertEqual(after.width, before.width, accuracy: 1)
+        XCTAssertEqual(after.maxX, before.maxX, accuracy: 1, "Value drifted away from the trailing edge")
+    }
+
+    /// Flipping a switch reloads the list; the appearance value must keep its single-line size and position.
+    func testSettingsAppearanceValueKeepsLayoutAfterTogglingSwitch() {
+        let app = makeApp()
+        app.launch()
+        let settings = app.tabBars.buttons["tab_settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 40))
+        settings.tap()
+        let menu = app.buttons["Giao diện"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 10))
+        let before = menu.frame
+        let sound = app.switches["Âm thanh và rung"]
+        XCTAssertTrue(sound.waitForExistence(timeout: 5))
+        sound.tap()
+        sound.tap()
+        let after = app.buttons["Giao diện"].frame
+        XCTAssertEqual(after.height, before.height, accuracy: 1, "Value wrapped onto a second line after the list reloaded")
+        XCTAssertEqual(after.width, before.width, accuracy: 1)
+        XCTAssertEqual(after.maxX, before.maxX, accuracy: 1, "Value drifted away from the trailing edge")
+    }
+
+    /// English and Japanese are required UI languages: tab titles, Settings copy and the level text from the backend follow the language.
+    func testInterfaceFollowsTheAppLanguage() {
+        let cases: [(language: String, locale: String, levelsTab: String, signIn: String, start: String)] = [
+            ("en", "en_US", "Levels", "Sign In", "Start studying vocabulary, J5"),
+            ("ja", "ja_JP", "レベル", "ログイン", "J5の単語の学習を始める")
+        ]
+        for item in cases {
+            let app = makeApp(language: item.language, locale: item.locale)
+            app.launch()
+            let tab = app.tabBars.buttons["tab_levels"]
+            XCTAssertTrue(tab.waitForExistence(timeout: 40), item.language)
+            XCTAssertEqual(tab.label, item.levelsTab)
+            XCTAssertEqual(app.buttons["home_start"].label, item.start)
+            app.tabBars.buttons["tab_settings"].tap()
+            let signIn = app.buttons["setting_sign_in"]
+            XCTAssertTrue(signIn.waitForExistence(timeout: 10), item.language)
+            XCTAssertEqual(signIn.label, item.signIn)
+            app.terminate()
+        }
+    }
+
     /// Signed out, the account header carries the one primary action and it opens the login screen.
     func testSettingsSignInButtonOpensLogin() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
         let settings = app.tabBars.buttons["tab_settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 40))
