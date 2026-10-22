@@ -1,6 +1,7 @@
 import XCTest
 import Alamofire
 import RxSwift
+import Security
 @testable import FlashcardApp
 
 private final class MemoryAuthTokens: AuthTokenManagerInterface {
@@ -187,17 +188,46 @@ final class AuthSessionTests: XCTestCase {
         XCTAssertEqual(session.currentUser?.id, userID)
     }
 
-    func testLogoutClearsLocalSessionEvenWhenRemoteFails() {
+    func testLogoutClearsLocalSessionAndReportsUnconfirmedWhenRemoteFails() {
         tokens.accessToken = "opaque-test-token"
         tokens.userId = userID
-        var failed = false
-        session.logout().subscribe(onFailure: { _ in failed = true }).disposed(by: bag)
+        var result: LogoutResult?
+        session.logout().subscribe(onSuccess: { result = $0 }, onFailure: { XCTFail("\($0)") }).disposed(by: bag)
         XCTAssertNil(tokens.accessToken)
         XCTAssertNil(tokens.userId)
         XCTAssertNil(session.currentUser)
         XCTAssertEqual(api.bearer, "opaque-test-token")
+        XCTAssertNil(result, "Result waits for the server answer")
         api.logoutResult.onError(NativeAuthError.unavailable)
-        XCTAssertTrue(failed)
+        XCTAssertEqual(result, .remoteUnconfirmed)
+    }
+
+    func testLogoutReportsRevokedWhenServerConfirms() {
+        tokens.accessToken = "opaque-test-token"
+        tokens.userId = userID
+        var result: LogoutResult?
+        session.logout().subscribe(onSuccess: { result = $0 }).disposed(by: bag)
+        api.logoutResult.onNext(())
+        XCTAssertEqual(result, .revoked)
+        XCTAssertNil(tokens.accessToken)
+    }
+
+    func testDuplicateLogoutWithNoSessionNeverCallsTheServer() {
+        var results: [LogoutResult] = []
+        session.logout().subscribe(onSuccess: { results.append($0) }).disposed(by: bag)
+        session.logout().subscribe(onSuccess: { results.append($0) }).disposed(by: bag)
+        XCTAssertEqual(results, [.revoked, .revoked])
+        XCTAssertNil(api.bearer)
+    }
+
+    func testLogoutRejectedAsUnauthorizedMeansTheServerSessionIsAlreadyGone() {
+        tokens.accessToken = "opaque-test-token"
+        tokens.userId = userID
+        var result: LogoutResult?
+        session.logout().subscribe(onSuccess: { result = $0 }, onFailure: { XCTFail("\($0)") }).disposed(by: bag)
+        api.logoutResult.onError(NativeAuthError.unauthorized)
+        XCTAssertEqual(result, .revoked, "A token the server no longer accepts needs no revocation")
+        XCTAssertNil(session.currentUser)
     }
 
     func testFailedKeychainDeletionIsReportedAndCannotRestoreAccount() {
@@ -393,6 +423,44 @@ final class NativeAuthAPITests: XCTestCase {
         wait(for: [done], timeout: 3)
     }
 
+    func testLoginFailureStatusesNeverAuthenticateAndAreClassified() {
+        let cases: [(Int, String, String)] = [
+            (400, #"{"error":"invalid request"}"#, NativeAuthError.unavailable.localizedDescription),
+            (401, #"{"error":"invalid credentials"}"#, NativeAuthError.invalidCredentials.localizedDescription),
+            (403, #"{"error":"forbidden: untrusted origin"}"#, NativeAuthError.unavailable.localizedDescription),
+            (429, #"{"error":"too many requests"}"#, NativeAuthError.rateLimited.localizedDescription),
+            (500, #"{"error":"internal error"}"#, NativeAuthError.unavailable.localizedDescription),
+            (503, #"{"error":"service unavailable"}"#, NativeAuthError.unavailable.localizedDescription),
+            // 200 with a body that is not a session must be rejected, not treated as success.
+            (200, #"{"ok":true}"#, NativeAuthError.invalidResponse.localizedDescription),
+            (200, #"{"ok":true,"tok"#, NativeAuthError.invalidResponse.localizedDescription)
+        ]
+        for (status, body, expected) in cases {
+            let done = expectation(description: "login \(status)")
+            AuthURLProtocol.handler = { _, transport in transport.reply(status: status, body: body) }
+            api.login(email: "user@example.com", password: "test")
+                .subscribe(onSuccess: { _ in XCTFail("Accepted \(status) \(body)"); done.fulfill() },
+                           onFailure: { error in
+                    XCTAssertEqual(error.localizedDescription, expected, "status \(status)")
+                    done.fulfill()
+                }).disposed(by: bag)
+            wait(for: [done], timeout: 3)
+        }
+    }
+
+    func testNetworkTimeoutIsReportedAsUnavailable() {
+        let done = expectation(description: "timeout")
+        AuthURLProtocol.handler = { _, transport in
+            transport.client?.urlProtocol(transport, didFailWithError: URLError(.timedOut))
+        }
+        api.login(email: "user@example.com", password: "test")
+            .subscribe(onSuccess: { _ in XCTFail("Accepted timeout"); done.fulfill() }, onFailure: { error in
+                XCTAssertEqual(error.localizedDescription, NativeAuthError.unavailable.localizedDescription)
+                done.fulfill()
+            }).disposed(by: bag)
+        wait(for: [done], timeout: 3)
+    }
+
     func testDisposeCancelsAlamofireRequest() {
         let started = expectation(description: "started")
         let stopped = expectation(description: "cancelled")
@@ -402,5 +470,86 @@ final class NativeAuthAPITests: XCTestCase {
         wait(for: [started], timeout: 3)
         operation.dispose()
         wait(for: [stopped], timeout: 3)
+    }
+}
+
+final class KeychainAuthTokenManagerTests: XCTestCase {
+    private let userID = "7c2218b4-590b-49b2-8be0-076fd9992135"
+    private let namespace = "com.flashcardapp.tests.\(UUID().uuidString)"
+    private var keychain: KeychainAuthTokenManager!
+
+    override func setUpWithError() throws {
+        keychain = KeychainAuthTokenManager(namespace: namespace)
+        // An unsigned build (CODE_SIGNING_ALLOWED=NO) has no Keychain entitlement: infrastructure, not a source failure.
+        do { try keychain.save(accessToken: "probe", userId: userID) }
+        catch { throw XCTSkip("Keychain unavailable in this build: \(error)") }
+        try keychain.clear()
+    }
+
+    override func tearDown() {
+        try? keychain.clear()
+    }
+
+    private func addLegacyItem(_ suffix: String, _ value: String) {
+        let status = SecItemAdd([
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: "\(namespace).\(suffix)",
+            kSecValueData as String: Data(value.utf8)
+        ] as CFDictionary, nil)
+        XCTAssertEqual(status, errSecSuccess)
+    }
+
+    private func legacyItemExists(_ suffix: String) -> Bool {
+        SecItemCopyMatching([
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: "\(namespace).\(suffix)"
+        ] as CFDictionary, nil) == errSecSuccess
+    }
+
+    func testSavedSessionRoundTripsAndReplacesThePreviousOne() throws {
+        XCTAssertNil(keychain.accessToken)
+        try keychain.save(accessToken: "first-test-token", userId: userID)
+        XCTAssertEqual(keychain.accessToken, "first-test-token")
+        XCTAssertEqual(keychain.userId, userID)
+
+        let other = "0b0f5b52-2d3c-4a8c-9d4e-7b52b6f2a111"
+        try keychain.save(accessToken: "second-test-token", userId: other)
+        XCTAssertEqual(keychain.accessToken, "second-test-token")
+        XCTAssertEqual(keychain.userId, other, "Token and user always come from the same save")
+    }
+
+    func testClearRemovesTheSession() throws {
+        try keychain.save(accessToken: "first-test-token", userId: userID)
+        try keychain.clear()
+        XCTAssertNil(keychain.accessToken)
+        XCTAssertNil(keychain.userId)
+        XCTAssertNoThrow(try keychain.clear(), "Clearing an empty store is not an error")
+    }
+
+    func testSessionStoredAsTwoItemsByAnEarlierVersionStillRestoresAndIsReplacedOnSave() throws {
+        addLegacyItem("accessToken", "legacy-test-token")
+        addLegacyItem("userId", userID)
+        XCTAssertEqual(keychain.accessToken, "legacy-test-token")
+        XCTAssertEqual(keychain.userId, userID)
+
+        try keychain.save(accessToken: "new-test-token", userId: userID)
+        XCTAssertEqual(keychain.accessToken, "new-test-token")
+        XCTAssertFalse(legacyItemExists("accessToken"))
+        XCTAssertFalse(legacyItemExists("userId"))
+    }
+
+    func testClearAlsoRemovesAnEarlierVersionsItems() throws {
+        addLegacyItem("accessToken", "legacy-test-token")
+        addLegacyItem("userId", userID)
+        try keychain.clear()
+        XCTAssertNil(keychain.accessToken)
+        XCTAssertFalse(legacyItemExists("accessToken"))
+        XCTAssertFalse(legacyItemExists("userId"))
+    }
+
+    func testHalfWrittenEarlierSessionIsNotUsable() {
+        addLegacyItem("accessToken", "orphan-test-token")
+        XCTAssertNil(keychain.accessToken)
+        XCTAssertNil(keychain.userId)
     }
 }

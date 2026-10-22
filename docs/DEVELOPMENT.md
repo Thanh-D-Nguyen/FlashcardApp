@@ -40,7 +40,10 @@ không còn mô tả đúng luồng đăng nhập này:
 1. POST `/api/auth/login` với JSON `email`, `password`, nhận `ok`, `token`.
 2. GET `/api/auth/me` với Bearer để lấy hồ sơ trực tiếp với `id`, `displayName`, `email`.
 3. Lưu token và UUID người dùng vào Keychain sau khi cả hai bước thành công.
-4. POST `/api/auth/logout` thu hồi phiên; xóa phiên local kể cả khi mạng lỗi.
+4. POST `/api/auth/logout` thu hồi phiên; xóa phiên local kể cả khi mạng lỗi. Server trả 401 nghĩa là
+   phiên đã hết/bị thu hồi (coi như xong); lỗi mạng hay 5xx vẫn đăng xuất local nhưng app báo rõ máy chủ chưa
+   xác nhận kết thúc phiên. Token và UUID nằm chung một mục Keychain (ghi nguyên tử); build không ký
+   (`CODE_SIGNING_ALLOWED=NO`) không có Keychain nên đăng nhập báo lỗi lưu phiên, test Keychain bị skip.
 
 Login/logout gửi `Origin` (scheme/host/port của API) theo CSRF allowlist của server.
 Không lưu cookie website/token vào UserDefaults hoặc log. Hủy request khi màn

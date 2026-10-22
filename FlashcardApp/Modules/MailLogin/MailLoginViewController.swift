@@ -227,7 +227,8 @@ final class MailLoginViewController: BaseViewController {
         let content = scrollView.contentLayoutGuide
         let frame = scrollView.frameLayoutGuide
         let preferredWidth = stack.widthAnchor.constraint(equalTo: frame.widthAnchor, constant: -2 * margin)
-        preferredWidth.priority = .defaultHigh
+        // Stronger than any field's intrinsic width: a long password must scroll inside its field, not widen the form.
+        preferredWidth.priority = UILayoutPriority(rawValue: 999)
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),

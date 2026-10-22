@@ -19,31 +19,49 @@ final class KeychainAuthTokenManager: AuthTokenManagerInterface {
 
     static let shared = KeychainAuthTokenManager()
 
-    private let tokenKey = "com.flashcardapp.accessToken"
-    private let userIdKey = "com.flashcardapp.userId"
-
-    private init() {}
-
-    var accessToken: String? {
-        load(key: tokenKey)
+    /// Token and user id live in one Keychain item so a crash or failed write can never pair one account's
+    /// token with another account's id.
+    private struct StoredSession: Codable {
+        let accessToken: String
+        let userId: String
     }
 
-    var userId: String? {
-        load(key: userIdKey)
+    private let sessionKey: String
+    // Two separate items held the session before the single-item format; still read, replaced on the next save.
+    private let legacyTokenKey: String
+    private let legacyUserIdKey: String
+
+    init(namespace: String = "com.flashcardapp") {
+        sessionKey = "\(namespace).session"
+        legacyTokenKey = "\(namespace).accessToken"
+        legacyUserIdKey = "\(namespace).userId"
     }
+
+    var accessToken: String? { storedSession?.accessToken }
+
+    var userId: String? { storedSession?.userId }
 
     func save(accessToken: String, userId: String) throws {
-        do {
-            try save(value: accessToken, key: tokenKey)
-            try save(value: userId, key: userIdKey)
-        } catch {
-            try? clear()
-            throw error
+        let data = try JSONEncoder().encode(StoredSession(accessToken: accessToken, userId: userId))
+        let query = itemQuery(key: sessionKey)
+        // Replace in place: the previous session stays intact if the write fails.
+        var status = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+        if status == errSecItemNotFound {
+            let attributes = query.merging([
+                kSecValueData as String: data,
+                kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            ]) { $1 }
+            status = SecItemAdd(attributes as CFDictionary, nil)
         }
+        guard status == errSecSuccess else {
+            throw AppError.authenticationFailed("Keychain write failed with status \(status)")
+        }
+        delete(key: legacyTokenKey)
+        delete(key: legacyUserIdKey)
     }
 
     func clear() throws {
-        let statuses = [delete(key: tokenKey), delete(key: userIdKey)]
+        let statuses = [delete(key: sessionKey), delete(key: legacyTokenKey), delete(key: legacyUserIdKey)]
         guard statuses.allSatisfy({ $0 == errSecSuccess || $0 == errSecItemNotFound }) else {
             throw NativeAuthError.storageFailed
         }
@@ -51,43 +69,32 @@ final class KeychainAuthTokenManager: AuthTokenManagerInterface {
 
     // MARK: - Private
 
-    private func load(key: String) -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        guard status == errSecSuccess, let data = result as? Data else { return nil }
-        return String(data: data, encoding: .utf8)
+    private var storedSession: StoredSession? {
+        if let data = load(key: sessionKey),
+           let session = try? JSONDecoder().decode(StoredSession.self, from: data) {
+            return session
+        }
+        guard let token = load(key: legacyTokenKey).flatMap({ String(data: $0, encoding: .utf8) }),
+              let userId = load(key: legacyUserIdKey).flatMap({ String(data: $0, encoding: .utf8) }) else { return nil }
+        return StoredSession(accessToken: token, userId: userId)
     }
 
-    private func save(value: String, key: String) throws {
-        guard let data = value.data(using: .utf8) else {
-            throw AppError.authenticationFailed("Cannot encode token to UTF-8")
-        }
-        // Delete existing item first to avoid duplicate-key errors
-        delete(key: key)
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-        ]
-        let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else {
-            throw AppError.authenticationFailed("Keychain write failed with status \(status)")
-        }
+    private func itemQuery(key: String) -> [String: Any] {
+        [kSecClass as String: kSecClassGenericPassword, kSecAttrAccount as String: key]
+    }
+
+    private func load(key: String) -> Data? {
+        let query = itemQuery(key: key).merging([
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]) { $1 }
+        var result: AnyObject?
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else { return nil }
+        return result as? Data
     }
 
     @discardableResult
     private func delete(key: String) -> OSStatus {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key
-        ]
-        return SecItemDelete(query as CFDictionary)
+        SecItemDelete(itemQuery(key: key) as CFDictionary)
     }
 }

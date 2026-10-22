@@ -167,7 +167,10 @@ extension SettingPresenter {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] in self?.reloadSections() }, onFailure: { [weak self] error in
                 self?.reloadSections()
-                self?.wireframe.showError(message: error.localizedDescription)
+                // Offline or a flaky server keeps the stored session; only an expired one needs the user's attention.
+                if case NativeAuthError.unauthorized = error {
+                    self?.wireframe.showError(message: error.localizedDescription)
+                }
             })
     }
 
@@ -241,10 +244,19 @@ extension SettingPresenter {
             self.refreshRequest?.dispose()
             self.interactor.logoutSession()
                 .observe(on: MainScheduler.instance)
-                .subscribe(onSuccess: { [weak self] in
-                    self?.isLoggingOut = false
-                    self?.reloadSections()
-                    self?.wireframe.navigateToWelcome()
+                .subscribe(onSuccess: { [weak self] result in
+                    guard let self else { return }
+                    self.isLoggingOut = false
+                    self.reloadSections()
+                    switch result {
+                    case .revoked:
+                        self.wireframe.navigateToWelcome()
+                    case .remoteUnconfirmed:
+                        // Signed out on this device regardless; say plainly that the server was not told.
+                        self.wireframe.showLogoutNotice(
+                            message: NSLocalizedString("You are signed out on this device, but the server could not be reached to end your session there.", comment: "Shown after Log Out when the remote revocation failed"),
+                            onDismiss: { [weak self] in self?.wireframe.navigateToWelcome() })
+                    }
                 }, onFailure: { [weak self] error in
                     self?.isLoggingOut = false
                     self?.reloadSections()

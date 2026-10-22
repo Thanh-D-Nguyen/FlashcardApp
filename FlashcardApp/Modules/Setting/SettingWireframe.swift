@@ -11,6 +11,7 @@ import SafariServices
 protocol SettingWireframeInterface: AnyObject {
     func showLogoutConfirmation(onConfirm: @escaping () -> Void)
     func navigateToWelcome()
+    func showLogoutNotice(message: String, onDismiss: @escaping () -> Void)
     func showError(message: String)
     func showNotificationDeniedAlert()
     func openSystemSettings()
@@ -61,6 +62,11 @@ extension SettingWireframe: SettingWireframeInterface {
             message: NSLocalizedString("Are you sure you want to log out?", comment: ""),
             actions: [confirmAction, cancelAction]
         )
+    }
+
+    func showLogoutNotice(message: String, onDismiss: @escaping () -> Void) {
+        let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { _ in onDismiss() }
+        showAlert(with: NSLocalizedString("Log Out", comment: ""), message: message, actions: [okAction])
     }
 
     func showNotificationDeniedAlert() {

@@ -14,7 +14,7 @@ protocol SettingInteractorInterface: AnyObject {
     func logout() throws
     var authStateChanges: Observable<Void> { get }
     func refreshCurrentUser() -> Single<Void>
-    func logoutSession() -> Single<Void>
+    func logoutSession() -> Single<LogoutResult>
     func getAppearance() -> String
     func setAppearance(_ value: String)
     func getNotificationEnabled() -> Bool
@@ -31,8 +31,8 @@ protocol SettingInteractorInterface: AnyObject {
 extension SettingInteractorInterface {
     var authStateChanges: Observable<Void> { .empty() }
     func refreshCurrentUser() -> Single<Void> { .just(()) }
-    func logoutSession() -> Single<Void> {
-        .deferred { try self.logout(); return .just(()) }
+    func logoutSession() -> Single<LogoutResult> {
+        .deferred { try self.logout(); return .just(.revoked) }
     }
 }
 
@@ -59,7 +59,7 @@ final class SettingInteractor: SettingInteractorInterface {
 
     var authStateChanges: Observable<Void> { session.authStateChanges }
     func refreshCurrentUser() -> Single<Void> { session.refresh() }
-    func logoutSession() -> Single<Void> { session.logout() }
+    func logoutSession() -> Single<LogoutResult> { session.logout() }
 
     // MARK: - Appearance
 

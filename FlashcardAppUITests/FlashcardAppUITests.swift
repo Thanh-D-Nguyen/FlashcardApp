@@ -244,6 +244,100 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.buttons["website_login_button"].waitForExistence(timeout: 5))
     }
 
+    // MARK: Website account against the local backend
+
+    private func openLogin(_ app: XCUIApplication) {
+        let settings = app.tabBars.buttons["tab_settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 40))
+        settings.tap()
+        let signIn = app.buttons["setting_sign_in"]
+        XCTAssertTrue(signIn.waitForExistence(timeout: 10))
+        signIn.tap()
+        XCTAssertTrue(app.buttons["website_login_button"].waitForExistence(timeout: 5))
+    }
+
+    private func submitLogin(_ app: XCUIApplication, email: String, password: String) {
+        let emailField = app.textFields["website_email"]
+        XCTAssertTrue(emailField.waitForExistence(timeout: 5))
+        emailField.tap()
+        emailField.typeText(email)
+        let passwordField = app.secureTextFields["website_password"]
+        passwordField.tap()
+        passwordField.typeText(password)
+        // The software keyboard must leave the focused field and the primary action reachable.
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5), "Software keyboard is showing")
+        XCTAssertLessThanOrEqual(passwordField.frame.maxY, keyboard.frame.minY, "Password field is not covered")
+        XCTAssertTrue(app.buttons["website_login_button"].isHittable, "Sign In stays reachable above the keyboard")
+        let signInFrame = app.buttons["website_login_button"].frame
+        XCTAssertGreaterThanOrEqual(signInFrame.minX, 0, "Form is not scrolled sideways: \(signInFrame) in \(app.frame)")
+        XCTAssertLessThanOrEqual(signInFrame.maxX, app.frame.width, "Form is not scrolled sideways: \(signInFrame) in \(app.frame)")
+        attachScreenshot(app, name: "login-filled-keyboard")
+        app.buttons["website_login_button"].tap()
+    }
+
+    /// Wrong credentials are refused by the real server and leave the user on the login screen, signed out.
+    func testLiveLoginRejectsWrongPassword() {
+        let app = makeApp()
+        app.launch()
+        openLogin(app)
+        submitLogin(app, email: "nobody-\(UUID().uuidString.prefix(8))@example.com", password: UUID().uuidString)
+        let message = app.staticTexts["Email hoặc mật khẩu không đúng."]
+        XCTAssertTrue(message.waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["website_login_button"].isEnabled, "The form is usable again after the failure")
+        attachScreenshot(app, name: "login-wrong-password")
+        XCTAssertFalse(app.tabBars.buttons["tab_levels"].exists)
+    }
+
+    /// Needs a disposable local account: TEST_RUNNER_FLASHCARD_E2E_EMAIL / TEST_RUNNER_FLASHCARD_E2E_PASSWORD.
+    /// Login, session shown in Settings, restored after relaunch, then logout clears it.
+    func testLiveLoginSurvivesRelaunchAndLogoutEndsTheSession() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let email = environment["FLASHCARD_E2E_EMAIL"], let password = environment["FLASHCARD_E2E_PASSWORD"] else {
+            throw XCTSkip("No disposable local account supplied")
+        }
+        let app = makeApp()
+        app.launch()
+        openLogin(app)
+        submitLogin(app, email: email, password: password)
+        XCTAssertTrue(app.tabBars.buttons["tab_levels"].waitForExistence(timeout: 20), "Successful login lands on Main")
+
+        let signedIn = NSPredicate(format: "label CONTAINS %@", email)
+        func showSettingsAccount(_ app: XCUIApplication) {
+            app.tabBars.buttons["tab_settings"].tap()
+            XCTAssertTrue(app.cells["setting_account"].waitForExistence(timeout: 10))
+            XCTAssertFalse(app.buttons["setting_sign_in"].exists)
+        }
+        showSettingsAccount(app)
+        XCTAssertTrue(app.descendants(matching: .any).matching(signedIn).firstMatch.waitForExistence(timeout: 15))
+        attachScreenshot(app, name: "settings-signed-in")
+
+        // Restart: the Keychain session is restored and confirmed by the server.
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["tab_settings"].waitForExistence(timeout: 40))
+        showSettingsAccount(app)
+        XCTAssertTrue(app.descendants(matching: .any).matching(signedIn).firstMatch.waitForExistence(timeout: 15))
+        let displayName = NSPredicate(format: "label CONTAINS %@", "iOS Auth Test")
+        XCTAssertTrue(app.descendants(matching: .any).matching(displayName).firstMatch.waitForExistence(timeout: 15),
+                      "Profile refreshed from /auth/me")
+        attachScreenshot(app, name: "settings-restored-after-relaunch")
+
+        // Logout: confirm, land on the login screen, and stay signed out after another relaunch.
+        let logout = app.cells["setting_logout"]
+        for _ in 0..<4 where !logout.isHittable { app.tables["settings_list"].swipeUp() }
+        logout.tap()
+        let confirm = app.alerts.buttons["Đăng xuất"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        confirm.tap()
+        XCTAssertTrue(app.buttons["website_login_button"].waitForExistence(timeout: 15))
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["tab_settings"].waitForExistence(timeout: 40))
+        app.tabBars.buttons["tab_settings"].tap()
+        XCTAssertTrue(app.buttons["setting_sign_in"].waitForExistence(timeout: 10), "No session survives logout")
+    }
+
     // MARK: Cards: create, study, edit, persist, delete
 
     /// The whole learner journey on real UI and the real Realm store: make a deck, study it (flip, quiz, summary),

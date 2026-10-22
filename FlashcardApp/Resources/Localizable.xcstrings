@@ -4945,6 +4945,30 @@
         }
       }
     },
+    "You are signed out on this device, but the server could not be reached to end your session there." : {
+      "extractionState" : "manual",
+      "comment" : "Shown after Log Out when the remote revocation failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are signed out on this device, but the server could not be reached to end your session there."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn đã đăng xuất khỏi thiết bị này, nhưng không thể kết nối máy chủ để kết thúc phiên ở đó."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスではログアウトしましたが、サーバーに接続できず、サーバー上のセッションを終了できませんでした。"
+          }
+        }
+      }
+    },
     "Too many sign-in attempts. Please try again later." : {
       "comment" : "Auth rate limit error",
       "extractionState" : "manual",

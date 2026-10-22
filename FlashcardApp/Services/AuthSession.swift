@@ -2,6 +2,14 @@ import Foundation
 import RxSwift
 import RxRelay
 
+/// What logging out achieved on the server. The local session is always gone by the time this is delivered.
+enum LogoutResult: Equatable {
+    /// The server ended the session, or already refused the token (expired or revoked earlier).
+    case revoked
+    /// The server could not be reached or failed, so the session may stay valid there until it expires.
+    case remoteUnconfirmed
+}
+
 final class AuthSession {
     static let shared = AuthSession()
 
@@ -102,7 +110,9 @@ final class AuthSession {
         }
     }
 
-    func logout() -> Single<Void> {
+    /// Clears the local session first, then asks the server to end it. Only a local storage failure is an error:
+    /// the server outcome is reported as a `LogoutResult` because the user is signed out on this device either way.
+    func logout() -> Single<LogoutResult> {
         Single.deferred { [self] in
             lock.lock()
             defer { lock.unlock() }
@@ -111,10 +121,15 @@ final class AuthSession {
             do { try clear(); storageError = nil }
             catch { storageError = error }
             let request = token.map { token in api.logout(token: { token }) } ?? .just(())
-            return request.map {
-                if let storageError { throw storageError }
-                return ()
-            }.catch { .error(storageError ?? $0) }
+            return request.map { LogoutResult.revoked }
+                .catch { error in
+                    if case NativeAuthError.unauthorized = error { return .just(.revoked) }
+                    return .just(.remoteUnconfirmed)
+                }
+                .map { result in
+                    if let storageError { throw storageError }
+                    return result
+                }
         }
     }
 

@@ -21,6 +21,14 @@ final class MockSettingInteractor: SettingInteractorInterface {
 
     func getCurrentUser() -> SocialUserEntity? { currentUser }
 
+    var logoutSessionResult: Single<LogoutResult>?
+    func logoutSession() -> Single<LogoutResult> {
+        logoutSessionResult ?? .deferred { try self.logout(); return .just(.revoked) }
+    }
+
+    var refreshResult: Single<Void> = .just(())
+    func refreshCurrentUser() -> Single<Void> { refreshResult }
+
     func logout() throws {
         logoutCalled = true
         if let error = logoutError { throw error }
@@ -60,6 +68,13 @@ final class MockSettingWireframe: SettingWireframeInterface {
 
     func showError(message: String) {
         lastErrorMessage = message
+    }
+
+    var logoutNoticeMessage: String?
+    var logoutNoticeDismissed: (() -> Void)?
+    func showLogoutNotice(message: String, onDismiss: @escaping () -> Void) {
+        logoutNoticeMessage = message
+        logoutNoticeDismissed = onDismiss
     }
 
     var deniedAlertCount = 0
@@ -359,6 +374,69 @@ final class SettingPresenterTests: XCTestCase {
         XCTAssertTrue(mockInteractor.logoutCalled)
         XCTAssertFalse(mockWireframe.navigateToWelcomeCalled)
         XCTAssertEqual(mockWireframe.lastErrorMessage, mockInteractor.logoutError?.localizedDescription)
+    }
+
+    func test_requestLogout_whenRemoteRevocationIsUnconfirmed_saysSoThenLeavesTheSignedOutScreen() {
+        mockInteractor.logoutSessionResult = .just(.remoteUnconfirmed)
+        presenter.viewDidLoad()
+        presenter.requestLogout()
+
+        mockWireframe.logoutConfirmationHandler?()
+
+        XCTAssertNotNil(mockWireframe.logoutNoticeMessage, "The user must be told the server was not informed")
+        XCTAssertNil(mockWireframe.lastErrorMessage)
+        XCTAssertFalse(mockWireframe.navigateToWelcomeCalled, "Navigation waits until the notice is dismissed")
+        mockWireframe.logoutNoticeDismissed?()
+        XCTAssertTrue(mockWireframe.navigateToWelcomeCalled,
+                      "The local session is gone, so the screen must not keep showing a signed-in context")
+    }
+
+    func test_requestLogout_whenServerConfirms_navigatesWithoutNotice() {
+        mockInteractor.logoutSessionResult = .just(.revoked)
+        presenter.viewDidLoad()
+        presenter.requestLogout()
+
+        mockWireframe.logoutConfirmationHandler?()
+
+        XCTAssertNil(mockWireframe.logoutNoticeMessage)
+        XCTAssertTrue(mockWireframe.navigateToWelcomeCalled)
+    }
+
+    func test_requestLogout_confirmedTwice_logsOutOnce() {
+        let pending = PublishSubject<LogoutResult>()
+        mockInteractor.logoutSessionResult = pending.take(1).asSingle()
+        presenter.viewDidLoad()
+        presenter.requestLogout()
+        let confirm = mockWireframe.logoutConfirmationHandler
+        confirm?()
+        confirm?()
+        presenter.requestLogout()
+
+        pending.onNext(.revoked)
+
+        XCTAssertTrue(mockWireframe.navigateToWelcomeCalled)
+        XCTAssertNil(mockWireframe.lastErrorMessage)
+    }
+
+    // MARK: - Session refresh
+
+    func test_viewWillAppear_whenOfflineKeepsTheSessionWithoutInterruptingTheUser() {
+        mockInteractor.currentUser = SocialUserEntity(id: "7c2218b4-590b-49b2-8be0-076fd9992135")
+        mockInteractor.refreshResult = .error(NativeAuthError.unavailable)
+        presenter.viewDidLoad()
+
+        presenter.viewWillAppear()
+
+        XCTAssertNil(mockWireframe.lastErrorMessage)
+    }
+
+    func test_viewWillAppear_whenSessionExpired_tellsTheUser() {
+        mockInteractor.refreshResult = .error(NativeAuthError.unauthorized)
+        presenter.viewDidLoad()
+
+        presenter.viewWillAppear()
+
+        XCTAssertEqual(mockWireframe.lastErrorMessage, NativeAuthError.unauthorized.localizedDescription)
     }
 
     // MARK: - Account display
