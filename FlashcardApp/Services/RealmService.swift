@@ -8,8 +8,9 @@ final class RealmService {
     /// 1: the bundled database, which also held the dictionary tables. 2: decks and cards only.
     /// 3: adds `RCardExample`, the learner's own example sentences (additive, nothing to migrate).
     /// 4: adds `RReviewAttempt`, the learner's answered questions (additive, nothing to migrate).
-    static let schemaVersion: UInt64 = 4
-    static let storedTypes: [Object.Type] = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self]
+    /// 5: adds `RReviewState`, when each card is next due (additive, nothing to migrate).
+    static let schemaVersion: UInt64 = 5
+    static let storedTypes: [Object.Type] = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self, RReviewState.self]
     /// Tables of the retired bundled dictionary. An upgraded install empties them; the decks are untouched.
     static let retiredDictionaryTables: [Object.Type] = [RetiredJaVi.self, RetiredViJa.self, RetiredKanji.self, RetiredGrammar.self, RetiredExample.self]
     /// How those tables are named in the file (the stand-in classes map to them with `_realmObjectName`).

@@ -195,7 +195,7 @@ Commit: `feat(study): save completed attempts during sessions`.
 - NOT VERIFIED: Dynamic Type cỡ accessibility, VoiceOver thực tế, Reduce Motion, haptic và âm thanh trên máy thật (chỉ nối dây, đúng
   một lần/sự kiện theo thiết kế), chạy UI test song song nhiều thiết bị, giao diện tiếng Anh sau thay đổi cuối (đã xem trước đó).
 
-### L04 — Lịch ôn có thể kiểm chứng (PLANNED; sau L03)
+### L04 — Lịch ôn có thể kiểm chứng (VERIFIED — chờ commit hash bên dưới)
 
 Phạm vi: logic lịch ôn thuần Foundation, store ở L02 và focused XCTest.
 
@@ -212,6 +212,62 @@ Tiêu chí:
 - Không có review card đã xóa hoặc nội dung đã bị thay đổi mà vẫn mang lịch cũ.
 
 Commit: `feat(study): schedule reviews from persisted attempts`.
+
+**Quyết định đã chốt (2026-10-23; người sở hữu sản phẩm chọn FSRS, phương án B)**
+- Thuật toán: **FSRS-6**, tham chiếu `py-fsrs` 6.3.2 (open-spaced-repetition, giấy phép MIT), 21 tham số **mặc định** (không cá nhân
+  hóa), `desired_retention` 0,90, khoảng tối đa 36500 ngày. Phiên bản lưu cùng lịch: `fsrs6-default`. Tham số mặc định được huấn
+  luyện từ dữ liệu quần thể của nguồn gốc, **chưa hiệu chỉnh theo người học của app**: không hiển thị "xác suất nhớ" hay "đã thuộc"
+  cho người học; chỉ dùng retrievability nội bộ trong công thức. Dữ liệu từ điển/mẫu câu trên server là nội dung học, không phải
+  lịch sử ôn tập, nên không dùng để tối ưu tham số. Muốn tối ưu sau này cần lịch sử ôn thật (thư viện gốc có optimizer).
+- Khác tham chiếu (có chủ đích): không có learning/relearning step tính bằng phút và **không fuzz** (một lượt trả lời được ghi một
+  lần mỗi phiên, không có hàng đợi trong phiên; mọi khoảng ôn là số ngày nguyên ≥ 1; cùng đầu vào cho cùng lịch). Đây đúng là cấu
+  hình `learning_steps=()`, `relearning_steps=()`, `enable_fuzzing=False` của thư viện gốc nên vẫn kiểm chứng được bằng vector.
+  Làm tròn khoảng ôn theo half-to-even như Python. Đồng hồ lùi: một lượt có thời điểm trước lần ôn trước được lên lịch như thể xảy ra
+  ở lần ôn trước (hạn không bao giờ sớm hơn lần ôn trước + 1 ngày); đây là khác biệt duy nhất không nằm trong vector tham chiếu và có test
+  riêng. Hệ quả chấp nhận: nếu đồng hồ máy từng bị đặt quá xa về tương lai rồi sửa lại, lịch của thẻ đó bị kẹt ở thời điểm sai cho tới
+  khi qua mốc ấy (không có đường khôi phục tự động).
+- Kỹ năng và khóa: lịch riêng cho từng **chủ thể học + card + kỹ năng** (`recognition` từ quiz, `selfRecall` từ tự đánh giá); kết quả
+  của kỹ năng này không đổi lịch của kỹ năng kia.
+- Ý nghĩa rating (giả thuyết sản phẩm, có phiên bản, cần xem lại khi có dữ liệu): `incorrect`/`needsReview` → **Again**;
+  `correct`/`remembered` không gợi ý → **Good**; có gợi ý (cách đọc/nghe trước khi trả lời) → **Hard**. Không bao giờ gửi **Easy**
+  vì chưa có tín hiệu nào nói "dễ hẳn". Skip không tạo lượt nên không đổi lịch.
+- Đổi nội dung (`contentVersion`): lịch cũ không còn hiệu lực — không xuất hiện trong danh sách đến hạn và lượt kế tiếp bắt đầu
+  lịch mới; lịch sử attempt giữ nguyên với phiên bản cũ. Đổi tên deck/ảnh/ghi chú không reset (không nằm trong `contentVersion`).
+- Dữ liệu: lịch là **dữ liệu suy ra** (attempt là nguồn sự thật). Cập nhật lịch nằm trong **cùng write transaction** với việc ghi
+  attempt; retry cùng attempt không dời hạn lần nữa. Có `rebuildSchedules` phát lại attempt theo thứ tự để dựng lại lịch (đổi
+  thuật toán/khôi phục). Xóa card xóa cả lịch. Hạn là **thời điểm tuyệt đối** (`lastReview` + n × 86400 s) nên không phụ thuộc múi
+  giờ/giờ mùa hè; "đến hạn hôm nay" theo ngày lịch là việc của L05.
+- Kiểm chứng: `scripts/fsrs_reference_vectors.py` sinh `FlashcardAppTests/FSRSReferenceVectors.swift` từ thư viện gốc (11 chuỗi
+  ôn, gồm lapse, sớm/muộn, cùng ngày, retention 0,8, trần 30 ngày, lịch sử ngẫu nhiên seed 42); test Swift phải khớp.
+
+**Kết quả triển khai (2026-10-23)**
+- Code: `Entities/ReviewScheduler.swift` (FSRS-6 thuần Foundation: `ReviewGrade`, `FSRSParameters`, `ReviewState`, `ReviewScheduler.next/grade/
+  isDue`), `Storage/Models/RReviewAttempt.swift` (+ `RReviewState`, `deleteReviewHistory(forCards:)`), `Interactors/ReviewHistoryStore.swift`
+  (`save` cập nhật lịch trong cùng write transaction; `schedules`, `dueSchedules`, `rebuildSchedules`, `ensureSchedules`), schema 4 → 5
+  (thêm bảng, không cần migration), `THIRD_PARTY_NOTICES.md` (MIT của py-fsrs).
+- Bỏ qua bản cập nhật lịch nhưng vẫn lưu attempt khi attempt thuộc **wording cũ** đến muộn (sau khi card đã sửa và trả lời lại), để không
+  đè lịch của wording hiện tại; phát lại theo thời gian cho cùng kết quả. `rebuildSchedules` là **phát lại theo thời điểm trả lời**, không
+  phải khôi phục chính xác nếu các lượt được lưu không theo thứ tự thời gian (đồng hồ chỉnh lùi). `ensureSchedules` dựng lịch khi có
+  attempt nhưng thiếu lịch hoặc lịch của thuật toán khác (cài đặt cũ ở schema 4, cập nhật thuật toán).
+- RED/GREEN: bộ lập lịch stub → 12/16 test fail theo assertion, sau đó 16/16 PASS; lịch lưu: 13/46 fail → xanh; sau review 2 test mới
+  (attempt cũ đến muộn, `ensureSchedules`) đỏ rồi xanh. Phép thử đột biến: đổi `exp(w8)` thành `exp(w8 + 0.001)` làm test vector đỏ (152 sai lệch).
+- Kiểm chứng số học: 11 chuỗi vector tham chiếu khớp (ổn định/độ khó ≤ 1e-9 tương đối, hạn ≤ 1 ms). Reviewer độc lập còn biên dịch
+  riêng `ReviewScheduler.swift` và so với py-fsrs 6.3.2 trên **3000 lịch sử ngẫu nhiên (38.398 bước; grade 1–4; khoảng cách < 1 ngày
+  đến 4000 ngày; retention 0,7–0,99; trần 1/2/30/365/36500): 0 sai lệch**.
+- Test: `FlashcardAppTests` 546 PASS / 0 fail / 5 skip (Keychain, build không ký). Coverage `ReviewScheduler.swift` 100% (77/77),
+  `ReviewHistoryStore.swift` 100% (137/137) trước các sửa review nhỏ (nhánh mới có test). Fixture nâng cấp: database **schema 4 thật**
+  (store schema 3 nâng bởi code schema 4, có attempt) → mở bằng schema 5 giữ deck/card/ví dụ/attempt, bảng lịch rỗng, `rebuildSchedules`
+  dựng đúng lịch.
+- Review độc lập (`flashcard-reviewer`): không blocker. Đã xử lý: store schema 4 cũ không có lịch (→ `ensureSchedules`), attempt wording cũ
+  đến muộn, bổ sung test (lịch của thuật toán khác không "đến hạn", xóa deck/card xóa lịch), tiền điều kiện cho tham số, bỏ trường
+  `lastAttemptId` không có consumer, NOTICE giấy phép.
+- **Điều kiện cho L05**: gọi `ensureSchedules(ownerKey:)` một lần trước khi đọc lịch; chỉ dùng `dueSchedules` (không dùng `schedules` để
+  suy ra "đến hạn" vì nó có cả lịch cũ/khác thuật toán); `dueSchedules` có thể trả hai dòng cho một card (recognition và selfRecall) nên
+  gộp theo card khi hiển thị một lần; "đến hạn hôm nay" theo ngày lịch cục bộ là việc của L05; hiển thị `THIRD_PARTY_NOTICES` (màn
+  cảm ơn/giấy phép) là điều kiện trước phát hành.
+- Chưa kiểm chứng: không có test ép lỗi giữa chừng một transaction (lịch và attempt cùng một `realm.write` nên nguyên tử theo cấu trúc,
+  nhưng nếu ai tách thành hai transaction thì test hiện tại vẫn qua); test múi giờ/DST chỉ khẳng định lịch là thời điểm tuyệt đối vì bộ lập
+  lịch không dùng `Calendar`; tham số FSRS mặc định chưa hiệu chỉnh theo người học của app; ý nghĩa rating là giả thuyết sản phẩm.
 
 ### L05 — Today từ dữ liệu thật (PLANNED; sau L04)
 

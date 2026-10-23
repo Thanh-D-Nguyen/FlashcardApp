@@ -30,6 +30,7 @@
 		6A11C0DE00000000000000B1 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A11C0DE00000000000000B2 /* AppLanguage.swift */; };
 		6A11C0DE00000000000000C1 /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A11C0DE00000000000000C2 /* LocalizationTests.swift */; };
 		6EDD0178164CD68BD8877687 /* StudySession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89F935A6E3E901638562AA0 /* StudySession.swift */; };
+		85B7539491694C6E8B4A2942 /* ReviewScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */; };
 		72796A297CC9F326ADC45E12 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C8CD127C27AAC201C95FD0 /* UserPreferences.swift */; };
 		750F55677D549B5D3E081418 /* CreateDeskPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185A12009D8D62C378721912 /* CreateDeskPresenterTests.swift */; };
 		789B15698F5DEC0768B4A6E7 /* EditorAccessoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2E2B52C17DF108E4ABC695 /* EditorAccessoryView.swift */; };
@@ -191,6 +192,8 @@
 		915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */; };
 		2417B315D2617D05A733D9AB /* ExampleEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E8CB3E7162557579B81AF /* ExampleEditorViewController.swift */; };
 		823788C02A6614E5980E5F07 /* CardExampleStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */; };
+		939CF13955A24E35BD258755 /* FSRSReferenceVectors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDE228DA5994703B5588750 /* FSRSReferenceVectors.swift */; };
+		CEB05FC53BE04032B5E3003F /* ReviewSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBED6F7111DF4107913F896B /* ReviewSchedulerTests.swift */; };
 		D6F91920EAB6485D88168056 /* ReviewHistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */; };
 		ADB7BB2AC1DC8D5E5E70AC79 /* ExampleEditorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */; };
 /* End PBXBuildFile section */
@@ -358,6 +361,7 @@
 		EB64F2E26CCBB8CC53AF84E4 /* CardMediaMaintenance.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardMediaMaintenance.swift; sourceTree = "<group>"; };
 		F7B083C077D5C5F2A240A228 /* DebugFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugFixtures.swift; sourceTree = "<group>"; };
 		F89F935A6E3E901638562AA0 /* StudySession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudySession.swift; sourceTree = "<group>"; };
+		4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReviewScheduler.swift; sourceTree = "<group>"; };
 		CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneration.swift; sourceTree = "<group>"; };
 		857BB1AD3118E84563C080CA /* PictureSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSuggestion.swift; sourceTree = "<group>"; };
 		942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerAPI.swift; sourceTree = "<group>"; };
@@ -399,6 +403,8 @@
 		7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorWireframe.swift; sourceTree = "<group>"; };
 		0F0E8CB3E7162557579B81AF /* ExampleEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorViewController.swift; sourceTree = "<group>"; };
 		F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleStoreTests.swift; sourceTree = "<group>"; };
+		7DDE228DA5994703B5588750 /* FSRSReferenceVectors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSRSReferenceVectors.swift; sourceTree = "<group>"; };
+		CBED6F7111DF4107913F896B /* ReviewSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSchedulerTests.swift; sourceTree = "<group>"; };
 		E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewHistoryStoreTests.swift; sourceTree = "<group>"; };
 		BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -581,6 +587,8 @@
 				450A8E8864106604935B3A8E /* CardStyleTests.swift */,
 				5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */,
 				F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */,
+				7DDE228DA5994703B5588750 /* FSRSReferenceVectors.swift */,
+				CBED6F7111DF4107913F896B /* ReviewSchedulerTests.swift */,
 				E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */,
 				BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */,
 			);
@@ -603,6 +611,7 @@
 				929C4DD929A7646F007651E9 /* DeskEntity.swift */,
 				995295DA00DA8922BE3BAAF5 /* DeckDraft.swift */,
 				F89F935A6E3E901638562AA0 /* StudySession.swift */,
+				4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */,
 				CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */,
 				857BB1AD3118E84563C080CA /* PictureSuggestion.swift */,
 				63DD4CFA591F395DBEB705FE /* CardExample.swift */,
@@ -1279,6 +1288,7 @@
 				1BE087530645B7FBA386BAC7 /* HomeCells.swift in Sources */,
 				7C8BA3A123EDA53AD7089B9F /* DeckDraft.swift in Sources */,
 				6EDD0178164CD68BD8877687 /* StudySession.swift in Sources */,
+				85B7539491694C6E8B4A2942 /* ReviewScheduler.swift in Sources */,
 				1921C438F07F7800FFD8DE5E /* CardImageStore.swift in Sources */,
 				06B2F221D43E11ABE16D5086 /* BulkDeckImport.swift in Sources */,
 				C17492DFDE713C9FE3C0751C /* RemoteImageLoader.swift in Sources */,
@@ -1368,6 +1378,8 @@
 				2BFAD412221A9565ED572372 /* CardStyleTests.swift in Sources */,
 				C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */,
 				823788C02A6614E5980E5F07 /* CardExampleStoreTests.swift in Sources */,
+				939CF13955A24E35BD258755 /* FSRSReferenceVectors.swift in Sources */,
+				CEB05FC53BE04032B5E3003F /* ReviewSchedulerTests.swift in Sources */,
 				D6F91920EAB6485D88168056 /* ReviewHistoryStoreTests.swift in Sources */,
 				ADB7BB2AC1DC8D5E5E70AC79 /* ExampleEditorTests.swift in Sources */,
 			);

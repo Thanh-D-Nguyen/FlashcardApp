@@ -17,12 +17,31 @@ final class RReviewAttempt: Object {
     @Persisted(indexed: true) var answeredAt: Date
 }
 
+/// When one card is next due for one kind of answer (`skill`), for one learner: the FSRS memory model of the saved attempts.
+/// It is derived data (the attempts are the truth) and is updated in the same transaction as each attempt, once per attempt.
+/// `recordId` is `ownerKey|cardId|skill`.
+final class RReviewState: Object {
+    @Persisted(primaryKey: true) var recordId: String
+    @Persisted(indexed: true) var ownerKey: String
+    @Persisted(indexed: true) var cardId: String
+    @Persisted var skill: String
+    @Persisted var contentVersion: String
+    @Persisted var algorithm: String
+    @Persisted var stability: Double
+    @Persisted var difficulty: Double
+    @Persisted(indexed: true) var due: Date
+    @Persisted var lastReview: Date
+    @Persisted var reviews: Int
+    @Persisted var lapses: Int
+}
+
 extension Realm {
-    /// Removes the review history of cards that no longer exist, for every account. Call it inside the write transaction
-    /// that deletes the cards, so a deleted card never leaves attempts behind. Editing a card does not call this: its
-    /// attempts stay, tagged with the wording they were answered against.
-    func deleteReviewAttempts(forCards cardIds: [String]) {
+    /// Removes the review history and schedules of cards that no longer exist, for every account. Call it inside the write
+    /// transaction that deletes the cards, so a deleted card never leaves a review item behind. Editing a card does not call
+    /// this: its attempts stay, tagged with the wording they were answered against.
+    func deleteReviewHistory(forCards cardIds: [String]) {
         guard !cardIds.isEmpty else { return }
         delete(objects(RReviewAttempt.self).filter("cardId IN %@", cardIds))
+        delete(objects(RReviewState.self).filter("cardId IN %@", cardIds))
     }
 }

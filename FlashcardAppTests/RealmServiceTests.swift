@@ -17,7 +17,7 @@ final class RealmServiceTests: XCTestCase {
     override func tearDownWithError() throws { try FileManager.default.removeItem(at: folder) }
 
     func test_theLocalSchemaHoldsTheLearnersOwnData() {
-        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard", "RCardExample", "RReviewAttempt"])
+        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard", "RCardExample", "RReviewAttempt", "RReviewState"])
     }
 
     func test_aFreshInstallOpensAnEmptyStoreWithoutAnyBundledFile() throws {
@@ -43,7 +43,7 @@ final class RealmServiceTests: XCTestCase {
         XCTAssertEqual(deckName, "My deck")
         XCTAssertEqual(frontTexts, ["犬"], "The learner's cards survive the upgrade")
         XCTAssertEqual(cardBack, "con chó")
-        XCTAssertEqual(tables, ["RDesk", "RCard", "RCardExample", "RReviewAttempt"])
+        XCTAssertEqual(tables, ["RDesk", "RCard", "RCardExample", "RReviewAttempt", "RReviewState"])
         XCTAssertEqual(version, RealmService.schemaVersion)
         XCTAssertEqual(try retiredRowCount(), 0, "The dictionary rows were emptied")
     }
@@ -121,6 +121,48 @@ final class RealmServiceTests: XCTestCase {
             XCTAssertEqual(RealmReviewHistoryStore().attempts(ownerKey: "u1", cardId: "card-1"), [attempt])
             XCTAssertEqual(RealmService.shared.realm.objects(RDesk.self).count, 2)
             XCTAssertEqual(RealmService.shared.realm.objects(RCardExample.self).count, 3)
+        }
+    }
+
+    func test_upgradingFromSchemaFourKeepsEverythingAndSchedulesCanBeBuiltFromTheSavedAttempts() throws {
+        // A real schema-4 file: the schema-3 store upgraded by schema-4 code, with one saved attempt in it.
+        let dates = try makeVersionThreeStore()
+        try autoreleasepool {
+            var configuration = Realm.Configuration(fileURL: fileURL, schemaVersion: 4)
+            configuration.objectTypes = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self]
+            let realm = try Realm(configuration: configuration)
+            try realm.write {
+                let record = RReviewAttempt()
+                record.recordId = "u1|run/0"
+                record.attemptId = "run/0"
+                record.ownerKey = "u1"
+                record.cardId = "card-1"
+                record.contentVersion = "v1"
+                record.result = "correct"
+                record.hints.append("reading")
+                record.answeredAt = dates.exampleDate
+                realm.add(record)
+            }
+        }
+
+        try autoreleasepool {
+            RealmService.shared.realm = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+            defer { RealmService.shared.realm = nil }
+            let realm = try XCTUnwrap(RealmService.shared.realm)
+            XCTAssertEqual(realm.configuration.schemaVersion, RealmService.schemaVersion)
+            XCTAssertEqual(realm.object(ofType: RDesk.self, forPrimaryKey: "deck-a")?.cards.map(\.id), ["card-3", "card-1", "card-2"])
+            XCTAssertEqual(realm.objects(RDesk.self).count, 2)
+            XCTAssertEqual(realm.objects(RCardExample.self).count, 3)
+            XCTAssertEqual(realm.objects(RReviewAttempt.self).count, 1, "The saved attempt survives")
+            XCTAssertEqual(realm.objects(RReviewState.self).count, 0, "The new table starts empty")
+
+            let store = RealmReviewHistoryStore()
+            try store.rebuildSchedules(ownerKey: "u1")
+            let schedule = try XCTUnwrap(store.schedules(ownerKey: "u1").first)
+            XCTAssertEqual([schedule.cardID, schedule.skill.rawValue], ["card-1", "recognition"])
+            XCTAssertEqual(schedule.state.reviews, 1)
+            XCTAssertEqual(schedule.state.contentVersion, "v1")
+            XCTAssertEqual(store.attempts(ownerKey: "u1", cardId: nil).count, 1, "Rebuilding never touches the attempts")
         }
     }
 

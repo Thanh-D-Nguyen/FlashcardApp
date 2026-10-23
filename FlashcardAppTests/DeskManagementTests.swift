@@ -84,6 +84,7 @@ final class DeskManagementTests: XCTestCase {
         try repository.delete(try XCTUnwrap(repository.getAll().first { $0.id == "gone" }))
 
         XCTAssertEqual(realm.objects(RReviewAttempt.self).map(\.cardId), ["k1"], "No review history is left for a deleted card")
+        XCTAssertEqual(Set(realm.objects(RReviewState.self).map(\.cardId)), ["k1"], "Nor a schedule")
     }
 
     func test_droppingACardFromADeckDeletesItsReviewHistory() throws {
@@ -95,6 +96,7 @@ final class DeskManagementTests: XCTestCase {
         try repository.update(edited)
 
         XCTAssertEqual(realm.objects(RReviewAttempt.self).map(\.cardId), ["a"])
+        XCTAssertEqual(realm.objects(RReviewState.self).map(\.cardId), ["a"])
     }
 
     func test_editingACardKeepsItsReviewHistoryWithTheWordingItWasAnsweredAgainst() throws {
@@ -107,6 +109,7 @@ final class DeskManagementTests: XCTestCase {
         let kept = try XCTUnwrap(realm.objects(RReviewAttempt.self).first)
         XCTAssertEqual(kept.cardId, "a")
         XCTAssertEqual(kept.contentVersion, "old-wording")
+        XCTAssertEqual(realm.objects(RReviewState.self).first?.cardId, "a", "The schedule stays too, until the next answer replaces it")
     }
 
     func test_deleteOfAnUnknownDeckThrowsInsteadOfCrashing() {
