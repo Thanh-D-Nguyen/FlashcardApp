@@ -195,7 +195,7 @@ Commit: `feat(study): save completed attempts during sessions`.
 - NOT VERIFIED: Dynamic Type cỡ accessibility, VoiceOver thực tế, Reduce Motion, haptic và âm thanh trên máy thật (chỉ nối dây, đúng
   một lần/sự kiện theo thiết kế), chạy UI test song song nhiều thiết bị, giao diện tiếng Anh sau thay đổi cuối (đã xem trước đó).
 
-### L04 — Lịch ôn có thể kiểm chứng (VERIFIED — chờ commit hash bên dưới)
+### L04 — Lịch ôn có thể kiểm chứng (DONE — commit `c78053a`)
 
 Phạm vi: logic lịch ôn thuần Foundation, store ở L02 và focused XCTest.
 
