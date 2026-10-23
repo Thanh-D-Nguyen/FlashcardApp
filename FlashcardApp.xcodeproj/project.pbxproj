@@ -183,11 +183,14 @@
 		2BFAD412221A9565ED572372 /* CardStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450A8E8864106604935B3A8E /* CardStyleTests.swift */; };
 		C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */; };
 		5709B51817C9AE729BCC6AF1 /* RCardExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E69356F010E94232AF06D15 /* RCardExample.swift */; };
+		D6885E40CF6A4FAA95F75984 /* RReviewAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */; };
 		3690461B9DC786EBC8303544 /* CardExampleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9369AB68FA2E9EA64090346F /* CardExampleStore.swift */; };
+		42FA2265229B4B8AAB251BD8 /* ReviewHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */; };
 		E91121EA250C574B968C58AA /* ExampleEditorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85AC2F81A5410D56B87F087 /* ExampleEditorPresenter.swift */; };
 		915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */; };
 		2417B315D2617D05A733D9AB /* ExampleEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E8CB3E7162557579B81AF /* ExampleEditorViewController.swift */; };
 		823788C02A6614E5980E5F07 /* CardExampleStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */; };
+		D6F91920EAB6485D88168056 /* ReviewHistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */; };
 		ADB7BB2AC1DC8D5E5E70AC79 /* ExampleEditorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -387,11 +390,14 @@
 		450A8E8864106604935B3A8E /* CardStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStyleTests.swift; sourceTree = "<group>"; };
 		5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerTests.swift; sourceTree = "<group>"; };
 		7E69356F010E94232AF06D15 /* RCardExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCardExample.swift; sourceTree = "<group>"; };
+		8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RReviewAttempt.swift; sourceTree = "<group>"; };
 		9369AB68FA2E9EA64090346F /* CardExampleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleStore.swift; sourceTree = "<group>"; };
+		BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewHistoryStore.swift; sourceTree = "<group>"; };
 		D85AC2F81A5410D56B87F087 /* ExampleEditorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorPresenter.swift; sourceTree = "<group>"; };
 		7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorWireframe.swift; sourceTree = "<group>"; };
 		0F0E8CB3E7162557579B81AF /* ExampleEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorViewController.swift; sourceTree = "<group>"; };
 		F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleStoreTests.swift; sourceTree = "<group>"; };
+		E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewHistoryStoreTests.swift; sourceTree = "<group>"; };
 		BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -572,6 +578,7 @@
 				450A8E8864106604935B3A8E /* CardStyleTests.swift */,
 				5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */,
 				F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */,
+				E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */,
 				BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */,
 			);
 			path = FlashcardAppTests;
@@ -626,6 +633,7 @@
 				7426DA0EF7DC2D9204B3CBA4 /* PictureSearchInteractor.swift */,
 				339BC40A8E2576CED50E4843 /* CardExamplesInteractor.swift */,
 				9369AB68FA2E9EA64090346F /* CardExampleStore.swift */,
+				BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */,
 			);
 			path = Interactors;
 			sourceTree = "<group>";
@@ -869,6 +877,7 @@
 				9209760E29A7887800ECF29C /* RCard.swift */,
 				A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */,
 				7E69356F010E94232AF06D15 /* RCardExample.swift */,
+				8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1314,7 +1323,9 @@
 				E6707E4DBD2AF9B620CBA8B5 /* CardStylePickerViewController.swift in Sources */,
 				1DECF8947A3E2234E8E495A5 /* StudyExamplesView.swift in Sources */,
 				5709B51817C9AE729BCC6AF1 /* RCardExample.swift in Sources */,
+				D6885E40CF6A4FAA95F75984 /* RReviewAttempt.swift in Sources */,
 				3690461B9DC786EBC8303544 /* CardExampleStore.swift in Sources */,
+				42FA2265229B4B8AAB251BD8 /* ReviewHistoryStore.swift in Sources */,
 				E91121EA250C574B968C58AA /* ExampleEditorPresenter.swift in Sources */,
 				915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */,
 				2417B315D2617D05A733D9AB /* ExampleEditorViewController.swift in Sources */,
@@ -1353,6 +1364,7 @@
 				2BFAD412221A9565ED572372 /* CardStyleTests.swift in Sources */,
 				C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */,
 				823788C02A6614E5980E5F07 /* CardExampleStoreTests.swift in Sources */,
+				D6F91920EAB6485D88168056 /* ReviewHistoryStoreTests.swift in Sources */,
 				ADB7BB2AC1DC8D5E5E70AC79 /* ExampleEditorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

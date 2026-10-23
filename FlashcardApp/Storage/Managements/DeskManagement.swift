@@ -71,6 +71,7 @@ class DeskManagement: DeskRepositoryInterface {
             managed.cards.append(objectsIn: cards)
             let dropped = previous.filter { !$0.isInvalidated && $0.assignee.isEmpty }
             realm.deleteExamples(forCards: dropped.map(\.id))
+            realm.deleteReviewAttempts(forCards: dropped.map(\.id))
             realm.delete(dropped)
         }
     }
@@ -84,6 +85,7 @@ class DeskManagement: DeskRepositoryInterface {
             realm.delete(managed)
             let dropped = cards.filter { !$0.isInvalidated && $0.assignee.isEmpty }
             realm.deleteExamples(forCards: dropped.map(\.id))
+            realm.deleteReviewAttempts(forCards: dropped.map(\.id))
             realm.delete(dropped)
         }
     }

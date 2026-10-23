@@ -99,7 +99,7 @@ Commit dự kiến: `feat(study): model completed review attempts`.
 - Rủi ro còn lại: chưa có consumer thật cho `ReviewAttempt` đến L02/L03; semantics Skip
   có thể cần đổi khi L03/L04 xác định summary và scheduler.
 
-### L02 — Lưu lịch sử an toàn (PLANNED; sau L01)
+### L02 — Lưu lịch sử an toàn (VERIFIED — chờ commit hash bên dưới)
 
 Phạm vi: `Services/RealmService.swift`, `Storage/Models/`, interactor/store học
 phù hợp với pattern hiện có; `RealmServiceTests` và integration tests của store.
@@ -116,6 +116,34 @@ Tiêu chí:
 Tăng schema từ version thực tế lúc triển khai, thêm model vào `storedTypes`.
 Không sửa migration cũ để xóa store. Commit: `feat(study): persist learner review history`.
 
+**Kết quả triển khai (2026-10-23)**
+- Quyết định: `RReviewAttempt` (khóa `ownerKey|attemptId`, `cardId`, `contentVersion`, `result` thô, `hints` đã sắp xếp,
+  `answeredAt`); `skill` không lưu vì suy ra từ `result` (mapping được ghim bằng test). `RealmReviewHistoryStore`
+  (`Interactors/`, theo mẫu `CardExampleStore`): `save` tra-cứu-rồi-ghi trong **cùng một write transaction**, trả
+  `true` khi ghi mới, `false` khi retry cùng attempt (so thời gian với dung sai 1 ms vì Realm làm tròn `Date`),
+  ném `.conflictingAttempt` khi cùng id nhưng khác nội dung và giữ bản đã lưu, `.invalidAttempt` khi thiếu id/card/version.
+  `attempts(ownerKey:cardId:)` trả value type theo thứ tự trả lời, bỏ qua `result` lạ (không đoán). Schema 3 → 4
+  (thêm bảng, không cần migration). `DeskManagement.update/delete` xóa lượt học của card bị bỏ/xóa trong cùng transaction;
+  sửa nội dung card **giữ** lịch sử (gắn `contentVersion` cũ). `ownerKey` giống `CardExampleStore`: UUID tài khoản hoặc
+  `""` cho guest; guest không bị gộp vào tài khoản và vẫn còn khi đăng nhập.
+- RED: store stub → 16/32 fail theo assertion; schema 3 không crash khi thêm bảng (Realm tự thêm bảng), nên RED nâng cấp
+  là khẳng định version chưa tăng. GREEN sau khi cài đặt và tăng schema.
+- Test: `ReviewHistoryStoreTests` 12, `RealmServiceTests` (fixture **database schema 3 thật** gồm 2 deck, thứ tự card,
+  mọi trường card, ba loại `RCardExample`; cộng đường nâng từ schema 1 và 2), `DeskManagementTests` +3, `StudySessionTests` 37:
+  69/69 PASS; toàn bộ `FlashcardAppTests` 482 PASS / 0 fail / 5 skip (Keychain, build không ký). Coverage
+  `ReviewHistoryStore.swift` 100% (50/50), `RReviewAttempt.swift` 100% (4/4) trước hardening (logic không đổi nhánh).
+- Runtime: build/launch trên iPhone 17 với container có sẵn 2 deck (30 + 20 card): app mở store schema 4, hai deck còn nguyên
+  (tab Cards). Không kiểm UI journey vì chưa có UI dùng store này.
+- Review độc lập (`flashcard-reviewer`): không blocker. Đã xử lý: lookup chuyển vào trong transaction; ghi chú tính duy nhất
+  của khóa; ghim mapping result→skill. Ghi nhận, chưa làm (thuộc L03): (1) xác nhận xóa deck/card phải nói rõ lịch sử
+  học của card cũng bị xóa (chưa ai theo dõi — **thêm vào tiêu chí L03**); (2) `save` không kiểm card còn tồn tại, nên L03
+  phải từ chối lưu khi deck đã bị xóa giữa phiên; (3) store chỉ dùng trên main thread, L03 phải giữ ràng buộc này.
+- Chưa có test ép transaction lỗi: `save` là một `realm.write` duy nhất nên nguyên tử theo cấu trúc; chỉ kiểm gián tiếp
+  rằng id/nội dung không hợp lệ hoặc xung đột để lại đúng số dòng. Rollback: build cũ không mở được store schema 4;
+  khắc phục bằng bản sửa tiến về trước, không xóa/hạ cấp store.
+- Rủi ro còn lại: chưa có consumer thật (L03); `contentVersion` và mapping result→skill là hợp đồng bền, đổi cách tính
+  phải có migration.
+
 ### L03 — Nối phiên học với persistence (PLANNED; sau L02)
 
 Phạm vi: `Modules/CardStudy/`, `Interactors/CardStudyInteractor.swift`,
@@ -128,6 +156,10 @@ Tiêu chí:
 - Đổi tài khoản giữa lúc lưu không gán kết quả sang chủ thể mới.
 - Nếu thêm tự đánh giá flip, giải thích rõ và bản địa hóa vi/en/ja; không tự đánh
   giá thay người học. Giữ menu, câu ví dụ, chỉnh sửa deck và navigation hiện có.
+- Xác nhận xóa deck/card nói rõ lịch sử học của các card đó cũng bị xóa (vi/en/ja); không lưu lượt khi deck đã bị xóa
+  giữa phiên; lưu qua `RealmReviewHistoryStore` chỉ trên main thread.
+- Thiết kế UI theo hướng đã chọn ở U00 (`personalized-learning-ux.md` §14) sau khi được duyệt thị giác; gọi
+  `noteHint(.reading)` khi cách đọc đang hiện trước khi trả lời.
 
 Commit: `feat(study): save completed attempts during sessions`.
 

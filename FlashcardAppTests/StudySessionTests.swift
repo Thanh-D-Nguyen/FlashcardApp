@@ -317,6 +317,14 @@ final class StudySessionTests: XCTestCase {
         XCTAssertEqual(session.correctCount, session.attempts.filter { $0.result == .correct }.count)
     }
 
+    func test_resultsKeepTheSkillTheyAreEvidenceFor() {
+        // Persisted results are reinterpreted through this mapping, so it is pinned.
+        XCTAssertEqual([ReviewResult.correct, .incorrect].map(\.skill), [.recognition, .recognition])
+        XCTAssertEqual([ReviewResult.remembered, .needsReview].map(\.skill), [.selfRecall, .selfRecall])
+        XCTAssertEqual([ReviewResult.correct, .incorrect, .remembered, .needsReview].map(\.rawValue),
+                       ["correct", "incorrect", "remembered", "needsReview"])
+    }
+
     // MARK: Content version
 
     func test_contentVersionIsAStableSha256OfFrontReadingAndBack() {

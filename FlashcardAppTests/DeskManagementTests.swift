@@ -69,6 +69,46 @@ final class DeskManagementTests: XCTestCase {
         XCTAssertEqual(realm.objects(RCard.self).map(\.id), ["k1"], "Cards of a deleted deck must not stay behind")
     }
 
+    private func saveAttempt(_ id: String, card: String, owner: String = "", version: String = "v1") throws {
+        try RealmReviewHistoryStore().save(ReviewAttempt(id: id, cardID: card, result: .correct, hints: [], contentVersion: version,
+                                                         answeredAt: Date(timeIntervalSince1970: 1_700_000_000)), ownerKey: owner)
+    }
+
+    func test_deletingADeckDeletesTheReviewHistoryOfItsCardsForEveryLearnerButNotOfOtherDecks() throws {
+        try repository.add(makeDesk(id: "keep", cards: [makeCard("k1", front: "a", back: "b")]))
+        try repository.add(makeDesk(id: "gone", cards: [makeCard("g1", front: "c", back: "d")]))
+        try saveAttempt("r/0", card: "g1", owner: "")
+        try saveAttempt("r/1", card: "g1", owner: "account")
+        try saveAttempt("r/2", card: "k1", owner: "account")
+
+        try repository.delete(try XCTUnwrap(repository.getAll().first { $0.id == "gone" }))
+
+        XCTAssertEqual(realm.objects(RReviewAttempt.self).map(\.cardId), ["k1"], "No review history is left for a deleted card")
+    }
+
+    func test_droppingACardFromADeckDeletesItsReviewHistory() throws {
+        try repository.add(makeDesk(cards: [makeCard("a", front: "1", back: "1"), makeCard("b", front: "2", back: "2")]))
+        try saveAttempt("r/0", card: "a")
+        try saveAttempt("r/1", card: "b")
+        let edited = try XCTUnwrap(repository.getAll().first)
+        edited.cards = edited.cards.filter { $0.id != "b" }
+        try repository.update(edited)
+
+        XCTAssertEqual(realm.objects(RReviewAttempt.self).map(\.cardId), ["a"])
+    }
+
+    func test_editingACardKeepsItsReviewHistoryWithTheWordingItWasAnsweredAgainst() throws {
+        try repository.add(makeDesk(cards: [makeCard("a", front: "犬", back: "chó")]))
+        try saveAttempt("r/0", card: "a", version: "old-wording")
+        let edited = try XCTUnwrap(repository.getAll().first)
+        edited.cards[0].backText = "con chó"
+        try repository.update(edited)
+
+        let kept = try XCTUnwrap(realm.objects(RReviewAttempt.self).first)
+        XCTAssertEqual(kept.cardId, "a")
+        XCTAssertEqual(kept.contentVersion, "old-wording")
+    }
+
     func test_deleteOfAnUnknownDeckThrowsInsteadOfCrashing() {
         XCTAssertThrowsError(try repository.delete(makeDesk(id: "missing", cards: [])))
     }

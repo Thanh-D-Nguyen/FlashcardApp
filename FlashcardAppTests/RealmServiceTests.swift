@@ -17,7 +17,7 @@ final class RealmServiceTests: XCTestCase {
     override func tearDownWithError() throws { try FileManager.default.removeItem(at: folder) }
 
     func test_theLocalSchemaHoldsTheLearnersOwnData() {
-        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard", "RCardExample"])
+        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard", "RCardExample", "RReviewAttempt"])
     }
 
     func test_aFreshInstallOpensAnEmptyStoreWithoutAnyBundledFile() throws {
@@ -43,7 +43,7 @@ final class RealmServiceTests: XCTestCase {
         XCTAssertEqual(deckName, "My deck")
         XCTAssertEqual(frontTexts, ["犬"], "The learner's cards survive the upgrade")
         XCTAssertEqual(cardBack, "con chó")
-        XCTAssertEqual(tables, ["RDesk", "RCard", "RCardExample"])
+        XCTAssertEqual(tables, ["RDesk", "RCard", "RCardExample", "RReviewAttempt"])
         XCTAssertEqual(version, RealmService.schemaVersion)
         XCTAssertEqual(try retiredRowCount(), 0, "The dictionary rows were emptied")
     }
@@ -74,6 +74,63 @@ final class RealmServiceTests: XCTestCase {
             realm.add(example)
         }
         XCTAssertEqual(realm.objects(RCardExample.self).count, 1, "The new table is writable")
+    }
+
+    func test_upgradingFromSchemaThreeKeepsEveryLearnerRecordAndAddsAnEmptyWritableReviewTable() throws {
+        let sentExamples = try makeVersionThreeStore()
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+            XCTAssertEqual(realm.configuration.schemaVersion, RealmService.schemaVersion)
+            XCTAssertGreaterThan(RealmService.schemaVersion, 3)
+
+            let desks = realm.objects(RDesk.self).sorted(byKeyPath: "id")
+            XCTAssertEqual(desks.map(\.id), ["deck-a", "deck-b"])
+            let deckA = try XCTUnwrap(realm.object(ofType: RDesk.self, forPrimaryKey: "deck-a"))
+            XCTAssertEqual(deckA.name, "JLPT N5 · Everyday")
+            XCTAssertEqual(deckA.desc, "Basics")
+            XCTAssertEqual(deckA.sortingLanguage, 1)
+            XCTAssertEqual(deckA.imageNamed, "deck-a.jpg")
+            XCTAssertEqual(deckA.date, sentExamples.deckDate)
+            XCTAssertEqual(deckA.cards.map(\.id), ["card-3", "card-1", "card-2"], "The order of the cards is kept")
+            let cardOne = try XCTUnwrap(realm.object(ofType: RCard.self, forPrimaryKey: "card-1"))
+            XCTAssertEqual([cardOne.frontText, cardOne.frontExtraText, cardOne.backText, cardOne.backExtraText, cardOne.imageUrl, cardOne.videoUrl],
+                           ["犬", "いぬ", "con chó", "animal", "local-image:dog.jpg", "clip.mp4"])
+            XCTAssertEqual(cardOne.assignee.first?.id, "deck-a", "The card still belongs to its deck")
+            XCTAssertEqual(realm.object(ofType: RDesk.self, forPrimaryKey: "deck-b")?.cards.map(\.id), ["card-4"])
+
+            let examples = realm.objects(RCardExample.self).sorted(byKeyPath: "id")
+            XCTAssertEqual(examples.map(\.id), ["u1|card-1|s1", "u1|card-1|s2", "custom-1"].sorted())
+            let edited = try XCTUnwrap(realm.object(ofType: RCardExample.self, forPrimaryKey: "u1|card-1|s1"))
+            XCTAssertEqual([edited.kind, edited.ownerKey, edited.cardId, edited.serverExampleId, edited.japanese, edited.reading, edited.translation],
+                           ["edited", "u1", "card-1", "s1", "犬が好き。", "いぬがすき。", "Thích chó."])
+            XCTAssertEqual(edited.createdAt, sentExamples.exampleDate)
+            XCTAssertEqual(realm.object(ofType: RCardExample.self, forPrimaryKey: "u1|card-1|s2")?.kind, "hidden")
+            XCTAssertEqual(realm.object(ofType: RCardExample.self, forPrimaryKey: "custom-1")?.ownerKey, "")
+
+            XCTAssertEqual(realm.objects(RReviewAttempt.self).count, 0, "The new table starts empty")
+        }
+
+        // The new table works against the upgraded file, and the old data is still intact afterwards.
+        try autoreleasepool {
+            RealmService.shared.realm = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+            defer { RealmService.shared.realm = nil }
+            let attempt = ReviewAttempt(id: "run/0", cardID: "card-1", result: .correct, hints: [.reading], contentVersion: "v",
+                                        answeredAt: sentExamples.exampleDate)
+            XCTAssertTrue(try RealmReviewHistoryStore().save(attempt, ownerKey: "u1"))
+            XCTAssertEqual(RealmReviewHistoryStore().attempts(ownerKey: "u1", cardId: "card-1"), [attempt])
+            XCTAssertEqual(RealmService.shared.realm.objects(RDesk.self).count, 2)
+            XCTAssertEqual(RealmService.shared.realm.objects(RCardExample.self).count, 3)
+        }
+    }
+
+    func test_everySupportedOlderSchemaOpensWithTheReviewTableAvailable() throws {
+        try makeVersionOneStore()
+        try autoreleasepool {
+            let realm = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+            XCTAssertEqual(realm.objects(RReviewAttempt.self).count, 0)
+            XCTAssertEqual(realm.objects(RDesk.self).count, 1)
+        }
     }
 
     func test_aMigratedStoreOpensAgainWithoutFurtherMigration() throws {
@@ -126,6 +183,66 @@ final class RealmServiceTests: XCTestCase {
             let realm = try Realm(configuration: configuration)
             return RealmService.retiredDictionaryTables.reduce(0) { $0 + realm.dynamicObjects($1.className()).count }
         }
+    }
+
+    /// A store exactly as schema 3 wrote it: two decks, ordered cards with every field set, and the learner's example
+    /// sentences of all three kinds. Opened with the schema-3 types only, so it is a real old file, not a new one.
+    private func makeVersionThreeStore() throws -> (deckDate: Date, exampleDate: Date) {
+        var configuration = Realm.Configuration(fileURL: fileURL, schemaVersion: 3)
+        configuration.objectTypes = [RDesk.self, RCard.self, RCardExample.self]
+        let deckDate = Date(timeIntervalSince1970: 1_650_000_000)
+        let exampleDate = Date(timeIntervalSince1970: 1_690_000_000)
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration)
+            try realm.write {
+                func card(_ id: String, _ front: String, _ back: String) -> RCard {
+                    let card = RCard()
+                    card.id = id
+                    card.frontText = front
+                    card.backText = back
+                    return card
+                }
+                let one = card("card-1", "犬", "con chó")
+                one.frontExtraText = "いぬ"
+                one.backExtraText = "animal"
+                one.imageUrl = "local-image:dog.jpg"
+                one.videoUrl = "clip.mp4"
+                let deckA = RDesk()
+                deckA.id = "deck-a"
+                deckA.name = "JLPT N5 · Everyday"
+                deckA.desc = "Basics"
+                deckA.sortingLanguage = 1
+                deckA.imageNamed = "deck-a.jpg"
+                deckA.date = deckDate
+                deckA.cards.append(objectsIn: [card("card-3", "猫", "con mèo"), one, card("card-2", "鳥", "con chim")])
+                let deckB = RDesk()
+                deckB.id = "deck-b"
+                deckB.name = "Work"
+                deckB.date = deckDate
+                deckB.cards.append(card("card-4", "会議", "cuộc họp"))
+                realm.add([deckA, deckB])
+
+                func example(_ id: String, owner: String, kind: RCardExample.Kind, server: String, japanese: String = "") -> RCardExample {
+                    let example = RCardExample()
+                    example.id = id
+                    example.cardId = "card-1"
+                    example.ownerKey = owner
+                    example.kind = kind.rawValue
+                    example.serverExampleId = server
+                    example.japanese = japanese
+                    example.createdAt = exampleDate
+                    example.updatedAt = exampleDate
+                    return example
+                }
+                let edited = example("u1|card-1|s1", owner: "u1", kind: .edited, server: "s1", japanese: "犬が好き。")
+                edited.reading = "いぬがすき。"
+                edited.translation = "Thích chó."
+                realm.add([edited,
+                           example("u1|card-1|s2", owner: "u1", kind: .hidden, server: "s2"),
+                           example("custom-1", owner: "", kind: .custom, server: "", japanese: "犬を飼う。")])
+            }
+        }
+        return (deckDate, exampleDate)
     }
 
     /// A store as the app wrote it before: schema 1 with the decks and the bundled dictionary tables.
