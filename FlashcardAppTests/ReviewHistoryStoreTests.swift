@@ -367,4 +367,15 @@ final class ReviewHistoryStoreTests: XCTestCase {
         XCTAssertTrue(store.schedules(ownerKey: owner).isEmpty)
         XCTAssertEqual(store.schedules(ownerKey: "").count, 1, "And never touches another learner's")
     }
+
+    func test_attemptsAnsweredSinceADateAreThoseAtOrAfterItForThatLearnerOnly() throws {
+        try store.save(attempt("a/0", at: 1_700_000_000), ownerKey: owner)
+        try store.save(attempt("a/1", card: "card-2", at: 1_700_050_000), ownerKey: owner)
+        try store.save(attempt("a/2", card: "card-3", at: 1_700_090_000), ownerKey: owner)
+        try store.save(attempt("b/0", at: 1_700_090_000), ownerKey: other)
+        let since = Date(timeIntervalSince1970: 1_700_050_000)
+        XCTAssertEqual(store.attempts(ownerKey: owner, answeredSince: since).map(\.id), ["a/1", "a/2"], "Oldest first, the boundary included")
+        XCTAssertEqual(store.attempts(ownerKey: other, answeredSince: since).map(\.id), ["b/0"])
+        XCTAssertTrue(store.attempts(ownerKey: owner, answeredSince: since.addingTimeInterval(1_000_000)).isEmpty)
+    }
 }

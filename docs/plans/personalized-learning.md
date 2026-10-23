@@ -269,7 +269,7 @@ Commit: `feat(study): schedule reviews from persisted attempts`.
   nhưng nếu ai tách thành hai transaction thì test hiện tại vẫn qua); test múi giờ/DST chỉ khẳng định lịch là thời điểm tuyệt đối vì bộ lập
   lịch không dùng `Calendar`; tham số FSRS mặc định chưa hiệu chỉnh theo người học của app; ý nghĩa rating là giả thuyết sản phẩm.
 
-### L05 — Today từ dữ liệu thật (PLANNED; sau L04)
+### L05 — Today từ dữ liệu thật (IMPLEMENTING — L05a logic xong, L05b giao diện chưa; sau L04)
 
 Phạm vi: `Modules/Home/`, Home/CardStudy wireframes và interactors,
 localization, HomePresenterTests và hành trình XCUITest.
@@ -286,6 +286,20 @@ Tiêu chí:
 Chọn default giới hạn phiên bằng usability test, không đóng cứng ví dụ 8+5.
 Build/test/chụp UI trên một Simulator theo guardrails.
 Commit: `feat(home): show today's review plan`.
+
+**Quyết định đã chốt cho L05 (2026-10-23; theo hướng Today A đã duyệt ở U00)**
+- Today lập kế hoạch cho **một bộ thẻ đang chọn** (một deck thì là deck đó; nhiều deck mà chưa chọn thì hỏi; lựa chọn lưu theo chủ thể,
+  deck bị xóa thì quay về chọn). Loại bài đang xét theo **chế độ học hiện tại**: flip → `selfRecall`, quiz (và deck tạo được quiz) →
+  `recognition`; "đến hạn" chỉ tính lịch của loại bài đó, nên học xong thì số đếm giảm đúng.
+- Trạng thái: `noDeck`, `chooseDeck`, `practice` (chưa từng trả lời loại bài này: "Luyện bộ thẻ này", không gọi là đến hạn/đã quên),
+  `due`, `returning` (đến hạn và lần ôn gần nhất cách ≥ 7 ngày: phiên nhỏ + hiện cả tồn), `nothingDue`, `doneToday`. Số đến hạn =
+  đếm từ lịch hiện hành của wording hiện tại; "đã lưu hôm nay" = lượt đã lưu trong **ngày lịch cục bộ** của deck đang chọn, quiz đúng/sai
+  tách khỏi tự đánh giá.
+- Phiên: các thẻ đến hạn, cũ nhất trước, tối đa theo ngân sách 3/5/10 phút (mặc định 5). **Giả thuyết chưa đo**: 20 giây/mục (3 → 9,
+  5 → 15, 10 → 30 mục) vì app chưa ghi thời gian phản hồi; phút chỉ để cỡ phiên và hiển thị "ước tính" cạnh số mục thật, cần usability
+  test trước khi coi là mặc định đúng. Phiên không chèn thẻ mới vào lúc có thẻ đến hạn; thẻ chưa học chỉ vào qua "Luyện bộ thẻ này" /
+  "Luyện thêm" (học cả bộ như tab Cards, vẫn lưu kết quả). `CardStudyWireframe(deckId:cardIDs:)` học đúng danh sách thẻ theo thứ tự
+  đã lập (bỏ qua xáo trộn; thẻ đã bị xóa thì bỏ qua; không còn thẻ nào thì rời màn).
 
 ### L06 — Một chủ đề tình huống (PLANNED; sau L05 và kiểm chứng API/nội dung)
 

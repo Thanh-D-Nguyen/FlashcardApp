@@ -38,6 +38,8 @@ protocol ReviewScheduleStoreInterface: AnyObject {
     /// The schedules due at `date`, oldest due first, only for the wording each card has now: a schedule made for an earlier
     /// wording is not due. Cards missing from `currentVersions` (for example deleted ones) are left out.
     func dueSchedules(ownerKey: String, at date: Date, currentVersions: [String: String]) -> [ReviewSchedule]
+    /// The learner's attempts answered at or after `date`, oldest first.
+    func attempts(ownerKey: String, answeredSince date: Date) -> [ReviewAttempt]
     /// Rebuilds this learner's schedules by replaying their saved attempts in the order of their answer times. A replay by time
     /// is not an exact restore when answers were saved out of time order (a clock set back): it follows the times, not the saves.
     func rebuildSchedules(ownerKey: String) throws
@@ -66,6 +68,12 @@ final class RealmReviewHistoryStore: ReviewHistoryStoreInterface, ReviewSchedule
             .sorted(by: [SortDescriptor(keyPath: "due"), SortDescriptor(keyPath: "recordId")])
             .compactMap(Self.schedule(of:))
             .filter { currentVersions[$0.cardID] == $0.state.contentVersion }
+    }
+
+    func attempts(ownerKey: String, answeredSince date: Date) -> [ReviewAttempt] {
+        realm.objects(RReviewAttempt.self).filter("ownerKey == %@ AND answeredAt >= %@", ownerKey, date)
+            .sorted(by: [SortDescriptor(keyPath: "answeredAt"), SortDescriptor(keyPath: "attemptId")])
+            .compactMap(Self.value(of:))
     }
 
     func ensureSchedules(ownerKey: String) throws {

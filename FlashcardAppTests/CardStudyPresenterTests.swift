@@ -123,6 +123,59 @@ final class CardStudyPresenterTests: XCTestCase {
         start()
     }
 
+    // MARK: A session planned on Today (L05)
+
+    private func startPlanned(_ ids: [String]) {
+        presenter = CardStudyPresenter(deckId: "deck", cardIDs: ids, interactor: interactor, wireframe: wireframe, preferences: preferences,
+                                       speech: speech, random: { $0.lowerBound }, examples: examples,
+                                       exampleStore: exampleStore ?? RealmCardExampleStore(), reviewHistory: history, ownerKey: { [unowned self] in owner })
+        presenter.view = view
+        presenter.viewWillAppear()
+    }
+
+    func test_aPlannedSessionStudiesOnlyItsCardsInItsOrderEvenWhenShuffleIsOn() {
+        interactor.deck = makeDeck(5)
+        preferences.isShuffled = true
+        startPlanned(["c4", "c2"])
+        XCTAssertEqual(state.card?.front, "F4")
+        XCTAssertEqual(state.review.total, 2)
+        XCTAssertEqual(state.progressText, String(format: NSLocalizedString("%1$lld of %2$lld", comment: ""), 1, 2))
+        presenter.next()
+        XCTAssertEqual(state.card?.front, "F2")
+        presenter.next()
+        XCTAssertEqual(state.screen, .finished)
+        XCTAssertEqual(state.summary.total, 2)
+    }
+
+    func test_aPlannedSessionSkipsCardsThatNoLongerExistAndLeavesWhenNoneRemain() {
+        interactor.deck = makeDeck(3)
+        startPlanned(["gone", "c3", "also-gone"])
+        XCTAssertEqual(state.review.total, 1)
+        XCTAssertEqual(state.card?.front, "F3")
+
+        interactor.deck = makeDeck(3)
+        let leaves = wireframe.leaveCount
+        startPlanned(["gone", "also-gone"])
+        XCTAssertEqual(wireframe.leaveCount, leaves + 1)
+    }
+
+    func test_startingOverAPlannedSessionKeepsItsCards() {
+        interactor.deck = makeDeck(5)
+        startPlanned(["c5", "c1"])
+        presenter.next(); presenter.next()
+        presenter.restart()
+        XCTAssertEqual(state.review.total, 2)
+        XCTAssertEqual(state.card?.front, "F5")
+    }
+
+    func test_aPlannedCardSavedWhileAnsweredCarriesItsOwnId() throws {
+        interactor.deck = makeDeck(5)
+        preferences.mode = .quiz
+        startPlanned(["c3", "c1"])
+        presenter.select(option: "B3")
+        XCTAssertEqual(history.saves.first?.0.cardID, "c3")
+    }
+
     func test_aQuizAnswerIsSavedForTheLearnerWithTheCardAndWhatWasAsked() throws {
         startQuiz()
         presenter.select(option: "B1")

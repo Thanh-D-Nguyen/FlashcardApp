@@ -135,6 +135,8 @@ protocol CardStudyPresenterInterface: AnyObject {
 
 final class CardStudyPresenter {
     private let deckId: String
+    /// Study only these cards, in this order (a session planned on Today); nil studies the whole deck.
+    private let cardIDs: [String]?
     private let interactor: CardStudyInteractorInterface
     private let wireframe: CardStudyWireframeInterface
     private let preferences: StudyPreferencesInterface
@@ -168,6 +170,7 @@ final class CardStudyPresenter {
     private let lookupRequest = SerialDisposable()
 
     init(deckId: String,
+         cardIDs: [String]? = nil,
          interactor: CardStudyInteractorInterface,
          wireframe: CardStudyWireframeInterface,
          preferences: StudyPreferencesInterface = UserDefaultsStudyPreferences.shared,
@@ -178,6 +181,7 @@ final class CardStudyPresenter {
          reviewHistory: ReviewHistoryStoreInterface = RealmReviewHistoryStore(),
          ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" }) {
         self.deckId = deckId
+        self.cardIDs = cardIDs
         self.interactor = interactor
         self.wireframe = wireframe
         self.preferences = preferences
@@ -198,12 +202,28 @@ final class CardStudyPresenter {
             wireframe.leave()
             return
         }
-        let cards = entity.cards.map(StudyCard.init(entity:))
+        let wholeDeck = entity.cards.map(StudyCard.init(entity:))
+        let cards: [StudyCard]
+        if let cardIDs {
+            // A planned session: its cards in its order. Cards deleted since it was planned are skipped; with none left there is
+            // nothing to study.
+            var byID: [String: StudyCard] = [:]
+            for card in wholeDeck where byID[card.id] == nil { byID[card.id] = card }
+            cards = cardIDs.compactMap { byID[$0] }
+            if cards.isEmpty {
+                speech.stop()
+                wireframe.leave()
+                return
+            }
+        } else {
+            cards = wholeDeck
+        }
         let changed = deck == nil || session.cards != cards
         if !changed, sessionEnded || ownerKey() != sessionOwner { return endSessionForAccountChange() }
         deck = entity
         if changed {
-            session = StudySession(cards: cards, mode: preferences.mode, shuffled: preferences.isShuffled, random: random)
+            // A planned session keeps the order it was planned in (oldest due first).
+            session = StudySession(cards: cards, mode: preferences.mode, shuffled: cardIDs == nil && preferences.isShuffled, random: random)
             startRun()
         }
         publish(.none)
