@@ -541,8 +541,8 @@ có phạm vi file/test và review riêng, không bắt một agent triển khai
 
 ## 14. U00 — bàn giao chọn bố cục (2026-10-23)
 
-**Trạng thái: ĐỀ XUẤT, CHỜ DUYỆT THỊ GIÁC.** Chưa là thiết kế đã duyệt; không bắt đầu code UI
-L03/L05 cho đến khi người sở hữu sản phẩm chọn/sửa hướng dưới đây. L01–L02 không phụ thuộc.
+**Trạng thái: ĐÃ DUYỆT (2026-10-23, người sở hữu sản phẩm duyệt hướng đề xuất: Today A, Study A + câu hỏi của C,
+Results A).** Đây là duyệt bố cục từ mockup, không phải nghiệm thu UI: mọi gate §13 vẫn phải qua build thật.
 
 Bằng chứng (ảnh trong [`docs/ui-redesign/personalized-learning/u00/`](../ui-redesign/personalized-learning/u00/);
 nguồn HTML tĩnh trong `src/`, dùng đúng token `DesignSystem.swift`, số liệu là **fixture**):
