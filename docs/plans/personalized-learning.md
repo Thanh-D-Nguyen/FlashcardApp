@@ -61,7 +61,7 @@ Không hứa số từ đã thuộc, thời gian thành thạo hay doanh thu khi
 
 ## Thứ tự thực hiện và nghiệm thu
 
-### L01 — Kết quả một lượt học (PLANNED)
+### L01 — Kết quả một lượt học (VERIFIED — chờ commit hash bên dưới)
 
 Phạm vi: `Entities/StudySession.swift`, `FlashcardAppTests/StudySessionTests.swift`;
 thêm value type chỉ khi cần cho consumer lưu trữ, đăng ký target đầy đủ.
@@ -74,6 +74,27 @@ Tiêu chí:
 
 Test RED trước khi đổi logic; test clock/random bằng đầu vào cố định.
 Commit dự kiến: `feat(study): model completed review attempts`.
+
+**Kết quả triển khai (2026-10-23)**
+- Quyết định: `ReviewAttempt` (id, cardID, `ReviewResult`, `hints`, `answeredAt`) trong
+  `StudySession.swift`, không đổi `project.pbxproj`. `ReviewResult` gộp
+  correct/incorrect (kỹ năng `recognition`) và remembered/needsReview (`selfRecall`) nên
+  không tạo được tổ hợp vô nghĩa. ID = `<runID>/<vị trí>`: ổn định trong một lượt chạy
+  (retry lưu cùng giá trị không tính đôi); `restart`/`setMode`/`setShuffled` tạo run mới.
+  `rate(_:)` chỉ hợp lệ khi đã lật đáp án ở chế độ flip; `noteHint(_:)` (reading/audio) chỉ tính
+  trước khi lộ đáp án. **Skip/Next không tạo attempt** (không có consumer ở L01); summary
+  L03 chỉ đếm attempt đã lưu. Tự đánh giá không vào `answeredCount/correctCount`.
+- Chưa có trong L01 (để story có consumer): phiên bản/dấu vân tay nội dung card (L02/L04),
+  thời gian suy nghĩ, wiring presenter/UI (L03). `StudyMode`/presenter không đổi hành vi.
+- RED: 12/31 test mới fail do assertion trên stub không hành vi (attempts rỗng, ...).
+- GREEN: `StudySessionTests` 32/32 PASS; hồi quy `CardStudyPresenterTests` +
+  `CardsIntegrationTests` + `LocalizationTests` 57/57 PASS (XcodeBuildMCP, scheme
+  `FlashcardApp-Local`, iPhone 17, `CODE_SIGNING_ALLOWED=NO`, không song song).
+- Coverage `StudySession.swift` 93,3% (152/163 dòng); phần chưa phủ là `StudyCard.init(entity:)`
+  và closure mặc định production, không thuộc L01. Không đo coverage toàn app.
+- Review: tự review kiến trúc/hồi quy (logic thuần, không UI/Realm/API), **không độc lập**.
+- Rủi ro còn lại: chưa có consumer thật cho `ReviewAttempt` đến L02/L03; semantics Skip
+  có thể cần đổi khi L03/L04 xác định summary và scheduler.
 
 ### L02 — Lưu lịch sử an toàn (PLANNED; sau L01)
 

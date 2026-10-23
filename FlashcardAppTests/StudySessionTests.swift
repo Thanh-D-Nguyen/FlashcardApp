@@ -127,6 +127,196 @@ final class StudySessionTests: XCTestCase {
         XCTAssertFalse(session.canGoBack)
     }
 
+    // MARK: Review attempts (L01)
+
+    private let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
+
+    private func session(_ count: Int = 3, mode: StudyMode = .flip, runIDs: [String] = ["run-1", "run-2", "run-3"]) -> StudySession {
+        var ids = runIDs
+        return StudySession(cards: cards(count), mode: mode, random: lowest, now: { self.fixedDate },
+                            makeRunID: { ids.isEmpty ? "run-extra" : ids.removeFirst() })
+    }
+
+    func test_choosingAQuizAnswerTwiceProducesOneAttempt() {
+        var session = session(mode: .quiz)
+        let wrong = session.options.first { $0 != session.current!.back }!
+        session.select(option: wrong)
+        session.select(option: session.current!.back)
+        XCTAssertEqual(session.attempts.count, 1)
+        XCTAssertEqual(session.attempts.first?.result, .incorrect)
+        XCTAssertEqual(session.currentAttempt, session.attempts.first)
+    }
+
+    func test_quizAttemptNamesTheCardSkillAndTime() throws {
+        var session = session(mode: .quiz)
+        let card = try XCTUnwrap(session.current)
+        session.select(option: card.back)
+        let attempt = try XCTUnwrap(session.currentAttempt)
+        XCTAssertEqual(attempt.cardID, card.id)
+        XCTAssertEqual(attempt.result, .correct)
+        XCTAssertEqual(attempt.skill, .recognition)
+        XCTAssertEqual(attempt.answeredAt, fixedDate)
+        XCTAssertTrue(attempt.hints.isEmpty)
+    }
+
+    func test_flippingNavigatingAndGoingBackProduceNoAttempt() {
+        var session = session()
+        session.flip()
+        session.advance()
+        session.goBack()
+        session.flip()
+        session.advance()
+        session.advance()
+        XCTAssertTrue(session.attempts.isEmpty)
+        XCTAssertNil(session.currentAttempt)
+        XCTAssertEqual(session.correctCount, 0)
+        XCTAssertEqual(session.answeredCount, 0)
+    }
+
+    func test_selfRatingNeedsTheAnswerToBeShown() {
+        var session = session()
+        session.rate(.remembered)
+        XCTAssertTrue(session.attempts.isEmpty)
+    }
+
+    func test_selfRatingRecordsASelfAssessmentNotAQuizResult() throws {
+        var session = session()
+        session.flip()
+        session.rate(.needsReview)
+        let attempt = try XCTUnwrap(session.currentAttempt)
+        XCTAssertEqual(attempt.result, .needsReview)
+        XCTAssertEqual(attempt.skill, .selfRecall)
+        XCTAssertEqual(attempt.cardID, "c1")
+        XCTAssertEqual(session.answeredCount, 0, "self-ratings are not graded answers")
+        XCTAssertEqual(session.correctCount, 0)
+    }
+
+    func test_ratingTheSameQuestionTwiceKeepsTheFirstAttemptEvenAfterGoingBack() throws {
+        var session = session()
+        session.flip()
+        session.rate(.remembered)
+        let first = try XCTUnwrap(session.currentAttempt)
+        session.rate(.needsReview)
+        session.advance()
+        session.goBack()
+        session.flip()
+        session.rate(.needsReview)
+        XCTAssertEqual(session.attempts, [first])
+        XCTAssertEqual(session.currentAttempt, first)
+    }
+
+    func test_quizModeIgnoresSelfRating() {
+        var session = session(mode: .quiz)
+        session.rate(.remembered)
+        XCTAssertTrue(session.attempts.isEmpty)
+    }
+
+    func test_attemptsAreKeptInAnsweredOrderWithDistinctIds() {
+        var session = session(mode: .quiz)
+        for _ in 0..<3 {
+            session.select(option: session.current!.back)
+            session.advance()
+        }
+        XCTAssertEqual(session.attempts.map(\.cardID), ["c1", "c2", "c3"])
+        XCTAssertEqual(Set(session.attempts.map(\.id)).count, 3)
+    }
+
+    func test_skippingAQuestionLeavesNoAttemptForIt() {
+        var session = session(mode: .quiz)
+        session.advance()
+        session.select(option: session.current!.back)
+        XCTAssertEqual(session.attempts.map(\.cardID), ["c2"])
+    }
+
+    func test_attemptIdStaysTheSameWhenReadAgain() throws {
+        var session = session(mode: .quiz)
+        session.select(option: session.current!.back)
+        let first = try XCTUnwrap(session.currentAttempt)
+        session.select(option: session.current!.back)
+        XCTAssertEqual(session.currentAttempt?.id, first.id)
+        XCTAssertEqual(session.attempts.map(\.id), [first.id])
+    }
+
+    func test_restartStartsANewRunWithNewAttemptIdsAndNoAttempts() throws {
+        var session = session(mode: .quiz)
+        session.select(option: session.current!.back)
+        let before = try XCTUnwrap(session.currentAttempt)
+        session.restart()
+        XCTAssertTrue(session.attempts.isEmpty)
+        XCTAssertNil(session.currentAttempt)
+        session.select(option: session.current!.back)
+        XCTAssertNotEqual(session.currentAttempt?.id, before.id)
+    }
+
+    func test_changingModeOrShuffleStartsANewRun() throws {
+        var session = session(mode: .quiz)
+        session.select(option: session.current!.back)
+        let first = try XCTUnwrap(session.currentAttempt)
+        session.setShuffled(true)
+        XCTAssertTrue(session.attempts.isEmpty)
+        session.select(option: session.current!.back)
+        let second = try XCTUnwrap(session.currentAttempt)
+        session.setMode(.flip)
+        XCTAssertTrue(session.attempts.isEmpty)
+        session.flip()
+        session.rate(.remembered)
+        let third = try XCTUnwrap(session.currentAttempt)
+        XCTAssertEqual(Set([first.id, second.id, third.id]).count, 3)
+    }
+
+    func test_hintsNotedBeforeAnsweringAreRecordedOnce() throws {
+        var session = session()
+        session.noteHint(.reading)
+        session.noteHint(.reading)
+        session.noteHint(.audio)
+        session.flip()
+        session.rate(.remembered)
+        XCTAssertEqual(session.currentAttempt?.hints, [.reading, .audio])
+    }
+
+    func test_hintsDoNotLeakToTheNextQuestionOrChangeAnAnsweredOne() throws {
+        var session = session(mode: .quiz)
+        session.noteHint(.reading)
+        session.select(option: session.current!.back)
+        session.noteHint(.audio)
+        XCTAssertEqual(session.currentAttempt?.hints, [.reading])
+        session.advance()
+        session.select(option: session.current!.back)
+        XCTAssertEqual(session.attempts.map(\.cardID), ["c1", "c2"])
+        XCTAssertEqual(session.attempts.last?.hints, [])
+    }
+
+    func test_hintsNotedAfterTheAnswerIsShownAreNotHints() {
+        var session = session()
+        session.flip()
+        session.noteHint(.audio)
+        session.rate(.remembered)
+        XCTAssertEqual(session.currentAttempt?.hints, [])
+    }
+
+    func test_finishedOrEmptySessionsAcceptNoAttempts() {
+        var empty = StudySession(cards: [])
+        empty.rate(.remembered)
+        empty.noteHint(.reading)
+        XCTAssertTrue(empty.attempts.isEmpty)
+
+        var finished = session(1, mode: .flip)
+        finished.flip()
+        finished.advance()
+        XCTAssertTrue(finished.isFinished)
+        finished.rate(.remembered)
+        XCTAssertTrue(finished.attempts.isEmpty)
+    }
+
+    func test_existingCountersStayInStepWithQuizAttempts() {
+        var session = session(mode: .quiz)
+        session.select(option: session.options.first { $0 != session.current!.back }!)
+        session.advance()
+        session.select(option: session.current!.back)
+        XCTAssertEqual(session.answeredCount, session.attempts.count)
+        XCTAssertEqual(session.correctCount, session.attempts.filter { $0.result == .correct }.count)
+    }
+
     func test_emptyDeckIsHandled() {
         var session = StudySession(cards: [])
         XCTAssertNil(session.current)

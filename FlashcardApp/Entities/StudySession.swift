@@ -44,11 +44,63 @@ enum StudyMode: String {
 /// Picks an integer in the range; injectable so shuffle and quiz options are testable.
 typealias StudyRandomSource = (Range<Int>) -> Int
 
+/// What a learner did when answering, kept apart because the evidence differs: a correct quiz
+/// answer shows recognition, a flip rated by the learner is a self-assessment. They never
+/// upgrade each other.
+enum ReviewSkill: String, Equatable {
+    case recognition
+    case selfRecall
+}
+
+/// Outcome of one answered question. Only combinations that can really happen exist.
+enum ReviewResult: String, Equatable {
+    case correct
+    case incorrect
+    case remembered
+    case needsReview
+
+    var skill: ReviewSkill {
+        switch self {
+        case .correct, .incorrect: return .recognition
+        case .remembered, .needsReview: return .selfRecall
+        }
+    }
+}
+
+/// Self-rating after the answer of a flipped card is shown.
+enum SelfRating: Equatable {
+    case remembered
+    case needsReview
+}
+
+/// Help that was available to the learner before answering, so the result is not read as an
+/// unaided recall.
+enum ReviewHint: String, Equatable, CaseIterable {
+    case reading
+    case audio
+}
+
+/// One answered question. The `id` is stable for the question in its run: persisting the same
+/// value again (a retry) must never count twice, while a restarted run gets new ids.
+struct ReviewAttempt: Equatable {
+    let id: String
+    let cardID: String
+    let result: ReviewResult
+    let hints: Set<ReviewHint>
+    let answeredAt: Date
+
+    var skill: ReviewSkill { result.skill }
+}
+
 struct StudySession {
     static let maximumQuizOptions = 4
 
     let cards: [StudyCard]
     private let random: StudyRandomSource
+    private let now: () -> Date
+    private let makeRunID: () -> String
+    private var runID = ""
+    private var hintsByPosition: [Int: Set<ReviewHint>] = [:]
 
     private(set) var order: [Int]
     private(set) var position = 0
@@ -62,10 +114,19 @@ struct StudySession {
     private(set) var correctCount = 0
     private(set) var answeredCount = 0
 
+    /// Answered questions of the current run in the order they were answered. Looking at a card,
+    /// flipping it, listening or moving on never adds one; skipped questions have none.
+    private(set) var attempts: [ReviewAttempt] = []
+    var currentAttempt: ReviewAttempt? { attempt(at: position) }
+
     init(cards: [StudyCard], mode: StudyMode = .flip, shuffled: Bool = false,
-         random: @escaping StudyRandomSource = { Int.random(in: $0) }) {
+         random: @escaping StudyRandomSource = { Int.random(in: $0) },
+         now: @escaping () -> Date = Date.init,
+         makeRunID: @escaping () -> String = { UUID().uuidString }) {
         self.cards = cards
         self.random = random
+        self.now = now
+        self.makeRunID = makeRunID
         self.isShuffled = shuffled
         self.order = Array(cards.indices)
         self.mode = (mode == .quiz && Self.canQuiz(cards)) ? .quiz : .flip
@@ -96,6 +157,9 @@ struct StudySession {
         selectedOption = nil
         correctCount = 0
         answeredCount = 0
+        attempts = []
+        hintsByPosition = [:]
+        runID = makeRunID()
         order = Array(cards.indices)
         if isShuffled { shuffleOrder() }
         prepareQuestion()
@@ -141,9 +205,38 @@ struct StudySession {
         selectedOption = option
         answeredCount += 1
         if option == card.back { correctCount += 1 }
+        record(option == card.back ? .correct : .incorrect, for: card)
+    }
+
+    /// Rates the shown answer of a flipped card; once per question.
+    mutating func rate(_ rating: SelfRating) {
+        guard mode == .flip, isFlipped, !isFinished, let card = current, !isAnswered(at: position) else { return }
+        record(rating == .remembered ? .remembered : .needsReview, for: card)
+    }
+
+    /// Notes help that was in view for the current question. Ignored once the answer is shown or
+    /// the question was answered: later help cannot have made the answer easier.
+    mutating func noteHint(_ hint: ReviewHint) {
+        guard !isFinished, current != nil, !isFlipped, !isAnswered(at: position) else { return }
+        hintsByPosition[position, default: []].insert(hint)
     }
 
     // MARK: Helpers
+
+    /// Stable for a question within a run, so persisting it again is recognisably a retry.
+    private func attemptID(at position: Int) -> String { "\(runID)/\(position)" }
+
+    private func attempt(at position: Int) -> ReviewAttempt? {
+        let id = attemptID(at: position)
+        return attempts.first { $0.id == id }
+    }
+
+    private func isAnswered(at position: Int) -> Bool { attempt(at: position) != nil }
+
+    private mutating func record(_ result: ReviewResult, for card: StudyCard) {
+        attempts.append(ReviewAttempt(id: attemptID(at: position), cardID: card.id, result: result,
+                                      hints: hintsByPosition[position] ?? [], answeredAt: now()))
+    }
 
     private mutating func prepareQuestion() {
         guard mode == .quiz, let card = current else {
