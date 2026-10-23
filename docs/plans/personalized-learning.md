@@ -61,7 +61,7 @@ Không hứa số từ đã thuộc, thời gian thành thạo hay doanh thu khi
 
 ## Thứ tự thực hiện và nghiệm thu
 
-### L01 — Kết quả một lượt học (VERIFIED — chờ commit hash bên dưới)
+### L01 — Kết quả một lượt học (DONE — commit `b32cfa8`)
 
 Phạm vi: `Entities/StudySession.swift`, `FlashcardAppTests/StudySessionTests.swift`;
 thêm value type chỉ khi cần cho consumer lưu trữ, đăng ký target đầy đủ.
