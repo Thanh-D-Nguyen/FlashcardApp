@@ -108,6 +108,8 @@ struct StudySession {
     static let maximumQuizOptions = 4
 
     let cards: [StudyCard]
+    /// Where quiz answers come from: the cards asked, or a bigger set they belong to.
+    private let pool: [StudyCard]
     private let random: StudyRandomSource
     private let now: () -> Date
     private let makeRunID: () -> String
@@ -133,17 +135,20 @@ struct StudySession {
     /// Help in view for the current question: what its attempt recorded once answered, otherwise what is noted so far.
     var currentHints: Set<ReviewHint> { attempt(at: position)?.hints ?? hintsByPosition[position] ?? [] }
 
-    init(cards: [StudyCard], mode: StudyMode = .flip, shuffled: Bool = false,
+    /// `quizPool` is where a quiz may take its answers from when the session asks only some of a deck's cards (a session planned
+    /// on Today): quiz or flip, and the wrong options, must not depend on how few cards are asked. It defaults to the cards.
+    init(cards: [StudyCard], quizPool: [StudyCard]? = nil, mode: StudyMode = .flip, shuffled: Bool = false,
          random: @escaping StudyRandomSource = { Int.random(in: $0) },
          now: @escaping () -> Date = Date.init,
          makeRunID: @escaping () -> String = { UUID().uuidString }) {
         self.cards = cards
+        self.pool = quizPool ?? cards
         self.random = random
         self.now = now
         self.makeRunID = makeRunID
         self.isShuffled = shuffled
         self.order = Array(cards.indices)
-        self.mode = (mode == .quiz && Self.canQuiz(cards)) ? .quiz : .flip
+        self.mode = (mode == .quiz && Self.canQuiz(quizPool ?? cards)) ? .quiz : .flip
         restart()
     }
 
@@ -152,7 +157,7 @@ struct StudySession {
         Set(cards.map(\.back).filter { !$0.isEmpty }).count >= 2
     }
 
-    var canQuiz: Bool { Self.canQuiz(cards) }
+    var canQuiz: Bool { Self.canQuiz(pool) }
     var count: Int { cards.count }
     var current: StudyCard? { order.indices.contains(position) ? cards[order[position]] : nil }
     var canGoBack: Bool { mode == .flip && position > 0 && !isFinished }
@@ -258,7 +263,7 @@ struct StudySession {
             return
         }
         var distractors: [String] = []
-        for other in cards where other.id != card.id && !other.back.isEmpty && other.back != card.back && !distractors.contains(other.back) {
+        for other in pool where other.id != card.id && !other.back.isEmpty && other.back != card.back && !distractors.contains(other.back) {
             distractors.append(other.back)
         }
         var chosen = Self.shuffled(distractors, random: random)

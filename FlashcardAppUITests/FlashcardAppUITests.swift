@@ -16,9 +16,17 @@ final class FlashcardAppUITests: XCTestCase {
         return app
     }
 
+    /// The first tab is Today; the levels are one tap away on its "Study by level" row.
+    private func openLevels(_ app: XCUIApplication) {
+        let row = app.buttons["today_levels_row"]
+        XCTAssertTrue(row.waitForExistence(timeout: 40), "Today is the first screen")
+        row.tap()
+    }
+
     func testLiveLevelsAndContentCanBeBrowsedWithoutLogin() {
         let app = makeApp()
         app.launch()
+        openLevels(app)
         let levels = app.tables["home_levels"]
         XCTAssertTrue(levels.waitForExistence(timeout: 40))
         let firstLevel = levels.cells["home_row_J5"]
@@ -103,6 +111,7 @@ final class FlashcardAppUITests: XCTestCase {
         let app = makeApp()
         app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
         app.launch()
+        openLevels(app)
         let levels = app.tables["home_levels"]
         XCTAssertTrue(levels.waitForExistence(timeout: 40))
         let firstLevel = levels.cells["home_row_J5"]
@@ -121,6 +130,7 @@ final class FlashcardAppUITests: XCTestCase {
     func testFeaturedStartOpensVocabulary() {
         let app = makeApp()
         app.launch()
+        openLevels(app)
         let start = app.buttons["home_start"]
         XCTAssertTrue(start.waitForExistence(timeout: 40))
         start.tap()
@@ -132,6 +142,7 @@ final class FlashcardAppUITests: XCTestCase {
     func testLevelCountOpensItsKindDirectly() {
         let app = makeApp()
         app.launch()
+        openLevels(app)
         let levels = app.tables["home_levels"]
         XCTAssertTrue(levels.waitForExistence(timeout: 40))
         let grammar = app.buttons["home_kind_J4_grammar"]
@@ -217,15 +228,16 @@ final class FlashcardAppUITests: XCTestCase {
     /// English and Japanese are required UI languages: tab titles, Settings copy and the level text from the backend follow the language.
     func testInterfaceFollowsTheAppLanguage() {
         let cases: [(language: String, locale: String, levelsTab: String, signIn: String, start: String)] = [
-            ("en", "en_US", "Levels", "Sign In", "Start studying vocabulary, J5"),
-            ("ja", "ja_JP", "レベル", "ログイン", "J5の単語の学習を始める")
+            ("en", "en_US", "Today", "Sign In", "Start studying vocabulary, J5"),
+            ("ja", "ja_JP", "今日", "ログイン", "J5の単語の学習を始める")
         ]
         for item in cases {
             let app = makeApp(language: item.language, locale: item.locale)
             app.launch()
             let tab = app.tabBars.buttons["tab_levels"]
             XCTAssertTrue(tab.waitForExistence(timeout: 40), item.language)
-            XCTAssertEqual(tab.label, item.levelsTab)
+            XCTAssertEqual(tab.label, item.levelsTab, "The first tab is Today")
+            openLevels(app)
             XCTAssertEqual(app.buttons["home_start"].label, item.start)
             app.tabBars.buttons["tab_settings"].tap()
             let signIn = app.buttons["setting_sign_in"]
@@ -599,6 +611,66 @@ final class FlashcardAppUITests: XCTestCase {
         tile("default").tap()
         XCTAssertTrue(tile("default").isSelected)
         app.buttons["card_style_done"].tap()
+    }
+
+    /// Today offers the deck the learner studies, starts a session on it, then shows what was saved; the session length can be
+    /// changed and the levels are one tap away. Real UI, real Realm.
+    func testTodayStartsASessionAndShowsWhatWasSavedAndTheSessionLengthCanBeChanged() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        let name = "UI \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "dog", back: "cho")
+        fillCard(app, index: 1, front: "cat", back: "meo")
+        app.buttons["save_deck"].tap()
+        XCTAssertTrue(deckRow(app, named: name).waitForExistence(timeout: 10))
+
+        // Today: with several decks the learner chooses once; the choice is the deck planned.
+        app.tabBars.buttons["tab_levels"].tap()
+        let primary = app.buttons["today_primary"]
+        XCTAssertTrue(primary.waitForExistence(timeout: 10))
+        // A deck chosen in an earlier run may still be the one planned: choose this one through the row, or through the button
+        // when nothing is chosen yet.
+        let chooser = primary.label.contains("Chọn bộ thẻ") ? primary : app.buttons["today_deck_row"]
+        chooser.tap()
+        let choice = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", name)).firstMatch
+        XCTAssertTrue(choice.waitForExistence(timeout: 5))
+        choice.tap()
+        XCTAssertTrue(app.staticTexts["today_hero_title"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["today_hero_title"].label, name)
+        XCTAssertTrue(app.staticTexts["today_figure"].label.hasPrefix("2"), "A new deck of two cards: practise it, nothing is 'due'")
+        attachScreenshot(app, name: "today-practice")
+
+        // The session length is a choice and is kept.
+        app.buttons["today_time_row"].tap()
+        let ten = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "10 phút")).firstMatch
+        XCTAssertTrue(ten.waitForExistence(timeout: 5))
+        ten.tap()
+        XCTAssertTrue(app.buttons["today_time_row"].label.contains("10"))
+
+        // Start, flip and rate the first card, leave: Today now counts what was saved, and nothing is due.
+        primary.tap()
+        XCTAssertTrue(app.buttons["study_card"].waitForExistence(timeout: 5))
+        app.buttons["study_primary"].tap()
+        app.buttons["study_rate_remembered"].tap()
+        XCTAssertTrue(app.staticTexts["study_save_status"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.buttons["today_primary"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["today_progress"].label, "Đã lưu 1 lượt học", "One saved attempt today")
+        XCTAssertTrue(app.buttons["today_primary"].label.contains("Luyện thêm"), "Done for today, with practice as a choice")
+        attachScreenshot(app, name: "today-done")
+
+        // The levels are one tap away and Back returns to Today.
+        app.buttons["today_levels_row"].tap()
+        XCTAssertTrue(app.tables["home_levels"].waitForExistence(timeout: 20))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.buttons["today_primary"].waitForExistence(timeout: 5))
     }
 
     /// An answer that cannot be saved is never shown as saved: the learner stays on the card, can try again, and the count only

@@ -341,6 +341,37 @@ final class StudySessionTests: XCTestCase {
                        ["correct", "incorrect", "remembered", "needsReview"])
     }
 
+    // MARK: A few cards asked from a bigger pool (a session planned on Today)
+
+    func test_aSessionThatAsksFewCardsKeepsTheQuizAndTakesItsOptionsFromTheWholePool() {
+        let all = cards(6)
+        let session = StudySession(cards: [all[2]], quizPool: all, mode: .quiz, random: lowest)
+        XCTAssertEqual(session.mode, .quiz, "One card asked is no reason to fall back to flipping")
+        XCTAssertTrue(session.canQuiz)
+        XCTAssertEqual(session.options.count, 4)
+        XCTAssertEqual(Set(session.options).count, 4)
+        XCTAssertTrue(session.options.contains("B3"))
+        XCTAssertTrue(Set(session.options).isSubset(of: Set(all.map(\.back))))
+        XCTAssertEqual(session.count, 1, "Only the planned card is asked")
+    }
+
+    func test_withoutAPoolAFewCardsDecideTheQuizAsBefore() {
+        XCTAssertEqual(StudySession(cards: [cards(6)[2]], mode: .quiz, random: lowest).mode, .flip)
+    }
+
+    func test_aPoolWithOnlyOneAnswerStillCannotMakeAQuiz() {
+        let same = (1...4).map { StudyCard(id: "c\($0)", front: "F\($0)", back: "same") }
+        XCTAssertEqual(StudySession(cards: [same[0]], quizPool: same, mode: .quiz).mode, .flip)
+    }
+
+    func test_changingTheModeInAPlannedSessionStillUsesThePool() {
+        let all = cards(5)
+        var session = StudySession(cards: [all[0], all[1]], quizPool: all, mode: .flip, random: lowest)
+        session.setMode(.quiz)
+        XCTAssertEqual(session.mode, .quiz)
+        XCTAssertGreaterThan(session.options.count, 2)
+    }
+
     // MARK: Content version
 
     func test_contentVersionIsAStableSha256OfFrontReadingAndBack() {

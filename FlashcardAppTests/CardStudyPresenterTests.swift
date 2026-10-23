@@ -168,6 +168,28 @@ final class CardStudyPresenterTests: XCTestCase {
         XCTAssertEqual(state.card?.front, "F5")
     }
 
+    func test_aPlannedSessionOfOneCardIsStillAQuizSoItsAnswerGradesTheRecognitionSchedule() {
+        interactor.deck = makeDeck(5)
+        preferences.mode = .quiz
+        startPlanned(["c3"])
+        XCTAssertEqual(state.mode, .quiz, "One due card must not turn the session into a flip")
+        XCTAssertGreaterThan(state.quiz?.options.count ?? 0, 2, "The wrong answers come from the whole deck")
+        presenter.select(option: "B3")
+        XCTAssertEqual(history.saves.map(\.0.result), [.correct])
+        XCTAssertEqual(history.saves.first?.0.skill, .recognition)
+    }
+
+    func test_aPlannedSessionOfCardsWithTheSameMeaningStillQuizzesWhenTheDeckCan() {
+        let deck = makeDeck(5)
+        deck.cards[0].backText = "same"
+        deck.cards[1].backText = "same"
+        interactor.deck = deck
+        preferences.mode = .quiz
+        startPlanned(["c1", "c2"])
+        XCTAssertEqual(state.mode, .quiz)
+        XCTAssertTrue(state.quiz!.options.contains("B3") || state.quiz!.options.contains("B4") || state.quiz!.options.contains("B5"))
+    }
+
     func test_aPlannedCardSavedWhileAnsweredCarriesItsOwnId() throws {
         interactor.deck = makeDeck(5)
         preferences.mode = .quiz

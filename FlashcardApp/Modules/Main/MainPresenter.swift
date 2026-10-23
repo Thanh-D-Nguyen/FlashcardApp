@@ -42,19 +42,20 @@ extension MainPresenter: MainPresenterInterface {
     
     private func createTabbar() -> MainTabbarController {
         let tabbarController = MainTabbarController()
-        let home = HomeWireframe()
-        let homeNav = BaseNavigationController(rootViewController: home.viewController)
+        // The first tab is Today; the levels are reached from it ("Study by level") and keep their own screen and identifiers.
+        let today = TodayWireframe()
+        let todayNav = BaseNavigationController(rootViewController: today.viewController)
         let card = CardWireframe()
         let cardNav = BaseNavigationController(rootViewController: card.viewController)
         let dictionary = DictionaryWireframe()
         let dictionaryNav = BaseNavigationController(rootViewController: dictionary.viewController)
         let setting = SettingWireframe()
         let settingNav = BaseNavigationController(rootViewController: setting.viewController)
-        home.viewController.tabBarItem.accessibilityIdentifier = "tab_levels"
+        today.viewController.tabBarItem.accessibilityIdentifier = "tab_levels"
         dictionary.viewController.tabBarItem.accessibilityIdentifier = "tab_dictionary"
         card.viewController.tabBarItem.accessibilityIdentifier = "tab_cards"
         setting.viewController.tabBarItem.accessibilityIdentifier = "tab_settings"
-        let viewControllers = [homeNav, dictionaryNav, cardNav, settingNav]
+        let viewControllers = [todayNav, dictionaryNav, cardNav, settingNav]
         tabbarController.viewControllers = viewControllers
         return tabbarController
     }

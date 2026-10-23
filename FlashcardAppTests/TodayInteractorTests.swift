@@ -136,6 +136,24 @@ final class TodayInteractorTests: XCTestCase {
         XCTAssertEqual(today.progress, TodayProgress(saved: 2, quizCorrect: 1, quizIncorrect: 1, selfRated: 0))
     }
 
+    func test_aCardDueLaterTodayIsDueNowButOneDueTomorrowIsNot() throws {
+        try addDeck("d", cards: 2)
+        let yesterdayEvening = calendar.startOfDay(for: now).addingTimeInterval(-6 * 3_600)   // 18:00 yesterday, Tokyo
+        try answer("d", 1, .needsReview, at: yesterdayEvening)                                // a day later: 18:00 today, after "now"
+        try answer("d", 2, .remembered, at: yesterdayEvening.addingTimeInterval(60))          // two days later: 18:01 tomorrow
+        let plan = try plan()
+        XCTAssertEqual(plan.dueCount, 1, "Due by the learner's calendar day, not only at the very minute")
+        XCTAssertEqual(plan.sessionCardIDs, ["d-c1"])
+        XCTAssertEqual(plan.kind, .due)
+    }
+
+    func test_anAnswerStampedInTheFutureIsNotTodays() throws {
+        try addDeck("d", cards: 2)
+        try answer("d", 1, .correct, at: now.addingTimeInterval(3 * day))
+        study.mode = .quiz
+        XCTAssertEqual(try plan().progress.saved, 0, "A clock that was set forward must not pad today's count")
+    }
+
     func test_whenNothingIsDueAfterAnsweringTodayItIsDone() throws {
         try addDeck("d", cards: 2)
         try answer("d", 1, .remembered, at: now.addingTimeInterval(-3_600))

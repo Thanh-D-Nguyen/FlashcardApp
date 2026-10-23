@@ -269,7 +269,7 @@ Commit: `feat(study): schedule reviews from persisted attempts`.
   nhưng nếu ai tách thành hai transaction thì test hiện tại vẫn qua); test múi giờ/DST chỉ khẳng định lịch là thời điểm tuyệt đối vì bộ lập
   lịch không dùng `Calendar`; tham số FSRS mặc định chưa hiệu chỉnh theo người học của app; ý nghĩa rating là giả thuyết sản phẩm.
 
-### L05 — Today từ dữ liệu thật (IMPLEMENTING — L05a logic xong, L05b giao diện chưa; sau L04)
+### L05 — Today từ dữ liệu thật (DONE — L05a logic `6ea9cda`, L05b giao diện: commit ghi ở dưới; sau L04)
 
 Phạm vi: `Modules/Home/`, Home/CardStudy wireframes và interactors,
 localization, HomePresenterTests và hành trình XCUITest.
@@ -300,6 +300,29 @@ Commit: `feat(home): show today's review plan`.
   test trước khi coi là mặc định đúng. Phiên không chèn thẻ mới vào lúc có thẻ đến hạn; thẻ chưa học chỉ vào qua "Luyện bộ thẻ này" /
   "Luyện thêm" (học cả bộ như tab Cards, vẫn lưu kết quả). `CardStudyWireframe(deckId:cardIDs:)` học đúng danh sách thẻ theo thứ tự
   đã lập (bỏ qua xáo trộn; thẻ đã bị xóa thì bỏ qua; không còn thẻ nào thì rời màn).
+
+**Kết quả triển khai L05b — giao diện Today (2026-10-23)**
+- Code: `Modules/Today/` (`TodayPresenter` với `makeState` thuần, `TodayViewController` gồm hero/hàng deck/hàng thời lượng/tiến độ/hàng Cấp độ,
+  `TodayWireframe`), tab đầu tiên là Today (`MainTabbarName.today`), `TextRole.heroFigure`, `CardStudyWireframe(deckId:cardIDs:)`,
+  `StudySession(quizPool:)`, schema Realm 5 → 6 (bỏ cột `RReviewState.lastAttemptId` không dùng; không xóa dữ liệu, có fixture nâng cấp
+  từ schema 5 có cột thừa). Chuỗi vi/en/ja trong `Localizable.xcstrings` (có plural "%lld more are waiting").
+- Review độc lập (`flashcard-reviewer`) tìm **blocker B1**: phiên quiz theo danh sách ít thẻ rơi về flip/thiếu đáp án nhiễu → sửa bằng
+  `quizPool` (toàn deck làm nguồn đáp án nhiễu), có test. Đã sửa thêm: N1 (luyện tiếp bằng thẻ chưa học: `practiceCardIDs`), N2 (đến hạn
+  theo ngày lịch cục bộ: `dueBefore` = cuối ngày), N3 (làm mới khi vào foreground/đổi ngày/múi giờ), N4 (`Calendar.autoupdatingCurrent`),
+  N7 (deck rỗng → `noDeck`), N10 (plural), N8 (assert tiến độ chính xác).
+- Test: `FlashcardAppTests` **628 PASS / 0 fail / 5 skip** (Keychain, build không ký) sau các sửa review (trước đó coverage `TodayPlan.swift`
+  100%, `TodayInteractor.swift` 100% ở L05a). UI test trên một Simulator (iPhone 17): hành trình Today (chọn deck → luyện → thấy "Đã lưu 1 lượt
+  học" → đổi thời lượng 3/5/10) PASS; thêm 6 UI test không cần backend PASS (tạo/học/sửa/xóa deck, lưu lỗi rồi thử lại, offline + tài khoản,
+  đổi ngôn ngữ tab "Today"/"今日", ví dụ câu sau khi lật, Cấp độ ở cỡ chữ accessibility).
+- Bằng chứng UI: `docs/ui-redesign/personalized-learning/l05/` (`today_practice_vi_light.png`, `today_done_vi_light.png`,
+  `today_ax_xxxl_en_light.jpg`). Ở cỡ chữ AX XXXL nút hero từng vỡ chữ → bỏ mũi tên và dùng góc `.large` ở cỡ accessibility, đã chụp lại.
+- Lệch so với thiết kế U00: trạng thái "đã xong" không có nút "Xem kết quả"; chọn deck/thời lượng qua action sheet có dấu ✓; định danh
+  `tab_levels` nay nằm trên tab Today (hàng "Cấp độ" mở Levels); "đến hạn" tính theo ngày lịch cục bộ; luyện tiếp có thể dùng thẻ chưa học.
+- **Chưa kiểm chứng / rủi ro còn lại**: (1) 3/5/10 phút và 20 giây/mục là giả thuyết, chưa qua usability test (U05); (2) 5 UI test gọi API
+  thật **NOT VERIFIED** vì backend `localhost:18081` không chạy (hạ tầng, không phải lỗi mã nguồn); (3) VoiceOver với hàng `UIControl`,
+  haptics, Reduce Motion, dark mode, iPad và DST chưa kiểm bằng runtime; (4) N5: `ensureSchedules`/băm nội dung chạy trên main thread mỗi lần
+  nạp Today — chưa đo với deck lớn; (5) N6: phiên theo danh sách bỏ qua tuỳ chọn xáo trộn; (6) N9: chưa có alias `tab_today`.
+- Tiếp theo: L06 cần hợp đồng API/nội dung/quyền âm thanh đã xác minh (cổng sản phẩm); L07 cần pilot thật.
 
 ### L06 — Một chủ đề tình huống (PLANNED; sau L05 và kiểm chứng API/nội dung)
 

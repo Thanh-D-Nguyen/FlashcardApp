@@ -18,7 +18,7 @@ protocol CardStudyWireframeInterface: AnyObject {
 
 final class CardStudyWireframe: BaseWireframe<CardStudyViewController> {
 
-    init(deckId: String) {
+    init(deckId: String, cardIDs: [String]? = nil) {
         let controller = CardStudyViewController()
         super.init(viewController: controller)
         controller.hidesBottomBarWhenPushed = true
@@ -27,7 +27,7 @@ final class CardStudyWireframe: BaseWireframe<CardStudyViewController> {
 #else
         let history: ReviewHistoryStoreInterface = RealmReviewHistoryStore()
 #endif
-        let presenter = CardStudyPresenter(deckId: deckId, interactor: CardStudyInteractor(), wireframe: self, reviewHistory: history)
+        let presenter = CardStudyPresenter(deckId: deckId, cardIDs: cardIDs, interactor: CardStudyInteractor(), wireframe: self, reviewHistory: history)
         presenter.view = controller
         controller.presenter = presenter
     }

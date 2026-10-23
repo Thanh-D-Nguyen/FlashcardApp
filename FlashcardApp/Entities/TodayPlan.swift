@@ -80,9 +80,14 @@ struct TodayPlan: Equatable {
     var unseenCount = 0
     /// What one session holds, in the order it is studied; empty when there is nothing to start.
     var sessionCardIDs: [String] = []
+    /// What "practise more" studies: the cards never studied, in deck order, up to the budget. Empty when every card has been
+    /// studied; the caller then studies the whole deck.
+    var practiceCardIDs: [String] = []
     var estimatedMinutes: Int?
     var budgetMinutes = TodayBudget.defaultMinutes
     var progress = TodayProgress()
+    /// The deck was studied before, but not in the way the learner studies now (a quiz and a self-rating are different answers).
+    var studiedAnotherWay = false
     /// Due cards a session does not hold (the budget is smaller than the backlog).
     var backlog: Int { max(0, dueCount - sessionCardIDs.count) }
 }
@@ -92,12 +97,14 @@ enum TodayPlanner {
     static let longBreak: TimeInterval = 7 * ReviewScheduler.secondsPerDay
 
     static func plan(decks: [TodayDeck], selectedDeckID: String?, mode: StudyMode, schedules: [ReviewSchedule],
-                     attemptsToday: [ReviewAttempt], budget: TodayBudget, now: Date,
+                     attemptsToday: [ReviewAttempt], budget: TodayBudget, now: Date, dueBefore: Date? = nil,
                      scheduler: ReviewScheduler = ReviewScheduler()) -> TodayPlan {
+        // A deck without cards cannot be studied, so it is not offered.
+        let decks = decks.filter { !$0.cards.isEmpty }
         guard !decks.isEmpty else { return TodayPlan(kind: .noDeck, budgetMinutes: budget.minutes) }
         // The deck the learner chose; with a single deck there is nothing to choose; a choice that no longer exists is no choice.
         let deck = decks.first { $0.id == selectedDeckID } ?? (decks.count == 1 ? decks[0] : nil)
-        guard let deck, !deck.cards.isEmpty else { return TodayPlan(kind: .chooseDeck, budgetMinutes: budget.minutes) }
+        guard let deck else { return TodayPlan(kind: .chooseDeck, budgetMinutes: budget.minutes) }
 
         let skill: ReviewSkill = (mode == .quiz && deck.canQuiz) ? .recognition : .selfRecall
         var versions: [String: String] = [:]
@@ -106,7 +113,9 @@ enum TodayPlanner {
         // Only schedules of the wording each card has now, made by this algorithm, count at all.
         let current = schedules.filter { versions[$0.cardID] == $0.state.contentVersion && $0.state.algorithm == FSRSParameters.algorithm }
         let forSkill = current.filter { $0.skill == skill }
-        let due = forSkill.filter { scheduler.isDue($0.state, at: now) }
+        // Due by the learner's calendar day when a horizon is given (the end of today); otherwise at this very instant.
+        let isDue: (ReviewSchedule) -> Bool = { schedule in dueBefore.map { schedule.state.due < $0 } ?? scheduler.isDue(schedule.state, at: now) }
+        let due = forSkill.filter(isDue)
             .sorted { ($0.state.due, $0.cardID) < ($1.state.due, $1.cardID) }
         let scheduled = Set(forSkill.map(\.cardID))
 
@@ -123,7 +132,9 @@ enum TodayPlanner {
         let limit = budget.itemLimit
         var plan = TodayPlan(kind: .nothingDue, deckID: deck.id, deckName: deck.name, cardCount: deck.cards.count, skill: skill)
         plan.dueCount = due.count
-        plan.unseenCount = deck.cards.filter { !scheduled.contains($0.id) }.count
+        let unseen = deck.cards.filter { !scheduled.contains($0.id) }
+        plan.unseenCount = unseen.count
+        plan.practiceCardIDs = unseen.prefix(budget.itemLimit).map(\.id)
         plan.budgetMinutes = budget.minutes
         plan.progress = progress
         if !due.isEmpty {
@@ -132,6 +143,7 @@ enum TodayPlanner {
             plan.sessionCardIDs = due.prefix(limit).map(\.cardID)
         } else if forSkill.isEmpty {
             plan.kind = .practice
+            plan.studiedAnotherWay = !current.isEmpty
             plan.sessionCardIDs = deck.cards.prefix(limit).map(\.id)
         } else {
             plan.kind = progress.saved > 0 ? .doneToday : .nothingDue

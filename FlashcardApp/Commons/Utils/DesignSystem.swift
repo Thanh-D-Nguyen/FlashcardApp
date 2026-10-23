@@ -113,6 +113,8 @@ enum Design {
         case term
         /// The meaning on the back of a study card.
         case answer
+        /// The one large number on the Today block: a count of items, in the same Mincho as the level numerals.
+        case heroFigure
         /// Screen headline in an editorial serif (New York for Latin and Vietnamese, Hiragino Mincho for kana and kanji).
         case display
 
@@ -133,6 +135,7 @@ enum Design {
             case .term: return UIFontMetrics(forTextStyle: .largeTitle).scaledFont(for: .systemFont(ofSize: 52, weight: .semibold), maximumPointSize: 96)
             case .answer: return .preferredFont(forTextStyle: .title2)
             case .display: return Self.editorialSerif(.largeTitle)
+            case .heroFigure: return Self.mincho(size: 64, style: .largeTitle, maximum: 96)
             }
         }
 
@@ -141,7 +144,7 @@ enum Design {
             case .title, .headword, .meaning, .explanation, .figure, .term, .answer, .display: return Color.textPrimary
             case .reading, .metadata: return Color.textSecondary
             case .mark, .numeral, .monogram: return Color.accent
-            case .numeralDisplay: return Color.onHero
+            case .numeralDisplay, .heroFigure: return Color.onHero
             case .eyebrow: return Color.textSecondary
             }
         }

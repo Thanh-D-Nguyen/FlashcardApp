@@ -9,7 +9,9 @@ final class RealmService {
     /// 3: adds `RCardExample`, the learner's own example sentences (additive, nothing to migrate).
     /// 4: adds `RReviewAttempt`, the learner's answered questions (additive, nothing to migrate).
     /// 5: adds `RReviewState`, when each card is next due (additive, nothing to migrate).
-    static let schemaVersion: UInt64 = 5
+    /// 6: `RReviewState` loses `lastAttemptId`, a column nothing read that the first schema-5 build had written. Realm drops it
+    /// during the version bump; every row is kept (a store written by that build would otherwise not open).
+    static let schemaVersion: UInt64 = 6
     static let storedTypes: [Object.Type] = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self, RReviewState.self]
     /// Tables of the retired bundled dictionary. An upgraded install empties them; the decks are untouched.
     static let retiredDictionaryTables: [Object.Type] = [RetiredJaVi.self, RetiredViJa.self, RetiredKanji.self, RetiredGrammar.self, RetiredExample.self]

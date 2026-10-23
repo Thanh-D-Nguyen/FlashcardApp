@@ -223,7 +223,9 @@ final class CardStudyPresenter {
         deck = entity
         if changed {
             // A planned session keeps the order it was planned in (oldest due first).
-            session = StudySession(cards: cards, mode: preferences.mode, shuffled: cardIDs == nil && preferences.isShuffled, random: random)
+            // The quiz of a planned session draws its wrong answers from the whole deck, so it is a quiz even for one due card.
+            session = StudySession(cards: cards, quizPool: cardIDs == nil ? nil : wholeDeck, mode: preferences.mode,
+                                   shuffled: cardIDs == nil && preferences.isShuffled, random: random)
             startRun()
         }
         publish(.none)

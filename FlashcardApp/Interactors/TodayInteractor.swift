@@ -27,7 +27,7 @@ final class TodayInteractor: TodayInteractorInterface {
          schedules: ReviewScheduleStoreInterface = RealmReviewHistoryStore(),
          studyPreferences: StudyPreferencesInterface = UserDefaultsStudyPreferences.shared,
          preferences: TodayPreferencesInterface = UserDefaultsTodayPreferences.shared,
-         calendar: Calendar = .current) {
+         calendar: Calendar = .autoupdatingCurrent) {
         self.decks = decks
         self.schedules = schedules
         self.studyPreferences = studyPreferences
@@ -42,13 +42,15 @@ final class TodayInteractor: TodayInteractorInterface {
         try schedules.ensureSchedules(ownerKey: ownerKey)
         // "Today" is the learner's local calendar day, not the last 24 hours.
         let startOfDay = calendar.startOfDay(for: now)
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) ?? startOfDay.addingTimeInterval(86_400)
         return TodayPlanner.plan(decks: todayDecks,
                                  selectedDeckID: preferences.selectedDeckID(ownerKey: ownerKey),
                                  mode: studyPreferences.mode,
                                  schedules: schedules.schedules(ownerKey: ownerKey),
-                                 attemptsToday: schedules.attempts(ownerKey: ownerKey, answeredSince: startOfDay),
+                                 // Answers stamped later than today (a clock that was set forward) are not today's.
+                                 attemptsToday: schedules.attempts(ownerKey: ownerKey, answeredSince: startOfDay).filter { $0.answeredAt < endOfDay },
                                  budget: TodayBudget(minutes: preferences.budgetMinutes(ownerKey: ownerKey)),
-                                 now: now)
+                                 now: now, dueBefore: endOfDay)
     }
 
     func deckChoices() -> [TodayDeckChoice] {

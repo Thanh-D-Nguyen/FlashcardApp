@@ -13,9 +13,12 @@ enum MainTabbarName: Int {
     case card
     case dictionary
     case setting
+    case today
     
     var title: String {
         switch self {
+            case .today:
+                return NSLocalizedString("Today", comment: "Tab and screen title")
             case .home:
                 return NSLocalizedString("Levels", comment: "")
             case .desk:
@@ -31,6 +34,8 @@ enum MainTabbarName: Int {
     
     var image: UIImage? {
         switch self {
+            case .today:
+                return UIImage(systemName: "sun.max")
             case .home:
                 return UIImage(systemName: "graduationcap")
             case .desk:
@@ -47,6 +52,8 @@ enum MainTabbarName: Int {
     /// Filled variant used for the selected tab.
     var selectedImage: UIImage? {
         switch self {
+            case .today:
+                return UIImage(systemName: "sun.max.fill")
             case .home:
                 return UIImage(systemName: "graduationcap.fill")
             case .desk:

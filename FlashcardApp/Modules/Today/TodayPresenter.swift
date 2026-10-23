@@ -1,0 +1,214 @@
+import Foundation
+
+/// What the primary button of Today does.
+enum TodayAction: Equatable {
+    case createDeck
+    case chooseDeck
+    /// Study these cards of the deck in this order; `nil` studies the whole deck.
+    case study(deckID: String, cardIDs: [String]?)
+}
+
+/// The one raised block of Today: where the learner is and the one thing to do next.
+struct TodayHero: Equatable {
+    let eyebrow: String
+    let title: String
+    /// A real count (never a placeholder) with its caption; both nil when there is no number to show.
+    let figure: String?
+    let caption: String?
+    let lines: [String]
+    let ctaTitle: String
+    let action: TodayAction
+}
+
+struct TodayRows: Equatable {
+    let deckName: String
+    let sessionLength: String
+}
+
+struct TodayProgressText: Equatable {
+    let title: String
+    let detail: String?
+}
+
+struct TodayViewState: Equatable {
+    enum Phase: Equatable {
+        case loaded
+        /// The saved progress could not be read. Never shown as zeros.
+        case failed
+    }
+
+    var phase: Phase
+    var subtitle: String
+    var hero: TodayHero?
+    var rows: TodayRows?
+    var progress: TodayProgressText?
+    var failureTitle: String?
+    var failureMessage: String?
+}
+
+protocol TodayViewInterface: AnyObject {
+    func render(_ state: TodayViewState)
+}
+
+protocol TodayPresenterInterface: AnyObject {
+    func viewWillAppear()
+    /// The screen is still open but the world moved on (the app came back to the foreground, the day changed).
+    func refresh()
+    func primaryAction()
+    func changeDeck()
+    func changeBudget()
+    func openLevels()
+    func retry()
+}
+
+final class TodayPresenter {
+    private let interactor: TodayInteractorInterface
+    private let wireframe: TodayWireframeInterface
+    private let ownerKey: () -> String
+    private let now: () -> Date
+    weak var view: TodayViewInterface?
+
+    private var plan: TodayPlan?
+    private var state: TodayViewState?
+
+    init(interactor: TodayInteractorInterface, wireframe: TodayWireframeInterface,
+         ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" },
+         now: @escaping () -> Date = Date.init) {
+        self.interactor = interactor
+        self.wireframe = wireframe
+        self.ownerKey = ownerKey
+        self.now = now
+    }
+
+    // MARK: State
+
+    private func reload() {
+        let owner = ownerKey()
+        do {
+            let plan = try interactor.plan(ownerKey: owner, now: now())
+            self.plan = plan
+            publish(Self.makeState(plan))
+        } catch {
+            logger.error("Reading today's plan failed: \(error.localizedDescription)")
+            plan = nil
+            publish(TodayViewState(phase: .failed, subtitle: "", hero: nil, rows: nil, progress: nil,
+                                   failureTitle: NSLocalizedString("Couldn't read your progress", comment: ""),
+                                   failureMessage: NSLocalizedString("The study data on this device couldn't be opened. Your data is not deleted.", comment: "")))
+        }
+    }
+
+    private func publish(_ state: TodayViewState) {
+        self.state = state
+        view?.render(state)
+    }
+
+    private static func text(_ key: String) -> String { NSLocalizedString(key, comment: "") }
+
+    private static func minutesText(_ count: Int) -> String { String.localizedStringWithFormat(text("%lld minutes"), count) }
+
+    private static func estimateText(_ plan: TodayPlan) -> String? {
+        plan.estimatedMinutes.map { String.localizedStringWithFormat(text("About %lld minutes"), $0) }
+    }
+
+    /// Everything on screen is stated from the plan: real counts, or no number at all.
+    static func makeState(_ plan: TodayPlan) -> TodayViewState {
+        let deckID = plan.deckID ?? ""
+        let deckName = plan.deckName ?? ""
+        var state = TodayViewState(phase: .loaded, subtitle: "", hero: nil, rows: nil, progress: nil)
+
+        switch plan.kind {
+        case .noDeck:
+            state.subtitle = text("No deck yet.")
+            state.hero = TodayHero(eyebrow: text("GET STARTED"), title: text("Start with your own deck"), figure: nil, caption: nil,
+                                   lines: [text("Make a deck from the words you are learning, or study by level.")],
+                                   ctaTitle: text("Create a deck"), action: .createDeck)
+            return state
+        case .chooseDeck:
+            state.subtitle = text("Choose the deck to study.")
+            state.hero = TodayHero(eyebrow: text("DECKS"), title: text("Which deck today?"), figure: nil, caption: nil,
+                                   lines: [text("You have several decks. Choose one to see what is due.")],
+                                   ctaTitle: text("Choose a deck"), action: .chooseDeck)
+            return state
+        case .practice:
+            // A deck answered before, but not in the way studied now, is not "never studied".
+            state.subtitle = plan.studiedAnotherWay ? text("You haven't studied this deck this way yet.") : text("You haven't studied this deck yet.")
+            state.hero = TodayHero(eyebrow: text("CURRENT DECK"), title: deckName, figure: "\(plan.sessionCardIDs.count)", caption: text("cards to practise"),
+                                   lines: [plan.studiedAnotherWay ? text("No answers of this kind saved yet.") : text("No answers saved yet.")]
+                                       + (estimateText(plan).map { [$0] } ?? []),
+                                   ctaTitle: text("Practise this deck"), action: .study(deckID: deckID, cardIDs: plan.sessionCardIDs))
+        case .due, .returning:
+            state.subtitle = plan.kind == .due ? text("Short reviews, on what you need to remember.") : text("Welcome back. Let's start gently.")
+            let caption = plan.backlog == 0 ? text("to review") : String.localizedStringWithFormat(text("of %lld to review"), plan.dueCount)
+            var lines = estimateText(plan).map { [$0] } ?? []
+            if plan.backlog > 0 { lines.append(String.localizedStringWithFormat(text("%lld more are waiting"), plan.backlog)) }
+            state.hero = TodayHero(eyebrow: text("CURRENT DECK"), title: deckName, figure: "\(plan.sessionCardIDs.count)", caption: caption, lines: lines,
+                                   ctaTitle: plan.kind == .due ? text("Start review") : text("Start a short session"),
+                                   action: .study(deckID: deckID, cardIDs: plan.sessionCardIDs))
+        case .nothingDue:
+            state.subtitle = text("Nothing to review today.")
+            state.hero = TodayHero(eyebrow: text("CURRENT DECK"), title: deckName, figure: nil, caption: nil,
+                                   lines: [text("Nothing due"), text("You can practise more whenever you like.")],
+                                   ctaTitle: text("Practise more"), action: .study(deckID: deckID, cardIDs: plan.practiceCardIDs.isEmpty ? nil : plan.practiceCardIDs))
+        case .doneToday:
+            state.subtitle = text("Today's review is done.")
+            state.hero = TodayHero(eyebrow: text("CURRENT DECK"), title: deckName, figure: nil, caption: nil,
+                                   lines: [String.localizedStringWithFormat(text("Saved %lld today"), plan.progress.saved)],
+                                   ctaTitle: text("Practise more"), action: .study(deckID: deckID, cardIDs: plan.practiceCardIDs.isEmpty ? nil : plan.practiceCardIDs))
+        }
+
+        state.rows = TodayRows(deckName: deckName, sessionLength: minutesText(plan.budgetMinutes))
+        state.progress = progressText(plan.progress)
+        return state
+    }
+
+    private static func progressText(_ progress: TodayProgress) -> TodayProgressText {
+        guard progress.saved > 0 else { return TodayProgressText(title: text("Nothing saved yet today."), detail: nil) }
+        var parts: [String] = []
+        if progress.quizCorrect + progress.quizIncorrect > 0 {
+            parts.append(text("Quiz") + " " + String(format: text("%1$lld correct · %2$lld incorrect"), progress.quizCorrect, progress.quizIncorrect))
+        }
+        if progress.selfRated > 0 {
+            parts.append(text("Self-rating") + " " + String.localizedStringWithFormat(text("%lld attempts"), progress.selfRated))
+        }
+        return TodayProgressText(title: String.localizedStringWithFormat(text("Saved %lld attempts"), progress.saved),
+                                 detail: parts.isEmpty ? nil : parts.joined(separator: " · "))
+    }
+}
+
+extension TodayPresenter: TodayPresenterInterface {
+    func viewWillAppear() { reload() }
+
+    func refresh() { reload() }
+
+    func primaryAction() {
+        guard let action = state?.hero?.action else { return }
+        switch action {
+        case .createDeck:
+            wireframe.showCreateDeck { [weak self] in self?.reload() }
+        case .chooseDeck:
+            changeDeck()
+        case .study(let deckID, let cardIDs):
+            wireframe.showStudy(deckId: deckID, cardIDs: cardIDs)
+        }
+    }
+
+    func changeDeck() {
+        wireframe.showDeckChooser(interactor.deckChoices(), selectedID: plan?.deckID) { [weak self] id in
+            guard let self else { return }
+            self.interactor.selectDeck(id: id, ownerKey: self.ownerKey())
+            self.reload()
+        }
+    }
+
+    func changeBudget() {
+        wireframe.showBudgetChooser(current: interactor.budgetMinutes(ownerKey: ownerKey())) { [weak self] minutes in
+            guard let self else { return }
+            self.interactor.setBudgetMinutes(minutes, ownerKey: self.ownerKey())
+            self.reload()
+        }
+    }
+
+    func openLevels() { wireframe.showLevels() }
+
+    func retry() { reload() }
+}

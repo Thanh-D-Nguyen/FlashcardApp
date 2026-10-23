@@ -13,6 +13,8 @@
 		198E01551E1631C719BC9626 /* DeskManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F523D82C0F0EA33D4FC0A0 /* DeskManagementTests.swift */; };
 		1BE087530645B7FBA386BAC7 /* HomeCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81651ED770FBD884568B4B44 /* HomeCells.swift */; };
 		2017FC53E1DE8E424F8E7859 /* CardStudyPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D1736D4AAAA549CC94C638F /* CardStudyPresenter.swift */; };
+		CF89FB6725724760B3861841 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA758F99D144FA683A582CF /* TodayViewController.swift */; };
+		66E62599F6024379833D481D /* TodayPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46CB83943214D0890DE16BE /* TodayPresenter.swift */; };
 		2349929752DB9DFBD7B6C758 /* PlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CBB7A6137EB7FF8380C091C /* PlaceholderTextView.swift */; };
 		2BB560E3B615780D74ABEFE0 /* BulkImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD255FF4CC4CCC3B0065E07A /* BulkImportViewController.swift */; };
 		2C2298CEFD0E65B39B1CF491 /* TextEntryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A49A1C506CF0E7537C6053 /* TextEntryCell.swift */; };
@@ -39,6 +41,7 @@
 		7C8BA3A123EDA53AD7089B9F /* DeckDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995295DA00DA8922BE3BAAF5 /* DeckDraft.swift */; };
 		8004D0E6A2CCAAF05CD0BAB9 /* DeckLibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175275535C56544C7B924F0A /* DeckLibraryCell.swift */; };
 		82AB31DD4A9E08CD1177E116 /* CardStudyWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98C18FA70B1D9007802033D /* CardStudyWireframe.swift */; };
+		F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */; };
 		8321A28636278A10213209B9 /* CardPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D2E20362C669E30C7FE447 /* CardPresenterTests.swift */; };
 		862184A154A58EB864D04742 /* StateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AFC78D9266C6D8BE5ABCAE /* StateView.swift */; };
 		87941E1FA68F7D98F1400D0C /* MailLoginPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9321F46D68635E10E86F8D4A /* MailLoginPresenterTests.swift */; };
@@ -195,6 +198,7 @@
 		915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */; };
 		2417B315D2617D05A733D9AB /* ExampleEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F0E8CB3E7162557579B81AF /* ExampleEditorViewController.swift */; };
 		823788C02A6614E5980E5F07 /* CardExampleStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */; };
+		43A5E88DAED44EB6B50458E6 /* TodayPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013332AF3A84AF1A334EC97 /* TodayPresenterTests.swift */; };
 		39A253290C90462492BE266A /* TodayPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */; };
 		E74DB119AE2D4A839856D92A /* TodayInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EADC489FA314F64A10F6D80 /* TodayInteractorTests.swift */; };
 		780646516F4F4E67AA91C0AF /* TodayPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A32B4DA0B2480CB3FFE81E /* TodayPlannerTests.swift */; };
@@ -231,6 +235,8 @@
 		203F142FE069DC1205CFFD9B /* SpeechService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyViewController.swift; sourceTree = "<group>"; };
 		2D1736D4AAAA549CC94C638F /* CardStudyPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyPresenter.swift; sourceTree = "<group>"; };
+		1BA758F99D144FA683A582CF /* TodayViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
+		B46CB83943214D0890DE16BE /* TodayPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayPresenter.swift; sourceTree = "<group>"; };
 		37129E6AA0E1A87ECA2E098E /* CardsIntegrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardsIntegrationTests.swift; sourceTree = "<group>"; };
 		416283339F8BEC2533A6E86B /* StudySessionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudySessionTests.swift; sourceTree = "<group>"; };
 		4479E6D17205D798B73B194A /* SettingsPrototypes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsPrototypes.swift; sourceTree = "<group>"; };
@@ -364,6 +370,7 @@
 		DD255FF4CC4CCC3B0065E07A /* BulkImportViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BulkImportViewController.swift; sourceTree = "<group>"; };
 		E778AECBA59C5BBC11CC8023 /* DeckDraftTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeckDraftTests.swift; sourceTree = "<group>"; };
 		E98C18FA70B1D9007802033D /* CardStudyWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyWireframe.swift; sourceTree = "<group>"; };
+		FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayWireframe.swift; sourceTree = "<group>"; };
 		E9DC789F28A351A8BE56E8BA /* AuthSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSessionTests.swift; sourceTree = "<group>"; };
 		EB64F2E26CCBB8CC53AF84E4 /* CardMediaMaintenance.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardMediaMaintenance.swift; sourceTree = "<group>"; };
 		F7B083C077D5C5F2A240A228 /* DebugFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugFixtures.swift; sourceTree = "<group>"; };
@@ -412,6 +419,7 @@
 		7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorWireframe.swift; sourceTree = "<group>"; };
 		0F0E8CB3E7162557579B81AF /* ExampleEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorViewController.swift; sourceTree = "<group>"; };
 		F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleStoreTests.swift; sourceTree = "<group>"; };
+		3013332AF3A84AF1A334EC97 /* TodayPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPresenterTests.swift; sourceTree = "<group>"; };
 		8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPreferencesTests.swift; sourceTree = "<group>"; };
 		7EADC489FA314F64A10F6D80 /* TodayInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInteractorTests.swift; sourceTree = "<group>"; };
 		C0A32B4DA0B2480CB3FFE81E /* TodayPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlannerTests.swift; sourceTree = "<group>"; };
@@ -599,6 +607,7 @@
 				450A8E8864106604935B3A8E /* CardStyleTests.swift */,
 				5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */,
 				F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */,
+				3013332AF3A84AF1A334EC97 /* TodayPresenterTests.swift */,
 				8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */,
 				7EADC489FA314F64A10F6D80 /* TodayInteractorTests.swift */,
 				C0A32B4DA0B2480CB3FFE81E /* TodayPlannerTests.swift */,
@@ -730,6 +739,7 @@
 				9251EC5529A1EAA5006C1D1C /* StartUp */,
 				9251EC5B29A1EAA5006C1D1C /* Main */,
 				A530508EA8CD810695762CD5 /* CardStudy */,
+				5706D73AC7254CC2ABD0FBEC /* Today */,
 				A8B0CF585A0F3D463BE42FC2 /* DeckGenerator */,
 				978215170D437DC6572B32C6 /* CardStyle */,
 				5A77B3E1BD54DF106032A604 /* ExampleEditor */,
@@ -948,6 +958,16 @@
 				92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		5706D73AC7254CC2ABD0FBEC /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				B46CB83943214D0890DE16BE /* TodayPresenter.swift */,
+				1BA758F99D144FA683A582CF /* TodayViewController.swift */,
+				FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */,
+			);
+			path = Today;
 			sourceTree = "<group>";
 		};
 		A530508EA8CD810695762CD5 /* CardStudy */ = {
@@ -1314,7 +1334,10 @@
 				1000F3D97F64CEC0BD65EC8D /* DeckDraftStore.swift in Sources */,
 				8004D0E6A2CCAAF05CD0BAB9 /* DeckLibraryCell.swift in Sources */,
 				2017FC53E1DE8E424F8E7859 /* CardStudyPresenter.swift in Sources */,
+				66E62599F6024379833D481D /* TodayPresenter.swift in Sources */,
+				CF89FB6725724760B3861841 /* TodayViewController.swift in Sources */,
 				82AB31DD4A9E08CD1177E116 /* CardStudyWireframe.swift in Sources */,
+				F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */,
 				E9CE2A4F18C297D0D9817B1E /* CardStudyViewController.swift in Sources */,
 				68BB88FE0F810C5DA0F0803A /* StudyCardView.swift in Sources */,
 				40F1DEE5AF06D1D54975B817 /* CardStudyInteractor.swift in Sources */,
@@ -1399,6 +1422,7 @@
 				2BFAD412221A9565ED572372 /* CardStyleTests.swift in Sources */,
 				C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */,
 				823788C02A6614E5980E5F07 /* CardExampleStoreTests.swift in Sources */,
+				43A5E88DAED44EB6B50458E6 /* TodayPresenterTests.swift in Sources */,
 				39A253290C90462492BE266A /* TodayPreferencesTests.swift in Sources */,
 				E74DB119AE2D4A839856D92A /* TodayInteractorTests.swift in Sources */,
 				780646516F4F4E67AA91C0AF /* TodayPlannerTests.swift in Sources */,

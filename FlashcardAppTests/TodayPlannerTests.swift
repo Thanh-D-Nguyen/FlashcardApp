@@ -23,9 +23,9 @@ final class TodayPlannerTests: XCTestCase {
     }
 
     private func plan(_ decks: [TodayDeck], selected: String? = nil, mode: StudyMode = .flip, schedules: [ReviewSchedule] = [],
-                      today: [ReviewAttempt] = [], minutes: Int = 5) -> TodayPlan {
+                      today: [ReviewAttempt] = [], minutes: Int = 5, dueBefore: Date? = nil) -> TodayPlan {
         TodayPlanner.plan(decks: decks, selectedDeckID: selected, mode: mode, schedules: schedules, attemptsToday: today,
-                          budget: TodayBudget(minutes: minutes), now: now)
+                          budget: TodayBudget(minutes: minutes), now: now, dueBefore: dueBefore)
     }
 
     // MARK: Which deck
@@ -63,8 +63,12 @@ final class TodayPlannerTests: XCTestCase {
         XCTAssertEqual(plan.cardCount, 7)
     }
 
-    func test_aDeckWithoutCardsCannotBeStudiedSoTheLearnerIsAskedToChoose() {
-        XCTAssertEqual(plan([TodayDeck(id: "e", name: "Empty", cards: [], canQuiz: false)]).kind, .chooseDeck)
+    func test_aDeckWithoutCardsCannotBeStudiedSoWithNothingElseTheLearnerIsAskedToMakeOne() {
+        let empty = TodayDeck(id: "e", name: "Empty", cards: [], canQuiz: false)
+        XCTAssertEqual(plan([empty]).kind, .noDeck, "Not 'choose one of several'")
+        XCTAssertEqual(plan([empty, deck("b")]).deckID, "b", "Empty decks are not offered")
+        XCTAssertEqual(plan([empty, deck("b"), deck("c")]).kind, .chooseDeck)
+        XCTAssertEqual(plan([empty, deck("b"), deck("c")], selected: "e").kind, .chooseDeck, "A choice that cannot be studied is no choice")
     }
 
     // MARK: Nothing answered yet
@@ -82,6 +86,15 @@ final class TodayPlannerTests: XCTestCase {
         let plan = plan([deck(cards: 3)])
         XCTAssertEqual(plan.sessionCardIDs.count, 3)
         XCTAssertEqual(plan.estimatedMinutes, 1)
+    }
+
+    func test_aDeckStudiedOnlyTheOtherWayIsPractisedAndSaysSo() {
+        let rated = [schedule("deck-c1", skill: .selfRecall, dueIn: 2), schedule("deck-c2", skill: .selfRecall, dueIn: 2)]
+        let quiz = plan([deck()], mode: .quiz, schedules: rated)
+        XCTAssertEqual(quiz.kind, .practice)
+        XCTAssertTrue(quiz.studiedAnotherWay)
+        XCTAssertFalse(plan([deck()], mode: .flip, schedules: rated).studiedAnotherWay, "In the way it was studied nothing is missing")
+        XCTAssertFalse(plan([deck()], mode: .quiz).studiedAnotherWay, "A deck never studied at all is simply new")
     }
 
     // MARK: Due
@@ -153,6 +166,37 @@ final class TodayPlannerTests: XCTestCase {
         let schedules = [schedule("deck-c1", dueIn: 5), schedule("deck-c2", skill: .recognition, dueIn: 5)]
         let plan = plan([deck(cards: 4)], schedules: schedules)
         XCTAssertEqual(plan.unseenCount, 3, "c2 is only known for the other kind of answer")
+    }
+
+    // MARK: Practising more, and what counts as due today
+
+    func test_afterPractisingSomeCardsMorePracticeContinuesWithTheOnesNeverStudied() {
+        let seen = [schedule("deck-c1", dueIn: 2), schedule("deck-c2", dueIn: 2)]
+        let plan = plan([deck(cards: 20)], schedules: seen, today: [attempt("deck-c1", .remembered)])
+        XCTAssertEqual(plan.kind, .doneToday)
+        XCTAssertEqual(plan.unseenCount, 18)
+        XCTAssertEqual(plan.practiceCardIDs, (3...17).map { "deck-c\($0)" }, "The next cards in the deck, up to the budget")
+    }
+
+    func test_whenEveryCardHasBeenStudiedMorePracticeIsTheWholeDeck() {
+        let all = (1...4).map { schedule("deck-c\($0)", dueIn: 2) }
+        let plan = plan([deck(cards: 4)], schedules: all)
+        XCTAssertEqual(plan.unseenCount, 0)
+        XCTAssertTrue(plan.practiceCardIDs.isEmpty, "Nothing unseen: the caller studies the whole deck")
+    }
+
+    func test_aFirstPracticeSessionAndItsMorePracticeAreTheSameCards() {
+        let plan = plan([deck(cards: 20)])
+        XCTAssertEqual(plan.practiceCardIDs, plan.sessionCardIDs)
+    }
+
+    func test_cardsDueLaterTodayCountAsDueButNotThoseDueFromTomorrow() {
+        let endOfToday = now.addingTimeInterval(6 * 3_600)
+        let schedules = [schedule("deck-c1", dueIn: 4 / 24.0), schedule("deck-c2", dueIn: 6 / 24.0), schedule("deck-c3", dueIn: 7 / 24.0)]
+        let plan = plan([deck(cards: 3)], schedules: schedules, dueBefore: endOfToday)
+        XCTAssertEqual(plan.dueCount, 1, "Due before the end of the local day; the end itself belongs to tomorrow")
+        XCTAssertEqual(plan.sessionCardIDs, ["deck-c1"])
+        XCTAssertEqual(self.plan([deck(cards: 3)], schedules: schedules).dueCount, 0, "Without a horizon only what is due now counts")
     }
 
     // MARK: Coming back and finishing

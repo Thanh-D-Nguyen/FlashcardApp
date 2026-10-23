@@ -166,6 +166,45 @@ final class RealmServiceTests: XCTestCase {
         }
     }
 
+    func test_aSchemaFiveStoreMadeBeforeAnUnusedColumnWasRemovedStillOpensAndKeepsItsData() throws {
+        // Schema 5 first shipped `RReviewState` with a `lastAttemptId` column that nothing read; a store written then must
+        // still open once the column is gone, with every row kept.
+        try autoreleasepool {
+            var configuration = Realm.Configuration(fileURL: fileURL, schemaVersion: 5)
+            configuration.objectTypes = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self, EarlierReviewState.self]
+            let realm = try Realm(configuration: configuration)
+            try realm.write {
+                let state = EarlierReviewState()
+                state.recordId = "u1|card-1|selfRecall"
+                state.ownerKey = "u1"
+                state.cardId = "card-1"
+                state.skill = "selfRecall"
+                state.contentVersion = "v1"
+                state.algorithm = FSRSParameters.algorithm
+                state.stability = 2.3065
+                state.difficulty = 2.118
+                state.due = Date(timeIntervalSince1970: 1_800_000_000)
+                state.lastReview = Date(timeIntervalSince1970: 1_799_800_000)
+                state.reviews = 1
+                state.lastAttemptId = "run/0"
+                realm.add(state)
+                let desk = RDesk()
+                desk.id = "deck-1"
+                desk.name = "Kept"
+                realm.add(desk)
+            }
+        }
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+            XCTAssertEqual(realm.object(ofType: RDesk.self, forPrimaryKey: "deck-1")?.name, "Kept")
+            let state = try XCTUnwrap(realm.object(ofType: RReviewState.self, forPrimaryKey: "u1|card-1|selfRecall"))
+            XCTAssertEqual([state.cardId, state.skill, state.contentVersion], ["card-1", "selfRecall", "v1"])
+            XCTAssertEqual(state.stability, 2.3065, accuracy: 1e-12)
+            XCTAssertEqual(state.reviews, 1)
+        }
+    }
+
     func test_everySupportedOlderSchemaOpensWithTheReviewTableAvailable() throws {
         try makeVersionOneStore()
         try autoreleasepool {
@@ -313,4 +352,23 @@ final class RealmServiceTests: XCTestCase {
             }
         }
     }
+}
+
+/// `RReviewState` as the first schema-5 build wrote it, with the column that was removed afterwards.
+final class EarlierReviewState: Object {
+    override class func _realmObjectName() -> String? { "RReviewState" }
+
+    @Persisted(primaryKey: true) var recordId: String
+    @Persisted(indexed: true) var ownerKey: String
+    @Persisted(indexed: true) var cardId: String
+    @Persisted var skill: String
+    @Persisted var contentVersion: String
+    @Persisted var algorithm: String
+    @Persisted var stability: Double
+    @Persisted var difficulty: Double
+    @Persisted(indexed: true) var due: Date
+    @Persisted var lastReview: Date
+    @Persisted var reviews: Int
+    @Persisted var lapses: Int
+    @Persisted var lastAttemptId: String
 }
