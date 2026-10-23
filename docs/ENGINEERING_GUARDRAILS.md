@@ -18,7 +18,7 @@ defines **how to demonstrate compliance**, not a new framework or architecture.
   accessibility identifiers, and Xcode target membership. New source/resources
   must be added explicitly to the correct target and verified by a build.
 - Keep API DTOs and UUIDs, authentication and Keychain lifecycle, Realm schema,
-  saved decks and bundled offline data unchanged for UI-only work. Any necessary
+  saved decks unchanged for UI-only work (the app bundles no dictionary database; dictionary data comes from the API). Any necessary
   behavior/data change requires its own justification and regression coverage.
 - Keep UIKit work on the main thread. Preserve request cancellation, error
   propagation, validation, Realm thread ownership, and login/logout race safety.

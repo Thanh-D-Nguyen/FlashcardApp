@@ -89,9 +89,8 @@ final class EditorAccessoryView: UIInputView {
         case .hidden:
             suggestionScroll.isHidden = true
             return
-        case .searching(let partial):
-            partial.enumerated().forEach { suggestionStack.addArrangedSubview(chip(for: $1, number: $0 + 1)) }
-            suggestionStack.addArrangedSubview(statusView(partial.isEmpty ? NSLocalizedString("Searching the dictionary…", comment: "") : nil, spinning: true))
+        case .searching:
+            suggestionStack.addArrangedSubview(statusView(NSLocalizedString("Searching the dictionary…", comment: ""), spinning: true))
         case .results(let suggestions):
             suggestions.enumerated().forEach { suggestionStack.addArrangedSubview(chip(for: $1, number: $0 + 1)) }
         case .empty:

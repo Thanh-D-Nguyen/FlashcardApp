@@ -2,27 +2,21 @@ import RxSwift
 import XCTest
 @testable import FlashcardApp
 
-/// How offline and online dictionary answers become one suggestion list.
+/// How the server's dictionary answers become the suggestion list.
 final class DictionarySuggestionTests: XCTestCase {
-    private var offline: StubOffline!
     private var online: StubOnline!
     private var interactor: DictionarySuggestionInteractor!
     private var bag: DisposeBag!
 
     override func setUp() {
         super.setUp()
-        offline = StubOffline()
         online = StubOnline()
-        interactor = DictionarySuggestionInteractor(offline: offline, online: online)
+        interactor = DictionarySuggestionInteractor(online: online)
         bag = DisposeBag()
     }
 
     private func dto(_ title: String, _ reading: String?, _ meaning: String?, kind: String = "lexeme", level: String? = nil) -> BJTSearchResultDTO {
         BJTSearchResultDTO(id: UUID().uuidString, kind: kind, title: title, description: meaning, reading: reading, jlptLevel: level)
-    }
-
-    private func local(_ japanese: String, _ reading: String, _ meaning: String) -> CardSuggestion {
-        CardSuggestion(japanese: japanese, reading: reading, vietnamese: meaning, typedJapanese: true)
     }
 
     private func collect(_ query: SuggestionQuery) -> [SuggestionsState] {
@@ -56,19 +50,22 @@ final class DictionarySuggestionTests: XCTestCase {
         XCTAssertEqual(JapaneseText.firstGloss(of: "  "), "")
     }
 
-    // MARK: Merging
+    // MARK: Ranking
 
-    func test_offlineAnswersFirstThenTheMergedOnlineResult() {
-        offline.entries = [local("食べ物", "たべもの", "đồ ăn (offline)")]
-        online.result = .just([dto("食べる", "たべる", "ăn", level: "N5"), dto("食べ物", "たべもの", "thức ăn", level: "N5")])
+    func test_searchingIsAnnouncedFirstThenTheRankedResult() {
+        online.result = .just([dto("食べ物", "たべもの", "thức ăn", level: "N5"), dto("食べる", "たべる", "ăn", level: "N5")])
         let states = collect(japanese)
         XCTAssertEqual(states.count, 2)
-        XCTAssertEqual(states[0], .searching(partial: [local("食べ物", "たべもの", "đồ ăn (offline)")]))
-        guard case .results(let merged) = states[1] else { return XCTFail("\(states[1])") }
-        XCTAssertEqual(merged.map(\.japanese), ["食べる", "食べ物"], "Prefix match first; the same word is listed once")
-        XCTAssertEqual(merged[1].vietnamese, "thức ăn", "The online entry wins over the offline duplicate")
-        XCTAssertEqual(merged[0].source, .online)
-        XCTAssertEqual(merged[0].jlptLevel, "N5")
+        XCTAssertEqual(states[0], .searching)
+        guard case .results(let ranked) = states[1] else { return XCTFail("\(states[1])") }
+        XCTAssertEqual(ranked.map(\.japanese), ["食べ物", "食べる"], "Equal ranks keep the server's order")
+        XCTAssertEqual(ranked[0].jlptLevel, "N5")
+    }
+
+    func test_theSameWordIsListedOnce() {
+        online.result = .just([dto("食べる", "たべる", "ăn"), dto("食べる", "たべる", "dùng bữa")])
+        guard case .results(let ranked) = collect(japanese).last else { return XCTFail() }
+        XCTAssertEqual(ranked.map(\.vietnamese), ["ăn"])
     }
 
     func test_typoToleranceNoiseFromTheServerIsDropped() {
@@ -113,13 +110,12 @@ final class DictionarySuggestionTests: XCTestCase {
         XCTAssertEqual(collect(japanese).last, .empty)
     }
 
-    func test_offlineAnswersSurviveAnOnlineFailure() {
-        offline.entries = [local("食べる", "たべる", "ăn")]
+    func test_noConnectionIsReportedAsUnavailableNotAsNoMatch() {
         online.result = .error(LearnerAPIError.offline)
-        XCTAssertEqual(collect(japanese).last, .results([local("食べる", "たべる", "ăn")]))
+        XCTAssertEqual(collect(japanese), [.searching, .unavailable])
     }
 
-    func test_anOnlineFailureWithNothingOfflineIsReportedAsUnavailable() {
+    func test_aServerFailureIsReportedAsUnavailable() {
         online.result = .error(AppError.invalidInput("x"))
         XCTAssertEqual(collect(japanese).last, .unavailable)
     }
@@ -139,11 +135,6 @@ final class DictionarySuggestionTests: XCTestCase {
         XCTAssertEqual(online.lookups.map(\.text), ["食べ"])
         XCTAssertEqual(online.lookups.first?.limit, 20)
     }
-}
-
-private final class StubOffline: OfflineDictionaryInterface {
-    var entries: [CardSuggestion] = []
-    func entries(for query: SuggestionQuery, limit: Int) -> [CardSuggestion] { Array(entries.prefix(limit)) }
 }
 
 private final class StubOnline: OnlineDictionaryInterface {

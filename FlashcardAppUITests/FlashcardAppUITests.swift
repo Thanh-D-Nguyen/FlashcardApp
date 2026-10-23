@@ -546,7 +546,7 @@ final class FlashcardAppUITests: XCTestCase {
         front.tap()
         front.typeText("犬")
         let suggestion = app.buttons["dictionary_suggestion_1"]
-        XCTAssertTrue(suggestion.waitForExistence(timeout: 10), "The offline dictionary answers immediately")
+        XCTAssertTrue(suggestion.waitForExistence(timeout: 10), "The dictionary API answers")
         attachScreenshot(app, name: "dictionary-suggestions")
         suggestion.tap()
         let back = app.textViews.matching(identifier: "card_back").element(boundBy: 0)

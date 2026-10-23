@@ -2,9 +2,9 @@
 //  DictionarySuggestionInteractor.swift
 //  FlashcardApp
 //
-//  Dictionary suggestions for the card editor. Two sources answer one query:
-//  - the offline dictionary bundled in Realm (instant, works without a connection), and
-//  - the public `GET /api/search?scope=lexeme` (headword, reading, Vietnamese meaning, JLPT level; no login).
+//  Dictionary suggestions for the card editor, from the public `GET /api/search?scope=lexeme` (headword,
+//  reading, Vietnamese meaning, JLPT level; no login). The app bundles no dictionary: without a connection
+//  there are no suggestions, and typing a card by hand keeps working.
 //  `POST /api/flashcards/cards/suggest` is not used: it needs a session, orders results at random and only
 //  matches substrings, which makes it a deck-building tool rather than autocomplete.
 //
@@ -14,15 +14,12 @@ import RxSwift
 
 /// A dictionary entry offered above the keyboard while typing a card.
 struct CardSuggestion: Equatable {
-    enum Source: Equatable { case offline, online }
-
     let japanese: String
     let reading: String
     let vietnamese: String
     /// The learner was typing Japanese (so the Japanese side is theirs) or Vietnamese.
     let typedJapanese: Bool
     var jlptLevel: String? = nil
-    var source: Source = .offline
 
     /// Text of the chip: the headword with its meaning.
     var title: String { "\(japanese) · \(vietnamese)" }
@@ -49,21 +46,16 @@ struct SuggestionQuery: Equatable {
 
 enum SuggestionsState: Equatable {
     case hidden
-    /// The online lookup is running; `partial` is what the offline dictionary already found.
-    case searching(partial: [CardSuggestion])
+    case searching
     case results([CardSuggestion])
     case empty
-    /// Nothing offline matched and the online dictionary could not be reached.
+    /// The dictionary could not be reached.
     case unavailable
 }
 
 protocol DictionarySuggestionInteractorInterface: AnyObject {
-    /// Emits `.searching` right away, then one final state. Disposing the subscription cancels the online request.
+    /// Emits `.searching` right away, then one final state. Disposing the subscription cancels the request.
     func suggestions(for query: SuggestionQuery) -> Observable<SuggestionsState>
-}
-
-protocol OfflineDictionaryInterface: AnyObject {
-    func entries(for query: SuggestionQuery, limit: Int) -> [CardSuggestion]
 }
 
 protocol OnlineDictionaryInterface: AnyObject {
@@ -76,47 +68,25 @@ extension BJTSearchAPI: OnlineDictionaryInterface {
     }
 }
 
-/// The bundled Realm dictionary. Realm objects are read on the calling (main) thread and copied into values.
-final class RealmOfflineDictionary: OfflineDictionaryInterface {
-    func entries(for query: SuggestionQuery, limit: Int) -> [CardSuggestion] {
-        if query.isJapanese {
-            return JaViManagement.shared.search(query.text, limit: limit).compactMap { entity in
-                guard let meaning = entity.means?.first?.mean, !meaning.isEmpty, !entity.word.isEmpty else { return nil }
-                return CardSuggestion(japanese: entity.word, reading: entity.phonetic, vietnamese: meaning, typedJapanese: true)
-            }
-        }
-        return ViJaManagement.shared.search(query.text, limit: limit).compactMap { entity in
-            guard let japanese = entity.means?.first?.mean, !japanese.isEmpty, !entity.word.isEmpty else { return nil }
-            return CardSuggestion(japanese: japanese, reading: "", vietnamese: entity.word, typedJapanese: false)
-        }
-    }
-}
-
 final class DictionarySuggestionInteractor: DictionarySuggestionInteractorInterface {
     static let limit = 10
 
-    private let offline: OfflineDictionaryInterface
     private let online: OnlineDictionaryInterface
 
-    init(offline: OfflineDictionaryInterface = RealmOfflineDictionary(), online: OnlineDictionaryInterface = BJTSearchAPI.shared) {
-        self.offline = offline
+    init(online: OnlineDictionaryInterface = BJTSearchAPI.shared) {
         self.online = online
     }
 
     func suggestions(for query: SuggestionQuery) -> Observable<SuggestionsState> {
-        let local = offline.entries(for: query, limit: Self.limit)
-        let remote = online.lookup(query.text, limit: 20)
+        let answer = online.lookup(query.text, limit: 20)
             .map { Self.suggestions(from: $0, for: query) }
             .asObservable()
-            .map { remote -> SuggestionsState in
-                let merged = Self.merge(remote: remote, local: local, query: query)
-                return merged.isEmpty ? .empty : .results(merged)
+            .map { found -> SuggestionsState in
+                let ranked = Self.rank(found, query: query)
+                return ranked.isEmpty ? .empty : .results(ranked)
             }
-            .catch { _ in
-                // The offline answer stands on its own; only an empty one makes the failure worth reporting.
-                .just(local.isEmpty ? .unavailable : .results(Self.merge(remote: [], local: local, query: query)))
-            }
-        return Observable.concat(.just(.searching(partial: Self.merge(remote: [], local: local, query: query))), remote)
+            .catch { _ in .just(.unavailable) }
+        return Observable.concat(.just(.searching), answer)
     }
 
     // MARK: Mapping and ranking
@@ -134,15 +104,14 @@ final class DictionarySuggestionInteractor: DictionarySuggestionInteractorInterf
                 : JapaneseText.folded(meaning).contains(folded) || JapaneseText.folded(result.title).contains(folded)
             guard relevant else { return nil }
             return CardSuggestion(japanese: result.title, reading: reading, vietnamese: meaning, typedJapanese: query.isJapanese,
-                                  jlptLevel: result.jlptLevel, source: .online)
+                                  jlptLevel: result.jlptLevel)
         }
     }
 
-    /// Online entries first (the server's content is the current one), then offline ones for words not already
-    /// listed; exact and prefix matches float to the top. Stable, so equal ranks keep the source order.
-    static func merge(remote: [CardSuggestion], local: [CardSuggestion], query: SuggestionQuery) -> [CardSuggestion] {
+    /// Same word listed once; exact and prefix matches float to the top. Stable, so equal ranks keep the server's order.
+    static func rank(_ suggestions: [CardSuggestion], query: SuggestionQuery) -> [CardSuggestion] {
         var seen = Set<String>()
-        let unique = (remote + local).filter { seen.insert($0.identity).inserted }
+        let unique = suggestions.filter { seen.insert($0.identity).inserted }
         let folded = JapaneseText.folded(query.text)
         func rank(_ suggestion: CardSuggestion) -> Int {
             let typed = query.isJapanese ? [suggestion.japanese, suggestion.reading] : [suggestion.vietnamese]

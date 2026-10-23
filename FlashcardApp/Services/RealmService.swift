@@ -1,71 +1,51 @@
 import RealmSwift
 import Foundation
 
+/// The local store: the learner's own decks and cards. Dictionary content (words, kanji, grammar, examples)
+/// is not stored here; it comes from the API. No database is bundled with the app.
 final class RealmService {
-    private let databaseName = "flash_card.realm"
-    private let databaseVersion: UInt64 = 1
+    static let databaseName = "flash_card.realm"
+    /// 1: the bundled database, which also held the dictionary tables. 2: decks and cards only.
+    static let schemaVersion: UInt64 = 2
+    static let storedTypes: [Object.Type] = [RDesk.self, RCard.self]
+    /// Tables of the retired bundled dictionary. An upgraded install empties them; the decks are untouched.
+    static let retiredDictionaryTables: [Object.Type] = [RetiredJaVi.self, RetiredViJa.self, RetiredKanji.self, RetiredGrammar.self, RetiredExample.self]
+    /// How those tables are named in the file (the stand-in classes map to them with `_realmObjectName`).
+    static let retiredDictionaryTableNames = ["RJaVi", "RViJa", "RKanji", "RGrammar", "RExample"]
+
     static let shared = RealmService()
     var realm: Realm!
-    var copyProgress: ((Double) -> Void)?
 
-    func copyBundleData(completion: @escaping (URL) -> Void, onError: ((AppError) -> Void)? = nil) {
-        guard let source = Bundle.main.url(forResource: databaseName, withExtension: nil) else {
-            onError?(.databaseInitializationFailed(NSLocalizedString("The bundled offline data was not found.", comment: "")))
-            return
-        }
-        let destination = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(databaseName)
-        copyProgress?(0)
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                try Self.installBundleDatabase(from: source, to: destination)
-                DispatchQueue.main.async {
-                    self.copyProgress?(100)
-                    completion(destination)
-                }
-            } catch {
-                logger.error("Database copy failed: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    onError?(.databaseInitializationFailed(NSLocalizedString("Couldn't prepare the offline data. Existing data was kept.", comment: "")))
-                }
-            }
-        }
+    static var defaultFileURL: URL {
+        FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent(databaseName)
     }
 
-    static func installBundleDatabase(from source: URL, to destination: URL) throws {
-        let manager = FileManager.default
-        let temporary = destination.appendingPathExtension("importing")
-        if manager.fileExists(atPath: temporary.path) { try manager.removeItem(at: temporary) }
-        let sourceData = try Data(contentsOf: source, options: .mappedIfSafe)
-        let exists = manager.fileExists(atPath: destination.path)
-        if exists {
-            let existing = try Data(contentsOf: destination, options: .mappedIfSafe)
-            // Repair only an exact, truncated bundle copy; never replace a modified user store.
-            guard existing.count < sourceData.count, sourceData.starts(with: existing) else { return }
-        }
-        defer { if manager.fileExists(atPath: temporary.path) { try? manager.removeItem(at: temporary) } }
-        try manager.copyItem(at: source, to: temporary)
-        if exists {
-            _ = try manager.replaceItemAt(destination, withItemAt: temporary)
-        } else {
-            try manager.moveItem(at: temporary, to: destination)
-        }
+    static func makeConfiguration(fileURL: URL = defaultFileURL) -> Realm.Configuration {
+        Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion, migrationBlock: migrate,
+                            shouldCompactOnLaunch: shouldCompact, objectTypes: storedTypes)
     }
 
     func configuration(onComplete: @escaping () -> Void = {}, onError: ((AppError) -> Void)? = nil) {
-        copyBundleData(completion: { [self] url in
-            let config = Realm.Configuration(fileURL: url, schemaVersion: databaseVersion,
-                                             migrationBlock: RealmService.migrate)
-            do {
-                realm = try Realm(configuration: config)
-                Realm.Configuration.defaultConfiguration = config
-                onComplete()
-            } catch {
-                logger.error("Database open failed: \(error.localizedDescription)")
-                onError?(.databaseInitializationFailed(NSLocalizedString("Couldn't open the offline data. Existing data was kept.", comment: "")))
-            }
-        }, onError: onError)
+        let config = Self.makeConfiguration()
+        do {
+            realm = try Realm(configuration: config)
+            Realm.Configuration.defaultConfiguration = config
+            onComplete()
+        } catch {
+            logger.error("Database open failed: \(error.localizedDescription)")
+            onError?(.databaseInitializationFailed(NSLocalizedString("Couldn't open the offline data. Existing data was kept.", comment: "")))
+        }
     }
 
-    static func migrate(migration: Migration, oldVersion: UInt64) {}
+    static func migrate(migration: Migration, oldVersion: UInt64) {
+        guard oldVersion < 2 else { return }
+        retiredDictionaryTableNames.forEach { _ = migration.deleteData(forType: $0) }
+    }
+
+    /// Dropping the dictionary tables frees most of a 100+ MB file; compact it on a later launch (the check
+    /// runs before the upgrade commits) so the space is returned to the device.
+    static func shouldCompact(totalBytes: Int, usedBytes: Int) -> Bool {
+        let threshold = 20 * 1024 * 1024
+        return totalBytes > threshold && Double(usedBytes) / Double(totalBytes) < 0.5
+    }
 }

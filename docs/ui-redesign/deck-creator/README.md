@@ -12,7 +12,7 @@ Không có DTO nào được suy ra từ tên endpoint; mỗi dòng dưới đâ
 | Xem trước số thẻ | `POST …/generate/preview` | Chỉ nhận `levels`, `sourceTypes`; trả `{availableCount}` | Không | Có |
 | Tạo tự động | Cấp độ, loại nội dung, chiều học, số thẻ 5–50 | `POST …/generate`: `name`, `sourceTypes`, `levels`, `limit` (≤0 hoặc >500 → **âm thầm thành 50**), `direction` (`jp_to_vn`, `vn_to_jp`, `both`). Trả bộ thẻ **không có thẻ**. | Không | Có (5–100, bước 5) |
 | Lọc theo chủ đề / "vùng yếu" (`adaptive`) | Có trên giao diện | **Không có**: handler bỏ qua các trường này | Không | **Không hiển thị** (không bịa) |
-| Gợi ý từ điển khi gõ | Chỉ gợi ý cách đọc (`/api/reading-assist`) | `GET /api/search` công khai (headword, reading, nghĩa tiếng Việt, JLPT); `GET /api/search/suggest` không có nghĩa; `POST /api/flashcards/cards/suggest` cần đăng nhập, `ORDER BY RANDOM()`, khớp chuỗi con | Chỉ từ điển offline (Realm), ánh xạ **toàn bộ** kết quả | `/api/search` + từ điển offline, có debounce, huỷ, chống kết quả cũ, IME |
+| Gợi ý từ điển khi gõ | Chỉ gợi ý cách đọc (`/api/reading-assist`) | `GET /api/search` công khai (headword, reading, nghĩa tiếng Việt, JLPT); `GET /api/search/suggest` không có nghĩa; `POST /api/flashcards/cards/suggest` cần đăng nhập, `ORDER BY RANDOM()`, khớp chuỗi con | Chỉ từ điển offline (Realm), ánh xạ **toàn bộ** kết quả | Chỉ `/api/search` (đã bỏ từ điển offline), có debounce, huỷ, chống kết quả cũ, IME |
 | Gợi ý ảnh | `POST /api/media/search-images` → `{images:[{id,thumbUrl,fullUrl,source}]}` | **Chỉ là stub**: sau khi kiểm tra đầu vào luôn trả **503** ("provider integration is missing") | Chọn từ Ảnh hoặc dán URL https | Thêm "Tìm ảnh…"; xử lý 503 như trạng thái bình thường |
 | CSRF cho POST native | Cookie + Origin | `CSRFGuard`: thiếu `Origin`/`Referer` → **403 `forbidden: missing origin`** (đã chạy thật); origin phải nằm trong `CORS_ORIGINS` (local có `http://localhost:18081`) | Login/logout gửi origin của chính API | Dùng lại đúng cách đó; 403 hiển thị là lỗi tích hợp |
 
@@ -53,9 +53,9 @@ và phát âm khi học chọn ja-JP/vi-VN theo từng thẻ (sửa `CardStudyPr
 - `SuggestionQuery`: tối thiểu 1 ký tự Nhật hoặc 2 ký tự Latin, tối đa 40; chữ viết của text đã gõ quyết định tra Nhật→Việt hay Việt→Nhật (không dựa vào chiều bộ thẻ).
 - Debounce 300 ms, `flatMapLatest` huỷ yêu cầu mạng cũ; mỗi phản hồi chỉ được hiển thị nếu vẫn khớp yêu cầu hiện tại (xoá chữ / đổi trường / đang gõ IME thì bỏ).
 - Đang soạn IME (`markedTextRange != nil`) **không gọi API**.
-- Từ điển offline trả ngay (có giới hạn, xếp hạng khớp-chính-xác → tiền tố → chứa), kết quả online hợp nhất, loại trùng, loại kết quả "nhiễu" do tìm kiếm chịu lỗi gõ (ví dụ "食べ" → "イベント駆動").
+- Kết quả `/api/search` được xếp hạng (khớp-chính-xác → tiền tố → chứa), loại trùng, loại kết quả "nhiễu" do tìm kiếm chịu lỗi gõ (ví dụ "食べ" → "イベント駆動").
 - Điền thẻ: ô đang gõ được hoàn thành; ô khác chỉ điền khi trống; nếu ô đã có chữ khác thì hỏi "Thay nội dung bạn đã viết?" (Thay thế / Giữ của tôi).
-- Chỉ điền trường có thật: từ, cách đọc, nghĩa. `/api/search` không trả từ loại hay câu ví dụ; từ điển offline chỉ có mã JMdict thô (`n`, `v1, vt`), nên **không** điền từ loại/ví dụ.
+- Chỉ điền trường có thật: từ, cách đọc, nghĩa. `/api/search` không trả từ loại hay câu ví dụ; nên **không** điền từ loại/ví dụ ở bước này. Mất mạng thì không có gợi ý (app không còn từ điển offline).
 
 ## 4. Gợi ý ảnh
 

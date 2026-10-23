@@ -12,22 +12,24 @@ Bốn tab hoạt động:
   phân trang 30 mục và xem nghĩa.
 - Từ điển: GET `/api/search`, scope `lexeme`, `kanji`, `grammar`, `example`.
   Đổi từ khóa hủy request cũ; có trạng thái tải, trống, lỗi và tải lại.
-- Thẻ: thư viện bộ thẻ Realm offline (tìm, sắp xếp, sửa, xoá), trình soạn bộ thẻ (cách đọc, ghi chú, ảnh từ Ảnh hoặc `https`, nhập hàng loạt, bản nháp) và màn học (lật, xáo trộn, trắc nghiệm, đọc to). Ảnh của thẻ nằm cục bộ vì backend Go chưa lưu ảnh cho thẻ; chi tiết, ma trận tương đương web và bằng chứng ở `docs/ui-redesign/cards/README.md`.
+- Thẻ: thư viện bộ thẻ Realm cục bộ (tìm, sắp xếp, sửa, xoá), trình soạn bộ thẻ (cách đọc, ghi chú, ảnh từ Ảnh hoặc `https`, nhập hàng loạt, bản nháp) và màn học (lật, xáo trộn, trắc nghiệm, đọc to). Ảnh của thẻ nằm cục bộ vì backend Go chưa lưu ảnh cho thẻ; chi tiết, ma trận tương đương web và bằng chứng ở `docs/ui-redesign/cards/README.md`.
 - Cài đặt: giao diện, âm thanh, thông báo và tài khoản của website.
 
 Giao diện có ba ngôn ngữ: Tiếng Việt, English, 日本語 (`Localizable.xcstrings`; chọn ngôn ngữ ở
 Cài đặt iOS ▸ FlashcardApp ▸ Ngôn ngữ). Tên và mô tả cấp độ theo ngôn ngữ; nghĩa từ vựng/kanji/ngữ pháp
 từ API hiện chỉ có tiếng Việt. UI test ghim `-AppleLanguages (vi)`.
 
-App mở thẳng vào nội dung, không yêu cầu đăng nhập để học offline hoặc đọc API
-công khai. Đăng nhập từ mục tài khoản trong Cài đặt bằng tài khoản website đã có.
+App mở thẳng vào nội dung, không yêu cầu đăng nhập để học bộ thẻ của mình hoặc đọc API
+công khai. App tạm thời không đóng gói từ điển: từ điển, ví dụ, kanji, ngữ pháp và gợi ý lấy từ API
+(cần server chạy; mất mạng thì chỉ còn bộ thẻ đã lưu và gõ thẻ bằng tay). Realm vẫn là nơi lưu dữ liệu
+cục bộ và cache; cơ chế tải từ điển về Realm sẽ làm sau. Đăng nhập từ mục tài khoản trong Cài đặt bằng tài khoản website đã có.
 
 ## Khởi động
 
 Launch screen hệ thống chỉ là một màn trống màu `LaunchBackground` (giấy washi / gần đen), trùng
 `Design.Color.background`; không logo, chữ hay animation. `StartUp` không phải màn splash: nó chỉ
-mở cơ sở dữ liệu offline qua `StartUpInteractor` rồi chuyển thẳng vào `Main`. Chỉ khi việc chuẩn bị
-kéo dài quá 0,4 giây (cài đặt lần đầu, sao chép ~120 MB) mới hiện trạng thái tải; lỗi mở dữ liệu hiện
+mở Realm cục bộ (chỉ bộ thẻ của người học) qua `StartUpInteractor` rồi chuyển thẳng vào `Main`. Chỉ khi việc
+chuẩn bị kéo dài quá 0,4 giây (nâng cấp schema) mới hiện trạng thái tải; lỗi mở dữ liệu hiện
 màn lỗi có nút Thử lại. Không có độ trễ giả. Chi tiết và ảnh chụp: `docs/ui-redesign/splash/`.
 
 ## API và tài khoản
@@ -65,7 +67,7 @@ backend đang chạy. OpenAPI cũ chưa đủ để khẳng định mọi endpoi
 | --- | --- |
 | RxSwift, bao gồm RxCocoa/RxRelay | Binding và vòng đời request hiện dùng xuyên app |
 | Alamofire | Request API, validation và cancellation |
-| realm-swift | Dữ liệu offline, bộ thẻ và schema đang dùng |
+| realm-swift | Bộ thẻ của người học và schema đang dùng |
 | Kingfisher | Tải/cache ảnh của thẻ đã lưu và avatar |
 
 `Package.resolved` gồm các package trên và `realm-core` là dependency bắc cầu.
@@ -76,8 +78,9 @@ cho các wrapper tương ứng. Màn Thẻ viết lại không còn dùng MMText
 Đã bỏ các thư viện vendored Disk, VImage, PullToRefresh, RESegmentedControl;
 giao diện snack/carousel mẫu, Quiz rỗng, Vocabulary/DictionaryWelcome mẫu; client
 Swagger phục vụ tìm ảnh và các BJT client/DTO không có caller hoặc sai contract.
-Tìm ảnh Flickr/Pixabay và khóa nhúng trong source đã được gỡ. URL ảnh đã lưu và
-`Storage/Data/flash_card.realm` được giữ. Xóa khóa khỏi source không thu hồi khóa
+Tìm ảnh Flickr/Pixabay và khóa nhúng trong source đã được gỡ. URL ảnh đã lưu được giữ.
+CSDL từ điển đóng gói `Storage/Data/flash_card.realm` (~120 MB) đã bị gỡ khỏi app theo yêu cầu (tạm thời): bản cài cũ
+được nâng lên schema 2, bỏ các bảng từ điển và giữ nguyên bộ thẻ; có thể khôi phục file từ Git (commit trước `feat(data)`). Xóa khóa khỏi source không thu hồi khóa
 ở nhà cung cấp hoặc trong lịch sử Git; chủ tài khoản cần thu hồi khóa cũ.
 
 ## Môi trường

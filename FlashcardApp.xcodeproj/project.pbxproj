@@ -46,12 +46,6 @@
 		9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761229A7B2AC00ECF29C /* CardManagement.swift */; };
 		9226D80929D00C1B0042F6DA /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D80829D00C1B0042F6DA /* PlaceholderView.swift */; };
 		9226D80B29D00C520042F6DA /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D80A29D00C520042F6DA /* Atomic.swift */; };
-		9238009829C5866900FECD23 /* SearchWordsInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009729C5866900FECD23 /* SearchWordsInteractor.swift */; };
-		9238009A29C5870800FECD23 /* JaViEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009929C5870800FECD23 /* JaViEntity.swift */; };
-		9238009C29C5888300FECD23 /* ViJaEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009B29C5888300FECD23 /* ViJaEntity.swift */; };
-		9238009E29C5891E00FECD23 /* SearchResultEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009D29C5891E00FECD23 /* SearchResultEntity.swift */; };
-		923800A029C96FD800FECD23 /* JaViMeansEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9238009F29C96FD800FECD23 /* JaViMeansEntity.swift */; };
-		923800A329C9732C00FECD23 /* ViJaMeansEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923800A229C9732C00FECD23 /* ViJaMeansEntity.swift */; };
 		924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */; };
 		924052E029AB398C00B47E09 /* CreateDeskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */; };
 		924052E129AB398C00B47E09 /* CreateDeskInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */; };
@@ -119,25 +113,14 @@
 		9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */; };
 		9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */; };
 		9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */; };
-		9288BADA29A3B54E00F9AC9F /* flash_card.realm in Resources */ = {isa = PBXBuildFile; fileRef = 9288BAD929A3B54E00F9AC9F /* flash_card.realm */; };
 		9291705A29AB672800894551 /* AppImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705929AB672800894551 /* AppImages.swift */; };
 		929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DBC29A733A2007651E9 /* CardEntity.swift */; };
 		929C4DC529A74806007651E9 /* AppColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DC429A74806007651E9 /* AppColor.swift */; };
 		929C4DC829A74CAE007651E9 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 929C4DC729A74CAE007651E9 /* Kingfisher */; };
 		929C4DD729A76442007651E9 /* DeskInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD229A76442007651E9 /* DeskInteractor.swift */; };
 		929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD929A7646F007651E9 /* DeskEntity.swift */; };
-		92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EB429A258CB00CE7E70 /* RExample.swift */; };
 		92A93EB829A25A1B00CE7E70 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 92A93EB729A25A1B00CE7E70 /* Realm */; };
 		92A93EBA29A25A1B00CE7E70 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 92A93EB929A25A1B00CE7E70 /* RealmSwift */; };
-		92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EBB29A25B5000CE7E70 /* RGrammar.swift */; };
-		92A93EBE29A25C1900CE7E70 /* RJaVi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EBD29A25C1900CE7E70 /* RJaVi.swift */; };
-		92A93EC029A25DBF00CE7E70 /* RKanji.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EBF29A25DBF00CE7E70 /* RKanji.swift */; };
-		92A93EC229A25F3300CE7E70 /* RViJa.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC129A25F3300CE7E70 /* RViJa.swift */; };
-		92A93EC529A2602800CE7E70 /* ExampleManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC429A2602800CE7E70 /* ExampleManagement.swift */; };
-		92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC629A260B800CE7E70 /* GrammarManagement.swift */; };
-		92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93EC829A260D700CE7E70 /* JaViManagement.swift */; };
-		92A93ECB29A260F700CE7E70 /* KanjiManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */; };
-		92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */; };
 		92B3A16F2C01B71600013599 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B3A16E2C01B71600013599 /* Image.swift */; };
 		92C5B44929F3C17000EE3377 /* AppErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C5B44829F3C17000EE3377 /* AppErrors.swift */; };
 		92D411922AD3D652005A15DC /* VersionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D411912AD3D652005A15DC /* VersionFooterView.swift */; };
@@ -153,7 +136,6 @@
 		93C63CAB1642EC80FAFBB221 /* AuthSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DC789F28A351A8BE56E8BA /* AuthSessionTests.swift */; };
 		954A1E2E95AA02D9E017EC63 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1575B578C6A276BCF1B2746 /* CardImageView.swift */; };
 		9F45520656CDB470FEBE6B8F /* AddCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29806379570F82DF1A17172 /* AddCardCell.swift */; };
-		A0BCF8E413F8AC623DDB6D83 /* RealmBootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E96D68F982120FDBA7412A1 /* RealmBootstrapTests.swift */; };
 		A9A67BB882CBE061BB82FC1C /* DictionaryPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D62027595C24F3BC7F093BF /* DictionaryPresenterTests.swift */; };
 		AA5A808EDC7B72C0FC341C15 /* CardEditorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D5F2A0E9E416427A083A8A /* CardEditorCell.swift */; };
 		B54706FD42A98427FF57E0FA /* DictionaryAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB0ABC95B2F0626764F789 /* DictionaryAPITests.swift */; };
@@ -187,6 +169,8 @@
 		75A9CBF12981CC4B0D5314D4 /* DictionarySuggestionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F9A0DFD210564B7A9A78D7 /* DictionarySuggestionTests.swift */; };
 		2261377E65101B75EA65A77B /* DeckGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */; };
 		11F32497EE4A0CC122C6D530 /* PictureSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C964F9799EFF286A346DC1 /* PictureSearchTests.swift */; };
+		7F591847AB436D6F4AD74020 /* RealmServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC556F467C4C588BD4781CDD /* RealmServiceTests.swift */; };
+		4D2EE12D11D8338888E09709 /* RetiredDictionaryTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -238,19 +222,12 @@
 		81651ED770FBD884568B4B44 /* HomeCells.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeCells.swift; sourceTree = "<group>"; };
 		83A49A1C506CF0E7537C6053 /* TextEntryCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TextEntryCell.swift; sourceTree = "<group>"; };
 		855C69598B064D18A3F1DB76 /* StudyCardView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudyCardView.swift; sourceTree = "<group>"; };
-		8E96D68F982120FDBA7412A1 /* RealmBootstrapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmBootstrapTests.swift; sourceTree = "<group>"; };
 		9209760C29A787C100ECF29C /* RDesk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDesk.swift; sourceTree = "<group>"; };
 		9209760E29A7887800ECF29C /* RCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCard.swift; sourceTree = "<group>"; };
 		9209761029A7AC4C00ECF29C /* DeskManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskManagement.swift; sourceTree = "<group>"; };
 		9209761229A7B2AC00ECF29C /* CardManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardManagement.swift; sourceTree = "<group>"; };
 		9226D80829D00C1B0042F6DA /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		9226D80A29D00C520042F6DA /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
-		9238009729C5866900FECD23 /* SearchWordsInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchWordsInteractor.swift; sourceTree = "<group>"; };
-		9238009929C5870800FECD23 /* JaViEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaViEntity.swift; sourceTree = "<group>"; };
-		9238009B29C5888300FECD23 /* ViJaEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaEntity.swift; sourceTree = "<group>"; };
-		9238009D29C5891E00FECD23 /* SearchResultEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultEntity.swift; sourceTree = "<group>"; };
-		9238009F29C96FD800FECD23 /* JaViMeansEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaViMeansEntity.swift; sourceTree = "<group>"; };
-		923800A229C9732C00FECD23 /* ViJaMeansEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaMeansEntity.swift; sourceTree = "<group>"; };
 		924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskPresenter.swift; sourceTree = "<group>"; };
 		924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskViewController.swift; sourceTree = "<group>"; };
 		924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskInteractor.swift; sourceTree = "<group>"; };
@@ -323,22 +300,11 @@
 		9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewController.swift; sourceTree = "<group>"; };
 		9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryInteractor.swift; sourceTree = "<group>"; };
 		9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryWireframe.swift; sourceTree = "<group>"; };
-		9288BAD929A3B54E00F9AC9F /* flash_card.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = flash_card.realm; sourceTree = "<group>"; };
 		9291705929AB672800894551 /* AppImages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
 		929C4DBC29A733A2007651E9 /* CardEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardEntity.swift; sourceTree = "<group>"; };
 		929C4DC429A74806007651E9 /* AppColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColor.swift; sourceTree = "<group>"; };
 		929C4DD229A76442007651E9 /* DeskInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskInteractor.swift; sourceTree = "<group>"; };
 		929C4DD929A7646F007651E9 /* DeskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskEntity.swift; sourceTree = "<group>"; };
-		92A93EB429A258CB00CE7E70 /* RExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RExample.swift; sourceTree = "<group>"; };
-		92A93EBB29A25B5000CE7E70 /* RGrammar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGrammar.swift; sourceTree = "<group>"; };
-		92A93EBD29A25C1900CE7E70 /* RJaVi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RJaVi.swift; sourceTree = "<group>"; };
-		92A93EBF29A25DBF00CE7E70 /* RKanji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RKanji.swift; sourceTree = "<group>"; };
-		92A93EC129A25F3300CE7E70 /* RViJa.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RViJa.swift; sourceTree = "<group>"; };
-		92A93EC429A2602800CE7E70 /* ExampleManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleManagement.swift; sourceTree = "<group>"; };
-		92A93EC629A260B800CE7E70 /* GrammarManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarManagement.swift; sourceTree = "<group>"; };
-		92A93EC829A260D700CE7E70 /* JaViManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaViManagement.swift; sourceTree = "<group>"; };
-		92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiManagement.swift; sourceTree = "<group>"; };
-		92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViJaManagement.swift; sourceTree = "<group>"; };
 		92B3A16E2C01B71600013599 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		92C5B44829F3C17000EE3377 /* AppErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrors.swift; sourceTree = "<group>"; };
 		92D411912AD3D652005A15DC /* VersionFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionFooterView.swift; sourceTree = "<group>"; };
@@ -389,6 +355,8 @@
 		09F9A0DFD210564B7A9A78D7 /* DictionarySuggestionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySuggestionTests.swift; sourceTree = "<group>"; };
 		8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorTests.swift; sourceTree = "<group>"; };
 		A0C964F9799EFF286A346DC1 /* PictureSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchTests.swift; sourceTree = "<group>"; };
+		FC556F467C4C588BD4781CDD /* RealmServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmServiceTests.swift; sourceTree = "<group>"; };
+		A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RetiredDictionaryTables.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -556,7 +524,6 @@
 				B5EB0ABC95B2F0626764F789 /* DictionaryAPITests.swift */,
 				9F9CAB3FBED0EBD7CB069327 /* SettingPresenterTests.swift */,
 				5E7A11C0D2B94A6F8C3E0A02 /* SettingsRowCellTests.swift */,
-				8E96D68F982120FDBA7412A1 /* RealmBootstrapTests.swift */,
 				5A7C0DE12F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift */,
 				9251EBE329A1E9A7006C1D1C /* FlashcardAppTests.swift */,
 				58F523D82C0F0EA33D4FC0A0 /* DeskManagementTests.swift */,
@@ -571,6 +538,7 @@
 				09F9A0DFD210564B7A9A78D7 /* DictionarySuggestionTests.swift */,
 				8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */,
 				A0C964F9799EFF286A346DC1 /* PictureSearchTests.swift */,
+				FC556F467C4C588BD4781CDD /* RealmServiceTests.swift */,
 			);
 			path = FlashcardAppTests;
 			sourceTree = "<group>";
@@ -589,11 +557,6 @@
 				9251EBFE29A1EAA5006C1D1C /* SocialUserEntity.swift */,
 				929C4DBC29A733A2007651E9 /* CardEntity.swift */,
 				929C4DD929A7646F007651E9 /* DeskEntity.swift */,
-				9238009929C5870800FECD23 /* JaViEntity.swift */,
-				9238009B29C5888300FECD23 /* ViJaEntity.swift */,
-				9238009D29C5891E00FECD23 /* SearchResultEntity.swift */,
-				9238009F29C96FD800FECD23 /* JaViMeansEntity.swift */,
-				923800A229C9732C00FECD23 /* ViJaMeansEntity.swift */,
 				995295DA00DA8922BE3BAAF5 /* DeckDraft.swift */,
 				F89F935A6E3E901638562AA0 /* StudySession.swift */,
 				CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */,
@@ -620,7 +583,6 @@
 				9251ED3329A212E9006C1D1C /* CardInteractor.swift */,
 				9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */,
 				9251ED1329A20040006C1D1C /* SettingInteractor.swift */,
-				9238009729C5866900FECD23 /* SearchWordsInteractor.swift */,
 				924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */,
 				9725D887B857CFD895F006A4 /* CardStudyInteractor.swift */,
 				5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */,
@@ -863,7 +825,6 @@
 			isa = PBXGroup;
 			children = (
 				92A93EC329A2600C00CE7E70 /* Managements */,
-				92A93EA929A2588900CE7E70 /* Data */,
 				92A93EA829A2586E00CE7E70 /* Models */,
 			);
 			path = Storage;
@@ -872,33 +833,16 @@
 		92A93EA829A2586E00CE7E70 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				92A93EB429A258CB00CE7E70 /* RExample.swift */,
-				92A93EBB29A25B5000CE7E70 /* RGrammar.swift */,
-				92A93EBD29A25C1900CE7E70 /* RJaVi.swift */,
-				92A93EBF29A25DBF00CE7E70 /* RKanji.swift */,
-				92A93EC129A25F3300CE7E70 /* RViJa.swift */,
 				9209760C29A787C100ECF29C /* RDesk.swift */,
 				9209760E29A7887800ECF29C /* RCard.swift */,
+				A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		92A93EA929A2588900CE7E70 /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				9288BAD929A3B54E00F9AC9F /* flash_card.realm */,
-			);
-			path = Data;
 			sourceTree = "<group>";
 		};
 		92A93EC329A2600C00CE7E70 /* Managements */ = {
 			isa = PBXGroup;
 			children = (
-				92A93EC429A2602800CE7E70 /* ExampleManagement.swift */,
-				92A93EC629A260B800CE7E70 /* GrammarManagement.swift */,
-				92A93EC829A260D700CE7E70 /* JaViManagement.swift */,
-				92A93ECA29A260F700CE7E70 /* KanjiManagement.swift */,
-				92A93ECC29A2611B00CE7E70 /* ViJaManagement.swift */,
 				9209761029A7AC4C00ECF29C /* DeskManagement.swift */,
 				9209761229A7B2AC00ECF29C /* CardManagement.swift */,
 			);
@@ -1122,7 +1066,6 @@
 				92D411942AD3D673005A15DC /* VersionFooterView.xib in Resources */,
 				9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */,
 				9251ECE029A1EAA5006C1D1C /* Localizable.xcstrings in Resources */,
-				9288BADA29A3B54E00F9AC9F /* flash_card.realm in Resources */,
 				9251ECCF29A1EAA5006C1D1C /* Main.storyboard in Resources */,
 				9251ECCB29A1EAA5006C1D1C /* StartUp.storyboard in Resources */,
 				9251ED1529A20040006C1D1C /* Setting.storyboard in Resources */,
@@ -1182,10 +1125,8 @@
 				9251ECD129A1EAA5006C1D1C /* MainWireframe.swift in Sources */,
 				929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */,
 				9251ED2129A2074D006C1D1C /* SettingsRowCell.swift in Sources */,
-				92A93EB529A258CB00CE7E70 /* RExample.swift in Sources */,
 				92B3A16F2C01B71600013599 /* Image.swift in Sources */,
 				929C4DD729A76442007651E9 /* DeskInteractor.swift in Sources */,
-				92A93EC229A25F3300CE7E70 /* RViJa.swift in Sources */,
 				9251ECCA29A1EAA5006C1D1C /* StartUpViewController.swift in Sources */,
 				9251ED1D29A20341006C1D1C /* AccountCell.swift in Sources */,
 				9226D80B29D00C520042F6DA /* Atomic.swift in Sources */,
@@ -1203,15 +1144,11 @@
 				9251EC9D29A1EAA5006C1D1C /* Color.swift in Sources */,
 				9251ECEA29A1EAA5006C1D1C /* Enums.swift in Sources */,
 				929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */,
-				92A93EBE29A25C1900CE7E70 /* RJaVi.swift in Sources */,
 				9251ED1829A20040006C1D1C /* SettingInteractor.swift in Sources */,
 				9251ED1729A20040006C1D1C /* SettingViewController.swift in Sources */,
 				9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */,
-				92A93EBC29A25B5000CE7E70 /* RGrammar.swift in Sources */,
 				9251EC9629A1EAA5006C1D1C /* BaseWireframe.swift in Sources */,
-				92A93ECB29A260F700CE7E70 /* KanjiManagement.swift in Sources */,
 				9251EBCD29A1E9A6006C1D1C /* AppDelegate.swift in Sources */,
-				92A93EC929A260D700CE7E70 /* JaViManagement.swift in Sources */,
 				9251EC9A29A1EAA5006C1D1C /* StackView.swift in Sources */,
 				9251ECE929A1EAA5006C1D1C /* Constants.swift in Sources */,
 				9251ECB029A1EAA5006C1D1C /* HomeViewController.swift in Sources */,
@@ -1219,20 +1156,16 @@
 				9251EC9129A1EAA5006C1D1C /* MailLoginInteractor.swift in Sources */,
 				9251ECC829A1EAA5006C1D1C /* StartUpInteractor.swift in Sources */,
 				9251ECB129A1EAA5006C1D1C /* HomeWireframe.swift in Sources */,
-				923800A029C96FD800FECD23 /* JaViMeansEntity.swift in Sources */,
 				9251ECA829A1EAA5006C1D1C /* RoundCornerButton.swift in Sources */,
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
 				929C4DC529A74806007651E9 /* AppColor.swift in Sources */,
 				D5A0000100000000000000A1 /* DesignSystem.swift in Sources */,
 				6A11C0DE00000000000000B1 /* AppLanguage.swift in Sources */,
-				92A93EC729A260B800CE7E70 /* GrammarManagement.swift in Sources */,
-				9238009C29C5888300FECD23 /* ViJaEntity.swift in Sources */,
 				9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */,
 				9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */,
 				9251ED4329A2133A006C1D1C /* DictionaryPresenter.swift in Sources */,
 				9251ECCC29A1EAA5006C1D1C /* StartUpPresenter.swift in Sources */,
 				9209760D29A787C100ECF29C /* RDesk.swift in Sources */,
-				923800A329C9732C00FECD23 /* ViJaMeansEntity.swift in Sources */,
 				9251EC8A29A1EAA5006C1D1C /* HomeInteractor.swift in Sources */,
 				9251ECC929A1EAA5006C1D1C /* StartUpWireframe.swift in Sources */,
 				9251EC9B29A1EAA5006C1D1C /* Storyboard.swift in Sources */,
@@ -1241,17 +1174,13 @@
 				9251EC8C29A1EAA5006C1D1C /* MainInteractor.swift in Sources */,
 				9251ECCE29A1EAA5006C1D1C /* MainPresenter.swift in Sources */,
 				9251ECCD29A1EAA5006C1D1C /* MainViewController.swift in Sources */,
-				9238009E29C5891E00FECD23 /* SearchResultEntity.swift in Sources */,
 				9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */,
 				924052E029AB398C00B47E09 /* CreateDeskViewController.swift in Sources */,
 				9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */,
 				9251ED4529A2133A006C1D1C /* DictionaryInteractor.swift in Sources */,
-				9238009A29C5870800FECD23 /* JaViEntity.swift in Sources */,
-				92A93EC529A2602800CE7E70 /* ExampleManagement.swift in Sources */,
 				9251EBCF29A1E9A6006C1D1C /* SceneDelegate.swift in Sources */,
 				9251ECB229A1EAA5006C1D1C /* HomePresenter.swift in Sources */,
 				9251EC8229A1EAA5006C1D1C /* SocialUserEntity.swift in Sources */,
-				9238009829C5866900FECD23 /* SearchWordsInteractor.swift in Sources */,
 				92D411922AD3D652005A15DC /* VersionFooterView.swift in Sources */,
 				9251ECBF29A1EAA5006C1D1C /* MailLoginViewController.swift in Sources */,
 				924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */,
@@ -1259,10 +1188,8 @@
 				9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */,
 				9251ED3829A212E9006C1D1C /* CardInteractor.swift in Sources */,
 				924052E229AB398C00B47E09 /* CreateDeskWireframe.swift in Sources */,
-				92A93EC029A25DBF00CE7E70 /* RKanji.swift in Sources */,
 				9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */,
 				9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */,
-				92A93ECD29A2611B00CE7E70 /* ViJaManagement.swift in Sources */,
 				9251EC9E29A1EAA5006C1D1C /* BaseNavigationController.swift in Sources */,
 				9251ED3929A212E9006C1D1C /* CardWireframe.swift in Sources */,
 				9251EC9429A1EAA5006C1D1C /* BaseViewControler.swift in Sources */,
@@ -1310,6 +1237,7 @@
 				DD6ED62AB5F6AB8615DEDF27 /* DeckGeneratorViewController.swift in Sources */,
 				6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */,
 				B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */,
+				4D2EE12D11D8338888E09709 /* RetiredDictionaryTables.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1326,7 +1254,6 @@
 				B54706FD42A98427FF57E0FA /* DictionaryAPITests.swift in Sources */,
 				3809A6AD49199CB7D07DBA0F /* SettingPresenterTests.swift in Sources */,
 				5E7A11C0D2B94A6F8C3E0A01 /* SettingsRowCellTests.swift in Sources */,
-				A0BCF8E413F8AC623DDB6D83 /* RealmBootstrapTests.swift in Sources */,
 				5A7C0DE22F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift in Sources */,
 				9251EBE429A1E9A7006C1D1C /* FlashcardAppTests.swift in Sources */,
 				198E01551E1631C719BC9626 /* DeskManagementTests.swift in Sources */,
@@ -1341,6 +1268,7 @@
 				75A9CBF12981CC4B0D5314D4 /* DictionarySuggestionTests.swift in Sources */,
 				2261377E65101B75EA65A77B /* DeckGeneratorTests.swift in Sources */,
 				11F32497EE4A0CC122C6D530 /* PictureSearchTests.swift in Sources */,
+				7F591847AB436D6F4AD74020 /* RealmServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

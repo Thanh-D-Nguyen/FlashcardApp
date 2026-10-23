@@ -468,11 +468,11 @@ final class CreateDeskPresenterTests: XCTestCase {
         XCTAssertEqual(suggestions.queries.last?.isJapanese, false, "Vietnamese typed on the front of a Japanese–Vietnamese deck")
     }
 
-    func test_choosingAnOfflineEntryWhileTheOnlineLookupRunsKeepsItsLateAnswerOut() {
+    func test_choosingAnEntryWhileTheLookupIsStillOpenKeepsItsLateAnswerOut() {
         let presenter = makePresenter()
         presenter.updateField(.front, ofCardAt: 0, text: "犬")
         settle()
-        suggestions.subjects[0].onNext(.searching(partial: [entry()]))
+        suggestions.subjects[0].onNext(.results([entry()]))
         settle(0.05)
         presenter.apply(entry(), toCardAt: 0)
         suggestions.subjects[0].onNext(.results([entry("犬小屋", reading: "いぬごや", "cũi chó")]))

@@ -7,10 +7,6 @@
 
 import UIKit
 
-enum CardFace {
-    case front, back
-}
-
 enum MainTabbarName: Int {
     case home
     case desk

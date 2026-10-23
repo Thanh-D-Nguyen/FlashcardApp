@@ -14,8 +14,13 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
   Keycloak/Swagger contracts do not describe the current Go login flow.
 - `Services/AuthSession.swift`: Keychain session lifecycle and stale-response protection.
   API results keep backend UUIDs; remote deck/progress synchronization is not implemented.
-- `Services/RealmService.swift`: bundled database bootstrap and schema version.
-  Preserve `Storage/Data/flash_card.realm`; it is user-facing offline content.
+- `Services/RealmService.swift`: Realm stays the local store for the learner's own data (decks and
+  cards: `RDesk`, `RCard`, schema 2) and is where future caches live (add models to `storedTypes`).
+  **The app bundles no database and keeps no dictionary for now**: words, kanji, grammar, example
+  sentences and suggestions come from the API. The user plans a download mechanism for dictionary
+  data later; until they ask for it, do not re-add the bundled `flash_card.realm` or dictionary
+  tables. Never delete the learner's decks; the schema-2 migration only empties the retired
+  dictionary tables of upgraded installs.
 - `FlashcardApp.xcodeproj/project.pbxproj` uses explicit file membership. New Swift
   files and resources must be added to the appropriate target and built.
 
