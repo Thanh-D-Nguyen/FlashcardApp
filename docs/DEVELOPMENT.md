@@ -1,5 +1,13 @@
 # Phát triển FlashcardApp
 
+## Quy trình AI và kế hoạch tính năng
+
+Dùng [flashcard-delivery](../.claude/skills/flashcard-delivery/SKILL.md) cho việc lập
+kế hoạch và triển khai từng story. [Quyết định quy trình](AI_WORKFLOW.md) giải thích
+cách áp dụng BMAD ở mức phương pháp cùng TDD/XCTest hiện có, và cách gọi từ Codex/Xcode.
+[Kế hoạch học cá nhân hóa](plans/personalized-learning.md) chia lịch sử học, lịch ôn,
+Today và bài tình huống thành các phần riêng; hiện mới PLANNED.
+
 ## Phạm vi hiện tại
 
 App dùng UIKit/storyboard, Swift 5 và iOS 26+. Giữ View → Presenter → Interactor →

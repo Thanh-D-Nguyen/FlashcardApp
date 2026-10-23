@@ -80,6 +80,12 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
   required before reporting completion. These rules also apply to work already
   in progress when the agent next reads project instructions.
 - Feature/bug: `.claude/skills/flashcard-feature/SKILL.md`.
+- Feature planning and delivery of a planned story: start with
+  `.claude/skills/flashcard-delivery/SKILL.md` (BMAD-inspired planning + existing
+  XCTest TDD), then the feature/API/release skill as needed. Codex discovers the
+  same skill through `.agents/skills/flashcard-delivery`. Method choice and usage:
+  `docs/AI_WORKFLOW.md`. Load only the relevant story from `docs/plans/`; a roadmap
+  is not authorization to implement all its stories. Trivial edits stay lightweight.
 - Backend integration/DTO/auth: `.claude/skills/flashcard-api-contract/SKILL.md`.
 - Environment, build or release verification:
   `.claude/skills/flashcard-release/SKILL.md`.

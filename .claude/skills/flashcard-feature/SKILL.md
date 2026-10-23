@@ -7,6 +7,11 @@ Read `AGENTS.md` from the repository root. Inspect the current diff and trace th
 affected screen, including storyboard outlets/identifiers and wireframe assembly.
 Use CodeGraph if present; otherwise use Xcode symbol/search tools.
 
+For a planned story or a feature needing scope/acceptance decisions, first use
+`../flashcard-delivery/SKILL.md`. Reuse its scope and test evidence instead of
+creating a second plan. For a small fix, keep the acceptance example and evidence
+in the task; no separate planning document is required.
+
 Reuse the nearest complete module as the pattern. UI rendering belongs in the
 controller, state/interaction in the presenter, use cases in the interactor and
 storage/network work in the existing service. Avoid forcing a rewrite to SwiftUI,

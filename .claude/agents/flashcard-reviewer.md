@@ -17,3 +17,7 @@ For each actionable finding give severity, file:line, concrete trigger, user imp
 and the smallest remedy. Distinguish proven bugs, untested assumptions and planned
 migrations. A successful build does not prove networking or persistence correctness.
 Avoid style-only findings and do not manufacture findings to fill a quota.
+
+For planned delivery work, compare the diff with that story's acceptance examples
+and actual RED/GREEN/verification evidence. Flag unverified gates without calling
+them source bugs; a plan-only change does not need app tests rerun.
