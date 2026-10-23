@@ -16,8 +16,8 @@ final class RealmServiceTests: XCTestCase {
 
     override func tearDownWithError() throws { try FileManager.default.removeItem(at: folder) }
 
-    func test_theLocalSchemaHoldsOnlyDecksAndCards() {
-        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard"])
+    func test_theLocalSchemaHoldsTheLearnersOwnData() {
+        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard", "RCardExample"])
     }
 
     func test_aFreshInstallOpensAnEmptyStoreWithoutAnyBundledFile() throws {
@@ -43,9 +43,37 @@ final class RealmServiceTests: XCTestCase {
         XCTAssertEqual(deckName, "My deck")
         XCTAssertEqual(frontTexts, ["犬"], "The learner's cards survive the upgrade")
         XCTAssertEqual(cardBack, "con chó")
-        XCTAssertEqual(tables, ["RDesk", "RCard"])
+        XCTAssertEqual(tables, ["RDesk", "RCard", "RCardExample"])
         XCTAssertEqual(version, RealmService.schemaVersion)
         XCTAssertEqual(try retiredRowCount(), 0, "The dictionary rows were emptied")
+    }
+
+    func test_upgradingFromSchemaTwoKeepsEveryDeckAndAddsAnEmptyExampleTable() throws {
+        try autoreleasepool {
+            var configuration = Realm.Configuration(fileURL: fileURL, schemaVersion: 2)
+            configuration.objectTypes = [RDesk.self, RCard.self]
+            let realm = try Realm(configuration: configuration)
+            try realm.write {
+                let card = RCard()
+                card.id = "card-1"
+                card.frontText = "犬"
+                let desk = RDesk()
+                desk.id = "deck-1"
+                desk.name = "My deck"
+                desk.cards.append(card)
+                realm.add(desk)
+            }
+        }
+        let realm = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+        XCTAssertEqual(realm.object(ofType: RDesk.self, forPrimaryKey: "deck-1")?.cards.first?.frontText, "犬")
+        XCTAssertEqual(realm.objects(RCardExample.self).count, 0)
+        try realm.write {
+            let example = RCardExample()
+            example.id = "e1"
+            example.cardId = "card-1"
+            realm.add(example)
+        }
+        XCTAssertEqual(realm.objects(RCardExample.self).count, 1, "The new table is writable")
     }
 
     func test_aMigratedStoreOpensAgainWithoutFurtherMigration() throws {

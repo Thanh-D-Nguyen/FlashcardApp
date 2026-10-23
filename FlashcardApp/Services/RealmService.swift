@@ -6,8 +6,9 @@ import Foundation
 final class RealmService {
     static let databaseName = "flash_card.realm"
     /// 1: the bundled database, which also held the dictionary tables. 2: decks and cards only.
-    static let schemaVersion: UInt64 = 2
-    static let storedTypes: [Object.Type] = [RDesk.self, RCard.self]
+    /// 3: adds `RCardExample`, the learner's own example sentences (additive, nothing to migrate).
+    static let schemaVersion: UInt64 = 3
+    static let storedTypes: [Object.Type] = [RDesk.self, RCard.self, RCardExample.self]
     /// Tables of the retired bundled dictionary. An upgraded install empties them; the decks are untouched.
     static let retiredDictionaryTables: [Object.Type] = [RetiredJaVi.self, RetiredViJa.self, RetiredKanji.self, RetiredGrammar.self, RetiredExample.self]
     /// How those tables are named in the file (the stand-in classes map to them with `_realmObjectName`).

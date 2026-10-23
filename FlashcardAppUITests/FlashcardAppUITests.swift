@@ -403,6 +403,7 @@ final class FlashcardAppUITests: XCTestCase {
         let newFront = app.textViews.matching(identifier: "card_front").element(boundBy: 2)
         XCTAssertTrue(newFront.waitForExistence(timeout: 5))
         newFront.typeText("bird")
+        waitForDictionaryLookup(app)
         app.textViews.matching(identifier: "card_back").element(boundBy: 2).tap()
         app.textViews.matching(identifier: "card_back").element(boundBy: 2).typeText("chim")
         app.buttons["save_deck"].tap()
@@ -595,6 +596,113 @@ final class FlashcardAppUITests: XCTestCase {
         app.buttons["card_style_done"].tap()
     }
 
+    /// The learner can add, edit and remove sentences on a card. Removing the server's sentence only hides it (and it can
+    /// be restored); what the learner wrote is deleted; changes survive leaving the card. Needs the local backend.
+    func testExampleSentencesCanBeAddedEditedRemovedAndRestored() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        let name = "UI \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "犬", back: "chó")
+        fillCard(app, index: 1, front: "猫", back: "mèo")
+        app.buttons["save_deck"].tap()
+        let row = deckRow(app, named: name)
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
+        XCTAssertTrue(app.buttons["study_card"].waitForExistence(timeout: 5))
+        app.buttons["study_primary"].tap()
+        XCTAssertTrue(app.buttons["study_example_speak_0"].waitForExistence(timeout: 20), "The server's sentences are the default")
+
+        func tags() -> [String] {
+            app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH %@", "study_example_tag_")).allElementsBoundByIndex.map(\.label)
+        }
+        func rowCount() -> Int { app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "study_example_more_")).count }
+        func fillEditor(_ sentence: String, meaning: String = "") {
+            let field = app.textViews["example_editor_japanese"]
+            XCTAssertTrue(field.waitForExistence(timeout: 5))
+            field.tap()
+            field.typeText(sentence)
+            if !meaning.isEmpty {
+                app.textViews["example_editor_translation"].tap()
+                app.textViews["example_editor_translation"].typeText(meaning)
+            }
+        }
+        let initialRows = rowCount()
+        XCTAssertGreaterThan(initialRows, 0)
+        XCTAssertTrue(tags().isEmpty)
+
+        // Add: a sentence of the learner's own, listed after the server's.
+        app.buttons["study_examples_add"].tap()
+        fillEditor("私は犬を飼っています。", meaning: "Tôi nuôi chó.")
+        attachScreenshot(app, name: "example-editor")
+        app.buttons["example_editor_save"].tap()
+        XCTAssertTrue(app.staticTexts["study_example_tag_\(initialRows)"].waitForExistence(timeout: 5))
+        XCTAssertEqual(rowCount(), initialRows + 1)
+        XCTAssertEqual(tags().count, 1)
+
+        // The same sentence twice is refused and the form stays open with the reason.
+        app.buttons["study_examples_add"].tap()
+        fillEditor("私は犬を飼っています。")
+        app.buttons["example_editor_save"].tap()
+        XCTAssertTrue(app.staticTexts["example_editor_problem"].waitForExistence(timeout: 5))
+        app.buttons["example_editor_cancel"].tap()
+        app.alerts.buttons["Bỏ"].tap()   // typing is not thrown away without asking
+        XCTAssertTrue(app.buttons["study_examples_add"].waitForExistence(timeout: 5))
+        XCTAssertEqual(rowCount(), initialRows + 1)
+
+        // Edit a server sentence: it becomes the learner's version, tagged.
+        app.buttons["study_example_more_0"].tap()
+        app.buttons["Sửa"].tap()
+        let field = app.textViews["example_editor_japanese"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertFalse((field.value as? String ?? "").isEmpty, "The form starts from the sentence")
+        app.textViews["example_editor_translation"].tap()
+        app.textViews["example_editor_translation"].typeText(" (đã sửa)")
+        app.buttons["example_editor_save"].tap()
+        XCTAssertTrue(app.staticTexts["study_example_tag_0"].waitForExistence(timeout: 5))
+        XCTAssertEqual(tags().count, 2)
+        attachScreenshot(app, name: "examples-edited")
+
+        // Remove a server sentence: asked first, then only hidden; it can be restored.
+        app.buttons["study_example_more_1"].tap()
+        app.buttons["Gỡ khỏi ví dụ của tôi"].tap()
+        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 5))
+        app.alerts.buttons["Huỷ"].tap()
+        XCTAssertEqual(rowCount(), initialRows + 1, "Cancelling the question changes nothing")
+        app.buttons["study_example_more_1"].tap()
+        app.buttons["Gỡ khỏi ví dụ của tôi"].tap()
+        app.alerts.buttons["Gỡ"].tap()
+        XCTAssertTrue(app.buttons["study_examples_restore"].waitForExistence(timeout: 5))
+        XCTAssertEqual(rowCount(), initialRows)
+
+        // The changes stay when the learner leaves the card and comes back.
+        app.buttons["study_primary"].tap()   // next card
+        app.buttons["study_previous"].tap()
+        app.buttons["study_primary"].tap()   // flip again
+        XCTAssertTrue(app.buttons["study_examples_restore"].waitForExistence(timeout: 20))
+        XCTAssertEqual(tags().count, 2)
+
+        // Restore the removed one; delete the learner's own sentence (final); bring back the original text.
+        app.buttons["study_examples_restore"].tap()
+        XCTAssertFalse(app.buttons["study_examples_restore"].exists)
+        XCTAssertEqual(rowCount(), initialRows + 1)
+        let mine = app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS[c] %@", "study_example_tag_", "BẠN")).allElementsBoundByIndex
+        XCTAssertEqual(mine.count, 2)
+        app.buttons["study_example_more_\(initialRows)"].tap()
+        app.buttons["Xoá"].tap()
+        app.alerts.buttons["Xoá"].tap()
+        XCTAssertTrue(waitForCount(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "study_example_more_")), equals: initialRows))
+        app.buttons["study_example_more_0"].tap()
+        app.buttons["Khôi phục bản gốc"].tap()
+        XCTAssertTrue(waitForCount(app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH %@", "study_example_tag_")), equals: 0), "Back to the server's sentences")
+    }
+
     /// Typing a Japanese word offers dictionary entries; choosing one fills the card, and a field the learner already
     /// wrote is left alone.
     func testTypingAJapaneseWordOffersDictionaryEntriesThatFillTheCard() {
@@ -655,9 +763,25 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 10))
     }
 
+    private func waitForCount(_ query: XCUIElementQuery, equals count: Int, timeout: TimeInterval = 5) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while query.count != count, Date() < deadline { RunLoop.current.run(until: Date().addingTimeInterval(0.1)) }
+        return query.count == count
+    }
+
     private func waitForLabel(_ element: XCUIElement, containing text: String, timeout: TimeInterval = 5) -> Bool {
         let predicate = NSPredicate(format: "label CONTAINS %@", text)
         return XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: element)], timeout: timeout) == .completed
+    }
+
+    /// The dictionary bar above the keyboard asks the API after the learner stops typing and changes the layout when it
+    /// answers; a test that taps the next field meanwhile can hit a chip. Wait until the lookup is no longer running.
+    private func waitForDictionaryLookup(_ app: XCUIApplication, timeout: TimeInterval = 10) {
+        let searching = app.staticTexts["Đang tra từ điển…"]
+        let deadline = Date().addingTimeInterval(timeout)
+        // The lookup starts after a 300 ms pause, so give it a moment to appear before waiting for it to finish.
+        _ = searching.waitForExistence(timeout: 1)
+        while searching.exists, Date() < deadline { RunLoop.current.run(until: Date().addingTimeInterval(0.2)) }
     }
 
     private func fillCard(_ app: XCUIApplication, index: Int, front: String, back: String) {
@@ -665,6 +789,7 @@ final class FlashcardAppUITests: XCTestCase {
         if !frontField.isHittable { app.tables["deck_editor_table"].swipeUp() }
         frontField.tap()
         frontField.typeText(front)
+        waitForDictionaryLookup(app)
         let backField = app.textViews.matching(identifier: "card_back").element(boundBy: index)
         backField.tap()
         backField.typeText(back)

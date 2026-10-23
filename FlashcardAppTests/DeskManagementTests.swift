@@ -9,7 +9,7 @@ final class DeskManagementTests: XCTestCase {
 
     override func setUpWithError() throws {
         let configuration = Realm.Configuration(inMemoryIdentifier: "desk-management-\(UUID().uuidString)",
-                                                objectTypes: [RDesk.self, RCard.self])
+                                                objectTypes: RealmService.storedTypes)
         realm = try Realm(configuration: configuration)
         RealmService.shared.realm = realm
         repository = DeskManagement()

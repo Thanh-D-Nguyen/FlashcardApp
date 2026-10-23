@@ -1,3 +1,4 @@
+import RealmSwift
 import RxSwift
 import XCTest
 @testable import FlashcardApp
@@ -8,8 +9,11 @@ final class CardStudyPresenterTests: XCTestCase {
     private var preferences: FakeStudyPreferences!
     private var speech: FakeSpeech!
     private var examples: FakeExamples!
+    private var realm: Realm!
+    private var owner = "11111111-1111-1111-1111-111111111111"
     private var view: SpyStudyView!
     private var presenter: CardStudyPresenter!
+    private var exampleStore: CardExampleStoreInterface?
 
     override func setUp() {
         super.setUp()
@@ -18,8 +22,18 @@ final class CardStudyPresenterTests: XCTestCase {
         preferences = FakeStudyPreferences()
         speech = FakeSpeech()
         examples = FakeExamples()
+        realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "study-\(UUID().uuidString)", objectTypes: RealmService.storedTypes))
+        RealmService.shared.realm = realm
+        owner = "11111111-1111-1111-1111-111111111111"
         view = SpyStudyView()
         interactor.deck = makeDeck(3)
+    }
+
+    override func tearDown() {
+        presenter = nil
+        realm = nil
+        RealmService.shared.realm = nil
+        super.tearDown()
     }
 
     private func makeDeck(_ count: Int, direction: LanguageSortingType = .normal) -> DeskEntity {
@@ -39,7 +53,8 @@ final class CardStudyPresenterTests: XCTestCase {
 
     private func start() {
         presenter = CardStudyPresenter(deckId: "deck", interactor: interactor, wireframe: wireframe, preferences: preferences,
-                                       speech: speech, random: { $0.lowerBound }, examples: examples)
+                                       speech: speech, random: { $0.lowerBound }, examples: examples,
+                                       exampleStore: exampleStore ?? RealmCardExampleStore(), ownerKey: { [unowned self] in owner })
         presenter.view = view
         presenter.viewWillAppear()
     }
@@ -222,25 +237,31 @@ final class CardStudyPresenterTests: XCTestCase {
         wait(for: [done], timeout: 2)
     }
 
+    private var panel: ExamplesPanelState { state.examples }
+
     func test_theSentencesAreLookedUpWhenTheCardAppearsButShownOnlyAfterTheAnswer() {
         japaneseDeck()
         start()
         XCTAssertEqual(examples.requests.map(\.term), ["犬"], "Prefetched while the front is showing")
         XCTAssertEqual(examples.requests.first?.reading, "いぬ")
-        XCTAssertEqual(state.examples, .hidden, "The front must not give the word's use away")
+        XCTAssertFalse(panel.isVisible, "The front must not give the word's use away")
         deliver([sentence("1")])
-        XCTAssertEqual(state.examples, .hidden)
+        XCTAssertFalse(panel.isVisible)
         presenter.flip()
-        XCTAssertEqual(state.examples, .results([sentence("1")]))
+        XCTAssertTrue(panel.isVisible)
+        XCTAssertEqual(panel.items, [ExampleItem(example: sentence("1"), origin: .server)])
+        XCTAssertEqual(panel.server, .loaded)
     }
 
-    func test_theLookupIsVisibleAsLoadingUntilItAnswers() {
+    func test_theServersPartIsLoadingUntilItAnswersAndAnEmptyAnswerIsNotAnError() {
         japaneseDeck()
         start()
         presenter.flip()
-        XCTAssertEqual(state.examples, .loading)
+        XCTAssertEqual(panel.server, .loading)
+        XCTAssertTrue(panel.items.isEmpty)
         deliver([])
-        XCTAssertEqual(state.examples, .empty)
+        XCTAssertEqual(panel.server, .loaded)
+        XCTAssertTrue(panel.items.isEmpty)
     }
 
     func test_aFailedLookupIsUnavailableAndRetryAsksAgain() {
@@ -249,12 +270,12 @@ final class CardStudyPresenterTests: XCTestCase {
         presenter.flip()
         examples.subjects[0].onError(LearnerAPIError.offline)
         waitForMain()
-        XCTAssertEqual(state.examples, .unavailable)
+        XCTAssertEqual(panel.server, .unavailable)
         presenter.retryExamples()
         XCTAssertEqual(examples.requests.count, 2)
-        XCTAssertEqual(state.examples, .loading)
+        XCTAssertEqual(panel.server, .loading)
         deliver([sentence("1")], request: 1)
-        XCTAssertEqual(state.examples, .results([sentence("1")]))
+        XCTAssertEqual(panel.items.map(\.id), ["1"])
     }
 
     func test_aLateAnswerForACardThatWasLeftIsDropped() {
@@ -265,16 +286,20 @@ final class CardStudyPresenterTests: XCTestCase {
         deliver([sentence("old")], request: 0)
         presenter.flip()
         XCTAssertEqual(state.card?.front, "猫")
-        XCTAssertEqual(state.examples, .loading, "The sentence for the first card must not appear under the second")
+        XCTAssertEqual(panel.server, .loading, "The sentence for the first card must not appear under the second")
+        XCTAssertTrue(panel.items.isEmpty)
         deliver([sentence("new", "猫がいます。")], request: 1)
-        XCTAssertEqual(state.examples, .results([sentence("new", "猫がいます。")]))
+        XCTAssertEqual(panel.items.map(\.id), ["new"])
     }
 
-    func test_aCardWithoutAJapaneseWordHasNoSentencesAndNoRequest() {
+    func test_aCardWithoutAJapaneseWordHasNoLookupButStillTakesTheLearnersOwnSentences() {
         start()
         presenter.flip()
         XCTAssertTrue(examples.requests.isEmpty)
-        XCTAssertEqual(state.examples, .hidden)
+        XCTAssertTrue(panel.isVisible)
+        XCTAssertEqual(panel.server, .notApplicable)
+        presenter.addExample()
+        XCTAssertEqual(wireframe.editors.count, 1)
     }
 
     func test_aQuizShowsTheSentencesOnlyAfterAnAnswer() {
@@ -282,9 +307,9 @@ final class CardStudyPresenterTests: XCTestCase {
         preferences.mode = .quiz
         start()
         deliver([sentence("1")])
-        XCTAssertEqual(state.examples, .hidden)
+        XCTAssertFalse(panel.isVisible)
         presenter.select(option: "chó")
-        XCTAssertEqual(state.examples, .results([sentence("1")]))
+        XCTAssertEqual(panel.items.map(\.id), ["1"])
     }
 
     func test_theSentencesLeaveWhenTheDeckIsFinished() {
@@ -293,7 +318,7 @@ final class CardStudyPresenterTests: XCTestCase {
         deliver([sentence("1")])
         presenter.flip(); presenter.primaryAction(); presenter.flip(); presenter.primaryAction()
         XCTAssertEqual(state.screen, .finished)
-        XCTAssertEqual(state.examples, .hidden)
+        XCTAssertFalse(panel.isVisible)
     }
 
     func test_leavingTheScreenCancelsTheLookup() {
@@ -321,6 +346,164 @@ final class CardStudyPresenterTests: XCTestCase {
         XCTAssertEqual(speech.spoken.last?.1, "ja-JP")
         presenter.speakExample(id: "unknown")
         XCTAssertEqual(speech.spoken.count, 1)
+    }
+
+    // MARK: The learner's own changes to the sentences
+
+    private func openJapaneseCard(serving found: [CardExample]) {
+        japaneseDeck()
+        start()
+        deliver(found)
+        presenter.flip()
+    }
+
+    func test_theLearnersOwnSentencesShowAtOnceAndWithoutAConnection() throws {
+        japaneseDeck()
+        start()
+        presenter.flip()
+        presenter.addExample()
+        try wireframe.editors[0].save(CardExampleDraft(japanese: "私の文。"))
+        XCTAssertEqual(panel.server, .loading, "The server is still being asked")
+        XCTAssertEqual(panel.items.map(\.origin), [.custom])
+        examples.subjects[0].onError(LearnerAPIError.offline)
+        waitForMain()
+        XCTAssertEqual(panel.server, .unavailable)
+        XCTAssertEqual(panel.items.map(\.example.japanese), ["私の文。"], "Offline the learner still has their own sentences")
+    }
+
+    func test_addingASentenceOpensTheFormAndStoresItOnSave() throws {
+        openJapaneseCard(serving: [sentence("1")])
+        presenter.addExample()
+        XCTAssertTrue(wireframe.editors[0].isNew)
+        XCTAssertEqual(wireframe.editors[0].draft, CardExampleDraft())
+        try wireframe.editors[0].save(CardExampleDraft(japanese: " 犬と散歩する。 ", translation: "Đi dạo với chó."))
+        XCTAssertEqual(panel.items.map(\.example.japanese), ["犬が好きです。", "犬と散歩する。"], "The server's first, then the learner's own")
+        XCTAssertEqual(panel.items.map(\.origin), [.server, .custom])
+        XCTAssertEqual(panel.items.last?.example.translation, "Đi dạo với chó.")
+    }
+
+    func test_aSentenceAlreadyOnTheCardIsRefusedWhetherServersOrTheLearners() throws {
+        openJapaneseCard(serving: [sentence("1", "犬が好きです。")])
+        presenter.addExample()
+        XCTAssertThrowsError(try wireframe.editors[0].save(CardExampleDraft(japanese: "犬が好きです。"))) { XCTAssertEqual($0 as? CardExampleError, .duplicate) }
+        try wireframe.editors[0].save(CardExampleDraft(japanese: "新しい文。"))
+        presenter.addExample()
+        XCTAssertThrowsError(try wireframe.editors[1].save(CardExampleDraft(japanese: " 新しい文。 "))) { XCTAssertEqual($0 as? CardExampleError, .duplicate) }
+        XCTAssertEqual(panel.items.count, 2)
+    }
+
+    func test_aBlankSentenceIsRefusedByTheStoreRules() {
+        openJapaneseCard(serving: [])
+        presenter.addExample()
+        XCTAssertThrowsError(try wireframe.editors[0].save(CardExampleDraft(japanese: "  "))) { XCTAssertEqual($0 as? CardExampleError, .sentenceMissing) }
+        XCTAssertTrue(panel.items.isEmpty)
+    }
+
+    func test_editingAServerSentenceShowsTheLearnersVersionAndCanGoBackToTheOriginal() throws {
+        openJapaneseCard(serving: [sentence("1", "犬が好きです。"), sentence("2", "犬を飼っています。")])
+        presenter.editExample(id: "1")
+        XCTAssertFalse(wireframe.editors[0].isNew)
+        XCTAssertEqual(wireframe.editors[0].draft.japanese, "犬が好きです。", "The form starts from the sentence")
+        try wireframe.editors[0].save(CardExampleDraft(japanese: "犬が大好きです。", translation: "Tôi rất thích chó."))
+        XCTAssertEqual(panel.items.map(\.origin), [.edited, .server], "The edit stays where the sentence was")
+        XCTAssertEqual(panel.items.first?.example.japanese, "犬が大好きです。")
+        XCTAssertEqual(panel.items.first?.id, "1")
+        presenter.restoreOriginalExample(id: "1")
+        XCTAssertEqual(panel.items.map(\.origin), [.server, .server])
+        XCTAssertEqual(panel.items.first?.example.japanese, "犬が好きです。")
+    }
+
+    func test_editingTheLearnersOwnSentenceKeepsItTheirs() throws {
+        openJapaneseCard(serving: [])
+        presenter.addExample()
+        try wireframe.editors[0].save(CardExampleDraft(japanese: "旧"))
+        let id = panel.items[0].id
+        presenter.editExample(id: id)
+        try wireframe.editors[1].save(CardExampleDraft(japanese: "新"))
+        XCTAssertEqual(panel.items.map(\.example.japanese), ["新"])
+        XCTAssertEqual(panel.items.map(\.origin), [.custom])
+        XCTAssertEqual(panel.items.first?.id, id)
+    }
+
+    func test_editingAnUnchangedSentenceToItself_isNotADuplicateOfItself() throws {
+        openJapaneseCard(serving: [sentence("1", "犬が好きです。")])
+        presenter.editExample(id: "1")
+        XCTAssertNoThrow(try wireframe.editors[0].save(CardExampleDraft(japanese: "犬が好きです。", translation: "Thích chó.")))
+        XCTAssertEqual(panel.items.first?.example.translation, "Thích chó.")
+    }
+
+    func test_removingAServerSentenceAsksFirstThenHidesItAndCanBeRestored() {
+        openJapaneseCard(serving: [sentence("1"), sentence("2", "犬を飼っています。")])
+        presenter.removeExample(id: "1")
+        XCTAssertEqual(wireframe.removalPrompts.map(\.origin), [.server])
+        XCTAssertEqual(panel.items.count, 2, "Nothing changes until the learner confirms")
+        wireframe.removalPrompts[0].confirm()
+        XCTAssertEqual(panel.items.map(\.id), ["2"])
+        XCTAssertEqual(panel.removedCount, 1)
+        presenter.restoreRemovedExamples()
+        XCTAssertEqual(panel.items.map(\.id), ["1", "2"])
+        XCTAssertEqual(panel.removedCount, 0)
+    }
+
+    func test_decliningTheConfirmationChangesNothing() {
+        openJapaneseCard(serving: [sentence("1")])
+        presenter.removeExample(id: "1")
+        XCTAssertEqual(panel.items.count, 1)
+        XCTAssertEqual(panel.removedCount, 0)
+    }
+
+    func test_deletingTheLearnersOwnSentenceIsFinalAndIsNotCountedAsRemoved() throws {
+        openJapaneseCard(serving: [])
+        presenter.addExample()
+        try wireframe.editors[0].save(CardExampleDraft(japanese: "消える"))
+        presenter.removeExample(id: panel.items[0].id)
+        XCTAssertEqual(wireframe.removalPrompts.last?.origin, .custom)
+        wireframe.removalPrompts[0].confirm()
+        XCTAssertTrue(panel.items.isEmpty)
+        XCTAssertEqual(panel.removedCount, 0, "There is nothing to restore")
+    }
+
+    func test_aRemovedSentenceStaysRemovedWhenTheCardIsVisitedAgain() {
+        openJapaneseCard(serving: [sentence("1")])
+        presenter.removeExample(id: "1")
+        wireframe.removalPrompts[0].confirm()
+        presenter.next()
+        presenter.previous()
+        deliver([sentence("1")], request: 2)   // the card is asked about again; the answer comes back with the sentence
+        presenter.flip()
+        XCTAssertTrue(panel.items.isEmpty, "The learner's removal is remembered")
+        XCTAssertEqual(panel.removedCount, 1)
+    }
+
+    func test_eachAccountSeesItsOwnSentencesAndItsOwnRemovals() throws {
+        openJapaneseCard(serving: [sentence("1")])
+        presenter.removeExample(id: "1")
+        wireframe.removalPrompts[0].confirm()
+        presenter.addExample()
+        try wireframe.editors[0].save(CardExampleDraft(japanese: "A さんの文"))
+        XCTAssertEqual(panel.items.map(\.example.japanese), ["A さんの文"])
+
+        owner = "22222222-2222-2222-2222-222222222222"   // another account signs in on this device
+        presenter.setReadingVisible(true)
+        XCTAssertEqual(panel.items.map(\.id), ["1"], "The server's sentence is still there for them")
+        XCTAssertEqual(panel.removedCount, 0)
+
+        owner = ""   // and nobody signed in
+        presenter.setReadingVisible(true)
+        XCTAssertEqual(panel.items.map(\.id), ["1"])
+    }
+
+    func test_aFailureToSaveIsReportedAndNothingIsRetried() throws {
+        japaneseDeck()
+        exampleStore = FailingExampleStore()
+        start()
+        deliver([sentence("1")])
+        presenter.flip()
+        presenter.removeExample(id: "1")
+        wireframe.removalPrompts[0].confirm()
+        XCTAssertEqual(wireframe.errors.count, 1)
+        XCTAssertTrue(wireframe.errors[0].contains("disk is full"))
+        XCTAssertEqual(panel.items.map(\.id), ["1"], "The sentence is still shown")
     }
 
     // MARK: Card style
@@ -367,6 +550,14 @@ private final class FakeStudyWireframe: CardStudyWireframeInterface {
     var leaveCount = 0
     var styleRequests: [String?] = []
     var styleChanged: (() -> Void)?
+    var editors: [(isNew: Bool, draft: CardExampleDraft, save: (CardExampleDraft) throws -> Void)] = []
+    var removalPrompts: [(origin: ExampleOrigin, confirm: () -> Void)] = []
+    var errors: [String] = []
+    func showExampleEditor(isNew: Bool, draft: CardExampleDraft, save: @escaping (CardExampleDraft) throws -> Void) {
+        editors.append((isNew, draft, save))
+    }
+    func confirmRemoveExample(origin: ExampleOrigin, onConfirm: @escaping () -> Void) { removalPrompts.append((origin, onConfirm)) }
+    func showError(_ message: String) { errors.append(message) }
     func showEditor(deckId: String, onFinish: @escaping () -> Void) { editedDeckId = deckId }
     func showStylePicker(selectedSlug: String?, onChange: @escaping () -> Void) {
         styleRequests.append(selectedSlug)
@@ -405,4 +596,14 @@ private final class FakeExamples: CardExamplesInteractorInterface {
         let index = subjects.count - 1
         return subject.asSingle().do(onDispose: { [weak self] in self?.disposed[index] = true })
     }
+}
+
+private final class FailingExampleStore: CardExampleStoreInterface {
+    struct DiskFull: LocalizedError { var errorDescription: String? { "The disk is full." } }
+    func overlay(cardId: String, ownerKey: String) -> ExampleOverlay { .empty }
+    func addCustom(_ draft: CardExampleDraft, cardId: String, ownerKey: String) throws { throw DiskFull() }
+    func update(_ item: ExampleItem, with draft: CardExampleDraft, cardId: String, ownerKey: String) throws { throw DiskFull() }
+    func remove(_ item: ExampleItem, cardId: String, ownerKey: String) throws { throw DiskFull() }
+    func restoreOriginal(of item: ExampleItem, cardId: String, ownerKey: String) throws { throw DiskFull() }
+    func restoreRemoved(cardId: String, ownerKey: String) throws { throw DiskFull() }
 }

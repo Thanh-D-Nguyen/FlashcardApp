@@ -69,7 +69,9 @@ class DeskManagement: DeskRepositoryInterface {
             }
             managed.cards.removeAll()
             managed.cards.append(objectsIn: cards)
-            realm.delete(previous.filter { !$0.isInvalidated && $0.assignee.isEmpty })
+            let dropped = previous.filter { !$0.isInvalidated && $0.assignee.isEmpty }
+            realm.deleteExamples(forCards: dropped.map(\.id))
+            realm.delete(dropped)
         }
     }
 
@@ -80,7 +82,9 @@ class DeskManagement: DeskRepositoryInterface {
         try realm.write {
             let cards = Array(managed.cards)
             realm.delete(managed)
-            realm.delete(cards.filter { !$0.isInvalidated && $0.assignee.isEmpty })
+            let dropped = cards.filter { !$0.isInvalidated && $0.assignee.isEmpty }
+            realm.deleteExamples(forCards: dropped.map(\.id))
+            realm.delete(dropped)
         }
     }
 }

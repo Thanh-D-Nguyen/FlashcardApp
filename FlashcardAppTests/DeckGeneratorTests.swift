@@ -309,7 +309,7 @@ final class DeckGeneratorInteractorTests: XCTestCase {
     private let deckId = "11111111-2222-4333-8444-555555555555"
 
     override func setUpWithError() throws {
-        let configuration = Realm.Configuration(inMemoryIdentifier: "generator-\(UUID().uuidString)", objectTypes: [RDesk.self, RCard.self])
+        let configuration = Realm.Configuration(inMemoryIdentifier: "generator-\(UUID().uuidString)", objectTypes: RealmService.storedTypes)
         RealmService.shared.realm = try Realm(configuration: configuration)
         repository = DeskManagement()
         interactor = DeckGeneratorInteractor(api: UnusedAPI(), repository: repository, auth: AuthSession(tokens: NoTokens(), api: NoAuth()))

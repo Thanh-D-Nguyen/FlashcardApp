@@ -13,7 +13,7 @@ final class CardsIntegrationTests: XCTestCase {
     private var suite: String!
 
     override func setUpWithError() throws {
-        let configuration = Realm.Configuration(inMemoryIdentifier: "cards-integration-\(UUID().uuidString)", objectTypes: [RDesk.self, RCard.self])
+        let configuration = Realm.Configuration(inMemoryIdentifier: "cards-integration-\(UUID().uuidString)", objectTypes: RealmService.storedTypes)
         RealmService.shared.realm = try Realm(configuration: configuration)
         repository = DeskManagement()
         folder = FileManager.default.temporaryDirectory.appendingPathComponent("cards-integration-\(UUID().uuidString)")

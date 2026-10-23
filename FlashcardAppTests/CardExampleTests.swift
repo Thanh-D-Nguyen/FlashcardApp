@@ -58,6 +58,52 @@ final class CardExampleTests: XCTestCase {
         XCTAssertEqual(CardExample(id: "1", japanese: "犬がいる。", reading: "いぬがいる。", translation: "Có chó.").copyText, "犬がいる。\nいぬがいる。\nCó chó.")
     }
 
+    // MARK: Merging the learner's changes
+
+    private func example(_ id: String, _ text: String) -> CardExample { CardExample(id: id, japanese: text, reading: "", translation: "") }
+
+    func test_withoutChangesTheServersSentencesAreShownAsTheyAre() {
+        let items = ExampleMerge.items(server: [example("1", "一"), example("2", "二")], overlay: .empty)
+        XCTAssertEqual(items.map(\.origin), [.server, .server])
+        XCTAssertEqual(items.map(\.id), ["1", "2"])
+        XCTAssertEqual(items.map(\.serverId), ["1", "2"])
+    }
+
+    func test_removedSentencesAreLeftOutEditsStayInPlaceAndTheLearnersOwnComeLast() {
+        var overlay = ExampleOverlay()
+        overlay.hidden = ["2"]
+        overlay.edited = ["3": example("3", "三（編集）")]
+        overlay.custom = [example("mine", "私の文")]
+        let items = ExampleMerge.items(server: [example("1", "一"), example("2", "二"), example("3", "三")], overlay: overlay)
+        XCTAssertEqual(items.map(\.example.japanese), ["一", "三（編集）", "私の文"])
+        XCTAssertEqual(items.map(\.origin), [.server, .edited, .custom])
+        XCTAssertNil(items[2].serverId, "A sentence the learner wrote has no server identity")
+        XCTAssertEqual(ExampleMerge.removedCount(server: [example("1", "一"), example("2", "二")], overlay: overlay), 1)
+    }
+
+    func test_anEditSurvivesTheServerNoLongerOfferingTheSentence() {
+        var overlay = ExampleOverlay()
+        overlay.edited = ["9": example("9", "私の版")]
+        XCTAssertEqual(ExampleMerge.items(server: [], overlay: overlay).map(\.example.japanese), ["私の版"], "Offline or after a re-ranking the learner's text is kept")
+        overlay.hidden = ["9"]
+        XCTAssertTrue(ExampleMerge.items(server: [], overlay: overlay).isEmpty, "Unless the learner removed it")
+    }
+
+    func test_removedCountOnlyCountsSentencesTheServerStillOffers() {
+        var overlay = ExampleOverlay()
+        overlay.hidden = ["gone", "1"]
+        XCTAssertEqual(ExampleMerge.removedCount(server: [example("1", "一")], overlay: overlay), 1)
+        XCTAssertEqual(ExampleMerge.removedCount(server: [], overlay: overlay), 0)
+    }
+
+    func test_aDraftIsTrimmedAndChecked() throws {
+        XCTAssertEqual(try CardExampleDraft(japanese: " 犬 ", reading: " いぬ ", translation: " chó ").validated(), CardExampleDraft(japanese: "犬", reading: "いぬ", translation: "chó"))
+        XCTAssertThrowsError(try CardExampleDraft(japanese: "\n ").validated()) { XCTAssertEqual($0 as? CardExampleError, .sentenceMissing) }
+        XCTAssertThrowsError(try CardExampleDraft(japanese: "犬", reading: String(repeating: "あ", count: 501)).validated())
+        XCTAssertNoThrow(try CardExampleDraft(japanese: String(repeating: "あ", count: 500)).validated())
+        XCTAssertFalse((CardExampleError.limitReached(20).errorDescription ?? "").isEmpty)
+    }
+
     // MARK: The interactor
 
     func test_anAnswerIsKeptSoARevisitedCardDoesNotAskTheServerAgain() {

@@ -122,6 +122,11 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         examplesView.onSpeak = { [weak self] id in self?.presenter.speakExample(id: id) }
         examplesView.onToggle = { [weak self] expanded in self?.presenter.setExamplesExpanded(expanded) }
         examplesView.onRetry = { [weak self] in self?.presenter.retryExamples() }
+        examplesView.onAdd = { [weak self] in self?.presenter.addExample() }
+        examplesView.onEdit = { [weak self] id in self?.presenter.editExample(id: id) }
+        examplesView.onRemove = { [weak self] id in self?.presenter.removeExample(id: id) }
+        examplesView.onRestoreOriginal = { [weak self] id in self?.presenter.restoreOriginalExample(id: id) }
+        examplesView.onRestoreRemoved = { [weak self] in self?.presenter.restoreRemovedExamples() }
         summaryView.onRestart = { [weak self] in self?.presenter.restart() }
         summaryView.onDone = { [weak self] in self?.navigationController?.popViewController(animated: true) }
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: CardStudyViewController, _) in

@@ -19,13 +19,130 @@ struct CardExample: Equatable, Identifiable {
     var copyText: String { [japanese, reading, translation].filter { !$0.isEmpty }.joined(separator: "\n") }
 }
 
-enum ExamplesState: Equatable {
-    /// Nothing to show: the answer is not revealed yet, or the card has no Japanese word to look up.
-    case hidden
-    case loading
-    case results([CardExample])
-    case empty
-    case unavailable
+/// Where a sentence on screen comes from. Only `server` sentences can come back from the server on their own.
+enum ExampleOrigin: Equatable {
+    /// Offered by the dictionary API, shown as it is.
+    case server
+    /// A server sentence the learner changed; their text is shown instead.
+    case edited
+    /// Written by the learner.
+    case custom
+}
+
+struct ExampleItem: Equatable, Identifiable {
+    let example: CardExample
+    let origin: ExampleOrigin
+    var id: String { example.id }
+    /// Identity of the server sentence this one stands for (it is the sentence's own id for `server` and `edited`).
+    var serverId: String? { origin == .custom ? nil : example.id }
+}
+
+/// What the learner did to a card's sentences. Server sentences are not stored; only the learner's changes are.
+struct ExampleOverlay: Equatable {
+    var edited: [String: CardExample] = [:]
+    var hidden: Set<String> = []
+    var custom: [CardExample] = []
+
+    static let empty = ExampleOverlay()
+}
+
+enum ExampleMerge {
+    /// The sentences to show: the server's in their order with the learner's edits in place and removed ones left out,
+    /// then the learner's own. Edited sentences are the learner's text, so they stay even when the server is out of reach.
+    static func items(server: [CardExample], overlay: ExampleOverlay) -> [ExampleItem] {
+        var shown = Set<String>()
+        var items: [ExampleItem] = []
+        for example in server where !overlay.hidden.contains(example.id) {
+            shown.insert(example.id)
+            if let edited = overlay.edited[example.id] {
+                items.append(ExampleItem(example: edited, origin: .edited))
+            } else {
+                items.append(ExampleItem(example: example, origin: .server))
+            }
+        }
+        // Without the server's answer (offline, or the sentence no longer matches) the learner's edits are still theirs.
+        let orphanedEdits = overlay.edited.filter { !shown.contains($0.key) && !overlay.hidden.contains($0.key) }
+            .sorted { $0.key < $1.key }.map { ExampleItem(example: $0.value, origin: .edited) }
+        return items + orphanedEdits + overlay.custom.map { ExampleItem(example: $0, origin: .custom) }
+    }
+
+    /// How many of the server's current sentences the learner removed (what "Restore" would bring back).
+    static func removedCount(server: [CardExample], overlay: ExampleOverlay) -> Int {
+        server.filter { overlay.hidden.contains($0.id) }.count
+    }
+}
+
+/// What the sentences panel shows. The learner's own sentences are shown at once; the server's part has its own status.
+struct ExamplesPanelState: Equatable {
+    enum Server: Equatable {
+        /// The card has no Japanese word to look sentences up by.
+        case notApplicable
+        case loading
+        case loaded
+        case unavailable
+    }
+
+    /// The panel appears with the answer.
+    var isVisible: Bool
+    var items: [ExampleItem]
+    var server: Server
+    var removedCount: Int
+
+    static let hidden = ExamplesPanelState(isVisible: false, items: [], server: .notApplicable, removedCount: 0)
+}
+
+/// Text the learner typed for a sentence, before it is saved.
+struct CardExampleDraft: Equatable {
+    static let maximumJapaneseLength = 500
+    static let maximumReadingLength = 500
+    static let maximumTranslationLength = 1000
+    static let maximumCustomPerCard = 20
+
+    var japanese = ""
+    var reading = ""
+    var translation = ""
+
+    init(japanese: String = "", reading: String = "", translation: String = "") {
+        self.japanese = japanese
+        self.reading = reading
+        self.translation = translation
+    }
+
+    init(_ example: CardExample) {
+        self.init(japanese: example.japanese, reading: example.reading, translation: example.translation)
+    }
+
+    /// The trimmed draft, or the first problem with it.
+    func validated() throws -> CardExampleDraft {
+        let draft = CardExampleDraft(japanese: japanese.trimmingCharacters(in: .whitespacesAndNewlines),
+                                     reading: reading.trimmingCharacters(in: .whitespacesAndNewlines),
+                                     translation: translation.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard !draft.japanese.isEmpty else { throw CardExampleError.sentenceMissing }
+        guard draft.japanese.count <= Self.maximumJapaneseLength else { throw CardExampleError.tooLong(Self.maximumJapaneseLength) }
+        guard draft.reading.count <= Self.maximumReadingLength else { throw CardExampleError.tooLong(Self.maximumReadingLength) }
+        guard draft.translation.count <= Self.maximumTranslationLength else { throw CardExampleError.tooLong(Self.maximumTranslationLength) }
+        return draft
+    }
+}
+
+enum CardExampleError: LocalizedError, Equatable {
+    case sentenceMissing
+    case tooLong(Int)
+    case duplicate
+    case limitReached(Int)
+    case notFound
+
+    var errorDescription: String? {
+        switch self {
+        case .sentenceMissing: return NSLocalizedString("Enter the example sentence.", comment: "")
+        case .tooLong(let limit):
+            return String(format: NSLocalizedString("This text is too long (up to %lld characters).", comment: ""), limit)
+        case .duplicate: return NSLocalizedString("This sentence is already in the list.", comment: "")
+        case .limitReached(let limit):
+            return String(format: NSLocalizedString("You can add up to %lld example sentences per card.", comment: ""), limit)
+        case .notFound: return NSLocalizedString("This example sentence no longer exists.", comment: "")
+        }
+    }
 }
 
 enum CardExampleLookup {

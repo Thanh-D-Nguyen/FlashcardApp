@@ -15,7 +15,8 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
 - `Services/AuthSession.swift`: Keychain session lifecycle and stale-response protection.
   API results keep backend UUIDs; remote deck/progress synchronization is not implemented.
 - `Services/RealmService.swift`: Realm stays the local store for the learner's own data (decks and
-  cards: `RDesk`, `RCard`, schema 2) and is where future caches live (add models to `storedTypes`).
+  cards `RDesk`/`RCard`, and their own changes to example sentences `RCardExample`; schema 3) and is where
+  future caches live (add models to `storedTypes`).
   **The app bundles no database and keeps no dictionary for now**: words, kanji, grammar, example
   sentences and suggestions come from the API. The user plans a download mechanism for dictionary
   data later; until they ask for it, do not re-add the bundled `flash_card.realm` or dictionary

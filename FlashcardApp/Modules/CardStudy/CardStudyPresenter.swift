@@ -52,8 +52,8 @@ struct CardStudyState: Equatable {
     var card: StudyCardState?
     /// The chosen card style; `nil` is the app's own adaptive card.
     var style: CardStyle?
-    /// Example sentences for the current card; `.hidden` until its answer is shown.
-    var examples: ExamplesState
+    /// Example sentences for the current card; hidden until its answer is shown.
+    var examples: ExamplesPanelState
     var examplesExpanded: Bool
     var quiz: StudyQuizState?
     var canGoBack: Bool
@@ -83,6 +83,11 @@ protocol CardStudyPresenterInterface: AnyObject {
     func speakExample(id: String)
     func setExamplesExpanded(_ expanded: Bool)
     func retryExamples()
+    func addExample()
+    func editExample(id: String)
+    func removeExample(id: String)
+    func restoreOriginalExample(id: String)
+    func restoreRemovedExamples()
     func chooseStyle()
     func restart()
     func edit()
@@ -96,12 +101,21 @@ final class CardStudyPresenter {
     private let speech: SpeechServiceInterface
     private let random: StudyRandomSource
     private let examplesInteractor: CardExamplesInteractorInterface
+    private let exampleStore: CardExampleStoreInterface
+    /// Whose sentences these are: the signed-in account's id, or "" with nobody signed in.
+    private let ownerKey: () -> String
     weak var view: CardStudyViewInterface?
 
     private var deck: DeskEntity?
     private var session = StudySession(cards: [])
-    /// The sentence lookup for the card on screen. Prefetched when the card appears, shown once its answer is.
-    private var lookup: (cardId: String, term: String, state: ExamplesState)?
+    private enum ServerSentences: Equatable {
+        case loading
+        case loaded([CardExample])
+        case unavailable
+    }
+
+    /// The server's sentences for the card on screen. Prefetched when the card appears, shown once its answer is.
+    private var lookup: (cardId: String, term: String, state: ServerSentences)?
     private let lookupRequest = SerialDisposable()
 
     init(deckId: String,
@@ -110,7 +124,9 @@ final class CardStudyPresenter {
          preferences: StudyPreferencesInterface = UserDefaultsStudyPreferences.shared,
          speech: SpeechServiceInterface = SystemSpeechService.shared,
          random: @escaping StudyRandomSource = { Int.random(in: $0) },
-         examples: CardExamplesInteractorInterface = CardExamplesInteractor()) {
+         examples: CardExamplesInteractorInterface = CardExamplesInteractor(),
+         exampleStore: CardExampleStoreInterface = RealmCardExampleStore(),
+         ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" }) {
         self.deckId = deckId
         self.interactor = interactor
         self.wireframe = wireframe
@@ -118,6 +134,8 @@ final class CardStudyPresenter {
         self.speech = speech
         self.random = random
         self.examplesInteractor = examples
+        self.exampleStore = exampleStore
+        self.ownerKey = ownerKey
     }
 
     // MARK: Loading
@@ -174,7 +192,7 @@ final class CardStudyPresenter {
             progress: Float(session.progress),
             card: card,
             style: CardStyle.style(forSlug: preferences.cardStyleSlug),
-            examples: finished ? .hidden : examplesState(),
+            examples: finished ? .hidden : examplesPanel(),
             examplesExpanded: preferences.areExamplesVisible,
             quiz: quiz,
             canGoBack: session.canGoBack,
@@ -201,9 +219,22 @@ final class CardStudyPresenter {
         session.mode == .flip ? session.isFlipped : session.selectedOption != nil
     }
 
-    private func examplesState() -> ExamplesState {
-        guard answerIsShown, let lookup, lookup.cardId == session.current?.id else { return .hidden }
-        return lookup.state
+    /// The sentences panel: the server's sentences with the learner's changes applied, then the learner's own. The learner's
+    /// part is read from the device on every render, so a change shows at once and an offline card still has its own sentences.
+    private func examplesPanel() -> ExamplesPanelState {
+        guard answerIsShown, let card = session.current else { return .hidden }
+        let overlay = exampleStore.overlay(cardId: card.id, ownerKey: ownerKey())
+        var server: [CardExample] = []
+        var status = ExamplesPanelState.Server.notApplicable
+        if let lookup, lookup.cardId == card.id {
+            switch lookup.state {
+            case .loading: status = .loading
+            case .unavailable: status = .unavailable
+            case .loaded(let found): server = found; status = .loaded
+            }
+        }
+        return ExamplesPanelState(isVisible: true, items: ExampleMerge.items(server: server, overlay: overlay), server: status,
+                                  removedCount: ExampleMerge.removedCount(server: server, overlay: overlay))
     }
 
     /// Starts the lookup for the current card when it changed. Only the answer of the lookup that is still current is
@@ -224,13 +255,13 @@ final class CardStudyPresenter {
         lookupRequest.disposable = examplesInteractor.examples(for: term, cardReading: reading)
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] examples in
-                self?.finishLookup(cardId: cardId, term: term, state: examples.isEmpty ? .empty : .results(examples))
+                self?.finishLookup(cardId: cardId, term: term, state: .loaded(examples))
             }, onFailure: { [weak self] _ in
                 self?.finishLookup(cardId: cardId, term: term, state: .unavailable)
             })
     }
 
-    private func finishLookup(cardId: String, term: String, state: ExamplesState) {
+    private func finishLookup(cardId: String, term: String, state: ServerSentences) {
         guard let current = lookup, current.cardId == cardId, current.term == term else { return }
         lookup = (cardId, term, state)
         publish(.none)
@@ -329,8 +360,8 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     }
 
     func speakExample(id: String) {
-        guard case .results(let examples)? = lookup?.state, let example = examples.first(where: { $0.id == id }) else { return }
-        speech.speak(example.japanese, languageCode: "ja-JP")
+        guard let item = currentExampleItems().first(where: { $0.id == id }) else { return }
+        speech.speak(item.example.japanese, languageCode: "ja-JP")
     }
 
     func setExamplesExpanded(_ expanded: Bool) {
@@ -339,9 +370,74 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     }
 
     func retryExamples() {
-        guard let lookup, lookup.state == .unavailable, let card = session.current else { return }
+        guard let lookup, case .unavailable = lookup.state, let card = session.current else { return }
         startLookup(cardId: lookup.cardId, term: lookup.term, reading: card.reading)
         publish(.none)
+    }
+
+    // MARK: Editing the learner's sentences
+
+    private func currentExampleItems() -> [ExampleItem] { examplesPanel().items }
+
+    /// Rejects a sentence that is already on the card, so adding or editing cannot create a visible duplicate.
+    private func ensureNotDuplicate(_ draft: CardExampleDraft, excluding id: String?) throws {
+        let japanese = draft.japanese.trimmingCharacters(in: .whitespacesAndNewlines)
+        if currentExampleItems().contains(where: { $0.id != id && $0.example.japanese == japanese }) { throw CardExampleError.duplicate }
+    }
+
+    func addExample() {
+        guard let card = session.current, answerIsShown else { return }
+        let cardId = card.id, owner = ownerKey()
+        wireframe.showExampleEditor(isNew: true, draft: CardExampleDraft()) { [weak self] draft in
+            guard let self else { return }
+            let valid = try draft.validated()
+            try self.ensureNotDuplicate(valid, excluding: nil)
+            try self.exampleStore.addCustom(valid, cardId: cardId, ownerKey: owner)
+            self.publish(.none)
+        }
+    }
+
+    func editExample(id: String) {
+        guard let card = session.current, let item = currentExampleItems().first(where: { $0.id == id }) else { return }
+        let cardId = card.id, owner = ownerKey()
+        wireframe.showExampleEditor(isNew: false, draft: CardExampleDraft(item.example)) { [weak self] draft in
+            guard let self else { return }
+            let valid = try draft.validated()
+            try self.ensureNotDuplicate(valid, excluding: item.id)
+            try self.exampleStore.update(item, with: valid, cardId: cardId, ownerKey: owner)
+            self.publish(.none)
+        }
+    }
+
+    func removeExample(id: String) {
+        guard let card = session.current, let item = currentExampleItems().first(where: { $0.id == id }) else { return }
+        let cardId = card.id, owner = ownerKey()
+        wireframe.confirmRemoveExample(origin: item.origin) { [weak self] in
+            self?.perform { try $0.exampleStore.remove(item, cardId: cardId, ownerKey: owner) }
+        }
+    }
+
+    func restoreOriginalExample(id: String) {
+        guard let card = session.current, let item = currentExampleItems().first(where: { $0.id == id }), item.origin == .edited else { return }
+        let cardId = card.id, owner = ownerKey()
+        perform { try $0.exampleStore.restoreOriginal(of: item, cardId: cardId, ownerKey: owner) }
+    }
+
+    func restoreRemovedExamples() {
+        guard let card = session.current else { return }
+        let cardId = card.id, owner = ownerKey()
+        perform { try $0.exampleStore.restoreRemoved(cardId: cardId, ownerKey: owner) }
+    }
+
+    /// Runs a change to the learner's sentences, shows it, or tells the learner it could not be saved. Nothing is retried.
+    private func perform(_ change: (CardStudyPresenter) throws -> Void) {
+        do {
+            try change(self)
+            publish(.none)
+        } catch {
+            wireframe.showError(String(format: NSLocalizedString("Couldn't save your change to the example sentences: %@", comment: ""), error.localizedDescription))
+            publish(.none)
+        }
     }
 
     func chooseStyle() {
