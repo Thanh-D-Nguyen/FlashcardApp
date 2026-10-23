@@ -144,7 +144,7 @@ Không sửa migration cũ để xóa store. Commit: `feat(study): persist learn
 - Rủi ro còn lại: chưa có consumer thật (L03); `contentVersion` và mapping result→skill là hợp đồng bền, đổi cách tính
   phải có migration.
 
-### L03 — Nối phiên học với persistence (VERIFIED — chờ commit hash bên dưới)
+### L03 — Nối phiên học với persistence (DONE — commit `4051455`)
 
 Phạm vi: `Modules/CardStudy/`, `Interactors/CardStudyInteractor.swift`,
 `Resources/Localizable.xcstrings`, presenter/integration tests và UI test liên quan.
