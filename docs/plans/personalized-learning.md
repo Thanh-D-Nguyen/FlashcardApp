@@ -2,6 +2,8 @@
 
 Ngày: 2026-10-23. Trạng thái: **PLANNED — chưa triển khai tính năng**.
 Checkpoint trước khi lập kế hoạch: `99e4c8b` (tiếp nối `3fa411a`).
+Đặc tả bố cục, tương tác, trạng thái và motion đề xuất: [personalized-learning-ux.md](personalized-learning-ux.md)
+(U00–U05; chưa có prototype được duyệt, không thay đổi trạng thái L01–L07).
 
 ## Mục tiêu và giới hạn
 
