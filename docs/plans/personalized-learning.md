@@ -85,8 +85,10 @@ Commit dự kiến: `feat(study): model completed review attempts`.
   `rate(_:)` chỉ hợp lệ khi đã lật đáp án ở chế độ flip; `noteHint(_:)` (reading/audio) chỉ tính
   trước khi lộ đáp án. **Skip/Next không tạo attempt** (không có consumer ở L01); summary
   L03 chỉ đếm attempt đã lưu. Tự đánh giá không vào `answeredCount/correctCount`.
-- Chưa có trong L01 (để story có consumer): phiên bản/dấu vân tay nội dung card (L02/L04),
-  thời gian suy nghĩ, wiring presenter/UI (L03). `StudyMode`/presenter không đổi hành vi.
+- Bổ sung sau khi bắt đầu L02: `StudyCard.contentVersion` (SHA-256 của front + reading + back, tách bằng U+001F;
+  không tính note/ảnh/id) được gắn vào `ReviewAttempt`, vì kế hoạch yêu cầu lưu phiên bản nội dung và L04 cần nó để
+  vô hiệu lịch cũ khi card đổi. Thuật toán được khóa bằng test với giá trị `shasum`; `StudySessionTests` 36/36 PASS.
+- Chưa có trong L01 (để story có consumer): thời gian suy nghĩ, wiring presenter/UI (L03). `StudyMode`/presenter không đổi hành vi.
 - RED: 12/31 test mới fail do assertion trên stub không hành vi (attempts rỗng, ...).
 - GREEN: `StudySessionTests` 32/32 PASS; hồi quy `CardStudyPresenterTests` +
   `CardsIntegrationTests` + `LocalizationTests` 57/57 PASS (XcodeBuildMCP, scheme

@@ -317,6 +317,39 @@ final class StudySessionTests: XCTestCase {
         XCTAssertEqual(session.correctCount, session.attempts.filter { $0.result == .correct }.count)
     }
 
+    // MARK: Content version
+
+    func test_contentVersionIsAStableSha256OfFrontReadingAndBack() {
+        // Persisted with every attempt, so the algorithm is pinned: SHA-256 of front, reading, back joined by U+001F
+        // (reference values from `shasum -a 256`).
+        XCTAssertEqual(StudyCard(id: "1", front: "犬", back: "con chó", reading: "いぬ").contentVersion,
+                       "0ce7de02e51bf87dcc60ba26a296702008614b91279ceeff93d7f6dd88ae5cf1")
+        XCTAssertEqual(StudyCard(id: "1", front: "犬", back: "con chó").contentVersion,
+                       "09fa40e723020db5ef31ab3a068f193394958b36a395598d5682ba0f659501c2")
+    }
+
+    func test_contentVersionChangesWithTheWordingButNotWithTheNoteImageOrId() {
+        let base = StudyCard(id: "1", front: "犬", back: "con chó", reading: "いぬ", note: "n", imageReference: "a.png")
+        XCTAssertNotEqual(base.contentVersion, StudyCard(id: "1", front: "猫", back: "con chó", reading: "いぬ").contentVersion)
+        XCTAssertNotEqual(base.contentVersion, StudyCard(id: "1", front: "犬", back: "chó", reading: "いぬ").contentVersion)
+        XCTAssertNotEqual(base.contentVersion, StudyCard(id: "1", front: "犬", back: "con chó", reading: "いね").contentVersion)
+        XCTAssertEqual(base.contentVersion, StudyCard(id: "2", front: "犬", back: "con chó", reading: "いぬ", note: "other", imageReference: "b.png").contentVersion)
+    }
+
+    func test_contentVersionKeepsTheFieldBoundaries() {
+        XCTAssertNotEqual(StudyCard(id: "1", front: "ab", back: "c").contentVersion, StudyCard(id: "1", front: "a", back: "bc").contentVersion)
+        XCTAssertNotEqual(StudyCard(id: "1", front: "a", back: "b", reading: "c").contentVersion,
+                          StudyCard(id: "1", front: "a", back: "bc").contentVersion)
+    }
+
+    func test_anAttemptCarriesTheContentVersionOfTheCardThatWasAnswered() throws {
+        var session = session(mode: .quiz)
+        let card = try XCTUnwrap(session.current)
+        session.select(option: card.back)
+        XCTAssertEqual(session.currentAttempt?.contentVersion, card.contentVersion)
+        XCTAssertFalse(card.contentVersion.isEmpty)
+    }
+
     func test_emptyDeckIsHandled() {
         var session = StudySession(cards: [])
         XCTAssertNil(session.current)

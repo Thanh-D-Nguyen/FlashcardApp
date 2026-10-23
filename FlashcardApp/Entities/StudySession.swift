@@ -7,6 +7,7 @@
 //  session only, as on the website (nothing here is synchronised or stored).
 //
 
+import CryptoKit
 import Foundation
 
 struct StudyCard: Equatable {
@@ -24,6 +25,14 @@ struct StudyCard: Equatable {
         reading = entity.frontExtraText
         note = entity.backExtraText
         imageReference = entity.imageUrl
+    }
+
+    /// Identifies what the learner was asked and shown: front, reading and back. The note and the picture
+    /// are not part of it, so renaming a deck or changing an image keeps the learner's history valid.
+    /// Persisted with each attempt: do not change how it is computed.
+    var contentVersion: String {
+        let joined = [front, reading, back].joined(separator: "\u{1F}")
+        return SHA256.hash(data: Data(joined.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
     init(id: String, front: String, back: String, reading: String = "", note: String = "", imageReference: String = "") {
@@ -87,6 +96,9 @@ struct ReviewAttempt: Equatable {
     let cardID: String
     let result: ReviewResult
     let hints: Set<ReviewHint>
+    /// `StudyCard.contentVersion` of the card as it was answered, so a later edit of the card does not
+    /// make this result look like evidence about the new wording.
+    let contentVersion: String
     let answeredAt: Date
 
     var skill: ReviewSkill { result.skill }
@@ -235,7 +247,7 @@ struct StudySession {
 
     private mutating func record(_ result: ReviewResult, for card: StudyCard) {
         attempts.append(ReviewAttempt(id: attemptID(at: position), cardID: card.id, result: result,
-                                      hints: hintsByPosition[position] ?? [], answeredAt: now()))
+                                      hints: hintsByPosition[position] ?? [], contentVersion: card.contentVersion, answeredAt: now()))
     }
 
     private mutating func prepareQuestion() {
