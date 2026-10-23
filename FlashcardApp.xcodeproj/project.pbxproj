@@ -171,6 +171,17 @@
 		11F32497EE4A0CC122C6D530 /* PictureSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C964F9799EFF286A346DC1 /* PictureSearchTests.swift */; };
 		7F591847AB436D6F4AD74020 /* RealmServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC556F467C4C588BD4781CDD /* RealmServiceTests.swift */; };
 		4D2EE12D11D8338888E09709 /* RetiredDictionaryTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */; };
+		1C774554124CA404BAF075EF /* CardExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DD4CFA591F395DBEB705FE /* CardExample.swift */; };
+		27CA006BABB9D88D4265C142 /* CardStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C8597C6AF5C56FFA894463 /* CardStyle.swift */; };
+		6B14DD908FEFB336FF7BCE96 /* CardExamplesInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339BC40A8E2576CED50E4843 /* CardExamplesInteractor.swift */; };
+		4E29320E05A61128A18B9B39 /* CardSurfaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B799A37BDC22CAB45D3BBCB /* CardSurfaceView.swift */; };
+		7427E9BD00EF2196D635403F /* CardStylePickerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC34B72DFA122A4D80A791C /* CardStylePickerPresenter.swift */; };
+		09C9E7C973668B17781A93E2 /* CardStylePickerWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B68735DD74CA56A4B76FF1 /* CardStylePickerWireframe.swift */; };
+		E6707E4DBD2AF9B620CBA8B5 /* CardStylePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E28153B579630CC76EBBE20 /* CardStylePickerViewController.swift */; };
+		1DECF8947A3E2234E8E495A5 /* StudyExamplesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4130315D22CF035B32AB524C /* StudyExamplesView.swift */; };
+		5C043E426C39C6564B2C66B2 /* CardExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C97D533A4221CB7602911CF8 /* CardExampleTests.swift */; };
+		2BFAD412221A9565ED572372 /* CardStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450A8E8864106604935B3A8E /* CardStyleTests.swift */; };
+		C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -357,6 +368,17 @@
 		A0C964F9799EFF286A346DC1 /* PictureSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchTests.swift; sourceTree = "<group>"; };
 		FC556F467C4C588BD4781CDD /* RealmServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmServiceTests.swift; sourceTree = "<group>"; };
 		A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RetiredDictionaryTables.swift; sourceTree = "<group>"; };
+		63DD4CFA591F395DBEB705FE /* CardExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExample.swift; sourceTree = "<group>"; };
+		E7C8597C6AF5C56FFA894463 /* CardStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStyle.swift; sourceTree = "<group>"; };
+		339BC40A8E2576CED50E4843 /* CardExamplesInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExamplesInteractor.swift; sourceTree = "<group>"; };
+		8B799A37BDC22CAB45D3BBCB /* CardSurfaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSurfaceView.swift; sourceTree = "<group>"; };
+		CDC34B72DFA122A4D80A791C /* CardStylePickerPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerPresenter.swift; sourceTree = "<group>"; };
+		00B68735DD74CA56A4B76FF1 /* CardStylePickerWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerWireframe.swift; sourceTree = "<group>"; };
+		6E28153B579630CC76EBBE20 /* CardStylePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerViewController.swift; sourceTree = "<group>"; };
+		4130315D22CF035B32AB524C /* StudyExamplesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyExamplesView.swift; sourceTree = "<group>"; };
+		C97D533A4221CB7602911CF8 /* CardExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleTests.swift; sourceTree = "<group>"; };
+		450A8E8864106604935B3A8E /* CardStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStyleTests.swift; sourceTree = "<group>"; };
+		5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -395,6 +417,7 @@
 			children = (
 				2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */,
 				855C69598B064D18A3F1DB76 /* StudyCardView.swift */,
+				4130315D22CF035B32AB524C /* StudyExamplesView.swift */,
 			);
 			name = Views;
 			path = Views;
@@ -539,6 +562,9 @@
 				8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */,
 				A0C964F9799EFF286A346DC1 /* PictureSearchTests.swift */,
 				FC556F467C4C588BD4781CDD /* RealmServiceTests.swift */,
+				C97D533A4221CB7602911CF8 /* CardExampleTests.swift */,
+				450A8E8864106604935B3A8E /* CardStyleTests.swift */,
+				5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */,
 			);
 			path = FlashcardAppTests;
 			sourceTree = "<group>";
@@ -561,6 +587,8 @@
 				F89F935A6E3E901638562AA0 /* StudySession.swift */,
 				CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */,
 				857BB1AD3118E84563C080CA /* PictureSuggestion.swift */,
+				63DD4CFA591F395DBEB705FE /* CardExample.swift */,
+				E7C8597C6AF5C56FFA894463 /* CardStyle.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -588,6 +616,7 @@
 				5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */,
 				8C4FC3548729A597266E3DC5 /* DictionarySuggestionInteractor.swift */,
 				7426DA0EF7DC2D9204B3CBA4 /* PictureSearchInteractor.swift */,
+				339BC40A8E2576CED50E4843 /* CardExamplesInteractor.swift */,
 			);
 			path = Interactors;
 			sourceTree = "<group>";
@@ -638,6 +667,7 @@
 				9226D80829D00C1B0042F6DA /* PlaceholderView.swift */,
 				55AFC78D9266C6D8BE5ABCAE /* StateView.swift */,
 				B1575B578C6A276BCF1B2746 /* CardImageView.swift */,
+				8B799A37BDC22CAB45D3BBCB /* CardSurfaceView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -656,6 +686,7 @@
 				9251EC5B29A1EAA5006C1D1C /* Main */,
 				A530508EA8CD810695762CD5 /* CardStudy */,
 				A8B0CF585A0F3D463BE42FC2 /* DeckGenerator */,
+				978215170D437DC6572B32C6 /* CardStyle */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -939,6 +970,24 @@
 				99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		978215170D437DC6572B32C6 /* CardStyle */ = {
+			isa = PBXGroup;
+			children = (
+				CDC34B72DFA122A4D80A791C /* CardStylePickerPresenter.swift */,
+				00B68735DD74CA56A4B76FF1 /* CardStylePickerWireframe.swift */,
+				56812FA730A810A9A424B872 /* Views */,
+			);
+			path = CardStyle;
+			sourceTree = "<group>";
+		};
+		56812FA730A810A9A424B872 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				6E28153B579630CC76EBBE20 /* CardStylePickerViewController.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1238,6 +1287,14 @@
 				6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */,
 				B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */,
 				4D2EE12D11D8338888E09709 /* RetiredDictionaryTables.swift in Sources */,
+				1C774554124CA404BAF075EF /* CardExample.swift in Sources */,
+				27CA006BABB9D88D4265C142 /* CardStyle.swift in Sources */,
+				6B14DD908FEFB336FF7BCE96 /* CardExamplesInteractor.swift in Sources */,
+				4E29320E05A61128A18B9B39 /* CardSurfaceView.swift in Sources */,
+				7427E9BD00EF2196D635403F /* CardStylePickerPresenter.swift in Sources */,
+				09C9E7C973668B17781A93E2 /* CardStylePickerWireframe.swift in Sources */,
+				E6707E4DBD2AF9B620CBA8B5 /* CardStylePickerViewController.swift in Sources */,
+				1DECF8947A3E2234E8E495A5 /* StudyExamplesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1269,6 +1326,9 @@
 				2261377E65101B75EA65A77B /* DeckGeneratorTests.swift in Sources */,
 				11F32497EE4A0CC122C6D530 /* PictureSearchTests.swift in Sources */,
 				7F591847AB436D6F4AD74020 /* RealmServiceTests.swift in Sources */,
+				5C043E426C39C6564B2C66B2 /* CardExampleTests.swift in Sources */,
+				2BFAD412221A9565ED572372 /* CardStyleTests.swift in Sources */,
+				C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

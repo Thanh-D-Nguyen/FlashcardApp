@@ -1,9 +1,10 @@
 import UIKit
 
-/// The study card: a single flat panel showing one side at a time. Tapping it is handled by the controller;
-/// this view only lays out the visible side and is one accessibility element.
+/// The study card: a single panel showing one side at a time, drawn in the chosen card style. Tapping it is handled by
+/// the controller; this view only lays out the visible side and is one accessibility element.
 final class StudyCardView: UIView {
     let imageView = CardImageView()
+    private let surface = CardSurfaceView()
     let speakButton = UIButton(configuration: .plain())
 
     private let eyebrowLabel = UILabel()
@@ -16,11 +17,12 @@ final class StudyCardView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = Design.Color.surface
-        layer.cornerRadius = Design.Radius.panel
-        layer.cornerCurve = .continuous
-        layer.borderWidth = 1
-        layer.borderColor = Design.Color.separator.cgColor
+        surface.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(surface)
+        NSLayoutConstraint.activate([
+            surface.topAnchor.constraint(equalTo: topAnchor), surface.bottomAnchor.constraint(equalTo: bottomAnchor),
+            surface.leadingAnchor.constraint(equalTo: leadingAnchor), surface.trailingAnchor.constraint(equalTo: trailingAnchor)
+        ])
 
         eyebrowLabel.apply(.eyebrow)
         // A caption, not content: it must not push the speaker button out at accessibility sizes.
@@ -81,13 +83,26 @@ final class StudyCardView: UIView {
         ])
         isAccessibilityElement = true
         accessibilityTraits = .button
-        // CGColor does not follow the appearance by itself.
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: StudyCardView, _) in
-            view.layer.borderColor = Design.Color.separator.cgColor
-        }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    private var termFont = Design.TextRole.term.font
+    private var answerFont = Design.TextRole.answer.font
+
+    /// Colours and faces of the chosen style; the app's own roles when there is none.
+    private func applyStyle(_ style: CardStyle?) {
+        surface.apply(style: style)
+        termFont = style?.font(textStyle: .largeTitle, weight: .semibold, size: 52, maximum: 96) ?? Design.TextRole.term.font
+        answerFont = style?.font(textStyle: .title2) ?? Design.TextRole.answer.font
+        readingLabel.font = style?.font(textStyle: .subheadline) ?? Design.TextRole.reading.font
+        noteLabel.font = style?.font(textStyle: .footnote) ?? Design.TextRole.metadata.font
+        termLabel.textColor = style?.foregroundColor ?? Design.TextRole.term.color
+        readingLabel.textColor = style?.mutedColor ?? Design.TextRole.reading.color
+        noteLabel.textColor = style?.mutedColor ?? Design.TextRole.metadata.color
+        eyebrowLabel.textColor = style?.mutedColor ?? Design.TextRole.eyebrow.color
+        speakButton.configuration?.baseForegroundColor = style?.accentColor ?? Design.Color.accent
+    }
 
     private func languageName(japanese: Bool) -> String {
         japanese ? NSLocalizedString("Japanese", comment: "Language name") : NSLocalizedString("Vietnamese", comment: "Language name")
@@ -95,7 +110,8 @@ final class StudyCardView: UIView {
 
     /// Lays out the visible side. `isFlip` cards show front or back; quiz cards show only the prompt (front).
     func configure(card: StudyCardState, direction: LanguageSortingType, showingBack: Bool, isQuiz: Bool = false,
-                   readingVisible: Bool, imagesVisible: Bool) {
+                   readingVisible: Bool, imagesVisible: Bool, style: CardStyle? = nil) {
+        applyStyle(style)
         let japaneseOnFront = JapaneseText.japaneseIsOnFront(front: card.front, back: card.back, deckHasJapaneseOnFront: direction != .opposite)
         let japaneseVisible = showingBack ? !japaneseOnFront : japaneseOnFront
         eyebrowLabel.text = languageName(japanese: japaneseVisible).uppercased(with: AppLanguage.current.locale)
@@ -103,7 +119,7 @@ final class StudyCardView: UIView {
         termLabel.text = text
         // The headword is the big mark; a meaning in the learner's language is set a size down.
         let big = japaneseVisible || !showingBack
-        termLabel.font = big ? Design.TextRole.term.font : Design.TextRole.answer.font
+        termLabel.font = big ? termFont : answerFont
         let reading = showingBack ? "" : card.reading
         readingLabel.text = reading
         readingLabel.isHidden = reading.isEmpty || !readingVisible

@@ -4,12 +4,15 @@ final class FlashcardAppUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     /// The assertions below read Vietnamese and English copy; pin the app language instead of trusting the simulator's.
-    private func makeApp(language: String = "vi", locale: String = "vi_VN") -> XCUIApplication {
+    private func makeApp(language: String = "vi", locale: String = "vi_VN", pinCardStyle: Bool = true) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(\(language))", "-AppleLocale", locale]
-        // Study preferences persist between runs; pin the ones the tests depend on.
+        // Study preferences persist between runs; pin the ones the tests depend on. An empty style slug is the app's own card.
+        // A pinned value also hides later writes, so the test that changes the card style leaves it unpinned.
+        // The sentence panel's open/closed choice is not pinned for the same reason; its test restores it.
         app.launchArguments += ["-com.flashcardapp.study.mode", "flip", "-com.flashcardapp.study.shuffled", "NO",
                                 "-com.flashcardapp.study.autoSpeak", "NO"]
+        if pinCardStyle { app.launchArguments += ["-com.flashcardapp.study.cardStyle", ""] }
         return app
     }
 
@@ -527,6 +530,69 @@ final class FlashcardAppUITests: XCTestCase {
         attachScreenshot(app, name: "generator")
         app.buttons["close_generator"].tap()
         XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5), "Closing the generator returns to the library")
+    }
+
+    /// After the flip the card shows example sentences from the dictionary API (hidden before it), which can be hidden,
+    /// read aloud and copied; the card style is chosen from a sheet and remembered.
+    func testStudyShowsExampleSentencesAfterTheFlipAndTheCardStyleCanBeChosen() {
+        let app = makeApp(pinCardStyle: false)
+        app.launch()
+        openCards(app)
+        let name = "UI \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "犬", back: "chó")
+        fillCard(app, index: 1, front: "猫", back: "mèo")
+        app.buttons["save_deck"].tap()
+        let row = deckRow(app, named: name)
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
+        let card = app.buttons["study_card"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+
+        XCTAssertFalse(app.buttons["study_example_speak_0"].exists, "The front must not show sentences")
+        app.buttons["study_primary"].tap()
+        let speak = app.buttons["study_example_speak_0"]
+        XCTAssertTrue(speak.waitForExistence(timeout: 20), "Example sentences for 犬 come from the API")
+        XCTAssertTrue(app.buttons["study_example_copy_0"].exists)
+        attachScreenshot(app, name: "study-examples")
+
+        app.buttons["study_example_copy_0"].tap()
+        XCTAssertTrue(waitForLabel(app.buttons["study_example_copy_0"], containing: "Đã sao chép"), "Copying is confirmed")
+
+        let toggle = app.buttons["study_examples_toggle"]
+        if waitForLabel(toggle, containing: "Hiện", timeout: 1) { toggle.tap() }   // a run that stopped half way left it collapsed
+        XCTAssertTrue(waitForLabel(toggle, containing: "Ẩn"), "The panel is open")
+        toggle.tap()
+        XCTAssertTrue(waitForLabel(toggle, containing: "Hiện"), "The panel collapsed")
+        XCTAssertFalse(speak.exists)
+        toggle.tap()
+        XCTAssertTrue(app.buttons["study_example_speak_0"].waitForExistence(timeout: 5), "The panel expanded again")
+
+        // Card style: the sheet marks the current style, a choice is remembered and the default can be restored.
+        func tile(_ slug: String) -> XCUIElement { app.descendants(matching: .any).matching(identifier: "card_style_\(slug)").firstMatch }
+        app.buttons["study_options"].tap()
+        app.buttons["study_card_style"].tap()
+        XCTAssertTrue(tile("minimal-ink").waitForExistence(timeout: 5))
+        tile("default").tap()   // the style persists between runs: start from the app's own card
+        XCTAssertTrue(tile("default").isSelected)
+        tile("minimal-ink").tap()
+        XCTAssertFalse(tile("default").isSelected, "Only one style is marked")
+        XCTAssertTrue(tile("minimal-ink").isSelected)
+        attachScreenshot(app, name: "card-style-sheet")
+        app.buttons["card_style_done"].tap()
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        app.buttons["study_options"].tap()
+        app.buttons["study_card_style"].tap()
+        XCTAssertTrue(tile("minimal-ink").waitForExistence(timeout: 5))
+        XCTAssertTrue(tile("minimal-ink").isSelected, "The choice is remembered")
+        tile("default").tap()
+        XCTAssertTrue(tile("default").isSelected)
+        app.buttons["card_style_done"].tap()
     }
 
     /// Typing a Japanese word offers dictionary entries; choosing one fills the card, and a field the learner already

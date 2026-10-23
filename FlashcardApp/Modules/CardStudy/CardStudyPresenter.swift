@@ -1,4 +1,5 @@
 import Foundation
+import RxSwift
 
 /// How the card area should change when new state arrives; the view animates accordingly.
 enum CardStudyTransition {
@@ -49,6 +50,11 @@ struct CardStudyState: Equatable {
     var progressText: String
     var progress: Float
     var card: StudyCardState?
+    /// The chosen card style; `nil` is the app's own adaptive card.
+    var style: CardStyle?
+    /// Example sentences for the current card; `.hidden` until its answer is shown.
+    var examples: ExamplesState
+    var examplesExpanded: Bool
     var quiz: StudyQuizState?
     var canGoBack: Bool
     var primaryTitle: String
@@ -74,6 +80,10 @@ protocol CardStudyPresenterInterface: AnyObject {
     func setImagesVisible(_ visible: Bool)
     func setAutoSpeak(_ enabled: Bool)
     func speakCurrent()
+    func speakExample(id: String)
+    func setExamplesExpanded(_ expanded: Bool)
+    func retryExamples()
+    func chooseStyle()
     func restart()
     func edit()
 }
@@ -85,23 +95,29 @@ final class CardStudyPresenter {
     private let preferences: StudyPreferencesInterface
     private let speech: SpeechServiceInterface
     private let random: StudyRandomSource
+    private let examplesInteractor: CardExamplesInteractorInterface
     weak var view: CardStudyViewInterface?
 
     private var deck: DeskEntity?
     private var session = StudySession(cards: [])
+    /// The sentence lookup for the card on screen. Prefetched when the card appears, shown once its answer is.
+    private var lookup: (cardId: String, term: String, state: ExamplesState)?
+    private let lookupRequest = SerialDisposable()
 
     init(deckId: String,
          interactor: CardStudyInteractorInterface,
          wireframe: CardStudyWireframeInterface,
          preferences: StudyPreferencesInterface = UserDefaultsStudyPreferences.shared,
          speech: SpeechServiceInterface = SystemSpeechService.shared,
-         random: @escaping StudyRandomSource = { Int.random(in: $0) }) {
+         random: @escaping StudyRandomSource = { Int.random(in: $0) },
+         examples: CardExamplesInteractorInterface = CardExamplesInteractor()) {
         self.deckId = deckId
         self.interactor = interactor
         self.wireframe = wireframe
         self.preferences = preferences
         self.speech = speech
         self.random = random
+        self.examplesInteractor = examples
     }
 
     // MARK: Loading
@@ -126,6 +142,7 @@ final class CardStudyPresenter {
 
     private func publish(_ transition: CardStudyTransition) {
         guard let deck else { return }
+        syncExamples(deck: deck)
         view?.render(makeState(deck: deck), transition: transition)
         if transition != .none, !session.isFinished, session.current != nil { autoSpeakIfNeeded() }
     }
@@ -156,6 +173,9 @@ final class CardStudyPresenter {
             progressText: progressText,
             progress: Float(session.progress),
             card: card,
+            style: CardStyle.style(forSlug: preferences.cardStyleSlug),
+            examples: finished ? .hidden : examplesState(),
+            examplesExpanded: preferences.areExamplesVisible,
             quiz: quiz,
             canGoBack: session.canGoBack,
             primaryTitle: title,
@@ -171,6 +191,49 @@ final class CardStudyPresenter {
         }
         if !session.isFlipped { return (NSLocalizedString("Show answer", comment: ""), true) }
         return (session.isLastCard ? NSLocalizedString("Finish", comment: "") : NSLocalizedString("Next card", comment: ""), true)
+    }
+
+    // MARK: Examples
+
+    /// Whether the learner may see the sentences yet: after the flip, or after answering a quiz question. Showing them
+    /// on the front would give the word's use away before the learner has tried to recall it.
+    private var answerIsShown: Bool {
+        session.mode == .flip ? session.isFlipped : session.selectedOption != nil
+    }
+
+    private func examplesState() -> ExamplesState {
+        guard answerIsShown, let lookup, lookup.cardId == session.current?.id else { return .hidden }
+        return lookup.state
+    }
+
+    /// Starts the lookup for the current card when it changed. Only the answer of the lookup that is still current is
+    /// kept: a late answer for a card the learner already left is dropped.
+    private func syncExamples(deck: DeskEntity) {
+        guard !session.isFinished, let card = session.current,
+              let term = CardExampleLookup.term(front: card.front, back: card.back, deckHasJapaneseOnFront: deck.sortingLanguage != .opposite) else {
+            lookupRequest.disposable = Disposables.create()
+            lookup = nil
+            return
+        }
+        guard lookup?.cardId != card.id || lookup?.term != term else { return }
+        startLookup(cardId: card.id, term: term, reading: card.reading)
+    }
+
+    private func startLookup(cardId: String, term: String, reading: String) {
+        lookup = (cardId, term, .loading)
+        lookupRequest.disposable = examplesInteractor.examples(for: term, cardReading: reading)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] examples in
+                self?.finishLookup(cardId: cardId, term: term, state: examples.isEmpty ? .empty : .results(examples))
+            }, onFailure: { [weak self] _ in
+                self?.finishLookup(cardId: cardId, term: term, state: .unavailable)
+            })
+    }
+
+    private func finishLookup(cardId: String, term: String, state: ExamplesState) {
+        guard let current = lookup, current.cardId == cardId, current.term == term else { return }
+        lookup = (cardId, term, state)
+        publish(.none)
     }
 
     // MARK: Speech
@@ -192,7 +255,12 @@ final class CardStudyPresenter {
 extension CardStudyPresenter: CardStudyPresenterInterface {
     func viewWillAppear() { load() }
 
-    func viewWillDisappear() { speech.stop() }
+    func viewWillDisappear() {
+        speech.stop()
+        // Leaving the screen cancels a lookup in flight; coming back asks again.
+        lookupRequest.disposable = Disposables.create()
+        lookup = nil
+    }
 
     func flip() {
         guard session.mode == .flip else { return }
@@ -258,6 +326,26 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
         let showingBack = session.mode == .flip && session.isFlipped
         let text = showingBack ? card.back : card.front
         speech.speak(text, languageCode: languageCode(for: card, front: !showingBack))
+    }
+
+    func speakExample(id: String) {
+        guard case .results(let examples)? = lookup?.state, let example = examples.first(where: { $0.id == id }) else { return }
+        speech.speak(example.japanese, languageCode: "ja-JP")
+    }
+
+    func setExamplesExpanded(_ expanded: Bool) {
+        preferences.areExamplesVisible = expanded
+        publish(.none)
+    }
+
+    func retryExamples() {
+        guard let lookup, lookup.state == .unavailable, let card = session.current else { return }
+        startLookup(cardId: lookup.cardId, term: lookup.term, reading: card.reading)
+        publish(.none)
+    }
+
+    func chooseStyle() {
+        wireframe.showStylePicker(selectedSlug: preferences.cardStyleSlug) { [weak self] in self?.publish(.none) }
     }
 
     func restart() {

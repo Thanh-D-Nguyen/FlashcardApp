@@ -26,6 +26,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
     private let scrollView = UIScrollView()
     private let contentStack = UIStackView()
     private let cardView = StudyCardView()
+    private let examplesView = StudyExamplesView()
     private let optionsStack = UIStackView()
     private let summaryView = StudySummaryView()
     private let controls = UIStackView()
@@ -84,7 +85,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         optionsStack.axis = .vertical
         optionsStack.spacing = Design.Spacing.m
-        [cardView, optionsStack, summaryView].forEach(contentStack.addArrangedSubview)
+        [cardView, examplesView, optionsStack, summaryView].forEach(contentStack.addArrangedSubview)
         scrollView.addSubview(contentStack)
 
         configureControls()
@@ -117,6 +118,10 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             scrollView.addGestureRecognizer(swipe)
         }
         cardView.accessibilityIdentifier = "study_card"
+        examplesView.isHidden = true
+        examplesView.onSpeak = { [weak self] id in self?.presenter.speakExample(id: id) }
+        examplesView.onToggle = { [weak self] expanded in self?.presenter.setExamplesExpanded(expanded) }
+        examplesView.onRetry = { [weak self] in self?.presenter.retryExamples() }
         summaryView.onRestart = { [weak self] in self?.presenter.restart() }
         summaryView.onDone = { [weak self] in self?.navigationController?.popViewController(animated: true) }
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: CardStudyViewController, _) in
@@ -138,8 +143,10 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
 
     private func updateCardHeight() {
         // Flip cards use most of the free height so the word reads large; quiz cards are as tall as their content.
+        // With example sentences below it the card leaves their heading in view, so it is clear there is more to scroll to.
         let free = scrollView.bounds.height
-        cardMinHeight.constant = state?.mode == .quiz ? 0 : max(240, free - Design.Spacing.xs)
+        let peek = examplesView.isHidden ? Design.Spacing.xs : 200
+        cardMinHeight.constant = state?.mode == .quiz ? 0 : max(240, free - peek)
     }
 
     private func configureControls() {
@@ -193,8 +200,9 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             apply()
         case .flip:
             haptics.flip()
+            let flip: UIView.AnimationOptions = newState.style?.flip == .vertical ? .transitionFlipFromBottom : .transitionFlipFromRight
             UIView.transition(with: cardView, duration: reduceMotion ? 0.15 : 0.45,
-                              options: [reduceMotion ? .transitionCrossDissolve : .transitionFlipFromRight, .allowAnimatedContent],
+                              options: [reduceMotion ? .transitionCrossDissolve : flip, .allowAnimatedContent],
                               animations: apply)
             announceFlip(newState)
         case .forward, .backward:
@@ -221,6 +229,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         navigationItem.rightBarButtonItem?.menu = makeMenu(for: state)
         let finished = state.screen == .finished
         cardView.isHidden = finished
+        examplesView.configure(state: finished ? .hidden : state.examples, expanded: state.examplesExpanded)
         optionsStack.isHidden = finished || state.quiz == nil
         summaryView.isHidden = !finished
         controls.isHidden = finished
@@ -230,7 +239,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         } else if let card = state.card {
             let isQuiz = state.mode == .quiz
             cardView.configure(card: card, direction: state.direction, showingBack: !isQuiz && card.isFlipped, isQuiz: isQuiz,
-                               readingVisible: state.readingVisible, imagesVisible: state.imagesVisible)
+                               readingVisible: state.readingVisible, imagesVisible: state.imagesVisible, style: state.style)
             cardView.accessibilityHint = isQuiz ? nil : NSLocalizedString("Double-tap to flip the card", comment: "")
             cardView.isAccessibilityElement = true
             cardView.accessibilityCustomActions = [
@@ -326,8 +335,10 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
                      attributes: state.deckHasImages ? [] : .disabled, state: state.imagesVisible ? .on : .off) { [weak self] _ in self?.presenter.setImagesVisible(!state.imagesVisible) },
             UIAction(title: NSLocalizedString("Read aloud automatically", comment: ""), image: UIImage(systemName: "speaker.wave.2"), state: state.autoSpeak ? .on : .off) { [weak self] _ in self?.presenter.setAutoSpeak(!state.autoSpeak) }
         ])
+        let appearance = UIAction(title: NSLocalizedString("Card style…", comment: ""), image: UIImage(systemName: "paintpalette")) { [weak self] _ in self?.presenter.chooseStyle() }
+        appearance.accessibilityIdentifier = "study_card_style"
         let restart = UIAction(title: NSLocalizedString("Start over", comment: ""), image: UIImage(systemName: "arrow.counterclockwise")) { [weak self] _ in self?.presenter.restart() }
-        return UIMenu(children: [edit, modes, options, restart])
+        return UIMenu(children: [edit, modes, options, UIMenu(options: .displayInline, children: [appearance]), restart])
     }
 }
 

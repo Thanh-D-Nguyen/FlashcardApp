@@ -1,3 +1,4 @@
+import RxSwift
 import XCTest
 @testable import FlashcardApp
 
@@ -6,6 +7,7 @@ final class CardStudyPresenterTests: XCTestCase {
     private var wireframe: FakeStudyWireframe!
     private var preferences: FakeStudyPreferences!
     private var speech: FakeSpeech!
+    private var examples: FakeExamples!
     private var view: SpyStudyView!
     private var presenter: CardStudyPresenter!
 
@@ -15,6 +17,7 @@ final class CardStudyPresenterTests: XCTestCase {
         wireframe = FakeStudyWireframe()
         preferences = FakeStudyPreferences()
         speech = FakeSpeech()
+        examples = FakeExamples()
         view = SpyStudyView()
         interactor.deck = makeDeck(3)
     }
@@ -36,7 +39,7 @@ final class CardStudyPresenterTests: XCTestCase {
 
     private func start() {
         presenter = CardStudyPresenter(deckId: "deck", interactor: interactor, wireframe: wireframe, preferences: preferences,
-                                       speech: speech, random: { $0.lowerBound })
+                                       speech: speech, random: { $0.lowerBound }, examples: examples)
         presenter.view = view
         presenter.viewWillAppear()
     }
@@ -193,6 +196,160 @@ final class CardStudyPresenterTests: XCTestCase {
         presenter.edit()
         XCTAssertEqual(wireframe.editedDeckId, "deck")
     }
+
+    // MARK: Example sentences
+
+    private func japaneseDeck() {
+        let deck = makeDeck(2)
+        deck.cards[0].frontText = "犬"; deck.cards[0].frontExtraText = "いぬ"; deck.cards[0].backText = "chó"
+        deck.cards[1].frontText = "猫"; deck.cards[1].backText = "mèo"
+        interactor.deck = deck
+    }
+
+    private func sentence(_ id: String, _ japanese: String = "犬が好きです。") -> CardExample {
+        CardExample(id: id, japanese: japanese, reading: "いぬがすきです。", translation: "Tôi thích chó.")
+    }
+
+    private func deliver(_ examples: [CardExample], request: Int = 0) {
+        self.examples.subjects[request].onNext(examples)
+        self.examples.subjects[request].onCompleted()
+        waitForMain()
+    }
+
+    private func waitForMain() {
+        let done = expectation(description: "main")
+        DispatchQueue.main.async { DispatchQueue.main.async { done.fulfill() } }
+        wait(for: [done], timeout: 2)
+    }
+
+    func test_theSentencesAreLookedUpWhenTheCardAppearsButShownOnlyAfterTheAnswer() {
+        japaneseDeck()
+        start()
+        XCTAssertEqual(examples.requests.map(\.term), ["犬"], "Prefetched while the front is showing")
+        XCTAssertEqual(examples.requests.first?.reading, "いぬ")
+        XCTAssertEqual(state.examples, .hidden, "The front must not give the word's use away")
+        deliver([sentence("1")])
+        XCTAssertEqual(state.examples, .hidden)
+        presenter.flip()
+        XCTAssertEqual(state.examples, .results([sentence("1")]))
+    }
+
+    func test_theLookupIsVisibleAsLoadingUntilItAnswers() {
+        japaneseDeck()
+        start()
+        presenter.flip()
+        XCTAssertEqual(state.examples, .loading)
+        deliver([])
+        XCTAssertEqual(state.examples, .empty)
+    }
+
+    func test_aFailedLookupIsUnavailableAndRetryAsksAgain() {
+        japaneseDeck()
+        start()
+        presenter.flip()
+        examples.subjects[0].onError(LearnerAPIError.offline)
+        waitForMain()
+        XCTAssertEqual(state.examples, .unavailable)
+        presenter.retryExamples()
+        XCTAssertEqual(examples.requests.count, 2)
+        XCTAssertEqual(state.examples, .loading)
+        deliver([sentence("1")], request: 1)
+        XCTAssertEqual(state.examples, .results([sentence("1")]))
+    }
+
+    func test_aLateAnswerForACardThatWasLeftIsDropped() {
+        japaneseDeck()
+        start()
+        presenter.next()
+        XCTAssertEqual(examples.requests.map(\.term), ["犬", "猫"])
+        deliver([sentence("old")], request: 0)
+        presenter.flip()
+        XCTAssertEqual(state.card?.front, "猫")
+        XCTAssertEqual(state.examples, .loading, "The sentence for the first card must not appear under the second")
+        deliver([sentence("new", "猫がいます。")], request: 1)
+        XCTAssertEqual(state.examples, .results([sentence("new", "猫がいます。")]))
+    }
+
+    func test_aCardWithoutAJapaneseWordHasNoSentencesAndNoRequest() {
+        start()
+        presenter.flip()
+        XCTAssertTrue(examples.requests.isEmpty)
+        XCTAssertEqual(state.examples, .hidden)
+    }
+
+    func test_aQuizShowsTheSentencesOnlyAfterAnAnswer() {
+        japaneseDeck()
+        preferences.mode = .quiz
+        start()
+        deliver([sentence("1")])
+        XCTAssertEqual(state.examples, .hidden)
+        presenter.select(option: "chó")
+        XCTAssertEqual(state.examples, .results([sentence("1")]))
+    }
+
+    func test_theSentencesLeaveWhenTheDeckIsFinished() {
+        japaneseDeck()
+        start()
+        deliver([sentence("1")])
+        presenter.flip(); presenter.primaryAction(); presenter.flip(); presenter.primaryAction()
+        XCTAssertEqual(state.screen, .finished)
+        XCTAssertEqual(state.examples, .hidden)
+    }
+
+    func test_leavingTheScreenCancelsTheLookup() {
+        japaneseDeck()
+        start()
+        presenter.viewWillDisappear()
+        XCTAssertTrue(examples.disposed[0])
+    }
+
+    func test_collapsingTheSentencesIsRemembered() {
+        japaneseDeck()
+        start()
+        presenter.setExamplesExpanded(false)
+        XCTAssertFalse(preferences.areExamplesVisible)
+        XCTAssertFalse(state.examplesExpanded)
+    }
+
+    func test_aSentenceIsReadAloudInJapanese() {
+        japaneseDeck()
+        start()
+        deliver([sentence("1", "犬が好きです。")])
+        presenter.flip()
+        presenter.speakExample(id: "1")
+        XCTAssertEqual(speech.spoken.last?.0, "犬が好きです。")
+        XCTAssertEqual(speech.spoken.last?.1, "ja-JP")
+        presenter.speakExample(id: "unknown")
+        XCTAssertEqual(speech.spoken.count, 1)
+    }
+
+    // MARK: Card style
+
+    func test_theCardUsesTheAppsOwnLookUntilAStyleIsChosen() {
+        start()
+        XCTAssertNil(state.style)
+        preferences.cardStyleSlug = "sakura-bloom"
+        presenter.setReadingVisible(true)
+        XCTAssertEqual(state.style, .sakuraBloom)
+    }
+
+    func test_aStyleThisVersionDoesNotKnowFallsBackToTheDefaultCard() {
+        preferences.cardStyleSlug = "removed-style"
+        start()
+        XCTAssertNil(state.style)
+    }
+
+    func test_choosingAStyleOpensThePickerAndRefreshesTheCardWhenItChanges() {
+        preferences.cardStyleSlug = "warm-paper"
+        start()
+        presenter.chooseStyle()
+        XCTAssertEqual(wireframe.styleRequests, ["warm-paper"])
+        let rendersBefore = view.renders.count
+        preferences.cardStyleSlug = "dark-focus"
+        wireframe.styleChanged?()
+        XCTAssertEqual(view.renders.count, rendersBefore + 1)
+        XCTAssertEqual(state.style, .darkFocus)
+    }
 }
 
 private final class SpyStudyView: CardStudyViewInterface {
@@ -208,7 +365,13 @@ private final class FakeStudyInteractor: CardStudyInteractorInterface {
 private final class FakeStudyWireframe: CardStudyWireframeInterface {
     var editedDeckId: String?
     var leaveCount = 0
+    var styleRequests: [String?] = []
+    var styleChanged: (() -> Void)?
     func showEditor(deckId: String, onFinish: @escaping () -> Void) { editedDeckId = deckId }
+    func showStylePicker(selectedSlug: String?, onChange: @escaping () -> Void) {
+        styleRequests.append(selectedSlug)
+        styleChanged = onChange
+    }
     func leave() { leaveCount += 1 }
 }
 
@@ -218,6 +381,8 @@ private final class FakeStudyPreferences: StudyPreferencesInterface {
     var autoSpeak = false
     var isShuffled = false
     var mode: StudyMode = .flip
+    var cardStyleSlug: String?
+    var areExamplesVisible = true
 }
 
 private final class FakeSpeech: SpeechServiceInterface {
@@ -225,4 +390,19 @@ private final class FakeSpeech: SpeechServiceInterface {
     var stopCount = 0
     func speak(_ text: String, languageCode: String) { spoken.append((text, languageCode)) }
     func stop() { stopCount += 1 }
+}
+
+private final class FakeExamples: CardExamplesInteractorInterface {
+    var requests: [(term: String, reading: String)] = []
+    var subjects: [PublishSubject<[CardExample]>] = []
+    var disposed: [Bool] = []
+
+    func examples(for term: String, cardReading: String) -> Single<[CardExample]> {
+        requests.append((term, cardReading))
+        let subject = PublishSubject<[CardExample]>()
+        subjects.append(subject)
+        disposed.append(false)
+        let index = subjects.count - 1
+        return subject.asSingle().do(onDispose: { [weak self] in self?.disposed[index] = true })
+    }
 }
