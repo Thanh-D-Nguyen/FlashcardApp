@@ -99,7 +99,7 @@ Commit dự kiến: `feat(study): model completed review attempts`.
 - Rủi ro còn lại: chưa có consumer thật cho `ReviewAttempt` đến L02/L03; semantics Skip
   có thể cần đổi khi L03/L04 xác định summary và scheduler.
 
-### L02 — Lưu lịch sử an toàn (VERIFIED — chờ commit hash bên dưới)
+### L02 — Lưu lịch sử an toàn (DONE — commit `2cf189d`)
 
 Phạm vi: `Services/RealmService.swift`, `Storage/Models/`, interactor/store học
 phù hợp với pattern hiện có; `RealmServiceTests` và integration tests của store.
