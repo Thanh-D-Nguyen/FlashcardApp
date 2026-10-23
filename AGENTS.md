@@ -60,7 +60,9 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
 10. Verify target membership, build, and the behavior changed. Use Xcode's available
     build/test/diagnostic tools in the IDE; CLI commands are in `docs/DEVELOPMENT.md`.
     Record infrastructure failures separately from source failures. Never claim
-    tests passed when only source parsing or mocks ran.
+    tests passed when only source parsing or mocks ran. For routine UI development,
+    use the single-Simulator fast loop in `docs/ENGINEERING_GUARDRAILS.md` §3;
+    do not run multi-device, large-text, or appearance/language matrices by default.
 11. Read-only inspection and local fixes are within normal development scope.
     Ask before publishing, pushing, merging, uploading builds, modifying remote
     data, or changing credentials, unless the user already authorized that action.

@@ -150,21 +150,21 @@
 		DC385AF763EE2D83AC71A055 /* CardMediaMaintenance.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB64F2E26CCBB8CC53AF84E4 /* CardMediaMaintenance.swift */; };
 		E36104E6FEC9F6BAC57C91A3 /* StudySessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416283339F8BEC2533A6E86B /* StudySessionTests.swift */; };
 		E9CE2A4F18C297D0D9817B1E /* CardStudyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */; };
-		DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */; };
 		11E0D5F3BF790428E69115C1 /* DeckGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */; };
 		9FE7631C4FF6CC447DF64FD3 /* PictureSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857BB1AD3118E84563C080CA /* PictureSuggestion.swift */; };
-		CFEB30D5910E8D9EC5B7D8CE /* DeckGeneratorInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */; };
+		6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */; };
+		B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */; };
+		DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */; };
 		6A92A3F7BB4F8C222128A076 /* DictionarySuggestionInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4FC3548729A597266E3DC5 /* DictionarySuggestionInteractor.swift */; };
+		CFEB30D5910E8D9EC5B7D8CE /* DeckGeneratorInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */; };
 		7CFC79EA7508F83CC523D57D /* PictureSearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7426DA0EF7DC2D9204B3CBA4 /* PictureSearchInteractor.swift */; };
-		E8F7EAB9A2B58980DE5101D7 /* NewDeckOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF8566DD19305209FA80298 /* NewDeckOptionsViewController.swift */; };
 		7A197FCFB7D13D3FE0B2FFB0 /* PictureSearchPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FE281EA1CD3920D0548573 /* PictureSearchPresenter.swift */; };
 		CDF48C69E38D5FD9FA5826C8 /* PictureSearchWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95722E5A19A0ADF9ED4FD7D /* PictureSearchWireframe.swift */; };
 		B166CC58A7F7F027F6B5B78E /* PictureSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40805D2F66FA9024E7BB65A /* PictureSearchViewController.swift */; };
 		430DD442B6FB684FBF7DDF1D /* DeckGeneratorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11873EA3ED9C175FB3CE6F3 /* DeckGeneratorPresenter.swift */; };
 		84F3A0EF290BDF8A4BBB3BDE /* DeckGeneratorWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87FB95533AC4E35A483D63E /* DeckGeneratorWireframe.swift */; };
 		DD6ED62AB5F6AB8615DEDF27 /* DeckGeneratorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D309F4CEB51E34D75F5A6D89 /* DeckGeneratorViewController.swift */; };
-		6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */; };
-		B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */; };
+		E8F7EAB9A2B58980DE5101D7 /* NewDeckOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF8566DD19305209FA80298 /* NewDeckOptionsViewController.swift */; };
 		DECD2552BEEA8BE80A1A8B3C /* BJTLearnerAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2CC9AE5C10D89658EB3A0C /* BJTLearnerAPITests.swift */; };
 		75A9CBF12981CC4B0D5314D4 /* DictionarySuggestionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F9A0DFD210564B7A9A78D7 /* DictionarySuggestionTests.swift */; };
 		2261377E65101B75EA65A77B /* DeckGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */; };
@@ -354,21 +354,21 @@
 		EB64F2E26CCBB8CC53AF84E4 /* CardMediaMaintenance.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardMediaMaintenance.swift; sourceTree = "<group>"; };
 		F7B083C077D5C5F2A240A228 /* DebugFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugFixtures.swift; sourceTree = "<group>"; };
 		F89F935A6E3E901638562AA0 /* StudySession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudySession.swift; sourceTree = "<group>"; };
-		C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JapaneseText.swift; sourceTree = "<group>"; };
 		CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneration.swift; sourceTree = "<group>"; };
 		857BB1AD3118E84563C080CA /* PictureSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSuggestion.swift; sourceTree = "<group>"; };
-		5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorInteractor.swift; sourceTree = "<group>"; };
+		942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerAPI.swift; sourceTree = "<group>"; };
+		99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerDTO.swift; sourceTree = "<group>"; };
+		C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JapaneseText.swift; sourceTree = "<group>"; };
 		8C4FC3548729A597266E3DC5 /* DictionarySuggestionInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySuggestionInteractor.swift; sourceTree = "<group>"; };
+		5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorInteractor.swift; sourceTree = "<group>"; };
 		7426DA0EF7DC2D9204B3CBA4 /* PictureSearchInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchInteractor.swift; sourceTree = "<group>"; };
-		6EF8566DD19305209FA80298 /* NewDeckOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewDeckOptionsViewController.swift; sourceTree = "<group>"; };
 		71FE281EA1CD3920D0548573 /* PictureSearchPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchPresenter.swift; sourceTree = "<group>"; };
 		D95722E5A19A0ADF9ED4FD7D /* PictureSearchWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchWireframe.swift; sourceTree = "<group>"; };
 		D40805D2F66FA9024E7BB65A /* PictureSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchViewController.swift; sourceTree = "<group>"; };
 		F11873EA3ED9C175FB3CE6F3 /* DeckGeneratorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorPresenter.swift; sourceTree = "<group>"; };
 		E87FB95533AC4E35A483D63E /* DeckGeneratorWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorWireframe.swift; sourceTree = "<group>"; };
 		D309F4CEB51E34D75F5A6D89 /* DeckGeneratorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorViewController.swift; sourceTree = "<group>"; };
-		942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerAPI.swift; sourceTree = "<group>"; };
-		99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerDTO.swift; sourceTree = "<group>"; };
+		6EF8566DD19305209FA80298 /* NewDeckOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewDeckOptionsViewController.swift; sourceTree = "<group>"; };
 		4E2CC9AE5C10D89658EB3A0C /* BJTLearnerAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerAPITests.swift; sourceTree = "<group>"; };
 		09F9A0DFD210564B7A9A78D7 /* DictionarySuggestionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySuggestionTests.swift; sourceTree = "<group>"; };
 		8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorTests.swift; sourceTree = "<group>"; };
@@ -433,7 +433,6 @@
 				855C69598B064D18A3F1DB76 /* StudyCardView.swift */,
 				4130315D22CF035B32AB524C /* StudyExamplesView.swift */,
 			);
-			name = Views;
 			path = Views;
 			sourceTree = "<group>";
 		};
@@ -468,13 +467,6 @@
 			children = (
 			);
 			path = LineView;
-			sourceTree = "<group>";
-		};
-		924052C429A9CE4600B47E09 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Views;
 			sourceTree = "<group>";
 		};
 		924052D829AB397400B47E09 /* CreateDesk */ = {
@@ -629,8 +621,8 @@
 				9251ED1329A20040006C1D1C /* SettingInteractor.swift */,
 				924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */,
 				9725D887B857CFD895F006A4 /* CardStudyInteractor.swift */,
-				5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */,
 				8C4FC3548729A597266E3DC5 /* DictionarySuggestionInteractor.swift */,
+				5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */,
 				7426DA0EF7DC2D9204B3CBA4 /* PictureSearchInteractor.swift */,
 				339BC40A8E2576CED50E4843 /* CardExamplesInteractor.swift */,
 				9369AB68FA2E9EA64090346F /* CardExampleStore.swift */,
@@ -693,7 +685,6 @@
 			isa = PBXGroup;
 			children = (
 				924052D829AB397400B47E09 /* CreateDesk */,
-				929C4DCE29A7642B007651E9 /* DeskList */,
 				9251ED3C29A21323006C1D1C /* Dictionary */,
 				9251ED3B29A212FC006C1D1C /* Card */,
 				9251ED0F29A2001E006C1D1C /* Setting */,
@@ -862,14 +853,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		929C4DCE29A7642B007651E9 /* DeskList */ = {
-			isa = PBXGroup;
-			children = (
-				924052C429A9CE4600B47E09 /* Views */,
-			);
-			path = DeskList;
-			sourceTree = "<group>";
-		};
 		92A93EA529A2540D00CE7E70 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
@@ -935,7 +918,6 @@
 				E98C18FA70B1D9007802033D /* CardStudyWireframe.swift */,
 				27254BF6F5893DA65161991A /* Views */,
 			);
-			name = CardStudy;
 			path = CardStudy;
 			sourceTree = "<group>";
 		};
@@ -952,8 +934,24 @@
 			children = (
 				81651ED770FBD884568B4B44 /* HomeCells.swift */,
 			);
-			name = Cells;
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		60C102E6FBABBAF56DBE94E0 /* BJTClient */ = {
+			isa = PBXGroup;
+			children = (
+				942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */,
+				A699BC15E01E547F063AFF2C /* Models */,
+			);
+			path = BJTClient;
+			sourceTree = "<group>";
+		};
+		A699BC15E01E547F063AFF2C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		A8B0CF585A0F3D463BE42FC2 /* DeckGenerator */ = {
@@ -972,23 +970,6 @@
 				D309F4CEB51E34D75F5A6D89 /* DeckGeneratorViewController.swift */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		60C102E6FBABBAF56DBE94E0 /* BJTClient */ = {
-			isa = PBXGroup;
-			children = (
-				942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */,
-				A699BC15E01E547F063AFF2C /* Models */,
-			);
-			path = BJTClient;
-			sourceTree = "<group>";
-		};
-		A699BC15E01E547F063AFF2C /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		978215170D437DC6572B32C6 /* CardStyle */ = {
@@ -1308,21 +1289,21 @@
 				789B15698F5DEC0768B4A6E7 /* EditorAccessoryView.swift in Sources */,
 				2BB560E3B615780D74ABEFE0 /* BulkImportViewController.swift in Sources */,
 				4DA0A4903AD1236206790933 /* DebugFixtures.swift in Sources */,
-				DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */,
 				11E0D5F3BF790428E69115C1 /* DeckGeneration.swift in Sources */,
 				9FE7631C4FF6CC447DF64FD3 /* PictureSuggestion.swift in Sources */,
-				CFEB30D5910E8D9EC5B7D8CE /* DeckGeneratorInteractor.swift in Sources */,
+				6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */,
+				B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */,
+				DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */,
 				6A92A3F7BB4F8C222128A076 /* DictionarySuggestionInteractor.swift in Sources */,
+				CFEB30D5910E8D9EC5B7D8CE /* DeckGeneratorInteractor.swift in Sources */,
 				7CFC79EA7508F83CC523D57D /* PictureSearchInteractor.swift in Sources */,
-				E8F7EAB9A2B58980DE5101D7 /* NewDeckOptionsViewController.swift in Sources */,
 				7A197FCFB7D13D3FE0B2FFB0 /* PictureSearchPresenter.swift in Sources */,
 				CDF48C69E38D5FD9FA5826C8 /* PictureSearchWireframe.swift in Sources */,
 				B166CC58A7F7F027F6B5B78E /* PictureSearchViewController.swift in Sources */,
 				430DD442B6FB684FBF7DDF1D /* DeckGeneratorPresenter.swift in Sources */,
 				84F3A0EF290BDF8A4BBB3BDE /* DeckGeneratorWireframe.swift in Sources */,
 				DD6ED62AB5F6AB8615DEDF27 /* DeckGeneratorViewController.swift in Sources */,
-				6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */,
-				B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */,
+				E8F7EAB9A2B58980DE5101D7 /* NewDeckOptionsViewController.swift in Sources */,
 				4D2EE12D11D8338888E09709 /* RetiredDictionaryTables.swift in Sources */,
 				1C774554124CA404BAF075EF /* CardExample.swift in Sources */,
 				27CA006BABB9D88D4265C142 /* CardStyle.swift in Sources */,

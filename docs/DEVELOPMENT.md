@@ -111,7 +111,15 @@ chạy backend; trên iPhone thật, nó trỏ về chính điện thoại.
 
 ## Kiểm chứng
 
-Dùng Xcode hoặc XcodeBuildMCP đã cài. Thay simulator ID bằng thiết bị có sẵn:
+Dùng Xcode hoặc XcodeBuildMCP đã cài. **Mặc định phát triển nhanh:** chọn **một**
+iPhone Simulator đang boot (nếu không có, chọn một iPhone khả dụng) và dùng nguyên
+simulator ID đó cho cả task. Build + chạy đúng luồng vừa sửa + xem một screenshot
+ở cỡ chữ mặc định. Chỉ chạy XCTest/XCUITest liên quan khi đổi logic/điều hướng.
+Không chạy ma trận thiết bị, cỡ chữ lớn, ngôn ngữ, Light/Dark hay VoiceOver mỗi
+lần sửa. Vẫn giữ hỗ trợ accessibility/localization trong code. Khi sửa chính
+các phần này, gặp regression hoặc chuẩn bị release thì kiểm chứng thêm theo rủi ro.
+
+Thay simulator ID bằng thiết bị đã chọn:
 
 ```sh
 rtk proxy sh scripts/tests/environment-validation.sh

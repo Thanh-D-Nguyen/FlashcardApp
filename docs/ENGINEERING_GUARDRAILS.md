@@ -42,12 +42,35 @@ record the collision, and continue on independent work.
 
 ## 3. Risk-based testing rules
 
+### Routine development: one-Simulator fast loop (default)
+
+- Use `FlashcardApp-Local` and **one available iPhone Simulator** throughout a
+  task: reuse a booted iPhone when possible; otherwise choose one available
+  recent iPhone. Keep that destination for build, relevant XCTest/XCUITest, app
+  launch and screenshots. Do not start additional devices just for verification.
+- For visual-only edits: build, launch, interact with the changed screen and
+  inspect **one screenshot on that Simulator at the default system text size**.
+  No tests for spacing, colors or font values.
+- Do **not** routinely test larger Dynamic Type sizes, multiple iPhone sizes,
+  iPad, VoiceOver, each language or both appearances. Do not generate a visual
+  screenshot matrix. Test an alternate setting only when the change specifically
+  affects it, a reported bug requires it, or the user explicitly requests it.
+- For behavior changes, keep focused regression tests and only the relevant
+  functional UI journey on that same Simulator. Do not run unrelated suites or
+  full UI regression just because one screen changed.
+- Before release or for high-risk work (auth/session, user data/Realm migration,
+  security, cross-device layouts), use the broader checks needed for that risk.
+  The fast loop is not a release certification.
+- **Still implement** accessible UIKit behavior, semantic fonts/colors, correct
+  constraints and localized strings. Skipping routine configuration-matrix tests
+  is not permission to remove accessibility or localization support.
+
 | Change | Required evidence |
 | --- | --- |
 | Behavior, validation, state transition or bug fix | Write a regression test that fails before the fix (RED), implement the smallest fix (GREEN), then refactor with the test passing. |
 | Presenter / Interactor / service logic | Focused XCTest with success, failure and cancellation/edge cases as applicable; integration checks when crossing API/Realm boundaries. |
-| Navigation, storyboard connections or essential user journeys | Relevant XCUITest (new or existing) plus an actual Simulator interaction when available. |
-| Pure spacing, colors, typography or token wiring | Build and inspect real rendered UI in Simulator/Preview; no artificial unit tests or snapshots just to satisfy TDD. |
+| Navigation, storyboard connections or essential user journeys | Relevant XCUITest (new or existing) and actual interaction on the chosen single Simulator when available. |
+| Pure spacing, colors, typography or token wiring | Build and inspect real rendered UI on the chosen single Simulator at default text size; no artificial unit tests or snapshots just to satisfy TDD. |
 | Auth, API, Realm IDs/schema or persistence | Tests covering boundary behavior and regression of saved user state; schema changes require old-store migration fixtures. Not part of UI P0. |
 
 Aim for at least 80% **meaningful coverage of changed domain logic** where
@@ -61,16 +84,17 @@ metrics to achieve a passing result.
   (iOS 26+). Prefer native navigation/tab controls and system accessibility
   behaviors over custom lookalikes.
 - Prioritize Japanese headwords/readings and Vietnamese meanings, clear actions,
-  adequate contrast, Dynamic Type, VoiceOver and Reduce Motion. Verify compact
-  widths, long Japanese strings and multiline Vietnamese content.
+  adequate contrast, Dynamic Type, VoiceOver and Reduce Motion. Design layouts
+  to accommodate compact widths and long Japanese/Vietnamese content; only run
+  expanded configuration checks when the fast-loop exception above applies.
 - Use semantic color roles in light/dark appearances; avoid unmotivated gradients,
   decorative cards, excessive shadows, and animation that obscures reading.
 - Design for clear action recognition and low extraneous cognitive load.
   Retrieval practice is a learning-flow principle, not permission to fabricate
   SRS, streaks, review counts, synced progress or performance claims.
-- Do not assume a screen is usable because it looks polished. Judge core user
-  tasks and visible states: initial, loading, empty, error/retry, large text,
-  light/dark, and relevant keyboard/navigation behavior.
+- Do not assume a screen is usable because it looks polished. Verify the changed
+  user journey and directly affected states (such as loading, error/retry or
+  keyboard behavior) on the default Simulator; defer unrelated display variants.
 
 ## 5. Completion gates and reporting
 
@@ -80,8 +104,8 @@ Before declaring a task complete:
    each affected module and confirm architecture boundaries still hold.
 2. Build the relevant scheme/target; run focused XCTest and XCUITest checks
    appropriate to the change. Do not claim a test ran from source inspection.
-3. For UI changes, inspect Simulator or Preview output; record which device,
-   appearance and text size were actually checked. Screenshots are evidence
+3. For UI changes, inspect the one selected Simulator at its default text size;
+   record device, appearance and text size actually checked. Screenshots are evidence
    only if captured from the rendered app, not mockups.
 4. Verify preservation of main routes and, where relevant, API/auth and Realm
    behavior; identify any untested environment-dependent paths.

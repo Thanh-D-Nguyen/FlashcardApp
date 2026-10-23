@@ -18,9 +18,13 @@ its owning thread and pass values across queues. Dispose subscriptions with the
 feature lifecycle and observe on the main scheduler before touching UIKit.
 
 Implement the smallest complete change. Register every new file in the explicit
-Xcode target, then run build and relevant tests. If storyboard/interaction behavior
-changes, verify the screen on a simulator, including Dynamic Type/VoiceOver labels
-and loading/error handling. For API work also load `flashcard-api-contract`.
+Xcode target, then run build and focused tests relevant to the change. Use the
+single-Simulator default verification loop in `docs/ENGINEERING_GUARDRAILS.md` §3.
+If interaction behavior changes, verify the affected user journey and its relevant
+states on that Simulator. Do not routinely run large-text, VoiceOver, appearance,
+language or multi-device matrices; expand only for relevant risks or release.
+Continue to implement accessible and localized UI. For API work also load
+`flashcard-api-contract`.
 
 Report the observed result and any remaining blocker. Do not equate an added file
 with an integrated feature or a launch-only UI test with a tested user journey.
