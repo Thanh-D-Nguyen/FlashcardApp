@@ -1,0 +1,26 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>U00 Study</title><link rel="stylesheet" href="u00.css"></head><body>
+<div class="board">
+<div class="fixture">Fixture — số liệu minh họa, không phải dữ liệu sản phẩm</div>
+<h1>U00 · Study — chỗ đặt “Cần ôn lại / Đã nhớ”, trạng thái đã lật đáp án (ôn có lưu)</h1>
+<p class="note">Cùng nội dung ở cả ba: thẻ 4/12, đã lưu 3/12, cách đọc đang bật nên được ghi là gợi ý đã dùng. Hai lựa chọn có trọng lượng thị giác bằng nhau (không có nút “đúng” nổi bật) để không thiên lệch tự đánh giá.</p>
+<div class="row" id="r"></div></div>
+<script>
+const hdr=`<div class="nav"><div class="circle"><i data-i="chevL" data-s="22"></i></div><div class="t">JLPT N5 · Từ vựng đời sống</div><div class="circle"><i data-i="dots" data-s="22"></i></div></div>
+<div class="prog"><div class="l"><span class="meta">Thẻ 4/12</span><span class="meta" style="color:var(--accent);font-weight:600">Đã lưu 3/12</span></div><div class="bar"><i style="width:25%"></i></div></div>`;
+const rate=`<div class="row2"><div class="btn rate"><i data-i="redo" data-s="19"></i>Cần ôn lại</div><div class="btn rate"><i data-i="check" data-s="19"></i>Đã nhớ</div></div>`;
+const face=(extra='')=>`<div class="top"><span class="pill">Tự nhớ</span><span style="color:var(--accent)"><i data-i="speaker" data-s="24"></i></span></div>
+ <div class="mid"><div class="term" style="font-size:calc(46px*var(--s))">犬</div><div class="sub">いぬ</div><div class="hr"></div><div class="answer">con chó</div>
+ <div style="margin-top:10px"><span class="pill warn">Đã dùng gợi ý: cách đọc</span></div></div>${extra}`;
+const ex=`<div class="ex"><span>Câu ví dụ (2)</span><i data-i="chevD" data-s="18"></i></div>`;
+const A=`<div class="phone">${hdr}<div class="study" style="bottom:166px">${face(ex)}</div>
+ <div class="bottom"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><span class="meta">Bạn tự đánh giá</span><span class="link">Bỏ qua</span></div>${rate}</div></div>`;
+const B=`<div class="phone">${hdr}<div class="study" style="bottom:116px">${face(`<div style="border-top:.5px solid var(--sep);margin-top:12px;padding-top:14px"><div class="meta" style="margin-bottom:10px;text-align:center">Bạn nhớ từ này không? · Bạn tự đánh giá</div><div class="row2"><div class="btn rate" style="height:48px;min-height:48px"><i data-i="redo" data-s="18"></i>Cần ôn lại</div><div class="btn rate" style="height:48px;min-height:48px"><i data-i="check" data-s="18"></i>Đã nhớ</div></div></div>`)}</div>
+ <div class="bottom" style="display:flex;align-items:center;gap:16px"><span class="link" style="flex:none">Bỏ qua</span><div class="btn primary dis">Câu tiếp theo</div></div></div>`;
+const C=`<div class="phone">${hdr}<div class="study" style="bottom:290px">${face(ex).replace(/<div class="ex">.*<\/div>$/,'')}</div>
+ <div class="dock"><div class="head">Bạn nhớ từ này không?</div><div class="meta" style="margin:2px 0 14px">Bạn tự đánh giá — kết quả sẽ được lưu.</div>${rate}<div class="link" style="margin-top:14px">Bỏ qua thẻ này</div></div></div>`;
+const caps=[['A · Thanh dưới thay nút chính','Sau “Hiện đáp án”, thanh nút dưới cùng đổi thành hai lựa chọn; “Bỏ qua” là liên kết chữ.',['Thẻ giữ chiều cao đầy đủ: đáp án + ví dụ đọc thoải mái','Cùng vị trí ngón cái với nút “Hiện đáp án” → chỉ một chỗ để nhìn','Câu hỏi “Bạn tự đánh giá” là nhãn nhỏ, dễ bị bỏ qua'],A],
+['B · Trong thẻ','Hai nút nằm trong thẻ, sát đáp án; thanh dưới còn “Câu tiếp theo” (khóa đến khi lưu xong).',['Gần nội dung nhất, nhưng thẻ ngắn hơn ~50 pt','Hai điểm chạm chính cùng lúc: nút rating (bật) và Câu tiếp theo (khóa) — dễ nhầm','Đáp án/ví dụ dài đẩy nút rating ra khỏi màn hình'],B],
+['C · Panel gắn đáy','Panel trắng bo góc trên, có câu hỏi riêng + hai nút; thẻ co lại phía trên.',['Câu hỏi rõ ràng nhất','Thẻ mất ~125 pt chiều cao: ví dụ/đáp án dài phải cuộn','Thêm một lớp bề mặt phủ lên màn học; phải tránh glass-trên-glass với nút'],C]];
+const r=document.getElementById('r');
+caps.forEach(c=>r.innerHTML+=`<div class="cell">${c[3]}<div class="cap"><b>${c[0]}</b>${c[1]}<ul>${c[2].map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`);
+</script><script src="u00.js"></script></body></html>

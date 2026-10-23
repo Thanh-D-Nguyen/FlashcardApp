@@ -538,3 +538,56 @@ không thay cho kết quả sử dụng thực tế.
 **Thứ tự giao Claude/Codex**: U00 (chốt bố cục trước khi sửa UI); L01 → L02 →
 L03 + U01/U03 → L04 → L05 + U02 → L06 + U04 → L07 + U05. Giao từng story
 có phạm vi file/test và review riêng, không bắt một agent triển khai cả roadmap.
+
+## 14. U00 — bàn giao chọn bố cục (2026-10-23)
+
+**Trạng thái: ĐỀ XUẤT, CHỜ DUYỆT THỊ GIÁC.** Chưa là thiết kế đã duyệt; không bắt đầu code UI
+L03/L05 cho đến khi người sở hữu sản phẩm chọn/sửa hướng dưới đây. L01–L02 không phụ thuộc.
+
+Bằng chứng (ảnh trong [`docs/ui-redesign/personalized-learning/u00/`](../ui-redesign/personalized-learning/u00/);
+nguồn HTML tĩnh trong `src/`, dùng đúng token `DesignSystem.swift`, số liệu là **fixture**):
+[Today ×3](../ui-redesign/personalized-learning/u00/today_alternatives.png),
+[Today trạng thái](../ui-redesign/personalized-learning/u00/today_states.png),
+[Study ×3](../ui-redesign/personalized-learning/u00/study_alternatives.png),
+[Study trạng thái](../ui-redesign/personalized-learning/u00/study_states.png),
+[Results ×2 + ngoại lệ](../ui-redesign/personalized-learning/u00/results_alternatives.png).
+Dựng lại: `chrome --headless=new --screenshot=<png> --window-size=<w>,<h> file://…/src/<tên>.html`.
+
+### Đề xuất và lý do
+
+| Màn | Chọn | Lý do (dựa trên ảnh/đo layout, chưa phải usability test) | Phương án bị loại |
+| --- | --- | --- | --- |
+| Today | **A · Hero-first** | Cùng ngôn ngữ với màn Cấp độ đã có; một khối nổi bật; đổi bộ thẻ/thời lượng, tiến bộ và Cấp độ đều trong màn đầu. CTA đo được y 350–404 pt (iPhone 17, 852 pt); với chữ +35% và tên bộ thẻ dài vẫn y 440–513, trên tab bar (y 767) | **B** (danh sách gọn, CTA y 288–342): ba khối trắng cùng trọng lượng, mất điểm nhấn; **C** (khối chàm ~70% màn, số 132 pt, CTA y 516–570): chỉ lộ 2 hàng, số tồn lớn dễ tạo áp lực |
+| Study (ôn có lưu) | **A + câu hỏi của C** | Hai nút tự đánh giá ở thanh dưới, cùng vị trí ngón cái với “Hiện đáp án”, thẻ giữ chiều cao; thêm dòng “Bạn nhớ từ này không?” đủ rõ; hai nút **cùng trọng lượng** (không nút “đúng” nổi bật, tránh thiên lệch tự đánh giá); “Bỏ qua” là chữ | **B** (nút trong thẻ): hai điểm chạm chính cùng lúc (rating + Câu tiếp theo bị khóa); **C** (panel gắn đáy): thẻ mất ~125 pt, thêm một lớp bề mặt |
+| Results | **A · Danh sách trước** | Con số nằm trong câu, không thành huy hiệu; “Tự đánh giá” tách khỏi tỷ lệ đúng; danh sách “Cần ôn lại” suy ra từ lượt đã lưu | **B** (khối chàm với số lượt lớn): dễ đọc như điểm số/thành tích |
+
+Thời lượng 3/5/10 phút: giữ làm **ngân sách ước tính**, luôn hiển thị số mục thật cạnh nó
+(“12 mục cần ôn · ≈4 phút”). Mặc định 5 phút vẫn là giả thuyết; chốt bằng usability test ở L05.
+
+### Quy tắc rút ra từ ba skill thiết kế (đã đối chiếu với UIKit/sản phẩm)
+
+- **Liquid Glass**: giữ tab bar/nav bar hệ thống (nổi, glass). Hero và thẻ học là lớp nội dung, không glass;
+  không glass-trên-glass (loại panel C vì lý do này và vì tốn chỗ); chỉ một nút nhấn (tint) mỗi màn.
+  Nút rating dùng bề mặt đặc cùng trọng lượng; có dùng `UIButton.Configuration.glass()` cho nút phụ hay không
+  phải xem render thật trước (chưa kiểm).
+- **Apple Design / UX writing**: nhãn hành động rõ (“Bắt đầu ôn”, “Hiện đáp án”, “Cần ôn lại/Đã nhớ”), lỗi nói
+  điều gì đã xảy ra và lối ra (“Chưa lưu được lượt này.” + Thử lại), không trách móc khi quay lại sau nghỉ.
+- **UI UX Pro Max**: chỉ dùng checklist chuyển được sang UIKit (vùng chạm ≥44 pt, lỗi gần thao tác, nút khóa
+  khi đang lưu, không nháy bố cục). Bảng màu/phông do công cụ gợi ý tiếp tục **không áp dụng** (xem §9).
+- Trạng thái đã vẽ: Today ×6 (chưa có bộ thẻ, chưa có lượt học, không đến hạn, xong hôm nay, nghỉ dài, store lỗi),
+  Study ×6 (trước lộ đáp án, tự đánh giá, đang lưu, đã lưu, lưu lỗi, quiz đã trả lời), Results ×2 ngoại lệ
+  (dừng sớm, chưa lưu lượt nào).
+
+### Phát hiện từ mockup cần xử lý trong L03/L05
+
+1. Cách đọc bật sẵn theo tùy chọn trước khi trả lời phải được ghi là **gợi ý** (nhãn ở mặt trước và mặt sau),
+   nếu không lượt tự nhớ không còn “sạch”. L03 gọi `StudySession.noteHint(.reading)` khi cách đọc đang hiện.
+2. “Thẻ n/12” (vị trí) và “Đã lưu n/12” (đã commit) phải là hai chỉ số riêng; thanh tiến độ chỉ theo lượt đã lưu.
+3. Trạng thái “đến hạn” chỉ có từ L04. Trước đó Today dùng “Luyện bộ thẻ này” (trạng thái 2), không dùng từ “đến hạn”.
+4. Chưa xác định: thẻ đã lật nhưng người học không tự đánh giá rồi bấm back/next — theo L01 là không có lượt.
+
+### Chưa kiểm chứng (NOT VERIFIED)
+
+Mockup HTML xấp xỉ render iOS (phông hệ thống, tab bar glass, SF Symbols vẽ tay); không phải UIKit chạy thật,
+chưa có Dynamic Type thật, VoiceOver, Reduce Motion, tương tác/motion (U03), chưa có người dùng thật
+(U05). Giá trị CTA y là hình học của mockup, không phải của app. Mọi gate UI ở §13 vẫn **NOT VERIFIED**.

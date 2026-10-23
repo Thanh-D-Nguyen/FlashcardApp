@@ -1,0 +1,23 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>U00 Results</title><link rel="stylesheet" href="u00.css"></head><body>
+<div class="board">
+<div class="fixture">Fixture — số liệu minh họa, không phải dữ liệu sản phẩm</div>
+<h1>U00 · Results — hai bố cục + trạng thái ngoại lệ</h1>
+<p class="note">12 lượt đã lưu = quiz 9 (7 đúng, 2 chưa đúng) + tự đánh giá 3. Tự đánh giá không vào tỷ lệ đúng. Danh sách “Cần ôn lại” chỉ gồm thẻ trả lời sai hoặc tự đánh giá cần ôn — suy ra từ lượt đã lưu, không bịa.</p>
+<div class="row" id="r1"></div><div class="row" id="r2"></div></div>
+<script>
+const nav=`<div class="nav"><div style="width:44px"></div><div class="t">Kết quả</div><div style="width:44px"></div></div>`;
+const rows=`<div class="card" style="margin-top:18px"><div class="li"><span class="body">Quiz</span><span class="v figure">7 đúng · 2 chưa đúng</span></div><div class="li"><span class="body">Tự đánh giá</span><span class="v figure">3 lượt</span></div></div>
+<div class="meta" style="margin:8px 4px 0">Tự đánh giá do bạn chấm nên không tính vào tỷ lệ đúng.</div>
+<div class="sechead">Cần ôn lại</div><div class="card">
+ <div class="wl"><span class="w">学校</span><span class="body" style="flex:1">trường học</span><span class="pill warn">Chưa đúng</span></div>
+ <div class="wl"><span class="w">電車</span><span class="body" style="flex:1">tàu điện</span><span class="pill warn">Chưa đúng</span></div>
+ <div class="wl"><span class="w">犬</span><span class="body" style="flex:1">con chó</span><span class="pill">Tự đánh giá</span></div></div>`;
+const act=(more=true,primary='Xong')=>`<div class="bottom"><div class="btn primary">${primary}</div>${more?'<div style="text-align:center;margin-top:14px" class="link">Luyện thêm</div>':''}</div>`;
+const RA=`<div class="phone">${nav}<div class="res" style="text-align:center"><div style="height:8px"></div><div class="okc"><i data-i="check" data-s="36"></i></div><div class="disp">Đã lưu 12 lượt học</div><div class="sub" style="margin-top:4px">JLPT N5 · Từ vựng đời sống</div><div style="text-align:left">${rows}</div></div>${act()}</div>`;
+const RB=`<div class="phone">${nav}<div class="res"><div class="hero" style="padding:20px;display:flex;align-items:center;gap:16px"><span class="mincho" style="font-size:calc(72px*var(--s));line-height:1">12</span><div><div class="head">lượt học đã lưu</div><div class="meta" style="color:var(--onHero2);margin-top:2px">JLPT N5 · Từ vựng đời sống</div></div></div><div>${rows}</div></div>${act()}</div>`;
+const early=(saved)=>`<div class="phone">${nav}<div class="res" style="text-align:center"><div style="height:8px"></div><div class="okc" style="background:rgba(35,64,107,.08);color:var(--accent);box-shadow:inset 0 0 0 2px rgba(43,76,126,.30)"><i data-i="sheet" data-s="34"></i></div><div class="disp">${saved?'Đã lưu tiến độ':'Chưa lưu lượt nào'}</div><div class="sub" style="margin:6px 8px 0">${saved?'Bạn dừng ở thẻ 6/12. 5 lượt đã được lưu; 7 thẻ còn lại chưa ôn.':'Bạn chưa trả lời thẻ nào trong phiên này, nên không có gì để ghi lại.'}</div>${saved?`<div style="text-align:left"><div class="card" style="margin-top:22px"><div class="li"><span class="body">Quiz</span><span class="v figure">3 đúng · 1 chưa đúng</span></div><div class="li"><span class="body">Tự đánh giá</span><span class="v figure">1 lượt</span></div></div></div>`:''}</div>${act(saved,saved?'Xong':'Quay lại')}</div>`;
+const caps=[['A · Danh sách trước','Dấu tích tĩnh + tiêu đề “Đã lưu N lượt”; kết quả là danh sách có chữ.',['Giữ nguyên hệ chữ của app; con số là một phần câu, không thành huy hiệu','Mức nhấn thấp: không tạo cảm giác “điểm số”','Hành động Xong luôn trong tầm ngón cái'],RA],
+['B · Khối chàm trước','Số lượt khổng lồ trong khối chàm như Today.',['Đồng nhất với Today','Số lượt “12” thành điểm nhấn — dễ bị đọc như điểm số / thành tích','Dùng thêm một khối chàm; khó đọc nếu số lượt nhỏ (1–2)'],RB]];
+caps.forEach(c=>r1.innerHTML+=`<div class="cell">${c[3]}<div class="cap"><b>${c[0]}</b>${c[1]}<ul>${c[2].map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`);
+r2.innerHTML=`<div class="cell">${early(true)}<div class="cap"><b>A · Dừng sớm</b>Tiêu đề “Đã lưu tiến độ”, không đóng dấu hoàn thành.</div></div><div class="cell">${early(false)}<div class="cap"><b>A · Chưa lưu lượt nào</b>Không có 0%, không biểu đồ; một lối quay lại.</div></div>`;
+</script><script src="u00.js"></script></body></html>

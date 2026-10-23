@@ -1,0 +1,60 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>U00 Today</title><link rel="stylesheet" href="u00.css"></head><body>
+<div class="board" id="b">
+<div class="fixture">Fixture — số liệu minh họa, không phải dữ liệu sản phẩm</div>
+<h1>U00 · Today — ba bố cục, trạng thái “có mục đến hạn”</h1>
+<p class="note">Hàng trên: cỡ chữ mặc định. Hàng dưới: cùng bố cục với tên bộ thẻ dài và cỡ chữ lớn hơn ≈35% (kiểm tra CTA còn trong màn hình đầu hay không). Chiều cao khung 852 pt (iPhone 17).</p>
+<div id="rows"></div></div>
+<script>
+const DECK=s=>s?'JLPT N4 · Từ vựng công việc và giao tiếp văn phòng':'JLPT N5 · Từ vựng đời sống';
+const levels=`<div class="li"><span class="body">Học theo cấp độ</span><span class="v"><i data-i="chevR" data-s="16"></i></span></div>`;
+function A(s){return `<div class="phone ${s?'stress':''}" data-tab="0"><div class="page">
+ <div class="lt">Hôm nay</div><div class="sub" style="margin-top:2px">Ôn ngắn, đúng phần cần nhớ.</div>
+ <div class="hero" style="margin-top:14px;padding:20px 20px 20px">
+  <div class="eyebrow" style="color:var(--onHero2)">BỘ THẺ ĐANG HỌC</div>
+  <div class="head" style="margin-top:4px">${DECK(s)}</div>
+  <div style="display:flex;align-items:baseline;gap:10px;margin-top:14px"><span class="mincho" style="font-size:calc(64px*var(--s));line-height:1">12</span><span class="body" style="color:var(--onHero2)">mục cần ôn</span></div>
+  <div class="meta" style="color:var(--onHero2);margin:6px 0 16px">Ước tính khoảng 4 phút</div>
+  <div class="btn hero">Bắt đầu ôn <i data-i="arrowR" data-s="18"></i></div></div>
+ <div class="list" style="margin-top:12px">
+  <div class="li"><span class="body">Bộ thẻ đang học</span><span class="v">Đổi <i data-i="chevR" data-s="16"></i></span></div>
+  <div class="li"><span class="body">Thời lượng phiên</span><span class="v">5 phút <i data-i="chevR" data-s="16"></i></span></div></div>
+ <div class="sechead">Tiến bộ hôm nay</div>
+ <div class="body">Đã lưu <span class="figure">6</span> lượt</div><div class="meta">Quiz 4/5 đúng · Tự đánh giá 1</div>
+ <div class="list" style="margin-top:10px">${levels}</div></div></div>`}
+function B(s){return `<div class="phone ${s?'stress':''}" data-tab="0"><div class="page">
+ <div class="lt">Hôm nay</div><div class="sub" style="margin-top:2px">Ôn ngắn, đúng phần cần nhớ.</div>
+ <div class="card" style="margin-top:14px;padding:16px">
+  <div class="eyebrow">BỘ THẺ ĐANG HỌC</div><div class="head" style="margin:3px 0 12px">${DECK(s)}</div>
+  <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:14px"><span class="figure" style="font-size:calc(34px*var(--s));line-height:1">12</span><span class="body">mục cần ôn</span><span class="meta" style="margin-left:auto">≈ 4 phút</span></div>
+  <div class="btn primary">Bắt đầu ôn</div></div>
+ <div class="card" style="margin-top:12px">
+  <div class="li"><span class="body">Bộ thẻ đang học</span><span class="v">Đổi <i data-i="chevR" data-s="16"></i></span></div>
+  <div class="li"><span class="body">Thời lượng phiên</span><span class="v">5 phút <i data-i="chevR" data-s="16"></i></span></div></div>
+ <div class="sechead">Tiến bộ hôm nay</div>
+ <div class="card"><div class="li"><span class="body">Đã lưu</span><span class="v figure">6 lượt</span></div>
+  <div class="li"><span class="body">Quiz</span><span class="v figure">4/5 đúng</span></div>
+  <div class="li"><span class="body">Tự đánh giá</span><span class="v figure">1 lượt</span></div></div>
+ <div class="sechead">Khám phá</div><div class="card">${levels}</div></div></div>`}
+function C(s){return `<div class="phone lightsb ${s?'stress':''}" data-tab="0"><div class="hero" style="position:absolute;left:0;right:0;top:0;height:${s?'690px':'600px'};border-radius:0 0 40px 40px;padding:98px 24px 0">
+  <div class="lt" style="color:var(--onHero)">Hôm nay</div>
+  <div class="eyebrow" style="color:var(--onHero2);margin-top:${s?'18px':'34px'}">BỘ THẺ ĐANG HỌC</div>
+  <div class="head" style="margin-top:4px">${DECK(s)}</div>
+  <div class="mincho" style="font-size:calc(132px*var(--s));line-height:1.05;margin-top:${s?'6px':'14px'}">12</div>
+  <div class="body" style="color:var(--onHero2)">mục cần ôn · ước tính khoảng 4 phút</div>
+  <div class="btn hero" style="position:absolute;left:24px;right:24px;bottom:30px;width:auto">Bắt đầu ôn <i data-i="arrowR" data-s="18"></i></div></div>
+ <div style="position:absolute;left:16px;right:16px;top:${s?'706px':'616px'}"><div class="list" style="margin:0 -16px"><div class="li"><span class="body">Bộ thẻ đang học</span><span class="v">Đổi <i data-i="chevR" data-s="16"></i></span></div>
+  <div class="li"><span class="body">Thời lượng phiên</span><span class="v">5 phút <i data-i="chevR" data-s="16"></i></span></div></div></div></div>`}
+const caps={
+A:['A · Hero-first','Cùng ngôn ngữ với màn Cấp độ đã có: một khối chàm duy nhất mang tên bộ thẻ, số mục thật và CTA.',['Mọi hàng (đổi bộ thẻ, thời lượng, tiến bộ, Cấp độ) nằm trong màn đầu','Một khối nổi bật duy nhất, cùng ngôn ngữ với màn Cấp độ đã có','Tiến bộ chỉ là một dòng chữ — gọn, không giả dashboard']],
+B:['B · Compact list-first','Một thẻ trắng nhỏ + danh sách nhóm kiểu Settings; CTA là nút accent chuẩn `Design.Button.primary`.',['Thấy nhiều nội dung nhất (tiến bộ thành 3 hàng số)','Không còn điểm nhấn “một hành động nổi bật”: ba khối trắng cùng trọng lượng','Số mục đến hạn nhỏ hơn — kém cảm giác “việc hôm nay”']],
+C:['C · Immersive focus','Khối chàm chiếm ~70% màn hình đầu, số mục là hình lớn; mọi thứ khác ở dưới nếp gấp.',['Chỉ 2 hàng phụ lộ ra; tiến bộ và Cấp độ phải cuộn','Số mục rất to: dễ đọc nhưng dễ tạo áp lực khi số tồn lớn','Một khối chàm chiếm ~70% màn hình, dùng cùng màu với bề mặt “hero” của app']]};
+const rows=document.getElementById('rows');
+[[0,'A'],[0,'B'],[0,'C']].length;
+for(const s of [false,true]){const r=document.createElement('div');r.className='row';
+ for(const [k,f] of [['A',A],['B',B],['C',C]]){const c=caps[k];
+  r.innerHTML+=`<div class="cell">${f(s)}<div class="cap">${s?`<b>${c[0]} — chữ lớn, tên dài</b><ul><li class="cta"></li></ul>`:`<b>${c[0]}</b>${c[1]}<ul><li class="cta"></li>${c[2].map(x=>`<li>${x}</li>`).join('')}</ul>`}</div></div>`}
+ rows.append(r)}
+</script><script src="u00.js"></script>
+<script>document.querySelectorAll('.cell').forEach(c=>{const p=c.querySelector('.phone'),b=p.querySelector('.btn'),o=c.querySelector('.cta');
+ const y=Math.round(b.getBoundingClientRect().bottom-p.getBoundingClientRect().top),top=Math.round(b.getBoundingClientRect().top-p.getBoundingClientRect().top);
+ o.textContent=`CTA đo được: y ${top}–${y} pt · ${y<=767?'còn trong màn hình đầu':'nằm dưới tab bar'} (tab bar bắt đầu y 767)`;window.__m=(window.__m||[]).concat([[top,y]])});</script></body></html>

@@ -1,0 +1,32 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>U00 Study states</title><link rel="stylesheet" href="u00.css"></head><body>
+<div class="board">
+<div class="fixture">Fixture — số liệu minh họa, không phải dữ liệu sản phẩm</div>
+<h1>U00 · Study đề xuất — các trạng thái</h1>
+<p class="note">Hướng đề xuất: vị trí thanh dưới của A + câu hỏi tường minh của C. “Thẻ n/12” là vị trí; “Đã lưu n/12” và thanh tiến độ chỉ đếm lượt đã lưu thành công.</p>
+<div class="row" id="r1"></div><div class="row" id="r2"></div></div>
+<script>
+const hdr=(saved,pos=4)=>`<div class="nav"><div class="circle"><i data-i="chevL" data-s="22"></i></div><div class="t">JLPT N5 · Từ vựng đời sống</div><div class="circle"><i data-i="dots" data-s="22"></i></div></div>
+<div class="prog"><div class="l"><span class="meta">Thẻ ${pos}/12</span><span class="meta" style="color:var(--accent);font-weight:600">Đã lưu ${saved}/12</span></div><div class="bar"><i style="width:${saved/12*100}%"></i></div></div>`;
+const topRow=`<div class="top"><span class="pill">Tự nhớ</span><span style="color:var(--accent)"><i data-i="speaker" data-s="24"></i></span></div>`;
+const hint=`<div style="margin-top:10px"><span class="pill warn">Đã dùng gợi ý: cách đọc</span></div>`;
+const front=`<div class="phone">${hdr(3)}<div class="study" style="bottom:130px">${topRow}<div class="mid"><div class="term">犬</div><div class="sub">いぬ</div><div style="margin-top:10px"><span class="pill warn">Cách đọc đang bật · tính là gợi ý</span></div></div></div><div class="bottom"><div class="btn primary">Hiện đáp án</div></div></div>`;
+const back=(mode)=>{
+ const saved=mode==='saved'?4:3;
+ const fbRow={ready:'',saving:'<div class="fb" style="color:var(--label2)"><span class="spin"></span>Đang lưu…</div>',saved:'<div class="fb" style="color:var(--ok)"><i data-i="check" data-s="18"></i>Đã lưu</div>',failed:'<div class="fb" style="color:var(--err)"><i data-i="warn" data-s="18"></i>Chưa lưu được lượt này.</div>'}[mode];
+ const ctrl={ready:`<div class="head" style="text-align:center;margin-bottom:10px">Bạn nhớ từ này không?</div><div class="row2"><div class="btn rate"><i data-i="redo" data-s="19"></i>Cần ôn lại</div><div class="btn rate"><i data-i="check" data-s="19"></i>Đã nhớ</div></div><div style="display:flex;justify-content:space-between;margin-top:12px"><span class="meta">Bạn tự đánh giá</span><span class="link">Bỏ qua</span></div>`,
+ saving:`<div class="head" style="text-align:center;margin-bottom:10px;opacity:.5">Bạn nhớ từ này không?</div><div class="row2"><div class="btn rate dis"><i data-i="redo" data-s="19"></i>Cần ôn lại</div><div class="btn rate" style="box-shadow:inset 0 0 0 2px var(--accent)"><span class="spin"></span>Đã nhớ</div></div><div style="height:29px"></div>`,
+ saved:`<div class="btn primary">Câu tiếp theo <i data-i="arrowR" data-s="18"></i></div><div style="height:29px"></div>`,
+ failed:`<div class="btn primary">Thử lại</div><div style="text-align:center;margin-top:12px"><span class="link" style="color:var(--err)">Rời phiên — lượt này sẽ không được lưu</span></div>`}[mode];
+ return `<div class="phone">${hdr(saved)}<div class="study" style="bottom:${mode==='failed'?'178px':'208px'}">${topRow}<div class="mid"><div class="term" style="font-size:calc(46px*var(--s))">犬</div><div class="sub">いぬ</div><div class="hr"></div><div class="answer">con chó</div>${hint}</div>${fbRow?`<div style="margin-top:12px">${fbRow}</div>`:''}</div><div class="bottom">${ctrl}</div></div>`};
+const quiz=`<div class="phone">${hdr(4,5)}<div class="study" style="bottom:130px"><div class="top"><span class="pill">Chọn đáp án</span><span style="color:var(--accent)"><i data-i="speaker" data-s="24"></i></span></div>
+ <div style="text-align:center;margin:8px 0 12px"><div class="term" style="font-size:calc(46px*var(--s))">犬</div></div>
+ <div style="display:flex;flex-direction:column;gap:10px"><div class="opt bad"><i data-i="x" data-s="20"></i>con mèo<span style="margin-left:auto;font-size:13px;font-weight:600">Chưa đúng</span></div><div class="opt good"><i data-i="check" data-s="20"></i>con chó<span style="margin-left:auto;font-size:13px;font-weight:600">Đáp án</span></div><div class="opt">con cá</div><div class="opt">con chim</div></div></div>
+ <div class="bottom"><div class="btn primary">Câu tiếp theo <i data-i="arrowR" data-s="18"></i></div></div></div>`;
+const S=[[front,'1 · Trước khi lộ đáp án','Một nút chính. Cách đọc hiển thị theo tùy chọn hiện có; khi đáp án lộ ra, nó được ghi là gợi ý đã dùng.'],
+[back('ready'),'2 · Đã lật — tự đánh giá','Hai lựa chọn cùng trọng lượng; “Bỏ qua” là chữ, không tạo lượt.'],
+[back('saving'),'3 · Đang lưu','Khóa lựa chọn, đáp án vẫn đọc được. Chỉ hiện “Đang lưu…” nếu quá ~300 ms.'],
+[back('saved'),'4 · Đã lưu','Bộ đếm “Đã lưu” tăng đúng một lần, sau khi transaction thành công.'],
+[back('failed'),'5 · Lưu lỗi','Giữ nguyên đáp án; Thử lại dùng cùng attempt ID; rời phiên có nói rõ hệ quả.'],
+[quiz,'6 · Quiz đã trả lời','Ký hiệu + chữ + màu (không chỉ xanh/đỏ); không tự nhảy sang câu sau.']];
+S.forEach((s,i)=>(i<3?r1:r2).innerHTML+=`<div class="cell">${s[0]}<div class="cap"><b>${s[1]}</b>${s[2]}</div></div>`);
+</script><script src="u00.js"></script></body></html>
