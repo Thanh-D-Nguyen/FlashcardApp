@@ -144,7 +144,7 @@ Không sửa migration cũ để xóa store. Commit: `feat(study): persist learn
 - Rủi ro còn lại: chưa có consumer thật (L03); `contentVersion` và mapping result→skill là hợp đồng bền, đổi cách tính
   phải có migration.
 
-### L03 — Nối phiên học với persistence (PLANNED; sau L02)
+### L03 — Nối phiên học với persistence (VERIFIED — chờ commit hash bên dưới)
 
 Phạm vi: `Modules/CardStudy/`, `Interactors/CardStudyInteractor.swift`,
 `Resources/Localizable.xcstrings`, presenter/integration tests và UI test liên quan.
@@ -162,6 +162,38 @@ Tiêu chí:
   `noteHint(.reading)` khi cách đọc đang hiện trước khi trả lời.
 
 Commit: `feat(study): save completed attempts during sessions`.
+
+**Kết quả triển khai (2026-10-23)**
+- Quyết định: Study từ tab Cards luôn là phiên **có lưu** (không có chế độ "xem tự do" riêng; "Bỏ qua" tương đương xem rồi
+  chuyển). Quiz lưu ngay khi chọn đáp án; flip có hai nút **Cần ôn lại / Đã nhớ** sau khi hiện đáp án (cùng trọng lượng, theo U00 đã
+  duyệt), Next/Bỏ qua không tạo lượt. Việc ghi là **đồng bộ trên main thread** (một write Realm), nên không có trạng thái
+  "đang lưu" riêng; chỉ có `none / saved / failed`. Chủ thể (`ownerKey`) được chốt khi bắt đầu một run; đổi/đăng xuất tài khoản
+  làm phiên dừng, đóng băng và báo người học (hỏi lại khi quay về màn). Lưu lỗi: ở lại câu hỏi, đáp án giữ nguyên, **Thử lại**
+  gửi đúng attempt cũ, **Rời phiên** có xác nhận; trong lúc chưa lưu: không đi tiếp, không đổi chế độ/xáo trộn/bắt đầu lại/sửa deck
+  (menu bị tắt), nút Back hệ thống được thay bằng "Rời phiên" và vuốt-quay-lại bị tắt. Tiến độ và "Đã lưu n/N" chỉ đếm lượt đã lưu
+  (khác "Thẻ n/N" là vị trí); mọi thay đổi run (restart, đổi chế độ, xáo trộn) đặt lại bộ đếm. Cách đọc hiện trước khi trả lời và nghe
+  mặt trước được ghi là gợi ý (`noteHint`), có nhãn "Cách đọc đang bật · tính là gợi ý / Đã dùng gợi ý: cách đọc". Tổng kết chỉ
+  tính lượt đã lưu: quiz đúng/sai, tự đánh giá tách riêng (không vào tỷ lệ), số thẻ bỏ qua, danh sách "Cần ôn lại". Xác nhận xóa
+  deck/card nay nói rõ lịch sử học cũng bị xóa. Hook debug `-FailReviewSaves N` (chỉ `#if DEBUG`) để kiểm thử lỗi lưu trên UI thật.
+- Sai khác so với mockup U00: không có chip "Tự nhớ/Chọn đáp án" trên thẻ; không có bước "Dừng sớm" (chưa có thao tác kết thúc sớm);
+  bản dịch ja rút gọn (復習が必要 / 覚えた) để vừa nửa chiều rộng; nút tổng kết tái dùng "Xong".
+- RED/GREEN: L03a (presenter): 22/110 test fail do assertion trên stub trước khi cài đặt; sau review, 2 test mới (đổi chế độ/xáo trộn
+  đặt lại bộ đếm; phiên đã kết thúc bị đóng băng) fail trước khi sửa (đếm 4 > tổng 3) rồi xanh.
+- Test: `FlashcardAppTests` 512 PASS / 0 fail / 5 skip (Keychain, build không ký); coverage `CardStudyPresenter.swift` 97% (trước các
+  sửa review; logic mới đều có test). UI test (một Simulator iPhone 17, vi): `testDeckCanBeCreatedStudiedEditedPersistedAndDeleted`
+  (đã cập nhật: lật → chấm → đã lưu 1 → bỏ qua → tổng kết), `testAFailedSaveKeepsTheLearnerOnTheCardUntilItIsRetried` (mới: lưu lỗi →
+  không đi tiếp → hỏi khi rời → ở lại → thử lại → đếm tăng → rời không hỏi), `testStudyShowsExampleSentences…`,
+  `testExampleSentencesCanBeAddedEditedRemovedAndRestored`: 4/4 PASS. Bằng chứng ảnh từ build thật:
+  `docs/ui-redesign/personalized-learning/l03/` (rating, lưu lỗi, tổng kết — vi; rating — ja).
+- Tiêu chí "thoát app trước tổng kết, mở lại vẫn còn": test tích hợp presenter + Realm thật trên đĩa (đóng/mở lại). Chưa có UI đọc
+  lịch sử (L05), nên chưa kiểm bằng UI sau kill app.
+- Review độc lập (`flashcard-reviewer`): 1 blocker (B1: đổi chế độ/xáo trộn không đặt lại bộ đếm đã lưu — đã sửa + test) và các điểm
+  đã xử lý: khôi phục cử chỉ vuốt-quay-lại, phiên đã kết thúc bị đóng băng và hỏi lại, thông điệp đổi tài khoản trung tính, thông báo
+  VoiceOver đăng sau khi vẽ lại và độc lập chế độ, tắt các mục menu khi chưa lưu, nhãn gợi ý khớp trạng thái cách đọc.
+  Còn ghi nhận: gợi ý audio được ghi mỗi khi tự đọc mặt trước (quyết định sản phẩm); header luôn hiện "Đã lưu 0/N" kể cả khi chỉ
+  xem; không kiểm "lưu sau khi deck bị xóa giữa phiên" vì `load()` dựng lại/thoát phiên khi deck đổi (giả định chưa có test riêng).
+- NOT VERIFIED: Dynamic Type cỡ accessibility, VoiceOver thực tế, Reduce Motion, haptic và âm thanh trên máy thật (chỉ nối dây, đúng
+  một lần/sự kiện theo thiết kế), chạy UI test song song nhiều thiết bị, giao diện tiếng Anh sau thay đổi cuối (đã xem trước đó).
 
 ### L04 — Lịch ôn có thể kiểm chứng (PLANNED; sau L03)
 

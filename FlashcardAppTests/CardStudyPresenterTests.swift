@@ -14,6 +14,7 @@ final class CardStudyPresenterTests: XCTestCase {
     private var view: SpyStudyView!
     private var presenter: CardStudyPresenter!
     private var exampleStore: CardExampleStoreInterface?
+    private var history: FakeReviewHistory!
 
     override func setUp() {
         super.setUp()
@@ -22,6 +23,7 @@ final class CardStudyPresenterTests: XCTestCase {
         preferences = FakeStudyPreferences()
         speech = FakeSpeech()
         examples = FakeExamples()
+        history = FakeReviewHistory()
         realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "study-\(UUID().uuidString)", objectTypes: RealmService.storedTypes))
         RealmService.shared.realm = realm
         owner = "11111111-1111-1111-1111-111111111111"
@@ -54,7 +56,7 @@ final class CardStudyPresenterTests: XCTestCase {
     private func start() {
         presenter = CardStudyPresenter(deckId: "deck", interactor: interactor, wireframe: wireframe, preferences: preferences,
                                        speech: speech, random: { $0.lowerBound }, examples: examples,
-                                       exampleStore: exampleStore ?? RealmCardExampleStore(), ownerKey: { [unowned self] in owner })
+                                       exampleStore: exampleStore ?? RealmCardExampleStore(), reviewHistory: history, ownerKey: { [unowned self] in owner })
         presenter.view = view
         presenter.viewWillAppear()
     }
@@ -66,7 +68,8 @@ final class CardStudyPresenterTests: XCTestCase {
         XCTAssertEqual(state.card?.front, "F1")
         XCTAssertEqual(state.card?.isFlipped, false)
         XCTAssertEqual(state.primaryTitle, NSLocalizedString("Show answer", comment: ""))
-        XCTAssertEqual(state.progress, 1.0 / 3.0, accuracy: 0.001)
+        XCTAssertEqual(state.progress, 0, accuracy: 0.001, "Progress counts saved attempts, not the card on screen")
+        XCTAssertEqual(state.progressText, String(format: NSLocalizedString("%1$lld of %2$lld", comment: ""), 1, 3))
     }
 
     func test_primaryButtonFlipsThenAdvancesThenFinishes() {
@@ -111,6 +114,381 @@ final class CardStudyPresenterTests: XCTestCase {
         presenter.primaryAction()
         XCTAssertEqual(state.card?.front, "F2")
         XCTAssertEqual(state.summary.correct, 1)
+    }
+
+    // MARK: Saving the learner's answers (L03)
+
+    private func startQuiz() {
+        preferences.mode = .quiz
+        start()
+    }
+
+    func test_aQuizAnswerIsSavedForTheLearnerWithTheCardAndWhatWasAsked() throws {
+        startQuiz()
+        presenter.select(option: "B1")
+
+        XCTAssertEqual(history.saves.count, 1)
+        let (attempt, savedFor) = try XCTUnwrap(history.saves.first)
+        XCTAssertEqual(savedFor, owner)
+        XCTAssertEqual(attempt.cardID, "c1")
+        XCTAssertEqual(attempt.result, .correct)
+        XCTAssertEqual(attempt.contentVersion, StudyCard(id: "c1", front: "F1", back: "B1").contentVersion)
+        XCTAssertEqual(state.review.save, .saved)
+        XCTAssertEqual(state.review.savedCount, 1)
+        XCTAssertEqual(state.progress, 1.0 / 3.0, accuracy: 0.001)
+    }
+
+    func test_aWrongQuizAnswerIsSavedAsIncorrect() {
+        startQuiz()
+        presenter.select(option: state.quiz!.options.first { $0 != "B1" }!)
+        XCTAssertEqual(history.saves.map(\.0.result), [.incorrect])
+    }
+
+    func test_choosingAnOptionTwiceSavesOnce() {
+        startQuiz()
+        presenter.select(option: "B1")
+        presenter.select(option: "B1")
+        presenter.select(option: state.quiz!.options.first { $0 != "B1" }!)
+        XCTAssertEqual(history.saves.count, 1)
+        XCTAssertEqual(state.review.savedCount, 1)
+    }
+
+    func test_lookingAtACardNeverSavesAnything() {
+        start()
+        presenter.flip()
+        presenter.next()
+        presenter.previous()
+        presenter.flip()
+        presenter.primaryAction()
+        XCTAssertTrue(history.saves.isEmpty)
+        XCTAssertEqual(state.review.savedCount, 0)
+        XCTAssertEqual(state.review.save, .none)
+    }
+
+    func test_aFlippedCardCanBeRatedAndTheRatingIsSavedAsASelfAssessment() throws {
+        start()
+        XCTAssertFalse(state.review.canRate, "The answer is not shown yet")
+        presenter.flip()
+        XCTAssertTrue(state.review.canRate)
+        presenter.rate(.needsReview)
+
+        let attempt = try XCTUnwrap(history.saves.first?.0)
+        XCTAssertEqual(attempt.result, .needsReview)
+        XCTAssertEqual(attempt.skill, .selfRecall)
+        XCTAssertEqual(attempt.cardID, "c1")
+        XCTAssertFalse(state.review.canRate, "A question is rated once")
+        XCTAssertEqual(state.review.save, .saved)
+        XCTAssertEqual(state.summary.answered, 0, "A self-rating is not a quiz answer")
+        XCTAssertEqual(state.summary.selfRated, 1)
+    }
+
+    func test_ratingBeforeTheAnswerIsShownOrInAQuizSavesNothing() {
+        start()
+        presenter.rate(.remembered)
+        XCTAssertTrue(history.saves.isEmpty)
+        presenter.setMode(.quiz)
+        presenter.rate(.remembered)
+        XCTAssertTrue(history.saves.isEmpty)
+    }
+
+    func test_ratingTheSameCardTwiceSavesOnce() {
+        start()
+        presenter.flip()
+        presenter.rate(.remembered)
+        presenter.rate(.needsReview)
+        XCTAssertEqual(history.saves.map(\.0.result), [.remembered])
+    }
+
+    func test_theReadingInViewBeforeTheAnswerIsRecordedAsAHint() {
+        let deck = makeDeck(3)
+        deck.cards[0].frontExtraText = "えふいち"
+        interactor.deck = deck
+        start()
+        XCTAssertTrue(state.review.usedReadingHint)
+        presenter.flip()
+        presenter.rate(.remembered)
+        XCTAssertEqual(history.saves.first?.0.hints, [.reading])
+        XCTAssertTrue(state.review.usedReadingHint)
+    }
+
+    func test_noReadingOrAHiddenReadingIsNoHint() {
+        let deck = makeDeck(3)
+        deck.cards[0].frontExtraText = "えふいち"
+        interactor.deck = deck
+        preferences.isReadingVisible = false
+        start()
+        XCTAssertFalse(state.review.usedReadingHint)
+        presenter.flip()
+        presenter.rate(.remembered)
+        presenter.next()
+        presenter.flip()
+        presenter.rate(.remembered)
+        XCTAssertEqual(history.saves.map(\.0.hints), [[], []], "Card 2 has no reading to show")
+    }
+
+    func test_listeningBeforeTheAnswerIsAHintAndListeningAfterIsNot() {
+        start()
+        presenter.speakCurrent()
+        presenter.flip()
+        presenter.speakCurrent()
+        presenter.rate(.remembered)
+        XCTAssertEqual(history.saves.first?.0.hints, [.audio])
+
+        presenter.next()
+        presenter.flip()
+        presenter.speakCurrent()
+        presenter.rate(.remembered)
+        XCTAssertEqual(history.saves.last?.0.hints, [], "Hearing the answer after seeing it helped nothing")
+    }
+
+    func test_answersSavedBeforeTheSummaryAreStillThereAfterTheAppIsClosedAndOpenedAgain() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let configuration = RealmService.makeConfiguration(fileURL: folder.appendingPathComponent("flash_card.realm"))
+        try autoreleasepool {
+            RealmService.shared.realm = try Realm(configuration: configuration)
+            preferences.mode = .quiz
+            presenter = CardStudyPresenter(deckId: "deck", interactor: interactor, wireframe: wireframe, preferences: preferences, speech: speech,
+                                           random: { $0.lowerBound }, examples: examples, exampleStore: RealmCardExampleStore(),
+                                           reviewHistory: RealmReviewHistoryStore(), ownerKey: { [unowned self] in owner })
+            presenter.view = view
+            presenter.viewWillAppear()
+            presenter.select(option: "B1")
+            presenter.next()
+            presenter.select(option: state.quiz!.options.first { $0 != "B2" }!)
+            // The app is closed here, before the summary was ever shown.
+            presenter = nil
+            RealmService.shared.realm = nil
+        }
+
+        RealmService.shared.realm = try Realm(configuration: configuration)
+        let saved = RealmReviewHistoryStore().attempts(ownerKey: owner, cardId: nil)
+        XCTAssertEqual(saved.map(\.cardID), ["c1", "c2"])
+        XCTAssertEqual(saved.map(\.result), [.correct, .incorrect])
+    }
+
+    // MARK: When saving fails
+
+    private func startWithFailingSave() {
+        history.failuresRemaining = 1
+        startQuiz()
+        presenter.select(option: "B1")
+    }
+
+    func test_aFailedSaveIsShownAsFailedAndIsNotCountedAsProgress() {
+        startWithFailingSave()
+        XCTAssertEqual(state.review.save, .failed)
+        XCTAssertEqual(state.review.savedCount, 0)
+        XCTAssertEqual(state.progress, 0)
+        XCTAssertEqual(state.summary.saved, 0)
+        XCTAssertEqual(state.quiz?.selected, "B1", "The answer stays on screen")
+    }
+
+    func test_whileAnAttemptIsUnsavedTheLearnerCannotMoveOnOrChangeTheSession() {
+        startWithFailingSave()
+        presenter.next()
+        presenter.primaryAction()
+        presenter.previous()
+        presenter.restart()
+        presenter.setMode(.flip)
+        presenter.setShuffled(true)
+        XCTAssertEqual(state.card?.front, "F1")
+        XCTAssertEqual(state.mode, .quiz)
+        XCTAssertFalse(state.isShuffled)
+        XCTAssertEqual(state.review.save, .failed)
+    }
+
+    func test_retryingSavesTheSameAttemptOnceAndUnblocksTheSession() throws {
+        startWithFailingSave()
+        presenter.retrySave()
+        presenter.retrySave()
+
+        XCTAssertEqual(history.attempted.count, 2, "One failed try and one successful retry; the second retry has nothing to save")
+        XCTAssertEqual(history.attempted[0].0.id, history.attempted[1].0.id, "A retry sends the same attempt, never a new one")
+        XCTAssertEqual(history.saves.count, 1)
+        XCTAssertEqual(state.review.save, .saved)
+        XCTAssertEqual(state.review.savedCount, 1)
+        presenter.next()
+        XCTAssertEqual(state.card?.front, "F2")
+    }
+
+    func test_aRetryThatFailsAgainKeepsWaiting() {
+        history.failuresRemaining = 2
+        startQuiz()
+        presenter.select(option: "B1")
+        presenter.retrySave()
+        XCTAssertEqual(state.review.save, .failed)
+        presenter.retrySave()
+        XCTAssertEqual(state.review.save, .saved)
+    }
+
+    func test_aFailedRatingStaysRatedAndCanBeRetried() {
+        history.failuresRemaining = 1
+        start()
+        presenter.flip()
+        presenter.rate(.remembered)
+        XCTAssertEqual(state.review.save, .failed)
+        XCTAssertFalse(state.review.canRate, "The rating was given; only saving remains")
+        presenter.rate(.needsReview)
+        presenter.retrySave()
+        XCTAssertEqual(history.saves.map(\.0.result), [.remembered])
+    }
+
+    func test_leavingWithAnUnsavedAttemptAsksFirst() {
+        startWithFailingSave()
+        presenter.leaveSession()
+        XCTAssertEqual(wireframe.leaveCount, 0)
+        XCTAssertEqual(wireframe.unsavedLeavePrompts.count, 1)
+        wireframe.unsavedLeavePrompts[0]()
+        XCTAssertEqual(wireframe.leaveCount, 1)
+        XCTAssertTrue(history.saves.isEmpty, "Nothing was saved, and the learner was told")
+    }
+
+    func test_leavingWhenEverythingIsSavedDoesNotAsk() {
+        startQuiz()
+        presenter.select(option: "B1")
+        presenter.leaveSession()
+        XCTAssertTrue(wireframe.unsavedLeavePrompts.isEmpty)
+        XCTAssertEqual(wireframe.leaveCount, 1)
+    }
+
+    // MARK: Whose results they are
+
+    func test_anAccountChangeDuringTheSessionEndsItAndNothingIsSavedForTheNewAccount() {
+        startQuiz()
+        presenter.select(option: "B1")
+        presenter.next()
+        owner = "22222222-2222-2222-2222-222222222222"
+        presenter.select(option: "B2")
+
+        XCTAssertEqual(history.saves.map(\.1), ["11111111-1111-1111-1111-111111111111"], "Only the first answer, for the first account")
+        XCTAssertEqual(wireframe.endedSessions.count, 1)
+    }
+
+    func test_signingOutDuringTheSessionEndsItToo() {
+        startQuiz()
+        owner = ""
+        presenter.select(option: "B1")
+        XCTAssertTrue(history.saves.isEmpty)
+        XCTAssertEqual(wireframe.endedSessions.count, 1)
+    }
+
+    func test_comingBackAfterTheAccountChangedEndsTheSession() {
+        start()
+        presenter.flip()
+        owner = "22222222-2222-2222-2222-222222222222"
+        presenter.viewWillAppear()
+        XCTAssertEqual(wireframe.endedSessions.count, 1)
+    }
+
+    func test_theSignedOutLearnerSavesUnderAnEmptyKey() {
+        owner = ""
+        startQuiz()
+        presenter.select(option: "B1")
+        XCTAssertEqual(history.saves.map(\.1), [""])
+    }
+
+    // MARK: A run and its summary
+
+    func test_startingOverBeginsANewRunWithNewAttemptIdsAndKeepsWhatWasSaved() {
+        startQuiz()
+        presenter.select(option: "B1")
+        presenter.restart()
+        XCTAssertEqual(state.review.savedCount, 0)
+        presenter.select(option: "B1")
+        XCTAssertEqual(history.saves.count, 2)
+        XCTAssertNotEqual(history.saves[0].0.id, history.saves[1].0.id)
+    }
+
+    func test_changingTheModeOrShufflingBeginsANewRunWhoseCountStartsAtZero() {
+        startQuiz()
+        presenter.select(option: "B1")
+        XCTAssertEqual(state.review.savedCount, 1)
+
+        presenter.setShuffled(true)
+        XCTAssertEqual(state.review.savedCount, 0, "Nothing is saved in the new run yet")
+        XCTAssertEqual(state.progress, 0)
+        presenter.select(option: state.quiz!.options.first { $0 == state.card!.back }!)
+        XCTAssertEqual(state.review.savedCount, 1)
+
+        presenter.setMode(.flip)
+        XCTAssertEqual(state.review.savedCount, 0)
+        presenter.flip()
+        presenter.rate(.remembered)
+        presenter.next()
+        presenter.flip()
+        presenter.rate(.remembered)
+        XCTAssertEqual(state.review.savedCount, 2)
+        XCTAssertLessThanOrEqual(state.review.savedCount, state.review.total)
+        XCTAssertEqual(state.summary.saved, 2, "The header and the summary agree")
+        XCTAssertEqual(history.saves.count, 4, "Every earlier attempt is still stored")
+    }
+
+    func test_anUnsavedAttemptAlsoBlocksEditingTheDeck() {
+        startWithFailingSave()
+        presenter.edit()
+        XCTAssertNil(wireframe.editedDeckId)
+        presenter.retrySave()
+        presenter.edit()
+        XCTAssertEqual(wireframe.editedDeckId, "deck")
+    }
+
+    func test_onceTheSessionEndedForAnAccountChangeNothingMoreIsAnsweredOrSaved() {
+        startQuiz()
+        owner = "22222222-2222-2222-2222-222222222222"
+        presenter.select(option: "B1")
+        XCTAssertEqual(wireframe.endedSessions.count, 1)
+
+        presenter.next()
+        presenter.select(option: "B1")
+        presenter.setMode(.flip)
+        presenter.setShuffled(true)
+        presenter.restart()
+        XCTAssertTrue(history.saves.isEmpty)
+        XCTAssertEqual(state.card?.front, "F1", "The session is frozen")
+        XCTAssertEqual(state.mode, .quiz)
+        presenter.viewWillAppear()
+        XCTAssertEqual(wireframe.endedSessions.count, 2, "Coming back asks again, in case the first message was never shown")
+    }
+
+    func test_theSummaryCountsOnlySavedAttemptsAndListsTheCardsToReview() throws {
+        startQuiz()
+        presenter.select(option: "B1")
+        presenter.next()
+        presenter.select(option: state.quiz!.options.first { $0 != "B2" }!)
+        presenter.next()
+        presenter.next()   // the third question is skipped: unanswered quiz questions cannot be left
+        presenter.select(option: "B3")
+        presenter.next()
+
+        XCTAssertEqual(state.screen, .finished)
+        XCTAssertEqual(state.summary.saved, 3)
+        XCTAssertEqual(state.summary.answered, 3)
+        XCTAssertEqual(state.summary.correct, 2)
+        XCTAssertEqual(state.summary.incorrect, 1)
+        XCTAssertEqual(state.summary.selfRated, 0)
+        XCTAssertEqual(state.summary.toReview, [StudyReviewedCard(front: "F2", back: "B2", result: .incorrect)])
+    }
+
+    func test_theSummaryKeepsSelfRatingsApartFromTheQuizScore() {
+        start()
+        presenter.flip(); presenter.rate(.remembered); presenter.next()
+        presenter.flip(); presenter.rate(.needsReview); presenter.next()
+        presenter.next()   // skipped
+        XCTAssertEqual(state.screen, .finished)
+        XCTAssertEqual(state.summary.saved, 2)
+        XCTAssertEqual(state.summary.selfRated, 2)
+        XCTAssertEqual(state.summary.answered, 0)
+        XCTAssertEqual(state.summary.toReview.map(\.front), ["F2"])
+    }
+
+    func test_aSessionWithNothingSavedSaysSo() {
+        start()
+        presenter.next(); presenter.next(); presenter.next()
+        XCTAssertEqual(state.screen, .finished)
+        XCTAssertEqual(state.summary.saved, 0)
+        XCTAssertTrue(state.summary.toReview.isEmpty)
     }
 
     func test_modeShuffleAndDisplayChoicesArePersisted() {
@@ -553,6 +931,10 @@ private final class FakeStudyWireframe: CardStudyWireframeInterface {
     var editors: [(isNew: Bool, draft: CardExampleDraft, save: (CardExampleDraft) throws -> Void)] = []
     var removalPrompts: [(origin: ExampleOrigin, confirm: () -> Void)] = []
     var errors: [String] = []
+    var unsavedLeavePrompts: [() -> Void] = []
+    var endedSessions: [String] = []
+    func confirmLeaveUnsaved(onLeave: @escaping () -> Void) { unsavedLeavePrompts.append(onLeave) }
+    func endSession(message: String) { endedSessions.append(message) }
     func showExampleEditor(isNew: Bool, draft: CardExampleDraft, save: @escaping (CardExampleDraft) throws -> Void) {
         editors.append((isNew, draft, save))
     }
@@ -564,6 +946,30 @@ private final class FakeStudyWireframe: CardStudyWireframeInterface {
         styleChanged = onChange
     }
     func leave() { leaveCount += 1 }
+}
+
+private final class FakeReviewHistory: ReviewHistoryStoreInterface {
+    struct DiskFull: LocalizedError { var errorDescription: String? { "The disk is full." } }
+    /// Every save the presenter attempted, including the ones that failed.
+    var attempted: [(ReviewAttempt, String)] = []
+    /// What was stored: one entry per attempt id and owner.
+    var saves: [(ReviewAttempt, String)] = []
+    var failuresRemaining = 0
+
+    func save(_ attempt: ReviewAttempt, ownerKey: String) throws -> Bool {
+        attempted.append((attempt, ownerKey))
+        if failuresRemaining > 0 {
+            failuresRemaining -= 1
+            throw DiskFull()
+        }
+        if saves.contains(where: { $0.0.id == attempt.id && $0.1 == ownerKey }) { return false }
+        saves.append((attempt, ownerKey))
+        return true
+    }
+
+    func attempts(ownerKey: String, cardId: String?) -> [ReviewAttempt] {
+        saves.filter { $0.1 == ownerKey && (cardId == nil || $0.0.cardID == cardId) }.map(\.0)
+    }
 }
 
 private final class FakeStudyPreferences: StudyPreferencesInterface {

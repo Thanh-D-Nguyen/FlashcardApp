@@ -24,11 +24,44 @@ struct StudyQuizState: Equatable {
     let correct: String
 }
 
+/// A card the learner got wrong or rated "needs review", for the end-of-session list.
+struct StudyReviewedCard: Equatable {
+    let front: String
+    let back: String
+    let result: ReviewResult
+}
+
+/// What the session covered. Only attempts confirmed saved are counted: an attempt that could not be saved is not progress.
 struct StudySummary: Equatable {
     let total: Int
+    /// Saved quiz answers, and how many of them were right.
     let answered: Int
     let correct: Int
     let mode: StudyMode
+    var saved = 0
+    var incorrect = 0
+    /// Saved self-ratings; they are never added to the quiz score.
+    var selfRated = 0
+    var toReview: [StudyReviewedCard] = []
+}
+
+/// Saving of the question on screen and of the session so far.
+struct StudyReviewState: Equatable {
+    enum Save: Equatable {
+        /// Nothing to save yet: not answered, or only looked at.
+        case none
+        case saved
+        /// The attempt could not be saved. The learner stays on the question and can retry or leave.
+        case failed
+    }
+
+    var savedCount = 0
+    var total = 0
+    /// Flip mode, answer shown, nothing recorded yet: the learner can rate themselves.
+    var canRate = false
+    var save = Save.none
+    /// The reading was in view before the answer, so the result is recorded as helped.
+    var usedReadingHint = false
 }
 
 struct CardStudyState: Equatable {
@@ -59,6 +92,7 @@ struct CardStudyState: Equatable {
     var canGoBack: Bool
     var primaryTitle: String
     var isPrimaryEnabled: Bool
+    var review: StudyReviewState
     var summary: StudySummary
 }
 
@@ -74,6 +108,12 @@ protocol CardStudyPresenterInterface: AnyObject {
     func previous()
     func next()
     func select(option: String)
+    /// Self-rating of a flipped card; the attempt is saved at once.
+    func rate(_ rating: SelfRating)
+    /// Saves the attempt that failed to save, again with the same id.
+    func retrySave()
+    /// Leaves the session, asking first when an attempt is still unsaved.
+    func leaveSession()
     func setMode(_ mode: StudyMode)
     func setShuffled(_ shuffled: Bool)
     func setReadingVisible(_ visible: Bool)
@@ -102,12 +142,21 @@ final class CardStudyPresenter {
     private let random: StudyRandomSource
     private let examplesInteractor: CardExamplesInteractorInterface
     private let exampleStore: CardExampleStoreInterface
+    private let reviewHistory: ReviewHistoryStoreInterface
     /// Whose sentences these are: the signed-in account's id, or "" with nobody signed in.
     private let ownerKey: () -> String
     weak var view: CardStudyViewInterface?
 
     private var deck: DeskEntity?
     private var session = StudySession(cards: [])
+    /// Whose results this session saves, fixed when it starts: a different account never receives them.
+    private var sessionOwner = ""
+    /// Attempts of this run that are confirmed saved.
+    private var savedAttemptIds = Set<String>()
+    /// The attempt that could not be saved; the session waits for a retry or for the learner to leave.
+    private var unsavedAttempt: ReviewAttempt?
+    /// Set once the account changed: the learner has been told, and no further answer is saved.
+    private var sessionEnded = false
     private enum ServerSentences: Equatable {
         case loading
         case loaded([CardExample])
@@ -126,6 +175,7 @@ final class CardStudyPresenter {
          random: @escaping StudyRandomSource = { Int.random(in: $0) },
          examples: CardExamplesInteractorInterface = CardExamplesInteractor(),
          exampleStore: CardExampleStoreInterface = RealmCardExampleStore(),
+         reviewHistory: ReviewHistoryStoreInterface = RealmReviewHistoryStore(),
          ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" }) {
         self.deckId = deckId
         self.interactor = interactor
@@ -135,6 +185,7 @@ final class CardStudyPresenter {
         self.random = random
         self.examplesInteractor = examples
         self.exampleStore = exampleStore
+        self.reviewHistory = reviewHistory
         self.ownerKey = ownerKey
     }
 
@@ -149,17 +200,80 @@ final class CardStudyPresenter {
         }
         let cards = entity.cards.map(StudyCard.init(entity:))
         let changed = deck == nil || session.cards != cards
+        if !changed, sessionEnded || ownerKey() != sessionOwner { return endSessionForAccountChange() }
         deck = entity
         if changed {
             session = StudySession(cards: cards, mode: preferences.mode, shuffled: preferences.isShuffled, random: random)
+            startRun()
         }
         publish(.none)
+    }
+
+    /// Starts counting a new run: the owner is fixed and nothing is saved or pending yet.
+    private func startRun() {
+        sessionOwner = ownerKey()
+        savedAttemptIds = []
+        unsavedAttempt = nil
+        sessionEnded = false
+    }
+
+    // MARK: Saving
+
+    private func persistCurrentAttempt() {
+        guard let attempt = session.currentAttempt, !savedAttemptIds.contains(attempt.id) else { return }
+        save(attempt)
+    }
+
+    /// Saves an attempt for the learner who started the session, in one step before anything else happens. A failure is
+    /// kept, not hidden: the session waits on this attempt until it is saved or the learner leaves.
+    private func save(_ attempt: ReviewAttempt) {
+        guard ownerKey() == sessionOwner else { return endSessionForAccountChange() }
+        do {
+            _ = try reviewHistory.save(attempt, ownerKey: sessionOwner)
+            savedAttemptIds.insert(attempt.id)
+            if unsavedAttempt?.id == attempt.id { unsavedAttempt = nil }
+        } catch {
+            logger.error("Saving a study attempt failed: \(error.localizedDescription)")
+            unsavedAttempt = attempt
+        }
+    }
+
+    /// The account is no longer the one that started the session. The session is frozen and the learner is told; coming back to
+    /// the screen asks again, so a message that could not be presented is not lost.
+    private func endSessionForAccountChange() {
+        sessionEnded = true
+        speech.stop()
+        wireframe.endSession(message: NSLocalizedString("The account changed, so this session ended. Your saved results are kept.", comment: ""))
+    }
+
+    /// False while an attempt waits to be saved or after the session ended: nothing may change the session then.
+    private var canChange: Bool { unsavedAttempt == nil && !sessionEnded }
+
+    private var saveStatus: StudyReviewState.Save {
+        guard let attempt = session.currentAttempt else { return .none }
+        if unsavedAttempt?.id == attempt.id { return .failed }
+        return savedAttemptIds.contains(attempt.id) ? .saved : .none
+    }
+
+    private func makeSummary() -> StudySummary {
+        let saved = session.attempts.filter { savedAttemptIds.contains($0.id) }
+        let quiz = saved.filter { $0.skill == .recognition }
+        let toReview = saved.compactMap { attempt -> StudyReviewedCard? in
+            guard attempt.result == .incorrect || attempt.result == .needsReview,
+                  let card = session.cards.first(where: { $0.id == attempt.cardID }) else { return nil }
+            return StudyReviewedCard(front: card.front, back: card.back, result: attempt.result)
+        }
+        return StudySummary(total: session.count, answered: quiz.count, correct: quiz.filter { $0.result == .correct }.count,
+                            mode: session.mode, saved: saved.count, incorrect: quiz.filter { $0.result == .incorrect }.count,
+                            selfRated: saved.filter { $0.skill == .selfRecall }.count, toReview: toReview)
     }
 
     // MARK: State
 
     private func publish(_ transition: CardStudyTransition) {
         guard let deck else { return }
+        // The reading in view before the answer is help; the result is recorded as such.
+        if preferences.isReadingVisible, let card = session.current, !card.reading.isEmpty { session.noteHint(.reading) }
         syncExamples(deck: deck)
         view?.render(makeState(deck: deck), transition: transition)
         if transition != .none, !session.isFinished, session.current != nil { autoSpeakIfNeeded() }
@@ -177,6 +291,10 @@ final class CardStudyPresenter {
         var quiz: StudyQuizState?
         if session.mode == .quiz, let current { quiz = StudyQuizState(options: session.options, selected: session.selectedOption, correct: current.back) }
         let (title, enabled) = primary(finished: finished)
+        let review = StudyReviewState(
+            savedCount: savedAttemptIds.count, total: session.count,
+            canRate: !finished && session.mode == .flip && session.isFlipped && session.currentAttempt == nil && unsavedAttempt == nil,
+            save: saveStatus, usedReadingHint: !session.currentHints.isDisjoint(with: [.reading]))
         return CardStudyState(
             screen: finished ? .finished : .card,
             deckName: deck.name,
@@ -189,7 +307,7 @@ final class CardStudyPresenter {
             autoSpeak: preferences.autoSpeak,
             deckHasImages: session.cards.contains { !$0.imageReference.isEmpty },
             progressText: progressText,
-            progress: Float(session.progress),
+            progress: session.count == 0 ? 0 : Float(savedAttemptIds.count) / Float(session.count),
             card: card,
             style: CardStyle.style(forSlug: preferences.cardStyleSlug),
             examples: finished ? .hidden : examplesPanel(),
@@ -198,7 +316,8 @@ final class CardStudyPresenter {
             canGoBack: session.canGoBack,
             primaryTitle: title,
             isPrimaryEnabled: enabled,
-            summary: StudySummary(total: session.count, answered: session.answeredCount, correct: session.correctCount, mode: session.mode))
+            review: review,
+            summary: makeSummary())
     }
 
     private func primary(finished: Bool) -> (String, Bool) {
@@ -294,7 +413,7 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     }
 
     func flip() {
-        guard session.mode == .flip else { return }
+        guard session.mode == .flip, canChange else { return }
         session.flip()
         publish(.flip)
     }
@@ -306,32 +425,63 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     }
 
     func previous() {
-        guard session.canGoBack else { return }
+        guard session.canGoBack, canChange else { return }
         session.goBack()
         publish(.backward)
     }
 
     func next() {
-        // Quiz answers are final: the learner must answer before moving on.
+        // An unsaved answer is not left behind, and quiz answers are final: the learner must answer before moving on.
+        guard canChange else { return }
         if session.mode == .quiz, session.selectedOption == nil { return }
         session.advance()
         publish(.forward)
     }
 
     func select(option: String) {
+        guard !sessionEnded else { return }
         session.select(option: option)
+        persistCurrentAttempt()
         publish(.none)
     }
 
+    func rate(_ rating: SelfRating) {
+        guard canChange else { return }
+        session.rate(rating)
+        persistCurrentAttempt()
+        publish(.none)
+    }
+
+    func retrySave() {
+        guard let attempt = unsavedAttempt, !sessionEnded else { return }
+        save(attempt)
+        publish(.none)
+    }
+
+    func leaveSession() {
+        guard unsavedAttempt != nil else {
+            speech.stop()
+            return wireframe.leave()
+        }
+        wireframe.confirmLeaveUnsaved { [weak self] in
+            self?.speech.stop()
+            self?.wireframe.leave()
+        }
+    }
+
     func setMode(_ mode: StudyMode) {
+        guard canChange else { return }
         preferences.mode = mode
         session.setMode(mode)
+        startRun()
         publish(.forward)
     }
 
     func setShuffled(_ shuffled: Bool) {
+        guard canChange else { return }
         preferences.isShuffled = shuffled
         session.setShuffled(shuffled)
+        startRun()
         publish(.forward)
     }
 
@@ -356,6 +506,7 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
         guard let card = session.current else { return }
         let showingBack = session.mode == .flip && session.isFlipped
         let text = showingBack ? card.back : card.front
+        if !showingBack { session.noteHint(.audio) }
         speech.speak(text, languageCode: languageCode(for: card, front: !showingBack))
     }
 
@@ -445,11 +596,14 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     }
 
     func restart() {
+        guard canChange else { return }
         session.restart()
+        startRun()
         publish(.forward)
     }
 
     func edit() {
+        guard canChange else { return }
         wireframe.showEditor(deckId: deckId) { [weak self] in self?.load() }
     }
 }

@@ -130,6 +130,8 @@ struct StudySession {
     /// flipping it, listening or moving on never adds one; skipped questions have none.
     private(set) var attempts: [ReviewAttempt] = []
     var currentAttempt: ReviewAttempt? { attempt(at: position) }
+    /// Help in view for the current question: what its attempt recorded once answered, otherwise what is noted so far.
+    var currentHints: Set<ReviewHint> { attempt(at: position)?.hints ?? hintsByPosition[position] ?? [] }
 
     init(cards: [StudyCard], mode: StudyMode = .flip, shuffled: Bool = false,
          random: @escaping StudyRandomSource = { Int.random(in: $0) },

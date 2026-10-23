@@ -179,6 +179,7 @@
 		09C9E7C973668B17781A93E2 /* CardStylePickerWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B68735DD74CA56A4B76FF1 /* CardStylePickerWireframe.swift */; };
 		E6707E4DBD2AF9B620CBA8B5 /* CardStylePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E28153B579630CC76EBBE20 /* CardStylePickerViewController.swift */; };
 		1DECF8947A3E2234E8E495A5 /* StudyExamplesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4130315D22CF035B32AB524C /* StudyExamplesView.swift */; };
+		7D5CC2E9FF8E4168AE3FD0C9 /* StudyReviewViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D960AD3C744128A7CA10F5 /* StudyReviewViews.swift */; };
 		5C043E426C39C6564B2C66B2 /* CardExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C97D533A4221CB7602911CF8 /* CardExampleTests.swift */; };
 		2BFAD412221A9565ED572372 /* CardStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450A8E8864106604935B3A8E /* CardStyleTests.swift */; };
 		C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */; };
@@ -386,6 +387,7 @@
 		00B68735DD74CA56A4B76FF1 /* CardStylePickerWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerWireframe.swift; sourceTree = "<group>"; };
 		6E28153B579630CC76EBBE20 /* CardStylePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerViewController.swift; sourceTree = "<group>"; };
 		4130315D22CF035B32AB524C /* StudyExamplesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyExamplesView.swift; sourceTree = "<group>"; };
+		A9D960AD3C744128A7CA10F5 /* StudyReviewViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyReviewViews.swift; sourceTree = "<group>"; };
 		C97D533A4221CB7602911CF8 /* CardExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleTests.swift; sourceTree = "<group>"; };
 		450A8E8864106604935B3A8E /* CardStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStyleTests.swift; sourceTree = "<group>"; };
 		5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerTests.swift; sourceTree = "<group>"; };
@@ -438,6 +440,7 @@
 				2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */,
 				855C69598B064D18A3F1DB76 /* StudyCardView.swift */,
 				4130315D22CF035B32AB524C /* StudyExamplesView.swift */,
+				A9D960AD3C744128A7CA10F5 /* StudyReviewViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1322,6 +1325,7 @@
 				09C9E7C973668B17781A93E2 /* CardStylePickerWireframe.swift in Sources */,
 				E6707E4DBD2AF9B620CBA8B5 /* CardStylePickerViewController.swift in Sources */,
 				1DECF8947A3E2234E8E495A5 /* StudyExamplesView.swift in Sources */,
+				7D5CC2E9FF8E4168AE3FD0C9 /* StudyReviewViews.swift in Sources */,
 				5709B51817C9AE729BCC6AF1 /* RCardExample.swift in Sources */,
 				D6885E40CF6A4FAA95F75984 /* RReviewAttempt.swift in Sources */,
 				3690461B9DC786EBC8303544 /* CardExampleStore.swift in Sources */,

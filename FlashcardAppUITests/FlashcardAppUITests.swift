@@ -366,17 +366,22 @@ final class FlashcardAppUITests: XCTestCase {
         let row = deckRow(app, named: name)
         XCTAssertTrue(row.waitForExistence(timeout: 10), "The saved deck appears in the library")
 
-        // Study: flip, next, finish, summary
+        // Study: flip and rate the first card (saved), flip and skip the second, summary
         row.tap()
         let card = app.buttons["study_card"]
         XCTAssertTrue(card.waitForExistence(timeout: 5))
         XCTAssertTrue(card.label.contains("dog"))
         app.buttons["study_primary"].tap()
         XCTAssertTrue(waitForLabel(card, containing: "cho"), "The card flipped to its back")
+        XCTAssertFalse(app.buttons["study_primary"].exists, "After the answer is shown the learner rates themselves")
+        attachScreenshot(app, name: "study-rating")
+        app.buttons["study_rate_remembered"].tap()
+        XCTAssertTrue(app.staticTexts["study_save_status"].waitForExistence(timeout: 5), "A saved rating is confirmed")
+        XCTAssertTrue(app.staticTexts["study_saved"].label.contains("1"), "One attempt is saved: \(app.staticTexts["study_saved"].label)")
         app.buttons["study_primary"].tap()
         XCTAssertTrue(waitForLabel(card, containing: "cat"))
         app.buttons["study_primary"].tap()
-        app.buttons["study_primary"].tap()
+        app.buttons["study_skip_rating"].tap()
         XCTAssertTrue(app.otherElements["study_summary"].waitForExistence(timeout: 5))
         attachScreenshot(app, name: "study-summary")
         app.buttons["study_restart"].tap()
@@ -596,6 +601,60 @@ final class FlashcardAppUITests: XCTestCase {
         app.buttons["card_style_done"].tap()
     }
 
+    /// An answer that cannot be saved is never shown as saved: the learner stays on the card, can try again, and the count only
+    /// moves once the save worked. The first save is made to fail by a debug launch argument.
+    func testAFailedSaveKeepsTheLearnerOnTheCardUntilItIsRetried() {
+        let app = makeApp()
+        app.launchArguments += ["-FailReviewSaves", "1"]
+        app.launch()
+        openCards(app)
+        let name = "UI \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "dog", back: "cho")
+        fillCard(app, index: 1, front: "cat", back: "meo")
+        app.buttons["save_deck"].tap()
+        let row = deckRow(app, named: name)
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
+
+        let card = app.buttons["study_card"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        app.buttons["study_primary"].tap()
+        XCTAssertTrue(waitForLabel(card, containing: "cho"))
+        app.buttons["study_rate_remembered"].tap()
+
+        let retry = app.buttons["study_retry_save"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 5), "A failed save offers a retry")
+        attachScreenshot(app, name: "study-save-failed")
+        XCTAssertTrue(app.staticTexts["study_save_status"].exists)
+        XCTAssertTrue(app.staticTexts["study_saved"].label.contains("0"), "Nothing counts as saved: \(app.staticTexts["study_saved"].label)")
+        XCTAssertFalse(app.buttons["study_primary"].exists, "The learner cannot move on with an unsaved answer")
+        XCTAssertFalse(app.buttons["study_rate_remembered"].exists)
+        XCTAssertTrue(card.label.contains("cho"), "The answer stays on screen")
+
+        // Leaving with an unsaved answer asks first and staying changes nothing.
+        app.buttons["study_leave_unsaved"].tap()
+        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 5), "Leaving with an unsaved answer asks first")
+        app.alerts.buttons["Ở lại"].tap()
+        XCTAssertTrue(retry.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["study_saved"].label.contains("0"))
+
+        retry.tap()
+        XCTAssertTrue(app.buttons["study_primary"].waitForExistence(timeout: 5), "After the retry worked the learner can move on")
+        XCTAssertFalse(retry.exists)
+        XCTAssertTrue(app.staticTexts["study_saved"].label.contains("1"), "Now it counts: \(app.staticTexts["study_saved"].label)")
+
+        // Leaving with everything saved needs no question.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 1))
+        XCTAssertTrue(deckRow(app, named: name).waitForExistence(timeout: 5))
+    }
+
     /// The learner can add, edit and remove sentences on a card. Removing the server's sentence only hides it (and it can
     /// be restored); what the learner wrote is deleted; changes survive leaving the card. Needs the local backend.
     func testExampleSentencesCanBeAddedEditedRemovedAndRestored() {
@@ -682,7 +741,7 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertEqual(rowCount(), initialRows)
 
         // The changes stay when the learner leaves the card and comes back.
-        app.buttons["study_primary"].tap()   // next card
+        app.buttons["study_skip_rating"].tap()   // next card
         app.buttons["study_previous"].tap()
         app.buttons["study_primary"].tap()   // flip again
         XCTAssertTrue(app.buttons["study_examples_restore"].waitForExistence(timeout: 20))

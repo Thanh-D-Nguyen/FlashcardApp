@@ -28,30 +28,6 @@
         }
       }
     },
-    "“%@” and all of its cards will be deleted from this device. This can't be undone." : {
-      "comment" : "Delete deck confirmation; %@ is the deck name",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” and all of its cards will be deleted from this device. This can't be undone."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「%@」とそのカードすべてがこのデバイスから削除されます。この操作は取り消せません。"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“%@” và toàn bộ thẻ trong đó sẽ bị xóa khỏi thiết bị này. Không thể hoàn tác."
-          }
-        }
-      }
-    },
     "%@\nTap refresh to try again." : {
       "comment" : "Dictionary error; %@ is the reason",
       "extractionState" : "manual",
@@ -2540,30 +2516,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nhập thẻ…"
-          }
-        }
-      }
-    },
-    "Its text and picture will be removed from this deck." : {
-      "comment" : "Confirmation message",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Its text and picture will be removed from this deck."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このカードの文字と画像がデッキから削除されます。"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nội dung và ảnh của thẻ sẽ bị xóa khỏi bộ thẻ này."
           }
         }
       }
@@ -8702,6 +8654,649 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Không đếm được thẻ"
+          }
+        }
+      }
+    },
+    "Leave without saving?" : {
+      "comment" : "Alert title when an answer could not be saved",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave without saving?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存せずに終了しますか？"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rời đi mà chưa lưu?"
+          }
+        }
+      }
+    },
+    "The last answer isn't saved, so it won't count toward your progress." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The last answer isn't saved, so it won't count toward your progress."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "直前の回答は保存されていないため、進み具合には含まれません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Câu trả lời gần nhất chưa được lưu nên sẽ không tính vào tiến độ của bạn."
+          }
+        }
+      }
+    },
+    "Leave session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "学習を終了"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rời phiên học"
+          }
+        }
+      }
+    },
+    "Saved %1$lld of %2$lld" : {
+      "comment" : "Study header: attempts saved of cards in the session",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved %1$lld of %2$lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld件中%1$lld件を保存済み"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã lưu %1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "Do you remember this word?" : {
+      "comment" : "Prompt above the self-rating buttons",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do you remember this word?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この単語を覚えていますか？"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn nhớ từ này không?"
+          }
+        }
+      }
+    },
+    "Needs review" : {
+      "comment" : "Self-rating button and end-of-session section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Needs review"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復習が必要"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cần ôn lại"
+          }
+        }
+      }
+    },
+    "I remembered" : {
+      "comment" : "Self-rating button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I remembered"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "覚えた"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã nhớ"
+          }
+        }
+      }
+    },
+    "You rate yourself" : {
+      "comment" : "Caption beside the self-rating buttons",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You rate yourself"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自己評価です"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn tự đánh giá"
+          }
+        }
+      }
+    },
+    "Skip" : {
+      "comment" : "Moves on without recording an answer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキップ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bỏ qua"
+          }
+        }
+      }
+    },
+    "Reading shown · counts as a hint" : {
+      "comment" : "Shown before the answer when the reading is visible",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading shown · counts as a hint"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読みを表示中・ヒントとして記録されます"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cách đọc đang bật · tính là gợi ý"
+          }
+        }
+      }
+    },
+    "Hint used: reading" : {
+      "comment" : "Shown after the answer when the reading was visible",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hint used: reading"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒントを使用：読み"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã dùng gợi ý: cách đọc"
+          }
+        }
+      }
+    },
+    "Saved" : {
+      "comment" : "Confirms an answer was saved",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存しました"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã lưu"
+          }
+        }
+      }
+    },
+    "Couldn't save this attempt." : {
+      "comment" : "Shown when saving an answer failed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save this attempt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今回の学習結果を保存できませんでした。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa lưu được lượt này."
+          }
+        }
+      }
+    },
+    "Saved %lld attempts" : {
+      "comment" : "End of session title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Saved %lld attempt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Saved %lld attempts"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld件の学習結果を保存しました"
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Đã lưu %lld lượt học"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Nothing saved this time" : {
+      "comment" : "End of session title when no answer was saved",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing saved this time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存された結果はありません"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa lưu lượt nào"
+          }
+        }
+      }
+    },
+    "You didn't answer any card in this session, so there is nothing to record." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You didn't answer any card in this session, so there is nothing to record."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このセッションではどのカードにも答えていないため、記録するものがありません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn chưa trả lời thẻ nào trong phiên này nên không có gì để ghi lại."
+          }
+        }
+      }
+    },
+    "%1$lld correct · %2$lld incorrect" : {
+      "comment" : "Quiz result row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld correct · %2$lld incorrect"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正解%1$lld・不正解%2$lld"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld đúng · %2$lld chưa đúng"
+          }
+        }
+      }
+    },
+    "Self-rating" : {
+      "comment" : "Summary row title and tag",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Self-rating"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自己評価"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tự đánh giá"
+          }
+        }
+      }
+    },
+    "%lld attempts" : {
+      "comment" : "Number of saved attempts",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld attempt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld attempts"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld件"
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lượt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Skipped" : {
+      "comment" : "Summary row title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキップ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã bỏ qua"
+          }
+        }
+      }
+    },
+    "Your own ratings aren't counted in the correct answer rate." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your own ratings aren't counted in the correct answer rate."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自己評価は正答率に含まれません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tự đánh giá do bạn chấm nên không tính vào tỷ lệ đúng."
+          }
+        }
+      }
+    },
+    "Incorrect" : {
+      "comment" : "Tag for a card answered wrong",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不正解"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa đúng"
+          }
+        }
+      }
+    },
+    "“%@”, all of its cards and your study history for them will be deleted from this device. This can't be undone." : {
+      "comment" : "Delete deck confirmation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”, all of its cards and your study history for them will be deleted from this device. This can't be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」とそのすべてのカード、およびカードの学習履歴がこのデバイスから削除されます。この操作は取り消せません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”, toàn bộ thẻ trong đó và lịch sử học của bạn với các thẻ này sẽ bị xóa khỏi thiết bị. Không thể hoàn tác."
+          }
+        }
+      }
+    },
+    "Its text, picture and study history will be removed from this deck when you save." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its text, picture and study history will be removed from this deck when you save."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存すると、このカードの文字・画像・学習履歴がデッキから削除されます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nội dung, ảnh và lịch sử học của thẻ sẽ bị xóa khỏi bộ thẻ khi bạn lưu."
+          }
+        }
+      }
+    },
+    "The account changed, so this session ended. Your saved results are kept." : {
+      "comment" : "Shown when the signed-in account changes during a study session",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The account changed, so this session ended. Your saved results are kept."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントが変わったため、この学習は終了しました。保存済みの結果は残っています。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tài khoản đã thay đổi nên phiên học này đã kết thúc. Các kết quả đã lưu vẫn được giữ."
           }
         }
       }

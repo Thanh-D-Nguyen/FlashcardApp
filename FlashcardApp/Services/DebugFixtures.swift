@@ -64,5 +64,30 @@ enum DebugFixtures {
         ]
         decks.forEach { try? DeskManagement.shared.add($0) }
     }
+
+    /// `-FailReviewSaves N`: the first N attempts the study screen saves fail, as if the disk were full, so the unsaved
+    /// state and its retry can be inspected and tested on the real UI. Without the argument the real store is used.
+    static func reviewHistory() -> ReviewHistoryStoreInterface {
+        let failures = UserDefaults.standard.integer(forKey: "FailReviewSaves")
+        return failures > 0 ? FlakyReviewHistoryStore(failures: failures) : RealmReviewHistoryStore()
+    }
+}
+
+private final class FlakyReviewHistoryStore: ReviewHistoryStoreInterface {
+    struct DiskFull: LocalizedError { var errorDescription: String? { "The disk is full (debug fixture)." } }
+    private let real = RealmReviewHistoryStore()
+    private var remainingFailures: Int
+
+    init(failures: Int) { remainingFailures = failures }
+
+    func save(_ attempt: ReviewAttempt, ownerKey: String) throws -> Bool {
+        if remainingFailures > 0 {
+            remainingFailures -= 1
+            throw DiskFull()
+        }
+        return try real.save(attempt, ownerKey: ownerKey)
+    }
+
+    func attempts(ownerKey: String, cardId: String?) -> [ReviewAttempt] { real.attempts(ownerKey: ownerKey, cardId: cardId) }
 }
 #endif

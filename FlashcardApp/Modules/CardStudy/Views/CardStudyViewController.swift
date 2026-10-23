@@ -10,6 +10,18 @@ private struct StudyHaptics {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
+    /// A self-rating was saved.
+    func rated() {
+        guard isEnabled() else { return }
+        UISelectionFeedbackGenerator().selectionChanged()
+    }
+
+    /// An answer could not be saved; fires once when that happens, not on every redraw.
+    func saveFailed() {
+        guard isEnabled() else { return }
+        UINotificationFeedbackGenerator().notificationOccurred(.error)
+    }
+
     func answered(correct: Bool) {
         guard isEnabled() else { return }
         UINotificationFeedbackGenerator().notificationOccurred(correct ? .success : .error)
@@ -30,6 +42,17 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
     private let optionsStack = UIStackView()
     private let summaryView = StudySummaryView()
     private let controls = UIStackView()
+    private let bottomStack = UIStackView()
+    private let ratingView = StudyRatingView()
+    private let failureView = StudySaveFailureView()
+    private let savedLabel = UILabel()
+    private let hintLabel = UILabel()
+    private let statusLabel = UILabel()
+    private lazy var leaveButton: UIBarButtonItem = {
+        let item = UIBarButtonItem(title: NSLocalizedString("Leave session", comment: ""), primaryAction: UIAction { [weak self] _ in self?.presenter.leaveSession() })
+        item.accessibilityIdentifier = "study_leave"
+        return item
+    }()
     private let previousButton = UIButton(configuration: .glass())
     private let nextButton = UIButton(configuration: .glass())
     // The one primary action is a solid accent capsule (readable in both appearances); only the secondary controls are glass.
@@ -53,6 +76,8 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         presenter.viewWillDisappear()
+        // The gesture belongs to the navigation controller, which other screens share: hand it back.
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
 
     func subscribe() {}
@@ -72,7 +97,16 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         progressView.progressTintColor = Design.Color.accent
         progressView.trackTintColor = Design.Color.highlight
         progressView.isAccessibilityElement = false
-        let header = UIStackView(arrangedSubviews: [progressLabel, progressView])
+        savedLabel.apply(.figure)
+        savedLabel.font = Design.TextRole.figure.font
+        savedLabel.textColor = Design.Color.accent
+        savedLabel.textAlignment = .right
+        savedLabel.accessibilityIdentifier = "study_saved"
+        let counts = UIStackView(arrangedSubviews: [progressLabel, savedLabel])
+        counts.alignment = .firstBaseline
+        counts.spacing = Design.Spacing.m
+        savedLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        let header = UIStackView(arrangedSubviews: [counts, progressView])
         header.axis = .vertical
         header.spacing = Design.Spacing.s
         header.translatesAutoresizingMaskIntoConstraints = false
@@ -85,11 +119,22 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         optionsStack.axis = .vertical
         optionsStack.spacing = Design.Spacing.m
-        [cardView, examplesView, optionsStack, summaryView].forEach(contentStack.addArrangedSubview)
+        for label in [hintLabel, statusLabel] {
+            label.apply(.metadata)
+            label.textAlignment = .center
+            label.isHidden = true
+        }
+        hintLabel.textColor = Design.Color.warning
+        hintLabel.accessibilityIdentifier = "study_hint"
+        statusLabel.accessibilityIdentifier = "study_save_status"
+        [cardView, hintLabel, statusLabel, examplesView, optionsStack, summaryView].forEach(contentStack.addArrangedSubview)
         scrollView.addSubview(contentStack)
 
         configureControls()
-        [header, scrollView, controls].forEach(view.addSubview)
+        bottomStack.axis = .vertical
+        bottomStack.translatesAutoresizingMaskIntoConstraints = false
+        [controls, ratingView, failureView].forEach(bottomStack.addArrangedSubview)
+        [header, scrollView, bottomStack].forEach(view.addSubview)
         let margins = view.layoutMarginsGuide
         cardMinHeight = cardView.heightAnchor.constraint(greaterThanOrEqualToConstant: 320)
         cardMinHeight.priority = .defaultHigh
@@ -100,14 +145,14 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             scrollView.topAnchor.constraint(equalTo: header.bottomAnchor, constant: Design.Spacing.m),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: controls.topAnchor, constant: -Design.Spacing.m),
+            scrollView.bottomAnchor.constraint(equalTo: bottomStack.topAnchor, constant: -Design.Spacing.m),
             contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
             contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
-            controls.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
-            controls.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
-            controls.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.s),
+            bottomStack.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
+            bottomStack.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
+            bottomStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.s),
             cardMinHeight
         ])
         cardView.speakButton.addAction(UIAction { [weak self] _ in self?.presenter.speakCurrent() }, for: .primaryActionTriggered)
@@ -129,6 +174,12 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         examplesView.onRestoreRemoved = { [weak self] in self?.presenter.restoreRemovedExamples() }
         summaryView.onRestart = { [weak self] in self?.presenter.restart() }
         summaryView.onDone = { [weak self] in self?.navigationController?.popViewController(animated: true) }
+        ratingView.isHidden = true
+        failureView.isHidden = true
+        ratingView.onRate = { [weak self] rating in self?.presenter.rate(rating) }
+        ratingView.onSkip = { [weak self] in self?.presenter.next() }
+        failureView.onRetry = { [weak self] in self?.presenter.retrySave() }
+        failureView.onLeave = { [weak self] in self?.presenter.leaveSession() }
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: CardStudyViewController, _) in
             controller.updatePrimaryShape()
             controller.updateCardHeight()
@@ -199,10 +250,11 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         switch transition {
         case .none:
             if let quiz = newState.quiz, let selected = quiz.selected, previous?.quiz?.selected == nil,
-               previous?.card?.front == newState.card?.front {
+               previous?.card?.front == newState.card?.front, newState.review.save != .failed {
                 haptics.answered(correct: selected == quiz.correct)
             }
             apply()
+            announceSave(from: previous, to: newState)
         case .flip:
             haptics.flip()
             let flip: UIView.AnimationOptions = newState.style?.flip == .vertical ? .transitionFlipFromBottom : .transitionFlipFromRight
@@ -223,6 +275,20 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         }
     }
 
+    /// One signal per event, however often the screen is redrawn, posted after the screen is up to date so nothing replaces
+    /// it: a failure, a saved self-rating, and a retry that worked (the quiz already announces its first result itself).
+    private func announceSave(from previous: CardStudyState?, to state: CardStudyState) {
+        let sameCard = previous?.card?.front == state.card?.front
+        if previous?.review.save != .failed, state.review.save == .failed {
+            haptics.saveFailed()
+            UIAccessibility.post(notification: .announcement, argument: NSLocalizedString("Couldn't save this attempt.", comment: ""))
+        } else if previous?.review.save != .saved, state.review.save == .saved, sameCard,
+                  state.mode == .flip || previous?.review.save == .failed {
+            haptics.rated()
+            UIAccessibility.post(notification: .announcement, argument: NSLocalizedString("Saved", comment: ""))
+        }
+    }
+
     private func announceFlip(_ state: CardStudyState) {
         guard state.card != nil, let text = cardView.accessibilityLabel else { return }
         UIAccessibility.post(notification: .announcement, argument: text)
@@ -237,8 +303,18 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         examplesView.configure(state: finished ? .hidden : state.examples, expanded: state.examplesExpanded)
         optionsStack.isHidden = finished || state.quiz == nil
         summaryView.isHidden = !finished
-        controls.isHidden = finished
+        let failed = state.review.save == .failed && !finished
+        controls.isHidden = finished || state.review.canRate || failed
+        ratingView.isHidden = finished || !state.review.canRate
+        failureView.isHidden = !failed
         progressLabel.isHidden = false
+        savedLabel.text = String(format: NSLocalizedString("Saved %1$lld of %2$lld", comment: "Study header: attempts saved of cards in the session"),
+                                 state.review.savedCount, state.review.total)
+        applyReview(state, finished: finished)
+        // While an answer is unsaved the way out is explicit, so the learner always knows what leaving costs.
+        navigationItem.hidesBackButton = failed
+        navigationItem.leftBarButtonItem = failed ? leaveButton : nil
+        if let pop = navigationController?.interactivePopGestureRecognizer, pop.isEnabled == failed { pop.isEnabled = !failed }
         if finished {
             summaryView.configure(with: state.summary)
         } else if let card = state.card {
@@ -261,6 +337,35 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         primaryButton.configuration?.title = state.primaryTitle
         primaryButton.isEnabled = state.isPrimaryEnabled
         updateCardHeight()
+    }
+
+    /// The hint notice and the save status under the card. Both state facts, in words and an icon, not only in colour.
+    private func applyReview(_ state: CardStudyState, finished: Bool) {
+        let answerShown = state.card?.isFlipped == true || state.quiz?.selected != nil
+        // Before the answer the notice describes what is on screen, so it goes when the reading is hidden again; the hint
+        // itself stays recorded and is named after the answer.
+        hintLabel.isHidden = finished || !state.review.usedReadingHint || (!answerShown && !state.readingVisible)
+        hintLabel.text = answerShown ? NSLocalizedString("Hint used: reading", comment: "")
+                                     : NSLocalizedString("Reading shown · counts as a hint", comment: "")
+        switch state.review.save {
+        case .saved where !finished:
+            statusLabel.attributedText = Self.statusText("checkmark", NSLocalizedString("Saved", comment: ""), Design.Color.success)
+            statusLabel.isHidden = false
+        case .failed where !finished:
+            statusLabel.attributedText = Self.statusText("exclamationmark.triangle", NSLocalizedString("Couldn't save this attempt.", comment: ""), Design.Color.error)
+            statusLabel.isHidden = false
+        default:
+            statusLabel.isHidden = true
+        }
+    }
+
+    private static func statusText(_ symbol: String, _ text: String, _ color: UIColor) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        attachment.image = UIImage(systemName: symbol)?.withTintColor(color, renderingMode: .alwaysOriginal)
+        let result = NSMutableAttributedString(attachment: attachment)
+        result.append(NSAttributedString(string: " " + text))
+        result.addAttributes([.foregroundColor: color, .font: Design.TextRole.metadata.font.withWeight(.semibold)], range: NSRange(location: 0, length: result.length))
+        return result
     }
 
     private func renderOptions(_ quiz: StudyQuizState?) {
@@ -327,14 +432,18 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
     // MARK: Menu
 
     private func makeMenu(for state: CardStudyState) -> UIMenu {
-        let edit = UIAction(title: NSLocalizedString("Edit deck", comment: ""), image: UIImage(systemName: "pencil")) { [weak self] _ in self?.presenter.edit() }
+        // While an answer is unsaved these would end the run and lose it, so they are off until it is saved or left.
+        let locked: UIMenuElement.Attributes = state.review.save == .failed ? .disabled : []
+        let edit = UIAction(title: NSLocalizedString("Edit deck", comment: ""), image: UIImage(systemName: "pencil"), attributes: locked) { [weak self] _ in self?.presenter.edit() }
         let modes = UIMenu(title: NSLocalizedString("Mode", comment: ""), options: [.displayInline, .singleSelection], children: [
-            UIAction(title: NSLocalizedString("Flip cards", comment: ""), image: UIImage(systemName: "rectangle.on.rectangle"), state: state.mode == .flip ? .on : .off) { [weak self] _ in self?.presenter.setMode(.flip) },
+            UIAction(title: NSLocalizedString("Flip cards", comment: ""), image: UIImage(systemName: "rectangle.on.rectangle"),
+                     attributes: locked, state: state.mode == .flip ? .on : .off) { [weak self] _ in self?.presenter.setMode(.flip) },
             UIAction(title: NSLocalizedString("Quiz", comment: ""), image: UIImage(systemName: "list.bullet.rectangle"),
-                     attributes: state.canQuiz ? [] : .disabled, state: state.mode == .quiz ? .on : .off) { [weak self] _ in self?.presenter.setMode(.quiz) }
+                     attributes: state.canQuiz ? locked : .disabled, state: state.mode == .quiz ? .on : .off) { [weak self] _ in self?.presenter.setMode(.quiz) }
         ])
         let options = UIMenu(options: .displayInline, children: [
-            UIAction(title: NSLocalizedString("Shuffle", comment: ""), image: UIImage(systemName: "shuffle"), state: state.isShuffled ? .on : .off) { [weak self] _ in self?.presenter.setShuffled(!state.isShuffled) },
+            UIAction(title: NSLocalizedString("Shuffle", comment: ""), image: UIImage(systemName: "shuffle"), attributes: locked,
+                     state: state.isShuffled ? .on : .off) { [weak self] _ in self?.presenter.setShuffled(!state.isShuffled) },
             UIAction(title: NSLocalizedString("Show reading", comment: ""), image: UIImage(systemName: "character.textbox"), state: state.readingVisible ? .on : .off) { [weak self] _ in self?.presenter.setReadingVisible(!state.readingVisible) },
             UIAction(title: NSLocalizedString("Show pictures", comment: ""), image: UIImage(systemName: "photo"),
                      attributes: state.deckHasImages ? [] : .disabled, state: state.imagesVisible ? .on : .off) { [weak self] _ in self?.presenter.setImagesVisible(!state.imagesVisible) },
@@ -342,64 +451,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         ])
         let appearance = UIAction(title: NSLocalizedString("Card style…", comment: ""), image: UIImage(systemName: "paintpalette")) { [weak self] _ in self?.presenter.chooseStyle() }
         appearance.accessibilityIdentifier = "study_card_style"
-        let restart = UIAction(title: NSLocalizedString("Start over", comment: ""), image: UIImage(systemName: "arrow.counterclockwise")) { [weak self] _ in self?.presenter.restart() }
+        let restart = UIAction(title: NSLocalizedString("Start over", comment: ""), image: UIImage(systemName: "arrow.counterclockwise"), attributes: locked) { [weak self] _ in self?.presenter.restart() }
         return UIMenu(children: [edit, modes, options, UIMenu(options: .displayInline, children: [appearance]), restart])
-    }
-}
-
-/// End of a session: what was covered (and the quiz score when there was one), with the two sensible next steps.
-final class StudySummaryView: UIView {
-    var onRestart: (() -> Void)?
-    var onDone: (() -> Void)?
-
-    private let icon = UIImageView(image: UIImage(systemName: "checkmark.circle"))
-    private let titleLabel = UILabel()
-    private let detailLabel = UILabel()
-    private let restartButton = UIButton(configuration: Design.Button.primary(title: NSLocalizedString("Study again", comment: "")))
-    private let doneButton = UIButton(configuration: .plain())
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        icon.tintColor = Design.Color.success
-        icon.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .largeTitle)
-        icon.isAccessibilityElement = false
-        titleLabel.apply(.title)
-        titleLabel.textAlignment = .center
-        titleLabel.accessibilityTraits = .header
-        detailLabel.apply(.meaning)
-        detailLabel.textAlignment = .center
-        doneButton.configuration?.title = NSLocalizedString("Done", comment: "")
-        doneButton.accessibilityIdentifier = "study_done"
-        restartButton.accessibilityIdentifier = "study_restart"
-        restartButton.addAction(UIAction { [weak self] _ in self?.onRestart?() }, for: .primaryActionTriggered)
-        doneButton.addAction(UIAction { [weak self] _ in self?.onDone?() }, for: .primaryActionTriggered)
-        let stack = UIStackView(arrangedSubviews: [icon, titleLabel, detailLabel, restartButton, doneButton])
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = Design.Spacing.m
-        stack.setCustomSpacing(Design.Spacing.xl, after: detailLabel)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.xxl),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.Spacing.xl),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor)
-        ])
-        accessibilityIdentifier = "study_summary"
-    }
-
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
-
-    func configure(with summary: StudySummary) {
-        titleLabel.text = NSLocalizedString("Deck complete", comment: "")
-        if summary.mode == .quiz, summary.answered > 0 {
-            let percent = Double(summary.correct) / Double(summary.answered)
-            detailLabel.text = String(format: NSLocalizedString("%1$lld of %2$lld correct (%3$@)", comment: "Quiz result"),
-                                      summary.correct, summary.answered, percent.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.current.locale)))
-        } else {
-            let cards = String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), summary.total)
-            detailLabel.text = String(format: NSLocalizedString("You went through %@.", comment: "Flip session result; %@ is a card count"), cards)
-        }
     }
 }

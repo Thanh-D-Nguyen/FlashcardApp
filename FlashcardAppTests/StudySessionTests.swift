@@ -286,6 +286,22 @@ final class StudySessionTests: XCTestCase {
         XCTAssertEqual(session.attempts.last?.hints, [])
     }
 
+    func test_currentHintsShowWhatIsNotedThenWhatTheAttemptRecorded() {
+        var session = session()
+        XCTAssertEqual(session.currentHints, [])
+        session.noteHint(.reading)
+        XCTAssertEqual(session.currentHints, [.reading])
+        session.flip()
+        session.noteHint(.audio)
+        XCTAssertEqual(session.currentHints, [.reading], "Help after the answer is shown is not counted")
+        session.rate(.remembered)
+        XCTAssertEqual(session.currentHints, [.reading])
+        session.advance()
+        XCTAssertEqual(session.currentHints, [], "The next question starts without help")
+        session.goBack()
+        XCTAssertEqual(session.currentHints, [.reading], "Going back shows what the answered question used")
+    }
+
     func test_hintsNotedAfterTheAnswerIsShownAreNotHints() {
         var session = session()
         session.flip()

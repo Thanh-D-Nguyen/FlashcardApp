@@ -66,7 +66,7 @@ extension CardWireframe: CardWireframeInterface {
 
     func confirmDelete(deckName: String, onConfirm: @escaping () -> Void) {
         let message = String.localizedStringWithFormat(
-            NSLocalizedString("“%@” and all of its cards will be deleted from this device. This can't be undone.", comment: "Delete deck confirmation"),
+            NSLocalizedString("“%@”, all of its cards and your study history for them will be deleted from this device. This can't be undone.", comment: "Delete deck confirmation"),
             deckName)
         let delete = UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive) { _ in onConfirm() }
         let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)

@@ -47,14 +47,14 @@ extension CreateDeskWireframe: CreateDeskWireframeInterface {
         let delete = UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive) { _ in onDelete() }
         let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)
         showAlert(with: String(format: NSLocalizedString("Delete card %lld?", comment: ""), number),
-                  message: NSLocalizedString("Its text and picture will be removed from this deck.", comment: ""), actions: [delete, cancel])
+                  message: NSLocalizedString("Its text, picture and study history will be removed from this deck when you save.", comment: ""), actions: [delete, cancel])
     }
 
     func confirmDeleteDeck(named name: String, onDelete: @escaping () -> Void) {
         let delete = UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive) { _ in onDelete() }
         let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)
         let message = String.localizedStringWithFormat(
-            NSLocalizedString("“%@” and all of its cards will be deleted from this device. This can't be undone.", comment: "Delete deck confirmation"), name)
+            NSLocalizedString("“%@”, all of its cards and your study history for them will be deleted from this device. This can't be undone.", comment: "Delete deck confirmation"), name)
         showAlert(with: NSLocalizedString("Delete this deck?", comment: ""), message: message, actions: [delete, cancel])
     }
 
