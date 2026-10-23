@@ -269,7 +269,7 @@ Commit: `feat(study): schedule reviews from persisted attempts`.
   nhưng nếu ai tách thành hai transaction thì test hiện tại vẫn qua); test múi giờ/DST chỉ khẳng định lịch là thời điểm tuyệt đối vì bộ lập
   lịch không dùng `Calendar`; tham số FSRS mặc định chưa hiệu chỉnh theo người học của app; ý nghĩa rating là giả thuyết sản phẩm.
 
-### L05 — Today từ dữ liệu thật (DONE — L05a logic `6ea9cda`, L05b giao diện: commit ghi ở dưới; sau L04)
+### L05 — Today từ dữ liệu thật (DONE — L05a logic `6ea9cda`, L05b giao diện `16e7db8`; sau L04)
 
 Phạm vi: `Modules/Home/`, Home/CardStudy wireframes và interactors,
 localization, HomePresenterTests và hành trình XCUITest.
