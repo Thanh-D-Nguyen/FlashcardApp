@@ -19,6 +19,8 @@
 		215ACAE719D1F681202C150D /* LifeLessonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A2747B21D3110BEA47C8A7 /* LifeLessonViewController.swift */; };
 		DF3E329A8C7C6D2E2B6C2114 /* LifeLessonPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC395943CED0A7E262119EA /* LifeLessonPresenter.swift */; };
 		8596FD96C05A3B273D17A238 /* TodayLifeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD84BB8A1D9F862ED0D5788A /* TodayLifeCard.swift */; };
+		142AC2DEE74F228CFE2E4564 /* TodayLifeHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362D14002E5CD688453CAFD5 /* TodayLifeHubView.swift */; };
+		563150A86FC99EA38B24B334 /* TodayLifeHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B811EAE70B681B9C15B7C6 /* TodayLifeHub.swift */; };
 		2349929752DB9DFBD7B6C758 /* PlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CBB7A6137EB7FF8380C091C /* PlaceholderTextView.swift */; };
 		2BB560E3B615780D74ABEFE0 /* BulkImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD255FF4CC4CCC3B0065E07A /* BulkImportViewController.swift */; };
 		2C2298CEFD0E65B39B1CF491 /* TextEntryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A49A1C506CF0E7537C6053 /* TextEntryCell.swift */; };
@@ -28,6 +30,7 @@
 		4EAEC9A459FEB6A80333B17D /* StudyPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93873D79B82BEDCA818D035F /* StudyPreferences.swift */; };
 		E17A096404B94CF88665933F /* TodayPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C86741EA0524940BAE20852 /* TodayPreferences.swift */; };
 		6A005BA4510ADC8E49785E5C /* LifeLessonPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A199F10AB1A863FAA1DA27 /* LifeLessonPreferences.swift */; };
+		F7434E7D17D8A98B636622AF /* LifePlaceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF07F347FD2BD66C45DB801E /* LifePlaceProvider.swift */; };
 		53633E24935BA3E4E8FF5F21 /* CardsIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37129E6AA0E1A87ECA2E098E /* CardsIntegrationTests.swift */; };
 		5636E5D7C2043B99B3A911BF /* LevelAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2346A32827E8018BA6C793F /* LevelAPITests.swift */; };
 		5A1BC91044F82177CD776D0B /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733B6F4A9F79724C785D6D5A /* AppLogger.swift */; };
@@ -40,6 +43,11 @@
 		6EDD0178164CD68BD8877687 /* StudySession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89F935A6E3E901638562AA0 /* StudySession.swift */; };
 		E1B670B1715C47A39296594C /* TodayPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = F862404CBFE94898ABF2CD60 /* TodayPlan.swift */; };
 		FD522D81543FA020FD1D49B5 /* LifeLesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AE4F17F125884E0FFDD865 /* LifeLesson.swift */; };
+		E61CC271FF0C74839A6A7A68 /* SampleLifeContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0043769D035FE684770AAD71 /* SampleLifeContent.swift */; };
+		B28AA84089A12FE3D8275660 /* LifeNearbyStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FDA61F512574210B0E0CA6 /* LifeNearbyStory.swift */; };
+		E7C31A911CDD0869D4462021 /* LifeDateStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4920F1B2BD0AB6FF7D632B53 /* LifeDateStory.swift */; };
+		0777F2B188FCB684869B509D /* LifeLessonDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17DBB4DB6598E49FA20AFD8 /* LifeLessonDraft.swift */; };
+		CA94AFEB7A931F7FF291CE25 /* LifeFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE7A3D2A56D8B8BEFB81D360 /* LifeFeed.swift */; };
 		85B7539491694C6E8B4A2942 /* ReviewScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */; };
 		72796A297CC9F326ADC45E12 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C8CD127C27AAC201C95FD0 /* UserPreferences.swift */; };
 		750F55677D549B5D3E081418 /* CreateDeskPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185A12009D8D62C378721912 /* CreateDeskPresenterTests.swift */; };
@@ -50,6 +58,7 @@
 		F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */; };
 		8321A28636278A10213209B9 /* CardPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D2E20362C669E30C7FE447 /* CardPresenterTests.swift */; };
 		862184A154A58EB864D04742 /* StateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AFC78D9266C6D8BE5ABCAE /* StateView.swift */; };
+		6B9CF3EBCDA467DC17D545BD /* LifeSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555DF104B67AC6EAD8F3542B /* LifeSceneView.swift */; };
 		87941E1FA68F7D98F1400D0C /* MailLoginPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9321F46D68635E10E86F8D4A /* MailLoginPresenterTests.swift */; };
 		8A0F67C0D739AAAFBE62B0BC /* AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1235E8CD5F0FDD150A00D51E /* AuthSession.swift */; };
 		9209760D29A787C100ECF29C /* RDesk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760C29A787C100ECF29C /* RDesk.swift */; };
@@ -102,6 +111,7 @@
 		9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC5F29A1EAA5006C1D1C /* MainTabbarController.swift */; };
 		9251ECD129A1EAA5006C1D1C /* MainWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC6029A1EAA5006C1D1C /* MainWireframe.swift */; };
 		9251ECE029A1EAA5006C1D1C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 9251EC7329A1EAA5006C1D1C /* Localizable.xcstrings */; };
+		AE66FBE633287C4404E0C834 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6D97E81F048800EE625F30D0 /* InfoPlist.xcstrings */; };
 		9251ECE229A1EAA5006C1D1C /* EvironmentConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC7629A1EAA5006C1D1C /* EvironmentConfig.swift */; };
 		9251ECE629A1EAA5006C1D1C /* RealmService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC7B29A1EAA5006C1D1C /* RealmService.swift */; };
 		9251ECE929A1EAA5006C1D1C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC7F29A1EAA5006C1D1C /* Constants.swift */; };
@@ -166,9 +176,12 @@
 		9FE7631C4FF6CC447DF64FD3 /* PictureSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857BB1AD3118E84563C080CA /* PictureSuggestion.swift */; };
 		6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */; };
 		4EC1A81763B6EADEFC9DD42D /* BJTLifeLessonAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8230DAEA66D80DBBDA6D9561 /* BJTLifeLessonAPI.swift */; };
+		AA6BD49F05DB11349D36F6F8 /* BJTLifeFeedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3AB8D23D98886F84B3D655B /* BJTLifeFeedAPI.swift */; };
 		B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */; };
 		42B443625AAC94A763A08310 /* BJTLifeLessonDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D726D9ADA91C08C52956B06 /* BJTLifeLessonDTO.swift */; };
+		9AA04D45D0CEE19583D9E08A /* BJTLifeFeedDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 708DFED82E76BA66048FA688 /* BJTLifeFeedDTO.swift */; };
 		DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */; };
+		B3336546E67BF4E2637C444B /* JapaneseCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C09BA9E71CCCFC64F02177 /* JapaneseCalendar.swift */; };
 		6A92A3F7BB4F8C222128A076 /* DictionarySuggestionInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4FC3548729A597266E3DC5 /* DictionarySuggestionInteractor.swift */; };
 		CFEB30D5910E8D9EC5B7D8CE /* DeckGeneratorInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */; };
 		7CFC79EA7508F83CC523D57D /* PictureSearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7426DA0EF7DC2D9204B3CBA4 /* PictureSearchInteractor.swift */; };
@@ -202,6 +215,7 @@
 		3690461B9DC786EBC8303544 /* CardExampleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9369AB68FA2E9EA64090346F /* CardExampleStore.swift */; };
 		592B098B99C14398AA6F6B9E /* TodayInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DBF5BDC33C94B38BF7072EF /* TodayInteractor.swift */; };
 		F21B22EB1016302ABF704C86 /* LifeLessonInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A4C5B7933FCF0B57F50A1B /* LifeLessonInteractor.swift */; };
+		DFB21D948ACA50D907B7D212 /* LifeFeedMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB95458093C713F94F09498 /* LifeFeedMapper.swift */; };
 		42FA2265229B4B8AAB251BD8 /* ReviewHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */; };
 		E91121EA250C574B968C58AA /* ExampleEditorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85AC2F81A5410D56B87F087 /* ExampleEditorPresenter.swift */; };
 		915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */; };
@@ -212,6 +226,9 @@
 		BC0DC8D74F4731D6344B3D0A /* LifeLessonPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA48EF5D63147D0CB215D3 /* LifeLessonPresenterTests.swift */; };
 		12E04490B4F4D648D44066FD /* LifeLessonInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE869BFC0B47685F93E484B /* LifeLessonInteractorTests.swift */; };
 		59DE0FBE064DFC23C7FB0C1D /* LifeLessonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1F0508FF7BE5F69BA21141 /* LifeLessonTests.swift */; };
+		86F6CB78AA543B29FDF3A3B2 /* LifeHubTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138D30B83AE6F5AC267278E0 /* LifeHubTests.swift */; };
+		AB2A2C601C45C58C5D5AAEA9 /* LifeHubLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7302904DE5CC4BBFCB1F2B4C /* LifeHubLoaderTests.swift */; };
+		788E3DC5367E1948D2FA73AE /* LifeFeedFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07161A277320DADEBA4C40E8 /* LifeFeedFixtures.swift */; };
 		FB56D4B862C02A12C9222471 /* LifeLessonTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */; };
 		6946EB77DA1C8932F5B68571 /* LifeLessonFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DA132F46E686262B0557E0 /* LifeLessonFixtures.swift */; };
 		39A253290C90462492BE266A /* TodayPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */; };
@@ -256,12 +273,15 @@
 		E4A2747B21D3110BEA47C8A7 /* LifeLessonViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonViewController.swift; sourceTree = "<group>"; };
 		DAC395943CED0A7E262119EA /* LifeLessonPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonPresenter.swift; sourceTree = "<group>"; };
 		BD84BB8A1D9F862ED0D5788A /* TodayLifeCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayLifeCard.swift; sourceTree = "<group>"; };
+		362D14002E5CD688453CAFD5 /* TodayLifeHubView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayLifeHubView.swift; sourceTree = "<group>"; };
+		75B811EAE70B681B9C15B7C6 /* TodayLifeHub.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayLifeHub.swift; sourceTree = "<group>"; };
 		37129E6AA0E1A87ECA2E098E /* CardsIntegrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardsIntegrationTests.swift; sourceTree = "<group>"; };
 		416283339F8BEC2533A6E86B /* StudySessionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudySessionTests.swift; sourceTree = "<group>"; };
 		4479E6D17205D798B73B194A /* SettingsPrototypes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsPrototypes.swift; sourceTree = "<group>"; };
 		4A421E34481835A9483C8B14 /* NativeAuthAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAuthAPI.swift; sourceTree = "<group>"; };
 		4FFA59B81BB08C36B46B31F5 /* HomePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenterTests.swift; sourceTree = "<group>"; };
 		55AFC78D9266C6D8BE5ABCAE /* StateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StateView.swift; sourceTree = "<group>"; };
+		555DF104B67AC6EAD8F3542B /* LifeSceneView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeSceneView.swift; sourceTree = "<group>"; };
 		56E0FF82AAFD26CE867642EB /* CardStudyPresenterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyPresenterTests.swift; sourceTree = "<group>"; };
 		58F523D82C0F0EA33D4FC0A0 /* DeskManagementTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeskManagementTests.swift; sourceTree = "<group>"; };
 		5A7C0DE12F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartUpPresenterTests.swift; sourceTree = "<group>"; };
@@ -332,6 +352,7 @@
 		9251EC5F29A1EAA5006C1D1C /* MainTabbarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabbarController.swift; sourceTree = "<group>"; };
 		9251EC6029A1EAA5006C1D1C /* MainWireframe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWireframe.swift; sourceTree = "<group>"; };
 		9251EC7329A1EAA5006C1D1C /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		6D97E81F048800EE625F30D0 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		9251EC7529A1EAA5006C1D1C /* ReleaseConfig.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ReleaseConfig.xcconfig; sourceTree = "<group>"; };
 		9251EC7629A1EAA5006C1D1C /* EvironmentConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EvironmentConfig.swift; sourceTree = "<group>"; };
 		9251EC7729A1EAA5006C1D1C /* BaseConfig.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = BaseConfig.xcconfig; sourceTree = "<group>"; };
@@ -376,6 +397,7 @@
 		93873D79B82BEDCA818D035F /* StudyPreferences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudyPreferences.swift; sourceTree = "<group>"; };
 		3C86741EA0524940BAE20852 /* TodayPreferences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayPreferences.swift; sourceTree = "<group>"; };
 		85A199F10AB1A863FAA1DA27 /* LifeLessonPreferences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonPreferences.swift; sourceTree = "<group>"; };
+		EF07F347FD2BD66C45DB801E /* LifePlaceProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifePlaceProvider.swift; sourceTree = "<group>"; };
 		9725D887B857CFD895F006A4 /* CardStudyInteractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyInteractor.swift; sourceTree = "<group>"; };
 		995295DA00DA8922BE3BAAF5 /* DeckDraft.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeckDraft.swift; sourceTree = "<group>"; };
 		9F9CAB3FBED0EBD7CB069327 /* SettingPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingPresenterTests.swift; sourceTree = "<group>"; };
@@ -397,14 +419,22 @@
 		F89F935A6E3E901638562AA0 /* StudySession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudySession.swift; sourceTree = "<group>"; };
 		F862404CBFE94898ABF2CD60 /* TodayPlan.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayPlan.swift; sourceTree = "<group>"; };
 		40AE4F17F125884E0FFDD865 /* LifeLesson.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLesson.swift; sourceTree = "<group>"; };
+		0043769D035FE684770AAD71 /* SampleLifeContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SampleLifeContent.swift; sourceTree = "<group>"; };
+		50FDA61F512574210B0E0CA6 /* LifeNearbyStory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeNearbyStory.swift; sourceTree = "<group>"; };
+		4920F1B2BD0AB6FF7D632B53 /* LifeDateStory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeDateStory.swift; sourceTree = "<group>"; };
+		A17DBB4DB6598E49FA20AFD8 /* LifeLessonDraft.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonDraft.swift; sourceTree = "<group>"; };
+		FE7A3D2A56D8B8BEFB81D360 /* LifeFeed.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeFeed.swift; sourceTree = "<group>"; };
 		4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReviewScheduler.swift; sourceTree = "<group>"; };
 		CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneration.swift; sourceTree = "<group>"; };
 		857BB1AD3118E84563C080CA /* PictureSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSuggestion.swift; sourceTree = "<group>"; };
 		942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerAPI.swift; sourceTree = "<group>"; };
 		8230DAEA66D80DBBDA6D9561 /* BJTLifeLessonAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTLifeLessonAPI.swift; sourceTree = "<group>"; };
+		B3AB8D23D98886F84B3D655B /* BJTLifeFeedAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTLifeFeedAPI.swift; sourceTree = "<group>"; };
 		99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerDTO.swift; sourceTree = "<group>"; };
 		6D726D9ADA91C08C52956B06 /* BJTLifeLessonDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTLifeLessonDTO.swift; sourceTree = "<group>"; };
+		708DFED82E76BA66048FA688 /* BJTLifeFeedDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTLifeFeedDTO.swift; sourceTree = "<group>"; };
 		C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JapaneseText.swift; sourceTree = "<group>"; };
+		32C09BA9E71CCCFC64F02177 /* JapaneseCalendar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JapaneseCalendar.swift; sourceTree = "<group>"; };
 		8C4FC3548729A597266E3DC5 /* DictionarySuggestionInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySuggestionInteractor.swift; sourceTree = "<group>"; };
 		5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorInteractor.swift; sourceTree = "<group>"; };
 		7426DA0EF7DC2D9204B3CBA4 /* PictureSearchInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchInteractor.swift; sourceTree = "<group>"; };
@@ -438,6 +468,7 @@
 		9369AB68FA2E9EA64090346F /* CardExampleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleStore.swift; sourceTree = "<group>"; };
 		0DBF5BDC33C94B38BF7072EF /* TodayInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInteractor.swift; sourceTree = "<group>"; };
 		D4A4C5B7933FCF0B57F50A1B /* LifeLessonInteractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonInteractor.swift; sourceTree = "<group>"; };
+		EEB95458093C713F94F09498 /* LifeFeedMapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeFeedMapper.swift; sourceTree = "<group>"; };
 		BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewHistoryStore.swift; sourceTree = "<group>"; };
 		D85AC2F81A5410D56B87F087 /* ExampleEditorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorPresenter.swift; sourceTree = "<group>"; };
 		7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorWireframe.swift; sourceTree = "<group>"; };
@@ -448,6 +479,9 @@
 		89FA48EF5D63147D0CB215D3 /* LifeLessonPresenterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonPresenterTests.swift; sourceTree = "<group>"; };
 		0CE869BFC0B47685F93E484B /* LifeLessonInteractorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonInteractorTests.swift; sourceTree = "<group>"; };
 		9E1F0508FF7BE5F69BA21141 /* LifeLessonTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonTests.swift; sourceTree = "<group>"; };
+		138D30B83AE6F5AC267278E0 /* LifeHubTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeHubTests.swift; sourceTree = "<group>"; };
+		7302904DE5CC4BBFCB1F2B4C /* LifeHubLoaderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeHubLoaderTests.swift; sourceTree = "<group>"; };
+		07161A277320DADEBA4C40E8 /* LifeFeedFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeFeedFixtures.swift; sourceTree = "<group>"; };
 		4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonTestDoubles.swift; sourceTree = "<group>"; };
 		B8DA132F46E686262B0557E0 /* LifeLessonFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonFixtures.swift; sourceTree = "<group>"; };
 		8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPreferencesTests.swift; sourceTree = "<group>"; };
@@ -652,6 +686,9 @@
 				89FA48EF5D63147D0CB215D3 /* LifeLessonPresenterTests.swift */,
 				0CE869BFC0B47685F93E484B /* LifeLessonInteractorTests.swift */,
 				9E1F0508FF7BE5F69BA21141 /* LifeLessonTests.swift */,
+				138D30B83AE6F5AC267278E0 /* LifeHubTests.swift */,
+				7302904DE5CC4BBFCB1F2B4C /* LifeHubLoaderTests.swift */,
+				07161A277320DADEBA4C40E8 /* LifeFeedFixtures.swift */,
 				4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */,
 				B8DA132F46E686262B0557E0 /* LifeLessonFixtures.swift */,
 				8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */,
@@ -683,6 +720,11 @@
 				F89F935A6E3E901638562AA0 /* StudySession.swift */,
 				F862404CBFE94898ABF2CD60 /* TodayPlan.swift */,
 				40AE4F17F125884E0FFDD865 /* LifeLesson.swift */,
+				0043769D035FE684770AAD71 /* SampleLifeContent.swift */,
+				50FDA61F512574210B0E0CA6 /* LifeNearbyStory.swift */,
+				4920F1B2BD0AB6FF7D632B53 /* LifeDateStory.swift */,
+				A17DBB4DB6598E49FA20AFD8 /* LifeLessonDraft.swift */,
+				FE7A3D2A56D8B8BEFB81D360 /* LifeFeed.swift */,
 				4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */,
 				CC89AE911FE0E9CFF6746A01 /* DeckGeneration.swift */,
 				857BB1AD3118E84563C080CA /* PictureSuggestion.swift */,
@@ -719,6 +761,7 @@
 				9369AB68FA2E9EA64090346F /* CardExampleStore.swift */,
 				0DBF5BDC33C94B38BF7072EF /* TodayInteractor.swift */,
 				D4A4C5B7933FCF0B57F50A1B /* LifeLessonInteractor.swift */,
+				EEB95458093C713F94F09498 /* LifeFeedMapper.swift */,
 				BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */,
 			);
 			path = Interactors;
@@ -769,6 +812,7 @@
 				9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */,
 				9226D80829D00C1B0042F6DA /* PlaceholderView.swift */,
 				55AFC78D9266C6D8BE5ABCAE /* StateView.swift */,
+				555DF104B67AC6EAD8F3542B /* LifeSceneView.swift */,
 				B1575B578C6A276BCF1B2746 /* CardImageView.swift */,
 				8B799A37BDC22CAB45D3BBCB /* CardSurfaceView.swift */,
 			);
@@ -845,6 +889,7 @@
 			isa = PBXGroup;
 			children = (
 				9251EC7329A1EAA5006C1D1C /* Localizable.xcstrings */,
+				6D97E81F048800EE625F30D0 /* InfoPlist.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -875,6 +920,7 @@
 				93873D79B82BEDCA818D035F /* StudyPreferences.swift */,
 				3C86741EA0524940BAE20852 /* TodayPreferences.swift */,
 				85A199F10AB1A863FAA1DA27 /* LifeLessonPreferences.swift */,
+				EF07F347FD2BD66C45DB801E /* LifePlaceProvider.swift */,
 				F7B083C077D5C5F2A240A228 /* DebugFixtures.swift */,
 			);
 			path = Services;
@@ -893,6 +939,7 @@
 				92C5B44829F3C17000EE3377 /* AppErrors.swift */,
 				7E77F62AA897954B5B91A027 /* BulkDeckImport.swift */,
 				C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */,
+				32C09BA9E71CCCFC64F02177 /* JapaneseCalendar.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -1015,6 +1062,8 @@
 			children = (
 				B46CB83943214D0890DE16BE /* TodayPresenter.swift */,
 				BD84BB8A1D9F862ED0D5788A /* TodayLifeCard.swift */,
+				362D14002E5CD688453CAFD5 /* TodayLifeHubView.swift */,
+				75B811EAE70B681B9C15B7C6 /* TodayLifeHub.swift */,
 				1BA758F99D144FA683A582CF /* TodayViewController.swift */,
 				FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */,
 			);
@@ -1052,6 +1101,7 @@
 			children = (
 				942F326C3C94D9EECE13F6EF /* BJTLearnerAPI.swift */,
 				8230DAEA66D80DBBDA6D9561 /* BJTLifeLessonAPI.swift */,
+				B3AB8D23D98886F84B3D655B /* BJTLifeFeedAPI.swift */,
 				A699BC15E01E547F063AFF2C /* Models */,
 			);
 			path = BJTClient;
@@ -1062,6 +1112,7 @@
 			children = (
 				99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */,
 				6D726D9ADA91C08C52956B06 /* BJTLifeLessonDTO.swift */,
+				708DFED82E76BA66048FA688 /* BJTLifeFeedDTO.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1245,6 +1296,7 @@
 				92D411942AD3D673005A15DC /* VersionFooterView.xib in Resources */,
 				9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */,
 				9251ECE029A1EAA5006C1D1C /* Localizable.xcstrings in Resources */,
+				AE66FBE633287C4404E0C834 /* InfoPlist.xcstrings in Resources */,
 				9251ECCF29A1EAA5006C1D1C /* Main.storyboard in Resources */,
 				9251ECCB29A1EAA5006C1D1C /* StartUp.storyboard in Resources */,
 				9251ED1529A20040006C1D1C /* Setting.storyboard in Resources */,
@@ -1376,11 +1428,17 @@
 				72796A297CC9F326ADC45E12 /* UserPreferences.swift in Sources */,
 				B7D044161C7EB7E739C30D8C /* SettingsPrototypes.swift in Sources */,
 				862184A154A58EB864D04742 /* StateView.swift in Sources */,
+				6B9CF3EBCDA467DC17D545BD /* LifeSceneView.swift in Sources */,
 				1BE087530645B7FBA386BAC7 /* HomeCells.swift in Sources */,
 				7C8BA3A123EDA53AD7089B9F /* DeckDraft.swift in Sources */,
 				6EDD0178164CD68BD8877687 /* StudySession.swift in Sources */,
 				E1B670B1715C47A39296594C /* TodayPlan.swift in Sources */,
 				FD522D81543FA020FD1D49B5 /* LifeLesson.swift in Sources */,
+				E61CC271FF0C74839A6A7A68 /* SampleLifeContent.swift in Sources */,
+				B28AA84089A12FE3D8275660 /* LifeNearbyStory.swift in Sources */,
+				E7C31A911CDD0869D4462021 /* LifeDateStory.swift in Sources */,
+				0777F2B188FCB684869B509D /* LifeLessonDraft.swift in Sources */,
+				CA94AFEB7A931F7FF291CE25 /* LifeFeed.swift in Sources */,
 				85B7539491694C6E8B4A2942 /* ReviewScheduler.swift in Sources */,
 				1921C438F07F7800FFD8DE5E /* CardImageStore.swift in Sources */,
 				06B2F221D43E11ABE16D5086 /* BulkDeckImport.swift in Sources */,
@@ -1393,6 +1451,8 @@
 				215ACAE719D1F681202C150D /* LifeLessonViewController.swift in Sources */,
 				DF3E329A8C7C6D2E2B6C2114 /* LifeLessonPresenter.swift in Sources */,
 				8596FD96C05A3B273D17A238 /* TodayLifeCard.swift in Sources */,
+				142AC2DEE74F228CFE2E4564 /* TodayLifeHubView.swift in Sources */,
+				563150A86FC99EA38B24B334 /* TodayLifeHub.swift in Sources */,
 				CF89FB6725724760B3861841 /* TodayViewController.swift in Sources */,
 				82AB31DD4A9E08CD1177E116 /* CardStudyWireframe.swift in Sources */,
 				F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */,
@@ -1404,6 +1464,7 @@
 				4EAEC9A459FEB6A80333B17D /* StudyPreferences.swift in Sources */,
 				E17A096404B94CF88665933F /* TodayPreferences.swift in Sources */,
 				6A005BA4510ADC8E49785E5C /* LifeLessonPreferences.swift in Sources */,
+				F7434E7D17D8A98B636622AF /* LifePlaceProvider.swift in Sources */,
 				954A1E2E95AA02D9E017EC63 /* CardImageView.swift in Sources */,
 				2349929752DB9DFBD7B6C758 /* PlaceholderTextView.swift in Sources */,
 				2C2298CEFD0E65B39B1CF491 /* TextEntryCell.swift in Sources */,
@@ -1417,9 +1478,12 @@
 				9FE7631C4FF6CC447DF64FD3 /* PictureSuggestion.swift in Sources */,
 				6CCDF5D900C556A89CAC782D /* BJTLearnerAPI.swift in Sources */,
 				4EC1A81763B6EADEFC9DD42D /* BJTLifeLessonAPI.swift in Sources */,
+				AA6BD49F05DB11349D36F6F8 /* BJTLifeFeedAPI.swift in Sources */,
 				B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */,
 				42B443625AAC94A763A08310 /* BJTLifeLessonDTO.swift in Sources */,
+				9AA04D45D0CEE19583D9E08A /* BJTLifeFeedDTO.swift in Sources */,
 				DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */,
+				B3336546E67BF4E2637C444B /* JapaneseCalendar.swift in Sources */,
 				6A92A3F7BB4F8C222128A076 /* DictionarySuggestionInteractor.swift in Sources */,
 				CFEB30D5910E8D9EC5B7D8CE /* DeckGeneratorInteractor.swift in Sources */,
 				7CFC79EA7508F83CC523D57D /* PictureSearchInteractor.swift in Sources */,
@@ -1445,6 +1509,7 @@
 				3690461B9DC786EBC8303544 /* CardExampleStore.swift in Sources */,
 				592B098B99C14398AA6F6B9E /* TodayInteractor.swift in Sources */,
 				F21B22EB1016302ABF704C86 /* LifeLessonInteractor.swift in Sources */,
+				DFB21D948ACA50D907B7D212 /* LifeFeedMapper.swift in Sources */,
 				42FA2265229B4B8AAB251BD8 /* ReviewHistoryStore.swift in Sources */,
 				E91121EA250C574B968C58AA /* ExampleEditorPresenter.swift in Sources */,
 				915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */,
@@ -1489,6 +1554,9 @@
 				BC0DC8D74F4731D6344B3D0A /* LifeLessonPresenterTests.swift in Sources */,
 				12E04490B4F4D648D44066FD /* LifeLessonInteractorTests.swift in Sources */,
 				59DE0FBE064DFC23C7FB0C1D /* LifeLessonTests.swift in Sources */,
+				86F6CB78AA543B29FDF3A3B2 /* LifeHubTests.swift in Sources */,
+				AB2A2C601C45C58C5D5AAEA9 /* LifeHubLoaderTests.swift in Sources */,
+				788E3DC5367E1948D2FA73AE /* LifeFeedFixtures.swift in Sources */,
 				FB56D4B862C02A12C9222471 /* LifeLessonTestDoubles.swift in Sources */,
 				6946EB77DA1C8932F5B68571 /* LifeLessonFixtures.swift in Sources */,
 				39A253290C90462492BE266A /* TodayPreferencesTests.swift in Sources */,

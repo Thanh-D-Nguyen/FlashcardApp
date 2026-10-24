@@ -153,17 +153,22 @@ final class LifeLessonInteractor: LifeLessonInteractorInterface {
         }
         let exercises = try dto.lesson.exercises.map { try exercise(from: $0) }
         let text = { (value: BJTLifeTextDTO) in LifeText(vi: value.vi, en: value.en) }
+        let maxC = Int(dto.facts.temperatureMaxC.rounded(.toNearestOrAwayFromZero))
+        let minC = Int(dto.facts.temperatureMinC.rounded(.toNearestOrAwayFromZero))
+        var chips = [LifeChip(symbol: "thermometer.medium", text: String(format: NSLocalizedString("High %1$lld° · low %2$lld°", comment: ""), maxC, minC))]
+        if let chance = dto.facts.precipitationProbabilityMaxPercent {
+            chips.append(LifeChip(symbol: "umbrella.fill", text: String(format: NSLocalizedString("%lld%% chance of rain or snow", comment: ""), chance)))
+        }
         return LifeLesson(
-            id: dto.id, level: dto.level, cityID: dto.city.id,
+            id: dto.id, topic: .weather, provenance: .live, level: dto.level, cityID: dto.city.id,
             titleJapanese: dto.lesson.title.japanese, titleReading: dto.lesson.title.reading,
             title: LifeText(vi: dto.lesson.title.vi, en: dto.lesson.title.en),
             source: LifeLesson.Source(providerName: dto.source.providerName, url: sourceURL, attributionText: dto.source.attributionText,
                                       licenseName: dto.source.licenseName, licenseStatus: licenseStatus,
                                       observedAt: observedAt, fetchedAt: fetchedAt, expiresAt: expiresAt, freshness: freshness),
-            facts: LifeLesson.Facts(date: dto.facts.date,
-                                    temperatureMaxC: Int(dto.facts.temperatureMaxC.rounded(.toNearestOrAwayFromZero)),
-                                    temperatureMinC: Int(dto.facts.temperatureMinC.rounded(.toNearestOrAwayFromZero)),
+            facts: LifeLesson.Facts(date: dto.facts.date, weatherCode: dto.facts.weatherCode, temperatureMaxC: maxC, temperatureMinC: minC,
                                     precipitationProbabilityPercent: dto.facts.precipitationProbabilityMaxPercent),
+            chips: chips, scene: nil,
             sentences: dto.lesson.sentences.map {
                 LifeLesson.Sentence(id: $0.id, isAdvice: $0.basis == "advice", japanese: $0.japanese, reading: $0.reading,
                                     translation: text($0.translations), explanation: text($0.explanation))
@@ -175,7 +180,7 @@ final class LifeLessonInteractor: LifeLessonInteractorInterface {
             cityName: LifeText(vi: dto.city.nameVi, en: dto.city.nameEn), cityNameJapanese: dto.city.nameJa)
     }
 
-    private static func exercise(from dto: BJTLifeLessonDTO.Exercise) throws -> LifeLesson.Exercise {
+    static func exercise(from dto: BJTLifeLessonDTO.Exercise) throws -> LifeLesson.Exercise {
         let prompt = LifeText(vi: dto.prompt.vi, en: dto.prompt.en)
         let explanation = LifeText(vi: dto.explanation.vi, en: dto.explanation.en)
         switch dto.kind {

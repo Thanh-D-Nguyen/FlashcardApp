@@ -45,7 +45,7 @@ struct TodayViewState: Equatable {
     var failureTitle: String?
     var failureMessage: String?
     /// "Learn from Life": independent of the review block above. `nil` hides it.
-    var life: TodayLifeSection?
+    var life: TodayHubSection?
 }
 
 protocol TodayViewInterface: AnyObject {
@@ -61,7 +61,8 @@ protocol TodayPresenterInterface: AnyObject {
     func changeBudget()
     func openLevels()
     func retry()
-    func openLifeLesson()
+    /// A card of the life hub was tapped (or its button): opens its lesson, asks for the location, or retries, by what the card is.
+    func openLifeCard(id: String)
     func changeLifeCity()
     func retryLife()
 }
@@ -73,7 +74,7 @@ final class TodayPresenter {
     private let now: () -> Date
     weak var view: TodayViewInterface?
 
-    private let life: TodayLifeLoading?
+    private let life: TodayLifeHubLoading?
 
     private var plan: TodayPlan?
     private var state: TodayViewState?
@@ -82,7 +83,7 @@ final class TodayPresenter {
     init(interactor: TodayInteractorInterface, wireframe: TodayWireframeInterface,
          ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" },
          now: @escaping () -> Date = Date.init,
-         life: TodayLifeLoading? = nil) {
+         life: TodayLifeHubLoading? = nil) {
         self.interactor = interactor
         self.wireframe = wireframe
         self.ownerKey = ownerKey
@@ -233,9 +234,17 @@ extension TodayPresenter: TodayPresenterInterface {
 
     func retry() { reload() }
 
-    func openLifeLesson() {
-        guard let life, case .loaded? = life.section?.content, let lesson = life.lesson else { return }
-        wireframe.showLifeLesson(cityID: life.cityID, lesson: lesson)
+    func openLifeCard(id: String) {
+        guard let life, let card = state?.life?.cards.first(where: { $0.id == id }) else { return }
+        switch card.status {
+        case .ready:
+            guard let lesson = life.lesson(forCard: id) else { return }
+            wireframe.showLifeLesson(cityID: life.cityID, lesson: lesson)
+        case .needsLocation: life.requestLocation()
+        case .locationDenied: wireframe.openAppSettings()
+        case .failed: life.retry()
+        case .loading, .locating: break
+        }
     }
 
     func changeLifeCity() {

@@ -16,10 +16,12 @@ struct LifeStoryState: Equatable {
     let eyebrow: String
     let title: String
     let titleReading: String
+    let topic: LifeTopic
+    let scene: LifeScene
     /// "Not the latest" and "Development source": shown as tags next to the facts, never hidden.
     let tags: [String]
     let factsHeader: String
-    let factChips: [String]
+    let factChips: [LifeChip]
     let sourceLine: String
     let attribution: String
     let sentencesHeader: String
@@ -200,23 +202,45 @@ final class LifeLessonPresenter {
         return formatter.string(from: date)
     }
 
+    /// The picture of a lesson: the weather's own kind for weather, the topic's scene for the rest.
+    static func scene(for lesson: LifeLesson) -> LifeScene {
+        if let scene = lesson.scene { return scene }
+        switch lesson.topic {
+        case .weather: return .weather(LifeWeatherKind(wmoCode: lesson.facts?.weatherCode ?? 3), temperatureC: lesson.facts?.temperatureMaxC)
+        case .date: return .date(day: 1, weekday: "")
+        case .nearby: return .place
+        case .transit: return .transit
+        case .shopping: return .shopping
+        case .news: return .news
+        case .food: return .food
+        case .culture: return .culture
+        case .money: return .money
+        case .lottery: return .lottery
+        }
+    }
+
     private func storyState(_ lesson: LifeLesson) -> LifeStoryState {
         let language = language()
         let city = LifeCity.city(id: lesson.cityID)?.displayName(language) ?? lesson.cityName.resolved(language)
         var tags: [String] = []
         if lesson.source.freshness == .stale { tags.append(Self.text("Not the latest")) }
         if lesson.source.licenseStatus == .nonCommercialDevOnly { tags.append(Self.text("Development source")) }
-        var chips = [String(format: Self.text("High %1$lld° · low %2$lld°"), lesson.facts.temperatureMaxC, lesson.facts.temperatureMinC)]
-        if let chance = lesson.facts.precipitationProbabilityPercent {
-            chips.append(String(format: Self.text("%lld%% chance of rain or snow"), chance))
-        }
+        if lesson.provenance == .sample { tags.append(Self.text("Sample content")) }
         let time = Self.timeText(lesson.source.observedAt, language: language)
+        let eyebrow = lesson.topic == .weather ? String(format: Self.text("%@ · TODAY'S WEATHER"), city.uppercased()) : lesson.topic.title.uppercased()
+        let sourceLine: String
+        switch lesson.provenance {
+        case .live: sourceLine = String(format: Self.text("%1$@ · observed %2$@ (Japan time)"), lesson.source.providerName, time)
+        case .onDevice: sourceLine = String(format: Self.text("%@ · worked out on this device"), lesson.source.providerName)
+        case .sample: sourceLine = Self.text("Example content · not live data yet")
+        }
         return LifeStoryState(
-            eyebrow: String(format: Self.text("%@ · TODAY'S WEATHER"), city.uppercased()),
-            title: lesson.titleJapanese, titleReading: lesson.titleReading, tags: tags,
-            factsHeader: Self.text("FROM THE DATA SOURCE"), factChips: chips,
-            sourceLine: String(format: Self.text("%1$@ · observed %2$@ (Japan time)"), lesson.source.providerName, time),
-            attribution: lesson.source.attributionText,
+            eyebrow: eyebrow,
+            title: lesson.titleJapanese, titleReading: lesson.titleReading,
+            topic: lesson.topic, scene: Self.scene(for: lesson), tags: tags,
+            factsHeader: lesson.provenance == .live ? Self.text("FROM THE DATA SOURCE") : Self.text("FACTS"), factChips: lesson.chips,
+            sourceLine: sourceLine,
+            attribution: lesson.source.attributionText ?? "",
             sentencesHeader: Self.text("SENTENCES TO LEARN"),
             sentences: lesson.sentences.map {
                 LifeSentenceRow(japanese: $0.japanese, reading: $0.reading, translation: $0.translation.resolved(language),

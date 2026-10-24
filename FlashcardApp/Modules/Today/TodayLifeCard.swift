@@ -82,7 +82,7 @@ final class TodayLifeLoader: TodayLifeLoading {
         return formatter.string(from: date)
     }
 
-    private func isToday(_ lesson: LifeLesson) -> Bool { lesson.facts.date == Self.japanDay(now()) }
+    private func isToday(_ lesson: LifeLesson) -> Bool { lesson.facts?.date == Self.japanDay(now()) }
 
     private func isCurrent(_ lesson: LifeLesson, city: String) -> Bool {
         lesson.cityID == city && isToday(lesson) && now() < lesson.source.expiresAt
@@ -125,7 +125,7 @@ final class TodayLifeLoader: TodayLifeLoading {
                 guard let self, self.loadingCityID == city else { return }
                 self.loadingCityID = nil
                 // A lesson of another Japan day must never be offered as today's, whatever the server believes.
-                guard lesson.facts.date == Self.japanDay(self.now()) else { return self.fail(LearnerAPIError.invalidResponse, city: city) }
+                guard lesson.facts?.date == Self.japanDay(self.now()) else { return self.fail(LearnerAPIError.invalidResponse, city: city) }
                 self.notOfferedUntil = nil
                 self.retryNotBefore = nil
                 self.lesson = lesson
@@ -178,8 +178,7 @@ final class TodayLifeLoader: TodayLifeLoading {
 
     static func card(for lesson: LifeLesson, language: AppLanguage) -> TodayLifeCard {
         let summary = (lesson.sentences.first { $0.id == "weather" } ?? lesson.sentences[0]).translation.resolved(language)
-        var facts = [String(format: text("High %1$lld° · low %2$lld°"), lesson.facts.temperatureMaxC, lesson.facts.temperatureMinC)]
-        if let chance = lesson.facts.precipitationProbabilityPercent { facts.append(String(format: text("%lld%% chance of rain or snow"), chance)) }
+        let facts = lesson.chips.map(\.text)
         let time = LifeLessonPresenter.timeText(lesson.source.observedAt, language: language)
         var tags: [String] = []
         if lesson.source.freshness == .stale { tags.append(text("Not the latest")) }

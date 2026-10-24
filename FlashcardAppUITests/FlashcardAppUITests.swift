@@ -962,31 +962,36 @@ final class FlashcardAppUITests: XCTestCase {
         add(attachment)
     }
 
-    // MARK: Learn from Life (needs the local backend with the weather lesson enabled; see docs/plans/today-life-learning-weather-slice.md)
+    // MARK: Learn from Life (the hub on Today)
 
-    private func scrollUntilHittable(_ element: XCUIElement, in scroll: XCUIElement, maxSwipes: Int = 6) {
-        var swipes = 0
-        while !element.isHittable && swipes < maxSwipes {
-            scroll.swipeUp()
-            swipes += 1
+    /// Brings a hub card's button into view: the card strip scrolls sideways, Today scrolls down.
+    private func revealLifeCard(_ app: XCUIApplication, idPrefix: String, timeout: TimeInterval = 40) -> XCUIElement? {
+        let button = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "life_card_action_\(idPrefix)")).firstMatch
+        let strip = app.scrollViews["today_life_cards"]
+        guard strip.waitForExistence(timeout: timeout) else { return nil }
+        let today = app.scrollViews["today_screen"]
+        var attempts = 0
+        while !(button.exists && button.isHittable) && attempts < 14 {
+            if strip.isHittable, !button.exists || button.frame.minX > app.frame.maxX || button.frame.maxX < 0 { strip.swipeLeft() }
+            else { today.swipeUp() }
+            attempts += 1
         }
+        return button.exists && button.isHittable ? button : nil
     }
 
-    /// Runs the lesson from Today up to the save step. `answer` is typed into the recall exercise; returns the feedback text of it.
+    /// Opens a lesson from Today and runs it to the save step, typing `answer` into the recall exercise and picking choice `pick`.
+    /// Returns the feedback text of the recall exercise.
     @discardableResult
-    private func playLifeLesson(_ app: XCUIApplication, answer: String) throws -> String {
-        let today = app.scrollViews["today_screen"]
-        let cta = app.buttons["today_life_cta"]
-        guard cta.waitForExistence(timeout: 40) else {
-            throw XCTSkip("Today shows no weather lesson: the backend does not offer it (enable it with LIFE_WEATHER_ALLOW_NONCOMMERCIAL=true) or the build points elsewhere.")
+    private func playLifeLesson(_ app: XCUIApplication, idPrefix: String, answer: String, pick: Int = 0) throws -> String {
+        guard let open = revealLifeCard(app, idPrefix: idPrefix) else {
+            throw XCTSkip("The \(idPrefix) card is not on Today (the backend does not offer it, or the build points elsewhere).")
         }
-        scrollUntilHittable(cta, in: today)
-        cta.tap()
-
+        open.tap()
         XCTAssertTrue(app.staticTexts["life_story_title"].waitForExistence(timeout: 10), "The story opens")
         let story = app.scrollViews["life_screen"]
         let start = app.buttons["life_story_start"]
-        scrollUntilHittable(start, in: story)
+        var swipes = 0
+        while !start.isHittable && swipes < 8 { story.swipeUp(); swipes += 1 }
         start.tap()
 
         let field = app.textFields["life_answer_field"]
@@ -999,7 +1004,7 @@ final class FlashcardAppUITests: XCTestCase {
         let text = feedback.label
         app.buttons["life_primary"].tap()                              // next
 
-        let choice = app.buttons["life_choice_0"]
+        let choice = app.buttons["life_choice_\(pick)"]
         XCTAssertTrue(choice.waitForExistence(timeout: 5), "The second exercise is a choice")
         choice.tap()
         app.buttons["life_primary"].tap()                              // check
@@ -1009,18 +1014,56 @@ final class FlashcardAppUITests: XCTestCase {
         return text
     }
 
-    func testLifeLessonCanBeCompletedSavedAndFoundAgainWithoutDuplicates() throws {
-        let app = makeApp()
-        app.launch()
-
-        // First pass: a wrong answer shows the right one; saving stores the words.
-        let wrong = try playLifeLesson(app, answer: "zzz")
+    /// Saves the words, continues, and returns to Today.
+    private func saveLifeWordsAndReturn(_ app: XCUIApplication) -> String {
         app.buttons["life_save_primary"].tap()
-        XCTAssertTrue(app.otherElements["life_save_done"].waitForExistence(timeout: 5), "Saved is reported after the store accepted the words")
+        let saved = app.otherElements["life_save_done"]
+        XCTAssertTrue(saved.waitForExistence(timeout: 5), "Saved is reported after the store accepted the words")
+        let message = saved.label
         app.buttons["life_save_primary"].tap()                         // continue
         XCTAssertTrue(app.staticTexts["life_done_title"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["life_done_save"].exists)
         app.buttons["life_done_back"].tap()
+        return message
+    }
+
+    func testTheLifeHubShowsTheDateAndTheLabelledCardsOnToday() throws {
+        let app = makeApp()
+        app.launch()
+        XCTAssertTrue(app.otherElements["today_date_header"].waitForExistence(timeout: 40), "The date header is the learner's own calendar")
+        XCTAssertTrue(app.buttons["today_primary"].exists, "The review button is still there")
+        let strip = app.scrollViews["today_life_cards"]
+        XCTAssertTrue(strip.waitForExistence(timeout: 10))
+        // The date card is worked out on the device; it needs no server.
+        XCTAssertNotNil(revealLifeCard(app, idPrefix: "date:"), "A date card is on Today")
+        try XCTSkipUnless(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "life_card_action_sample:")).count > 0 || revealLifeCard(app, idPrefix: "sample:transit", timeout: 5) != nil,
+                          "The backend already provides a life feed: no example cards to check.")
+    }
+
+    func testAnExampleLessonRunsFromTodayAndItsWordsAreSavedOnceOnly() throws {
+        let app = makeApp()
+        app.launch()
+        // The trains example: 遅れて is the answer; choice 1 (ちえん) is the right reading.
+        try playLifeLesson(app, idPrefix: "sample:transit", answer: "遅れて", pick: 1)
+        XCTAssertTrue(app.buttons["life_save_primary"].exists)
+        let first = saveLifeWordsAndReturn(app)
+        XCTAssertFalse(first.isEmpty)
+        // Again: the same words are reported as already there and nothing is added twice.
+        let feedback = try playLifeLesson(app, idPrefix: "sample:transit", answer: "遅れて", pick: 1)
+        XCTAssertTrue(feedback.contains("Chính xác"), "A correct answer is confirmed: \(feedback)")
+        app.buttons["life_save_primary"].tap()
+        let saved = app.otherElements["life_save_done"]
+        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        XCTAssertTrue(saved.label.contains("Đã có trong"), "The same words are reported as already there: \(saved.label)")
+    }
+
+    func testLifeLessonFromTheServerCanBeCompletedSavedAndFoundAgainWithoutDuplicates() throws {
+        let app = makeApp()
+        app.launch()
+
+        // First pass: a wrong answer shows the right one; saving stores the words.
+        let wrong = try playLifeLesson(app, idPrefix: "weather:", answer: "zzz")
+        _ = saveLifeWordsAndReturn(app)
 
         // The words are in the learner's decks.
         app.tabBars.buttons["tab_cards"].tap()
@@ -1037,7 +1080,7 @@ final class FlashcardAppUITests: XCTestCase {
         // Second pass: the answer read from the first feedback ("… Đáp án: 雨 (あめ) — mưa.") is accepted, and nothing is added twice.
         var answer = "zzz"
         if let range = wrong.range(of: "Đáp án: "), let end = wrong[range.upperBound...].firstIndex(of: " ") { answer = String(wrong[range.upperBound..<end]) }
-        let again = try playLifeLesson(app, answer: answer)
+        let again = try playLifeLesson(app, idPrefix: "weather:", answer: answer)
         XCTAssertTrue(again.contains("Chính xác"), "A correct answer is confirmed: \(again)")
         app.buttons["life_save_primary"].tap()
         let saved = app.otherElements["life_save_done"]

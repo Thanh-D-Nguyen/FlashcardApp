@@ -1,4 +1,5 @@
 import Foundation
+import RealmSwift
 @testable import FlashcardApp
 
 /// A response captured from the running backend (`GET /api/life/lessons/weather?city=tokyo`, 2026-10-24, Open-Meteo free tier).
@@ -230,6 +231,25 @@ enum LifeLessonFixtures {
         try LifeLessonInteractor.lesson(from: try dto(transform), requestedCityID: "tokyo")
     }
 
+    /// The calendar of a learner in Japan: the date tests are exact whatever zone the test machine is in.
+    static var japanCalendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+        return calendar
+    }
+
     /// 2026-10-24 08:30 in Japan.
     static let morning = Date(timeIntervalSince1970: 1_792_798_200)
+}
+
+/// An in-memory Realm installed as the app's, removed again by `tearDown`.
+final class RealmFixture {
+    static func makeInMemory() throws -> RealmFixture { try RealmFixture() }
+    private init() throws {
+        let configuration = Realm.Configuration(inMemoryIdentifier: "fixture-\(UUID().uuidString)", objectTypes: RealmService.storedTypes)
+        realm = try Realm(configuration: configuration)
+        RealmService.shared.realm = realm
+    }
+    private var realm: Realm?
+    func tearDown() { RealmService.shared.realm = nil; realm = nil }
 }

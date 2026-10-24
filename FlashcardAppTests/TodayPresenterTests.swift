@@ -287,9 +287,11 @@ private final class FakeTodayWireframe: TodayWireframeInterface {
     var levelsOpened = 0
     var lifeLessons: [(cityID: String, lesson: LifeLesson)] = []
     var cityChoosers: [(selectedID: String, select: (String) -> Void)] = []
+    var settingsOpened = 0
 
     func showLifeLesson(cityID: String, lesson: LifeLesson) { lifeLessons.append((cityID, lesson)) }
     func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void) { cityChoosers.append((selectedID, onSelect)) }
+    func openAppSettings() { settingsOpened += 1 }
     func showStudy(deckId: String, cardIDs: [String]?) { studies.append((deckId, cardIDs)) }
     func showCreateDeck(onFinish: @escaping () -> Void) { createFlows.append(onFinish) }
     func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void) {
@@ -305,105 +307,140 @@ private final class SpyTodayView: TodayViewInterface {
 }
 
 
-/// "Learn from Life" next to the review block: independent of it in both directions.
-private final class FakeLife: TodayLifeLoading {
-    var section: TodayLifeSection?
-    var lesson: LifeLesson?
+/// The life hub next to the review block: independent of it in both directions.
+private final class FakeHub: TodayLifeHubLoading {
+    var section: TodayHubSection?
+    var lessons: [String: LifeLesson] = [:]
     var cityID = "tokyo"
     var onChange: (() -> Void)?
-    var refreshes = 0, retries = 0
+    var refreshes = 0, retries = 0, locationRequests = 0
     var selected: [String] = []
 
+    func lesson(forCard id: String) -> LifeLesson? { lessons[id] }
     func refresh() { refreshes += 1 }
     func retry() { retries += 1 }
     func selectCity(_ id: String) { selected.append(id) }
-    func update(_ section: TodayLifeSection?) { self.section = section; onChange?() }
+    func requestLocation() { locationRequests += 1 }
+    func update(_ section: TodayHubSection?) { self.section = section; onChange?() }
 }
 
 extension TodayPresenterTests {
-    private func startWithLife(_ plan: TodayPlan, life: FakeLife) -> (TodayPresenter, FakeTodayWireframe, SpyTodayView) {
+    private func startWithHub(_ plan: TodayPlan, hub: FakeHub) -> (TodayPresenter, FakeTodayWireframe, SpyTodayView) {
         let interactor = FakeTodayInteractor()
         interactor.result = .success(plan)
         let wireframe = FakeTodayWireframe()
         let view = SpyTodayView()
-        let presenter = TodayPresenter(interactor: interactor, wireframe: wireframe, ownerKey: { "owner" }, now: { Date(timeIntervalSince1970: 1_800_000_000) }, life: life)
+        let presenter = TodayPresenter(interactor: interactor, wireframe: wireframe, ownerKey: { "owner" }, now: { Date(timeIntervalSince1970: 1_800_000_000) }, life: hub)
         presenter.view = view
         presenter.viewWillAppear()
         return (presenter, wireframe, view)
     }
 
-    private func card() throws -> TodayLifeCard { TodayLifeLoader.card(for: try LifeLessonFixtures.lesson(), language: .vietnamese) }
-
-    func test_theLifeSectionIsAskedForWhenTodayAppearsAndShownBesideTheReviewBlock() throws {
-        let life = FakeLife()
-        life.section = TodayLifeSection(content: .loaded(try card()), exploreValue: "Weather · Tokyo")
-        let (_, _, view) = startWithLife(duePlan(), life: life)
-        XCTAssertEqual(life.refreshes, 1)
-        XCTAssertEqual(view.renders.last?.life, life.section)
-        XCTAssertEqual(view.renders.last?.hero?.ctaTitle, text("Start review"), "The review block is the same with or without a lesson")
+    private func hubSection(cards: [LifeFeedCard]) -> TodayHubSection {
+        TodayHubSection(header: TodayLifeHubLoader.header(now: LifeLessonFixtures.morning, calendar: LifeLessonFixtures.japanCalendar), cityName: "Tokyo", cards: cards)
     }
 
-    func test_whenTheLessonFailsTheReviewBlockIsUntouched() throws {
-        let life = FakeLife()
-        let (presenter, _, view) = startWithLife(duePlan(due: 12), life: life)
-        withExtendedLifetime(presenter) {}
+    private func readyCard() throws -> LifeFeedCard { LifeFeedMapper.card(for: try LifeLessonFixtures.lesson(), language: .vietnamese) }
+
+    private func placeholder(_ status: LifeFeedCard.Status, id: String) -> LifeFeedCard {
+        LifeFeedCard(id: id, topic: .nearby, status: status, provenance: .onDevice, eyebrow: "NEAR YOU", headlineJapanese: "近くの場所", reading: "ちかくのばしょ",
+                     summary: "x", chips: [], meta: "", scene: .place, ctaTitle: "go", lesson: nil)
+    }
+
+    func test_theHubIsAskedForWhenTodayAppearsAndShownBesideTheReviewBlock() throws {
+        let hub = FakeHub()
+        hub.section = hubSection(cards: [try readyCard()])
+        let (_, _, view) = startWithHub(duePlan(), hub: hub)
+        XCTAssertEqual(hub.refreshes, 1)
+        XCTAssertEqual(view.renders.last?.life, hub.section)
+        XCTAssertEqual(view.renders.last?.hero?.ctaTitle, text("Start review"), "The review block is the same with or without the hub")
+    }
+
+    func test_whenAHubCardFailsTheReviewBlockIsUntouched() throws {
+        let hub = FakeHub()
+        let (presenter, _, view) = startWithHub(duePlan(due: 12), hub: hub)
         let reviewOnly = view.renders.last
-        life.update(TodayLifeSection(content: .failed(title: "No", message: "offline"), exploreValue: "Weather · Tokyo"))
-        let afterFailure = try XCTUnwrap(view.renders.last)
-        XCTAssertEqual(afterFailure.hero, reviewOnly?.hero)
-        XCTAssertEqual(afterFailure.rows, reviewOnly?.rows)
-        XCTAssertEqual(afterFailure.progress, reviewOnly?.progress)
-        XCTAssertEqual(afterFailure.hero?.figure, "12", "The number of cards to review is not replaced by anything")
-        XCTAssertNotNil(afterFailure.life)
+        hub.update(hubSection(cards: [placeholder(.failed(message: "offline"), id: "weather:failed")]))
+        let after = try XCTUnwrap(view.renders.last)
+        XCTAssertEqual(after.hero, reviewOnly?.hero)
+        XCTAssertEqual(after.rows, reviewOnly?.rows)
+        XCTAssertEqual(after.progress, reviewOnly?.progress)
+        XCTAssertEqual(after.hero?.figure, "12", "The number of cards to review is not replaced by anything")
+        XCTAssertNotNil(after.life)
         withExtendedLifetime(presenter) {}
     }
 
-    func test_whenTheSavedProgressCannotBeReadTheLessonOfferIsStillThere() throws {
-        let life = FakeLife()
-        life.section = TodayLifeSection(content: .loaded(try card()), exploreValue: "Weather · Tokyo")
+    func test_whenTheSavedProgressCannotBeReadTheHubIsStillThere() throws {
+        let hub = FakeHub()
+        hub.section = hubSection(cards: [try readyCard()])
         let interactor = FakeTodayInteractor()
         interactor.result = .failure(NSError(domain: "t", code: 1))
         let view = SpyTodayView()
-        let presenter = TodayPresenter(interactor: interactor, wireframe: FakeTodayWireframe(), ownerKey: { "owner" }, life: life)
+        let presenter = TodayPresenter(interactor: interactor, wireframe: FakeTodayWireframe(), ownerKey: { "owner" }, life: hub)
         presenter.view = view
         presenter.viewWillAppear()
         XCTAssertEqual(view.renders.last?.phase, .failed)
         XCTAssertNotNil(view.renders.last?.life)
     }
 
-    func test_withoutALifeLoaderTodayShowsNoOffer() {
+    func test_withoutAHubTodayShowsNoCards() {
         start(duePlan())
         XCTAssertNil(state.life)
     }
 
-    func test_theLessonOpensOnlyOnceItHasLoaded() throws {
-        let life = FakeLife()
-        let (presenter, wireframe, _) = startWithLife(duePlan(), life: life)
-        life.lesson = try LifeLessonFixtures.lesson()
-        life.section = TodayLifeSection(content: .loading, exploreValue: "x")
-        presenter.openLifeLesson()
-        XCTAssertTrue(wireframe.lifeLessons.isEmpty, "While loading there is nothing to open")
-        life.update(TodayLifeSection(content: .loaded(try card()), exploreValue: "x"))
-        presenter.openLifeLesson()
+    func test_aReadyCardOpensItsLesson() throws {
+        let hub = FakeHub()
+        let card = try readyCard()
+        hub.section = hubSection(cards: [card])
+        hub.lessons[card.id] = card.lesson
+        let (presenter, wireframe, _) = startWithHub(duePlan(), hub: hub)
+        presenter.openLifeCard(id: card.id)
         XCTAssertEqual(wireframe.lifeLessons.count, 1)
         XCTAssertEqual(wireframe.lifeLessons.first?.cityID, "tokyo")
         XCTAssertEqual(wireframe.lifeLessons.first?.lesson.id, "weather:tokyo:2026-10-24")
     }
 
+    func test_whatATapDoesFollowsTheStateOfTheCard() {
+        let hub = FakeHub()
+        hub.section = hubSection(cards: [placeholder(.needsLocation, id: "ask"), placeholder(.locationDenied, id: "denied"),
+                                         placeholder(.failed(message: "x"), id: "failed"), placeholder(.loading, id: "loading"), placeholder(.locating, id: "locating")])
+        let (presenter, wireframe, _) = startWithHub(duePlan(), hub: hub)
+        presenter.openLifeCard(id: "loading")
+        presenter.openLifeCard(id: "locating")
+        XCTAssertEqual(hub.locationRequests + hub.retries + wireframe.settingsOpened + wireframe.lifeLessons.count, 0, "Busy cards do nothing")
+        presenter.openLifeCard(id: "ask")
+        XCTAssertEqual(hub.locationRequests, 1, "The position is read only from the learner's tap on the card")
+        presenter.openLifeCard(id: "denied")
+        XCTAssertEqual(wireframe.settingsOpened, 1)
+        presenter.openLifeCard(id: "failed")
+        XCTAssertEqual(hub.retries, 1)
+        presenter.openLifeCard(id: "unknown")
+        XCTAssertTrue(wireframe.lifeLessons.isEmpty)
+    }
+
+    func test_aReadyCardWithoutItsLessonOpensNothing() throws {
+        let hub = FakeHub()
+        let card = try readyCard()
+        hub.section = hubSection(cards: [card])
+        let (presenter, wireframe, _) = startWithHub(duePlan(), hub: hub)
+        presenter.openLifeCard(id: card.id)
+        XCTAssertTrue(wireframe.lifeLessons.isEmpty)
+    }
+
     func test_theCityChoiceStartsFromTheCurrentCityAndAppliesTheChosenOne() {
-        let life = FakeLife()
-        life.cityID = "osaka"
-        let (presenter, wireframe, _) = startWithLife(duePlan(), life: life)
+        let hub = FakeHub()
+        hub.cityID = "osaka"
+        let (presenter, wireframe, _) = startWithHub(duePlan(), hub: hub)
         presenter.changeLifeCity()
         XCTAssertEqual(wireframe.cityChoosers.first?.selectedID, "osaka")
         wireframe.cityChoosers.first?.select("naha")
-        XCTAssertEqual(life.selected, ["naha"])
+        XCTAssertEqual(hub.selected, ["naha"])
     }
 
-    func test_retryAsksTheLessonAgainWithoutReloadingTheReviewPlan() {
-        let life = FakeLife()
-        let (presenter, _, _) = startWithLife(duePlan(), life: life)
+    func test_retryAsksTheHubAgainWithoutReloadingTheReviewPlan() {
+        let hub = FakeHub()
+        let (presenter, _, _) = startWithHub(duePlan(), hub: hub)
         presenter.retryLife()
-        XCTAssertEqual(life.retries, 1)
+        XCTAssertEqual(hub.retries, 1)
     }
 }

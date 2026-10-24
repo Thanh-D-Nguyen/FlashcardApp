@@ -24,6 +24,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Flashcard uses your location once, only when you tap "Use my location", to teach you the Japanese for the places around you. It is never stored or sent anywhere.</string>
 	<key>ProductBaseUrl</key>
 	<string>$(PRODUCT_BASE_URL)</string>
 	<key>UIApplicationSceneManifest</key>

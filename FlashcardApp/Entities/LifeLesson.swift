@@ -37,12 +37,17 @@ struct LifeText: Equatable {
 /// A validated weather lesson. Provider facts (`facts`, `source`) are separate from the template text (`sentences`...).
 struct LifeLesson: Equatable {
     enum Freshness: String, Equatable { case live, stale }
-    enum LicenseStatus: String, Equatable { case commercial, nonCommercialDevOnly = "non_commercial_dev_only" }
+    enum LicenseStatus: String, Equatable {
+        case commercial, nonCommercialDevOnly = "non_commercial_dev_only"
+        /// Computed on the device or written as an example: no provider licence is involved.
+        case notApplicable = "not_applicable"
+    }
 
     struct Source: Equatable {
         let providerName: String
-        let url: URL
-        let attributionText: String
+        /// The provider's own page (the attribution link its licence asks for); `nil` for on-device and sample lessons.
+        let url: URL?
+        let attributionText: String?
         let licenseName: String
         let licenseStatus: LicenseStatus
         let observedAt: Date
@@ -51,9 +56,11 @@ struct LifeLesson: Equatable {
         let freshness: Freshness
     }
 
+    /// The provider's weather values; only weather lessons have them.
     struct Facts: Equatable {
         /// The Japan calendar day the values describe, `yyyy-MM-dd`.
         let date: String
+        let weatherCode: Int
         let temperatureMaxC: Int
         let temperatureMinC: Int
         let precipitationProbabilityPercent: Int?
@@ -96,13 +103,19 @@ struct LifeLesson: Equatable {
     }
 
     let id: String
+    let topic: LifeTopic
+    let provenance: LifeProvenance
     let level: String
     let cityID: String
     let titleJapanese: String
     let titleReading: String
     let title: LifeText
     let source: Source
-    let facts: Facts
+    let facts: Facts?
+    /// The facts in short, for the story and the card.
+    let chips: [LifeChip]
+    /// The picture for topics that choose their own; weather derives it from the weather code.
+    let scene: LifeScene?
     let sentences: [Sentence]
     let vocabulary: [Vocabulary]
     let exercises: [Exercise]

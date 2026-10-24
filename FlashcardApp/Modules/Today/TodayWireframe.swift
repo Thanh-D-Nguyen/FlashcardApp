@@ -9,6 +9,8 @@ protocol TodayWireframeInterface: AnyObject {
     func showLevels()
     func showLifeLesson(cityID: String, lesson: LifeLesson)
     func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void)
+    /// The system page of this app's settings, where the learner can allow the location again.
+    func openAppSettings()
 }
 
 final class TodayWireframe: BaseWireframe<TodayViewController> {
@@ -17,7 +19,7 @@ final class TodayWireframe: BaseWireframe<TodayViewController> {
         super.init(viewController: controller)
         controller.title = MainTabbarName.today.title
         controller.tabBarItem = MainTabbarName.today.tabBarItem
-        let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self, life: TodayLifeLoader())
+        let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self, life: TodayLifeHubLoader(weather: TodayLifeLoader()))
         presenter.view = controller
         controller.presenter = presenter
     }
@@ -100,6 +102,11 @@ extension TodayWireframe: TodayWireframeInterface {
         }
         sheet.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel))
         present(sheet)
+    }
+
+    func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     private func present(_ sheet: UIAlertController) {

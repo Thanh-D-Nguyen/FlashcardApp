@@ -1,0 +1,30 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "NSLocationWhenInUseUsageDescription": {
+      "comment": "Shown in the system location prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flashcard uses your location once, only when you tap \"Use my location\", to teach you the Japanese for the places around you. It is never stored or sent anywhere."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flashcard chỉ dùng vị trí của bạn một lần, khi bạn bấm “Dùng vị trí của tôi”, để dạy tiếng Nhật về những nơi quanh bạn. Vị trí không bao giờ được lưu hay gửi đi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「現在地を使う」をタップしたときに一度だけ現在地を使い、周りの場所を日本語で学べるようにします。現在地は保存も送信もされません。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.1"
+}

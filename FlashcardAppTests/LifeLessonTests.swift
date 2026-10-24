@@ -14,14 +14,14 @@ final class LifeLessonTests: XCTestCase {
         XCTAssertEqual(lesson.id, "weather:tokyo:2026-10-24")
         XCTAssertEqual(lesson.cityID, "tokyo")
         XCTAssertEqual(lesson.titleJapanese, "今日の東京の天気")
-        XCTAssertEqual(lesson.facts.date, "2026-10-24")
-        XCTAssertEqual(lesson.facts.temperatureMaxC, 16, "15.8 is shown as 16, like the lesson sentence")
-        XCTAssertEqual(lesson.facts.temperatureMinC, 14)
-        XCTAssertEqual(lesson.facts.precipitationProbabilityPercent, 80)
+        XCTAssertEqual(lesson.facts?.date, "2026-10-24")
+        XCTAssertEqual(lesson.facts?.temperatureMaxC, 16, "15.8 is shown as 16, like the lesson sentence")
+        XCTAssertEqual(lesson.facts?.temperatureMinC, 14)
+        XCTAssertEqual(lesson.facts?.precipitationProbabilityPercent, 80)
         XCTAssertEqual(lesson.source.providerName, "Open-Meteo")
         XCTAssertEqual(lesson.source.licenseStatus, .nonCommercialDevOnly)
         XCTAssertEqual(lesson.source.freshness, .live)
-        XCTAssertEqual(lesson.source.url.absoluteString, "https://open-meteo.com/")
+        XCTAssertEqual(lesson.source.url?.absoluteString, "https://open-meteo.com/")
         XCTAssertEqual(lesson.sentences.map(\.id), ["weather", "temperature", "precipitation", "umbrella"])
         XCTAssertEqual(lesson.sentences.map(\.isAdvice), [false, false, false, true], "Only the umbrella line is template advice")
         XCTAssertEqual(lesson.sentences[0].japanese, "今日の東京の天気は雨です。")
@@ -81,7 +81,7 @@ final class LifeLessonTests: XCTestCase {
 
     func test_optionalFactsMayBeAbsent() throws {
         let lesson = try LifeLessonFixtures.lesson { var f = $0["facts"] as! [String: Any]; f.removeValue(forKey: "precipitationProbabilityMaxPercent"); $0["facts"] = f }
-        XCTAssertNil(lesson.facts.precipitationProbabilityPercent)
+        XCTAssertNil(lesson.facts?.precipitationProbabilityPercent)
     }
 
     func test_theTextFollowsTheAppLanguageAndJapaneseShowsEnglish() {

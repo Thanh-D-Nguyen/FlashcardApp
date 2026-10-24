@@ -257,7 +257,12 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
     // MARK: Story
 
     private func storyViews(_ story: LifeStoryState) -> [UIView] {
-        var views: [UIView] = [eyebrow(story.eyebrow)]
+        let sceneView = LifeSceneView()
+        sceneView.layer.cornerRadius = 22
+        sceneView.layer.cornerCurve = .continuous
+        sceneView.heightAnchor.constraint(equalToConstant: 148).isActive = true
+        sceneView.configure(scene: story.scene, topic: story.topic)
+        var views: [UIView] = [sceneView, eyebrow(story.eyebrow)]
         let title = label(story.title, role: .headword, traits: .header)
         title.font = Design.TextRole.headword.font.withWeight(.semibold)
         title.accessibilityIdentifier = "life_story_title"
@@ -270,22 +275,38 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
             views.append(wrapped(story.tags.map { tag($0, color: Design.Color.warning) }))
         }
 
-        let source = UIButton(type: .system)
-        var link = UIButton.Configuration.plain()
-        link.title = story.attribution
-        link.contentInsets = .zero
-        link.titleAlignment = .leading
-        source.configuration = link
-        source.contentHorizontalAlignment = .leading
-        source.accessibilityTraits = .link
-        source.accessibilityIdentifier = "life_source_link"
-        source.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
-        source.addAction(UIAction { [weak self] _ in self?.presenter.openSource() }, for: .primaryActionTriggered)
-
-        let facts = label(story.factChips.joined(separator: "\n"), role: .meaning)
+        var factViews: [UIView] = [eyebrow(story.factsHeader)]
+        factViews += story.factChips.map { chip in
+            let text = label(chip.text, role: .meaning)
+            let image = UIImageView(image: chip.symbol.flatMap { UIImage(systemName: $0) })
+            image.tintColor = Design.Color.accent
+            image.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .body)
+            image.setContentHuggingPriority(.required, for: .horizontal)
+            image.widthAnchor.constraint(equalToConstant: 26).isActive = true
+            image.contentMode = .center
+            let row = UIStackView(arrangedSubviews: [image, text])
+            row.spacing = Design.Spacing.s
+            row.alignment = .firstBaseline
+            return row
+        }
+        factViews.append(label(story.sourceLine, role: .metadata))
+        if !story.attribution.isEmpty {
+            let source = UIButton(type: .system)
+            var link = UIButton.Configuration.plain()
+            link.title = story.attribution
+            link.contentInsets = .zero
+            link.titleAlignment = .leading
+            source.configuration = link
+            source.contentHorizontalAlignment = .leading
+            source.accessibilityTraits = .link
+            source.accessibilityIdentifier = "life_source_link"
+            source.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+            source.addAction(UIAction { [weak self] _ in self?.presenter.openSource() }, for: .primaryActionTriggered)
+            factViews.append(source)
+        }
+        let facts = card(factViews, spacing: Design.Spacing.xs)
         facts.accessibilityIdentifier = "life_facts"
-        let sourceLine = label(story.sourceLine, role: .metadata)
-        views.append(card([eyebrow(story.factsHeader), facts, sourceLine, source], spacing: Design.Spacing.xs))
+        views.append(facts)
 
         views.append(eyebrow(story.sentencesHeader))
         for (index, sentence) in story.sentences.enumerated() {
@@ -293,8 +314,9 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
             japanese.accessibilityIdentifier = "life_sentence_\(index)"
             var rows: [UIView] = []
             if sentence.isAdvice { rows.append(wrapped([tag(NSLocalizedString("Tip", comment: "Label on a suggestion that is not a source fact"))])) }
-            rows += [japanese, label(sentence.reading, role: .reading), label(sentence.translation, role: .meaning),
-                     label(sentence.explanation, role: .metadata)]
+            rows.append(japanese)
+            if !sentence.reading.isEmpty { rows.append(label(sentence.reading, role: .reading)) }
+            rows += [label(sentence.translation, role: .meaning), label(sentence.explanation, role: .metadata)]
             views.append(card(rows))
         }
         views.append(primaryButton(story.ctaTitle, id: "life_story_start") { [weak self] in self?.presenter.startPractice() })
