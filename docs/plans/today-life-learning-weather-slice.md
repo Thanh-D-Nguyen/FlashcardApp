@@ -118,7 +118,7 @@ Tài chính/xổ số chỉ được dùng làm ngữ cảnh học từ và các
 2. Nội dung tiếng Nhật do mẫu cố định tạo, đã tự kiểm cách đọc số/phần trăm, nhưng **chưa có người biên tập Nhật ngữ xác nhận** (chủ sở hữu nội dung chưa được chỉ định). Cấp độ «N4» là ước tính biên tập.
 3. Cache trong bộ nhớ một tiến trình: nhiều bản API sẽ mỗi bản gọi nhà cung cấp riêng (10 thành phố × số bản; vẫn rất thấp so với giới hạn).
 4. Chưa kiểm accessibility trên thiết bị/VoiceOver thật; chưa kiểm ngôn ngữ ja/vi bằng mắt.
-5. Backend nằm trên nhánh riêng vì thư mục chính có thay đổi chưa commit của agent khác; khi merge cần xử lý xung đột tiềm năng ở `docs/openapi.json`, `docs/api-route-inventory.json`, `apps/api-go/cmd/route-contract/main.go`.
+5. Backend nằm trên nhánh riêng `feat/life-weather-lesson`. Trong lúc làm, agent khác đã commit lên `main` (`74f6e107`, `797ea60b`); thử merge (không thay đổi gì) cho thấy xung đột ở `apps/api-go/cmd/route-contract/main.go` (giữ cả hai mục `verifiedOperations`) và `docs/api-route-inventory.json` (chạy lại `go run ./cmd/route-contract -root ../..` rồi `-check`); `docs/openapi.json` tự gộp được. Sau khi gộp phải chạy lại `pnpm quality` vì vân tay task đổi.
 6. Test flaky không liên quan: `TestAudit153SocialAdminContractsPersistAcrossTemplateAndEventFlows` thất bại một lần trong một lần chạy toàn bộ (đạt 6/6 khi chạy riêng và đạt ở các lần chạy toàn bộ khác); không sửa/không nới lỏng.
 7. Ổ đĩa máy dev đầy 100% do `test-products` của công cụ test (77 GB, đã xóa phần sinh lại được): lỗi hạ tầng, không phải lỗi mã.
 
