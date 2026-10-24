@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today — Học từ cuộc sống: wireframe lát cắt thời tiết</title>
+<style>
+  :root {
+    --bg: #F6F3ED; --surface: #FFFFFF; --ink: #1c1c1e; --ink2: #6b6b70; --line: #d9d5cc;
+    --hero: #23406B; --on-hero: #F6F3ED; --accent: #23406B; --ok: #1E6B34; --warn: #8A4B00; --err: #B3261E;
+    --page: #e9e6df;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0F0F10; --surface:#1C1C1E; --ink:#f2f2f2; --ink2:#a0a0a6; --line:#38383a; --hero:#24406E; --accent:#8FB4F0; --ok:#34c759; --warn:#ff9f0a; --err:#ff6961; --page:#1a1a1c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px 16px 64px; background:var(--page); color:var(--ink); font:15px/1.45 -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+  h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:17px; margin:40px 0 4px; } p.note { color:var(--ink2); margin:0 0 16px; max-width:70ch; }
+  .row { display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; }
+  figure { margin:0; } figcaption { font-size:13px; color:var(--ink2); margin-top:8px; max-width:300px; }
+  .phone { width:300px; min-height:560px; background:var(--bg); border:1px solid var(--line); border-radius:34px; padding:16px 14px 12px; display:flex; flex-direction:column; gap:10px; overflow:hidden; position:relative; }
+  .nav { font-size:11px; color:var(--ink2); display:flex; justify-content:space-between; }
+  .title { font-size:26px; font-weight:700; margin:2px 2px 0; }
+  .hero { background:var(--hero); color:var(--on-hero); border-radius:24px; padding:16px; }
+  .hero .eye { font-size:10px; letter-spacing:.08em; opacity:.78; } .hero .big { font:600 44px/1 "Hiragino Mincho ProN", serif; margin:6px 0 2px; } .hero .cap { opacity:.78; font-size:13px; }
+  .btn { display:inline-block; background:var(--on-hero); color:#1B2F52; border-radius:999px; padding:10px 16px; font-weight:600; font-size:14px; margin-top:10px; }
+  .btn.solid { background:var(--accent); color:var(--surface); } .btn.ghost { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  .btn.full { display:block; text-align:center; }
+  .list { border-top:1px solid var(--line); } .li { padding:10px 2px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; font-size:14px; }
+  .li small { color:var(--ink2); }
+  .card { background:var(--surface); border-radius:20px; padding:14px; }
+  .eyebrow { font-size:10px; font-weight:600; letter-spacing:.06em; color:var(--ink2); }
+  .jp { font:600 20px/1.35 "Hiragino Mincho ProN", "Hiragino Sans", serif; } .rd { font-size:12px; color:var(--ink2); } .meta { font-size:12px; color:var(--ink2); }
+  .fact { display:flex; gap:10px; flex-wrap:wrap; font-size:13px; margin:6px 0; } .chip { background:var(--bg); border-radius:999px; padding:3px 10px; }
+  .tag { display:inline-block; font-size:10px; font-weight:600; border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--ink2); }
+  .tag.dev { color:var(--warn); border-color:var(--warn); }
+  .opt { border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:6px 0; font-size:15px; background:var(--surface); }
+  .opt.ok { border-color:var(--ok); color:var(--ok); } .opt.bad { border-color:var(--err); color:var(--err); }
+  .input { border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:12px; font-size:18px; }
+  .ok-t { color:var(--ok); font-weight:600; } .err-t { color:var(--err); font-weight:600; } .warn-t { color:var(--warn); font-weight:600; }
+  .check { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--line); } .box { width:20px; height:20px; border-radius:6px; border:2px solid var(--accent); flex:none; background:var(--accent); }
+  .tabs { margin-top:auto; border-top:1px solid var(--line); padding-top:8px; display:flex; justify-content:space-around; font-size:11px; color:var(--ink2); }
+  .tabs b { color:var(--accent); }
+  .skel { height:12px; border-radius:6px; background:var(--line); margin:8px 0; }
+  .badge-rej { position:absolute; top:10px; right:12px; font-size:11px; color:var(--err); font-weight:700; }
+  .badge-sel { position:absolute; top:10px; right:12px; font-size:11px; color:var(--ok); font-weight:700; }
+  table { border-collapse:collapse; font-size:13px; max-width:760px; } td, th { border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; }
+</style>
+</head>
+<body>
+<h1>Today — “Học từ cuộc sống / Learn from Life / 暮らしから学ぶ”</h1>
+<p class="note">Wireframe cho lát cắt đầu tiên: <b>今日の天気</b>. Chữ trong khung là minh họa bố cục, <b>không phải dữ liệu thời tiết thật</b>. Màu, chữ và bán kính lấy từ <code>Design</code> hiện có (washi, chàm 藍, một khối nổi hero). Không có glass trên nội dung: chỉ thanh tab/nav hệ thống dùng Liquid Glass.</p>
+
+<h2>1. Hai hướng bố cục cho Today</h2>
+<p class="note">Chọn <b>A</b>. Hero ôn tập vẫn là hành động chính; phần đời sống là một thẻ nhỏ, phẳng, bên dưới tiến độ; một hàng phụ “Khám phá chủ đề”.</p>
+<div class="row">
+  <figure>
+    <div class="phone"><span class="badge-sel">ĐƯỢC CHỌN</span>
+      <div class="nav"><span>9:41</span><span>Hôm nay</span></div><div class="title">Hôm nay</div>
+      <div class="hero"><div class="eye">BỘ THẺ HIỆN TẠI</div><div style="font-weight:600">Giao tiếp công việc</div><div class="big">8 <span class="cap" style="font:13px sans-serif">thẻ cần ôn</span></div><span class="btn">Bắt đầu ôn →</span></div>
+      <div class="list"><div class="li"><span>Bộ thẻ</span><small>Giao tiếp ›</small></div><div class="li"><span>Thời lượng</span><small>5 phút ›</small></div></div>
+      <div><div class="eyebrow">TIẾN ĐỘ HÔM NAY</div><div>Chưa lưu gì hôm nay.</div></div>
+      <div class="card"><div class="eyebrow">HỌC TỪ CUỘC SỐNG</div>
+        <div class="jp">今日の東京の天気</div><div class="rd">きょうのとうきょうのてんき</div>
+        <div class="fact"><span class="chip">雨</span><span class="chip">16° / 14°</span><span class="chip">80%</span></div>
+        <div class="meta">Open-Meteo · cập nhật 08:00 · ~2 phút · N4</div>
+        <span class="btn solid">Học bài này</span> <span class="meta">Tokyo ▾</span></div>
+      <div class="list"><div class="li"><span>Khám phá chủ đề</span><small>›</small></div><div class="li"><span>Học theo cấp độ</span><small>›</small></div></div>
+      <div class="tabs"><b>Hôm nay</b><span>Từ điển</span><span>Thẻ</span><span>Cài đặt</span></div></div>
+    <figcaption><b>A — Thẻ ngữ cảnh nhỏ.</b> Hero và hai hàng cài đặt giữ nguyên vị trí; “Bắt đầu ôn” nhìn thấy không cần cuộn. Một đề xuất, một CTA, nguồn và giờ cập nhật nằm ngay trong thẻ.</figcaption>
+  </figure>
+  <figure>
+    <div class="phone"><span class="badge-rej">BỊ LOẠI</span>
+      <div class="nav"><span>9:41</span><span>Hôm nay</span></div><div class="title">Hôm nay</div>
+      <div class="card" style="padding:0;overflow:hidden"><div style="background:linear-gradient(#7fa8d8,#cfe0f2);height:120px;padding:12px;color:#fff;font:700 40px serif">☔ 16°</div>
+        <div style="padding:12px"><div class="eyebrow">HÔM NAY Ở TOKYO</div><div class="jp">今日は雨です</div><div class="meta">Vuốt để xem thêm chủ đề →</div></div></div>
+      <div class="hero"><div class="eye">BỘ THẺ HIỆN TẠI</div><div style="font-weight:600">Giao tiếp công việc</div><div class="big">8</div><span class="btn">Bắt đầu ôn →</span></div>
+      <div class="list"><div class="li"><span>Bộ thẻ</span><small>›</small></div></div>
+      <div class="tabs"><b>Hôm nay</b><span>Từ điển</span><span>Thẻ</span><span>Cài đặt</span></div></div>
+    <figcaption><b>B — Thẻ ảnh lớn lên đầu, carousel.</b> Giành vùng nhìn đầu với hero ôn, đẩy “Bắt đầu ôn” xuống, gợi ý cuộn chủ đề (nguy cơ feed), gradient trang trí; nghĩa tiếng Nhật nằm trên nền ảnh khó đọc.</figcaption>
+  </figure>
+</div>
+<h2>Tiêu chí chọn</h2>
+<table>
+  <tr><th>Tiêu chí</th><th>A: thẻ nhỏ dưới tiến độ</th><th>B: thẻ ảnh lớn / carousel</th></tr>
+  <tr><td>Thứ bậc thị giác</td><td>Hero ôn là khối nổi duy nhất; thẻ phẳng thứ cấp</td><td>Hai khối cạnh tranh; hành động chính bị đẩy xuống</td></tr>
+  <tr><td>Tải nhận thức</td><td>1 đề xuất, 1 CTA, 1 hàng phụ</td><td>Nhiều đề xuất, cuộn ngang</td></tr>
+  <tr><td>Đọc chữ Nhật</td><td>Chữ trên nền surface đặc, tương phản cao</td><td>Chữ trên ảnh/gradient</td></tr>
+  <tr><td>Vùng chạm / a11y</td><td>Nút ≥ 44 pt, một phần tử VoiceOver cho dữ kiện</td><td>Carousel khó cho VoiceOver/Switch Control</td></tr>
+  <tr><td>Kiểm soát người dùng</td><td>Thành phố do người chọn; không tự cuộn</td><td>Tự gợi ý nhiều chủ đề</td></tr>
+  <tr><td>Phụ thuộc dữ liệu</td><td>Một API; lỗi chỉ ảnh hưởng thẻ này</td><td>Cần ảnh/asset có bản quyền</td></tr>
+</table>
+
+<h2>2. Hành trình học (một màn hình, bốn giai đoạn)</h2>
+<p class="note">Today → Câu chuyện → Bài tập → Lưu từ → Hoàn tất → Today. Nút quay lại của hệ thống rời bài học ở mọi bước; không có modal chặn.</p>
+<div class="row">
+  <figure><div class="phone"><div class="nav"><span>‹ Hôm nay</span><span>1 / 4</span></div>
+    <div class="eyebrow">TOKYO ▾ · THỜI TIẾT HÔM NAY</div>
+    <div class="card"><div class="eyebrow">DỮ KIỆN TỪ NGUỒN <span class="tag">trực tiếp</span> <span class="tag dev">dev · phi thương mại</span></div>
+      <div class="fact"><span class="chip">Mưa</span><span class="chip">cao 16° · thấp 14°</span><span class="chip">mưa 80%</span></div>
+      <div class="meta">Open-Meteo · quan sát 08:00 · tải 08:05<br>Weather data by Open-Meteo.com</div></div>
+    <div class="eyebrow">CÂU HỌC (do mẫu tạo, không phải dữ liệu nguồn)</div>
+    <div class="card"><div class="jp">今日の東京の天気は雨です。</div><div class="rd">きょうのとうきょうのてんきはあめです。</div><div class="meta">Hôm nay thời tiết ở Tokyo là mưa.</div><div class="meta">“A は B です” = “A là B”.</div></div>
+    <div class="card"><div class="jp">傘を持っていきましょう。</div><div class="rd">かさをもっていきましょう。</div><div class="meta"><span class="tag">gợi ý</span> Hãy mang theo ô nhé.</div></div>
+    <span class="btn solid full">Thử nhớ lại →</span></div>
+    <figcaption>① Câu chuyện: dữ kiện và câu học tách khối, nhãn “gợi ý” cho dòng không phải dữ kiện. Nguồn, giờ, giấy phép một chạm.</figcaption></figure>
+  <figure><div class="phone"><div class="nav"><span>‹ Hôm nay</span><span>2 / 4 · Bài tập 1/2</span></div>
+    <div class="eyebrow">NHỚ LẠI (không nhìn bài)</div>
+    <div class="card"><div class="jp">今日の東京の天気は＿＿です。</div><div class="meta">Gõ từ tiếng Nhật chỉ “mưa”.</div></div>
+    <div class="input">あめ</div>
+    <span class="btn solid full">Kiểm tra</span>
+    <div class="card"><div class="ok-t">✓ Đúng</div><div>Đáp án: 雨 (あめ) — mưa.</div></div>
+    <span class="btn ghost full">Tiếp</span></div>
+    <figcaption>② Nhớ lại: gõ đáp án (chấp nhận 雨 hoặc あめ); phản hồi và giải thích hiện <i>sau</i> khi trả lời. Bài 2 là chọn cách đọc “16度” (nhận biết, ghi nhãn đúng kỹ năng).</figcaption></figure>
+  <figure><div class="phone"><div class="nav"><span>‹ Hôm nay</span><span>3 / 4</span></div>
+    <div class="eyebrow">LƯU TỪ VÀO BỘ THẺ</div>
+    <div class="card">
+      <div class="check"><span class="box"></span><div><div class="jp" style="font-size:17px">雨 <span class="rd">あめ</span></div><div class="meta">mưa</div></div></div>
+      <div class="check"><span class="box"></span><div><div class="jp" style="font-size:17px">最高気温 <span class="rd">さいこうきおん</span></div><div class="meta">nhiệt độ cao nhất</div></div></div>
+      <div class="check"><span class="box"></span><div><div class="jp" style="font-size:17px">傘 <span class="rd">かさ</span></div><div class="meta">cái ô</div></div></div></div>
+    <div class="row" style="gap:6px"><span class="btn ghost">Vào: Giao tiếp ▾</span></div>
+    <span class="btn solid full">Lưu 3 từ</span><span class="btn ghost full">Để sau</span></div>
+    <figcaption>③ Lưu: chọn từ và bộ thẻ (bộ hiện có hoặc “Học từ cuộc sống” mới). Nút chỉ báo thành công sau khi Realm ghi xong; bấm lặp không tạo thẻ trùng.</figcaption></figure>
+  <figure><div class="phone"><div class="nav"><span>‹ Hôm nay</span><span>4 / 4</span></div>
+    <div class="title" style="font-size:22px">Xong bài hôm nay</div>
+    <div class="card"><div class="eyebrow">BÀI TẬP</div><div><span class="ok-t">Hoàn thành</span> · 2 / 2 đúng</div></div>
+    <div class="card"><div class="eyebrow">THẺ ĐÃ LƯU</div><div><span class="ok-t">Đã lưu 3 từ</span> vào “Giao tiếp công việc”</div><div class="meta">Chưa có lượt ôn nào được ghi. Lịch ôn bắt đầu khi bạn học các thẻ này.</div></div>
+    <span class="btn solid full">Ôn các thẻ này</span><span class="btn ghost full">Về Hôm nay</span></div>
+    <figcaption>④ Hoàn tất: tách “làm xong bài” khỏi “đã lưu thẻ” và khỏi “đã ghi lượt ôn” (không có streak/điểm bịa).</figcaption></figure>
+</div>
+
+<h2>3. Trạng thái</h2>
+<div class="row">
+  <figure><div class="phone" style="min-height:0"><div class="card"><div class="eyebrow">HỌC TỪ CUỘC SỐNG</div><div class="skel" style="width:70%"></div><div class="skel" style="width:90%"></div><div class="meta">Đang tải bài thời tiết…</div></div></div><figcaption>Đang tải: giữ chỗ cùng chiều cao, hero ôn không đổi.</figcaption></figure>
+  <figure><div class="phone" style="min-height:0"><div class="card"><div class="eyebrow">HỌC TỪ CUỘC SỐNG</div><div class="warn-t">Không có kết nối</div><div class="meta">Bạn vẫn ôn các thẻ đã lưu bình thường.</div><span class="btn ghost">Thử lại</span></div></div><figcaption>Offline/lỗi: chỉ khối này báo lỗi; số thẻ cần ôn không bị đổi.</figcaption></figure>
+  <figure><div class="phone" style="min-height:0"><div class="card"><div class="eyebrow">HỌC TỪ CUỘC SỐNG</div><div class="jp" style="font-size:17px">今日の東京の天気</div><div class="meta"><span class="tag" style="color:var(--warn);border-color:var(--warn)">dữ liệu cũ</span> Không tải được bản mới; cập nhật lúc 08:00.</div><span class="btn solid">Học bài này</span></div></div><figcaption>Cũ (cùng ngày): hiện nhãn “dữ liệu cũ” và giờ thật. Khác ngày: không hiện như “hôm nay”.</figcaption></figure>
+  <figure><div class="phone" style="min-height:0"><div class="card"><div class="eyebrow">HỌC TỪ CUỘC SỐNG</div><div>Chưa có bài hôm nay.</div><div class="meta">Thử thành phố khác hoặc học theo cấp độ.</div></div></div><figcaption>Trống/không khả dụng (máy chủ chưa bật nguồn thời tiết): thẻ ẩn hẳn hoặc thông báo; không số liệu giả.</figcaption></figure>
+  <figure><div class="phone" style="min-height:0"><div class="card"><div class="eyebrow">LƯU TỪ</div><div class="err-t">Chưa lưu được</div><div class="meta">Dữ liệu trên máy không ghi được. Chưa có thẻ nào được thêm.</div><span class="btn solid">Thử lại</span> <span class="btn ghost">Để sau</span></div></div><figcaption>Lưu lỗi: không báo thành công, giữ lựa chọn, thử lại an toàn (id thẻ cố định → không trùng).</figcaption></figure>
+  <figure><div class="phone" style="min-height:0"><div class="card"><div class="eyebrow">LƯU TỪ</div><div class="ok-t">Đã có sẵn</div><div class="meta">3 từ này đã có trong “Giao tiếp công việc”. Không thêm thẻ trùng.</div></div></div><figcaption>Đã lưu trước đó: báo “đã có”, không ghi lần hai.</figcaption></figure>
+</div>
+<h2>4. Ghi chú thiết kế</h2>
+<p class="note">Cỡ chữ Dynamic Type theo text style; câu Nhật xuống dòng, không cắt; hàng chọn cách đọc là nút ≥ 44 pt xếp dọc (không lưới); VoiceOver: thẻ Today đọc “Học từ cuộc sống, 今日の東京の天気, nguồn Open-Meteo, cập nhật 08:00, khoảng 2 phút” rồi tới nút; phản hồi đúng/sai gửi thông báo accessibility; chuyển giai đoạn là cross-fade ngắn và tắt khi Reduce Motion. Furigana: dòng đọc hiragana bên dưới câu (UIKit không có ruby inline bền vững), không che nghĩa. Trong giao diện tiếng Nhật, phần dịch hiển thị tiếng Anh (backend chỉ có vi/en).</p>
+</body>
+</html>
