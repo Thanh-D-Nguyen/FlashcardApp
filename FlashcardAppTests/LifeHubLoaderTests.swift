@@ -301,7 +301,17 @@ final class LifeFeedMapperTests: XCTestCase {
         XCTAssertEqual(date.lesson?.provenance, .live)
         XCTAssertEqual(date.lesson?.source.url?.absoluteString, "https://example.org/source")
         XCTAssertEqual(date.lesson?.source.attributionText, "Source: Cabinet Office")
+        XCTAssertEqual(date.lesson?.cityID, "tokyo")
         XCTAssertEqual(date.scene, LifeScene.date(day: 24, weekday: "土"))
+    }
+
+    func test_feedChipsUseTheRequestedLanguage() throws {
+        let dto = try LifeFeedFixtures.dto(LifeFeedFixtures.typical)
+        let english = try LifeFeedMapper.cards(from: dto, requestedCityID: "tokyo", language: .english)
+        let vietnamese = try LifeFeedMapper.cards(from: dto, requestedCityID: "tokyo", language: .vietnamese)
+
+        XCTAssertEqual(english.first?.chips.first?.text, "Holiday")
+        XCTAssertEqual(vietnamese.first?.chips.first?.text, "Ngày lễ")
     }
 
     func test_aSampleFromTheServerStaysASample() throws {

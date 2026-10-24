@@ -33,14 +33,15 @@ enum LifeFeedMapper {
         guard dto.schemaVersion == 1, dto.cityId == requestedCityID else { throw LearnerAPIError.invalidResponse }
         var seen = Set<String>()
         let cards = dto.cards.compactMap { entry -> LifeFeedCard? in
-            guard seen.insert(entry.id).inserted, let lesson = try? lesson(from: entry) else { return nil }
+            guard seen.insert(entry.id).inserted,
+                  let lesson = try? lesson(from: entry, requestedCityID: requestedCityID, language: language) else { return nil }
             return card(for: lesson, language: language)
         }
         if !dto.cards.isEmpty, cards.isEmpty { throw LearnerAPIError.invalidResponse }
         return cards
     }
 
-    static func lesson(from card: BJTLifeFeedDTO.Card) throws -> LifeLesson {
+    static func lesson(from card: BJTLifeFeedDTO.Card, requestedCityID: String, language: AppLanguage) throws -> LifeLesson {
         guard let topic = LifeTopic(rawValue: card.topic), card.provenance == "live" || card.provenance == "sample",
               let provenance = LifeProvenance(rawValue: card.provenance), let scene = scene(from: card.scene, topic: topic) else {
             throw LearnerAPIError.invalidResponse
@@ -56,9 +57,8 @@ enum LifeFeedMapper {
         let licence = dto.source.licenseStatus.flatMap(LifeLesson.LicenseStatus.init(rawValue:)) ?? .notApplicable
         let exercises = try dto.exercises.map { try LifeLessonInteractor.exercise(from: $0) }
         let text = { (value: BJTLifeTextDTO) in LifeText(vi: value.vi, en: value.en) }
-        let language = AppLanguage.current
         return LifeLesson(
-            id: dto.id, topic: topic, provenance: provenance, level: dto.level, cityID: card.id,
+            id: dto.id, topic: topic, provenance: provenance, level: dto.level, cityID: requestedCityID,
             titleJapanese: dto.title.japanese, titleReading: dto.title.reading, title: LifeText(vi: dto.title.vi, en: dto.title.en),
             source: LifeLesson.Source(providerName: dto.source.providerName, url: url, attributionText: dto.source.attributionText, licenseName: "",
                                       licenseStatus: licence, observedAt: observedAt, fetchedAt: fetchedAt, expiresAt: expiresAt, freshness: freshness),
