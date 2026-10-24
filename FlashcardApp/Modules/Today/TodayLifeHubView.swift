@@ -52,7 +52,10 @@ final class LifeTopicCardView: UIView {
         headline.font = Design.TextRole.headword.font.withWeight(.semibold)
         reading.apply(.reading)
         summary.apply(.meaning)
+        summary.numberOfLines = 2
         meta.apply(.metadata)
+        meta.numberOfLines = 1
+        meta.lineBreakMode = .byTruncatingTail
         chips.axis = .vertical
         chips.spacing = Design.Spacing.xs
         spinner.hidesWhenStopped = true
@@ -62,7 +65,7 @@ final class LifeTopicCardView: UIView {
         sheen.isHidden = true
         layer.addSublayer(sheen)
 
-        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
         button.addAction(UIAction { [weak self] _ in self?.fire() }, for: .primaryActionTriggered)
         let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped))
         addGestureRecognizer(tap)
@@ -70,10 +73,10 @@ final class LifeTopicCardView: UIView {
         content.axis = .vertical
         content.spacing = Design.Spacing.xs
         content.isLayoutMarginsRelativeArrangement = true
-        content.layoutMargins = UIEdgeInsets(top: Design.Spacing.m, left: Design.Spacing.l, bottom: Design.Spacing.l, right: Design.Spacing.l)
+        content.layoutMargins = UIEdgeInsets(top: Design.Spacing.s, left: Design.Spacing.m, bottom: Design.Spacing.m, right: Design.Spacing.m)
         [eyebrow, headline, reading, summary, chips, spinner, meta, button].forEach(content.addArrangedSubview)
         content.setCustomSpacing(Design.Spacing.s, after: summary)
-        content.setCustomSpacing(Design.Spacing.m, after: meta)
+        content.setCustomSpacing(Design.Spacing.s, after: meta)
         let column = UIStackView(arrangedSubviews: [scene, content])
         column.axis = .vertical
         column.translatesAutoresizingMaskIntoConstraints = false
@@ -83,7 +86,7 @@ final class LifeTopicCardView: UIView {
             column.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
             column.leadingAnchor.constraint(equalTo: leadingAnchor),
             column.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scene.heightAnchor.constraint(equalToConstant: 124)
+            scene.heightAnchor.constraint(equalToConstant: 96)
         ])
     }
 
@@ -117,7 +120,7 @@ final class LifeTopicCardView: UIView {
         meta.text = card.meta
         meta.isHidden = card.meta.isEmpty
         chips.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        for chip in card.chips.prefix(3) { chips.addArrangedSubview(chipRow(chip)) }
+        for chip in card.chips.prefix(2) { chips.addArrangedSubview(chipRow(chip)) }
         chips.isHidden = card.chips.isEmpty
 
         let busy = card.status == .loading || card.status == .locating
