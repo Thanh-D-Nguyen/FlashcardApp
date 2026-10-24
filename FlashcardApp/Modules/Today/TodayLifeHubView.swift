@@ -90,6 +90,9 @@ final class LifeTopicCardView: UIView {
             badgeBox.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
             badgeBox.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.m)
         ])
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: LifeTopicCardView, _) in
+            view.updateDensity()
+        }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -112,12 +115,12 @@ final class LifeTopicCardView: UIView {
         let showsScene = card.topic != .date
         scene.isHidden = !showsScene
         sceneHeightConstraint.isActive = showsScene
-        content.layoutMargins.top = showsScene ? Design.Spacing.s : 36
         scene.configure(scene: card.scene, topic: card.topic)
         badge.text = Self.badgeText(card.provenance)
         let tint = card.provenance == .sample ? Design.Color.warning : card.provenance == .live ? Design.Color.success : Design.Color.accent
         badge.textColor = tint
         badgeBox.backgroundColor = Design.Color.surface.withAlphaComponent(0.88)
+        updateDensity()
         eyebrow.text = card.eyebrow
         headline.text = card.headlineJapanese
         reading.text = card.reading
@@ -173,6 +176,23 @@ final class LifeTopicCardView: UIView {
         headline.isAccessibilityElement = true
         headline.accessibilityTraits = card.status == .ready ? .button : .staticText
         accessibilityElements = [headline] + (button.isHidden ? [] : [button])
+    }
+
+    /// Keep the default card compact, but never trade away readable content at accessibility text sizes.
+    private func updateDensity() {
+        let accessibilityText = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        summary.numberOfLines = accessibilityText ? 0 : 2
+        meta.numberOfLines = accessibilityText ? 0 : 1
+        meta.lineBreakMode = accessibilityText ? .byWordWrapping : .byTruncatingTail
+
+        guard card?.topic == .date else {
+            content.layoutMargins.top = Design.Spacing.s
+            return
+        }
+        // The date card has no scene, so reserve exactly enough room for the overlaid provenance badge.
+        // This grows with Dynamic Type instead of relying on a fixed 36-point gap.
+        let badgeHeight = badgeBox.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
+        content.layoutMargins.top = Design.Spacing.m + badgeHeight + Design.Spacing.s
     }
 
     private func chipRow(_ chip: LifeChip) -> UIView {
