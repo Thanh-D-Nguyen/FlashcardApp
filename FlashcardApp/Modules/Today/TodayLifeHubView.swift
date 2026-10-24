@@ -299,12 +299,11 @@ final class TodayDateHeaderView: UIView {
     }
 }
 
-/// The whole hub: the date header, the city, and the cards in a paged strip the learner scrolls by hand (never on its own).
+/// The life hub: the city and cards in a paged strip the learner scrolls by hand (never on its own).
 final class TodayLifeHubView: UIView, UIScrollViewDelegate {
     var onCardAction: ((String) -> Void)?
     var onChangeCity: (() -> Void)?
 
-    private let header = TodayDateHeaderView()
     private let titleLabel = UILabel()
     private let cityButton = UIButton(type: .system)
     private let scroll = UIScrollView()
@@ -348,10 +347,9 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
         pages.isUserInteractionEnabled = false
         pages.isAccessibilityElement = false
 
-        let column = UIStackView(arrangedSubviews: [header, bar, scroll, pages])
+        let column = UIStackView(arrangedSubviews: [bar, scroll, pages])
         column.axis = .vertical
         column.spacing = Design.Spacing.s
-        column.setCustomSpacing(Design.Spacing.l, after: header)
         column.translatesAutoresizingMaskIntoConstraints = false
         addSubview(column)
         NSLayoutConstraint.activate([
@@ -377,8 +375,7 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
         for view in views.values where view.widthConstraint?.constant != cardWidth { view.widthConstraint?.constant = cardWidth }
     }
 
-    func configure(_ section: TodayHubSection, monthNumber: Int) {
-        header.configure(section.header, monthNumber: monthNumber)
+    func configure(_ section: TodayHubSection) {
         var config = cityButton.configuration
         config?.title = section.cityName
         config?.baseForegroundColor = Design.Color.accent

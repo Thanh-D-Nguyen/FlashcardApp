@@ -7,6 +7,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
 
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
+    private let dateHeader = TodayDateHeaderView()
     private let subtitleLabel = UILabel()
     private let heroView = TodayHeroView()
     private let failureView = TodayFailureView()
@@ -89,10 +90,10 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         levelsRow.configure(title: NSLocalizedString("Study by level", comment: "Row that opens the JLPT levels"), value: nil)
         levelsRow.accessibilityIdentifier = "today_levels_row"
 
+        dateHeader.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        // The review block stays first; the life hub is the next thing the learner sees, before the settings of the review.
-        [subtitleLabel, heroView, failureView, hubView, settingsGroup, progressGroup, levelsRow].forEach(stack.addArrangedSubview)
+        [dateHeader, subtitleLabel, heroView, failureView, hubView, settingsGroup, progressGroup, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.s, after: subtitleLabel)
         stack.setCustomSpacing(Design.Spacing.xl, after: hubView)
         stack.setCustomSpacing(Design.Spacing.xl, after: settingsGroup)
@@ -145,8 +146,12 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             progressDetail.text = progress.detail
             progressDetail.isHidden = progress.detail == nil
         }
+        dateHeader.isHidden = state.life == nil
         hubView.isHidden = state.life == nil
-        if let life = state.life { hubView.configure(life, monthNumber: life.header.month) }
+        if let life = state.life {
+            dateHeader.configure(life.header, monthNumber: life.header.month)
+            hubView.configure(life)
+        }
     }
 }
 
