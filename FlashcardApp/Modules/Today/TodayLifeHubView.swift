@@ -20,6 +20,7 @@ final class LifeTopicCardView: UIView {
     private let sheen = CAGradientLayer()
     private let button = UIButton(configuration: Design.Button.primary(title: " "))
     private let content = UIStackView()
+    private var sceneHeightConstraint: NSLayoutConstraint!
     private var card: LifeFeedCard?
 
     override init(frame: CGRect) {
@@ -37,14 +38,11 @@ final class LifeTopicCardView: UIView {
         badgeBox.layer.cornerCurve = .continuous
         badgeBox.translatesAutoresizingMaskIntoConstraints = false
         badgeBox.addSubview(badge)
-        scene.addSubview(badgeBox)
         NSLayoutConstraint.activate([
             badge.topAnchor.constraint(equalTo: badgeBox.topAnchor, constant: 3),
             badge.bottomAnchor.constraint(equalTo: badgeBox.bottomAnchor, constant: -3),
             badge.leadingAnchor.constraint(equalTo: badgeBox.leadingAnchor, constant: 8),
-            badge.trailingAnchor.constraint(equalTo: badgeBox.trailingAnchor, constant: -8),
-            badgeBox.topAnchor.constraint(equalTo: scene.topAnchor, constant: Design.Spacing.m),
-            badgeBox.leadingAnchor.constraint(equalTo: scene.leadingAnchor, constant: Design.Spacing.m)
+            badge.trailingAnchor.constraint(equalTo: badgeBox.trailingAnchor, constant: -8)
         ])
 
         eyebrow.apply(.eyebrow)
@@ -81,12 +79,16 @@ final class LifeTopicCardView: UIView {
         column.axis = .vertical
         column.translatesAutoresizingMaskIntoConstraints = false
         addSubview(column)
+        addSubview(badgeBox)
+        sceneHeightConstraint = scene.heightAnchor.constraint(equalToConstant: 96)
         NSLayoutConstraint.activate([
             column.topAnchor.constraint(equalTo: topAnchor),
             column.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
             column.leadingAnchor.constraint(equalTo: leadingAnchor),
             column.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scene.heightAnchor.constraint(equalToConstant: 96)
+            sceneHeightConstraint,
+            badgeBox.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
+            badgeBox.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.m)
         ])
     }
 
@@ -107,6 +109,10 @@ final class LifeTopicCardView: UIView {
     func configure(_ card: LifeFeedCard) {
         self.card = card
         cardID = card.id
+        let showsScene = card.topic != .date
+        scene.isHidden = !showsScene
+        sceneHeightConstraint.isActive = showsScene
+        content.layoutMargins.top = showsScene ? Design.Spacing.s : 36
         scene.configure(scene: card.scene, topic: card.topic)
         badge.text = Self.badgeText(card.provenance)
         let tint = card.provenance == .sample ? Design.Color.warning : card.provenance == .live ? Design.Color.success : Design.Color.accent
