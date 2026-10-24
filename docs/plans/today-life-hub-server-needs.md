@@ -1,21 +1,25 @@
-# Today · Life hub — những gì server cần bổ sung
+# Today · Life hub — hợp đồng server và trạng thái triển khai
 
-**Ngày:** 2026-10-24 · **Phía client:** đã xong và đã kiểm thử · **Phía server:** chưa có (mục này là danh sách việc)
+**Ngày:** 2026-10-24 · **Phía client:** đã triển khai · **Phía server:** đã triển khai local ở commit `7c039cbc`; chưa bật production
 
-Màn Today hiện có *life hub*: tiêu đề ngày, và dải thẻ chủ đề cuộc sống (ngày hôm nay, thời tiết, quanh bạn, tàu điện, mua sắm, tin tức, ẩm thực, mùa & văn hóa, tiền bạc, xổ số). Mỗi thẻ mở cùng một hành trình học (câu chuyện → bài nhớ lại → bài nhận biết → lưu từ → hoàn tất). Client **không cần sửa gì** khi server sẵn sàng: nó đã gọi endpoint dưới đây và tự thay nội dung mẫu bằng nội dung thật.
+Màn Today hiện có *life hub*: tiêu đề ngày, và dải thẻ chủ đề cuộc sống (ngày hôm nay, thời tiết, quanh bạn, tàu điện, mua sắm, tin tức, ẩm thực, mùa & văn hóa, tiền bạc, xổ số). Mỗi thẻ mở cùng một hành trình học (câu chuyện → bài nhớ lại → bài nhận biết → lưu từ → hoàn tất). Client đã gọi endpoint dưới đây và tự thay nội dung mẫu bằng nội dung thật khi nhận feed hợp lệ.
+
+Backend `7c039cbc` đã có `GET /api/life/feed` cho 10 thành phố, ngày/ngày lễ từ Cabinet Office, thời tiết MET Norway (CC BY 4.0) với cache/rate limit, schema + migration PostgreSQL, workflow admin tạo/kiểm duyệt/xuất bản với RBAC + audit log, validator nội dung/thời hạn/nguồn/giấy phép, OpenAPI và tài liệu tích hợp mobile. Báo cáo backend: 1.514 test Go + 490 test frontend, race/build/browser PASS; independent review APPROVE; LIFE-2 CLOSED/VERIFIED.
+
+Trước production còn ba gate: chạy migration, cấu hình `MET_NORWAY_USER_AGENT`, và xuất bản ít nhất một bài đã `reviewed` + xác nhận quyền sử dụng. Cho đến lúc đó feed chủ động trả 404 nên iOS tiếp tục dùng nội dung fallback. Chưa xác minh E2E đầy đủ iOS ↔ backend mới và đăng nhập admin thật; dữ liệu ngày lễ hiện chỉ đến hết 2027.
 
 ## 1. Hôm nay mỗi thẻ lấy dữ liệu từ đâu
 
-| Thẻ | Nguồn hiện tại | Nhãn trên thẻ | Việc server cần làm |
+| Thẻ | Nguồn hiện tại | Nhãn trên thẻ | Trạng thái / việc còn lại |
 | --- | --- | --- | --- |
-| Ngày hôm nay | Lịch của máy (ngày, thứ, năm Reiwa, mùa, lời chào — chính xác, tính tại chỗ) | `ON THIS DEVICE` | Trả thẻ `date` có **ngày lễ, 今日は何の日, lịch sự kiện** (client dùng thẻ của server thay thẻ tính tại máy) |
-| Thời tiết | `GET /api/life/lessons/weather` (đã có, Open-Meteo, **giấy phép thương mại chưa giải quyết**) | `LIVE` | Đưa vào feed; chuyển nguồn sang nơi có quyền thương mại |
+| Ngày hôm nay | Feed server dùng dữ liệu ngày/ngày lễ Cabinet Office; khi feed 404 thì dùng lịch của máy | `LIVE` hoặc `ON THIS DEVICE` | Đã triển khai; dữ liệu ngày lễ hiện đến hết 2027 |
+| Thời tiết | Feed server dùng MET Norway, CC BY 4.0, có cache/rate limit; khi feed không có thì client giữ fallback hiện tại | `LIVE` | Đã triển khai; production cần `MET_NORWAY_USER_AGENT` |
 | Quanh bạn | **Trên máy**: CoreLocation một lần (khi người dùng bấm) + Apple Maps | `ON THIS DEVICE` | Không bắt buộc. Xem §4 nếu muốn bổ sung |
-| Tàu điện, Mua sắm, Tin tức, Ẩm thực, Mùa & văn hóa, Tiền bạc, Xổ số | Bài **mẫu viết tay** trong app | `SAMPLE` + “Example content · not live data yet” | Cung cấp bài thật qua feed (§2) |
+| Tàu điện, Mua sắm, Tin tức, Ẩm thực, Mùa & văn hóa, Tiền bạc, Xổ số | Bài server đã kiểm duyệt/xác nhận quyền khi có; nếu feed 404 thì dùng bài mẫu trong app | `LIVE` hoặc `SAMPLE` | Workflow biên tập/xuất bản đã triển khai; cần có bài `reviewed` + rights-cleared trước production |
 
 Khi `GET /api/life/feed` trả ≥ 1 thẻ hợp lệ: toàn bộ bài mẫu **biến mất** (không trộn thật và mẫu). Khi trả 404: hỏi lại sau 1 giờ; lỗi khác: hỏi lại sau 60 giây; trong lúc đó vẫn hiện bài mẫu.
 
-## 2. Việc ưu tiên P0 — `GET /api/life/feed`
+## 2. Hợp đồng P0 — `GET /api/life/feed`
 
 Công khai, không cần phiên, giới hạn tốc độ như các route public khác. Query: `city=<id>` (một trong `tokyo, yokohama, osaka, nagoya, kyoto, sapporo, sendai, hiroshima, fukuoka, naha`; id khác → 400). Client gọi **tối đa một lần/ngày/thành phố** khi còn hiệu lực.
 
@@ -72,19 +76,17 @@ Quy tắc hợp đồng (client **bỏ** thẻ vi phạm, và **từ chối cả
 - Thời gian RFC 3339 có múi giờ (client chấp nhận có/không có phần giây lẻ). `expiresAt` không quá nửa đêm giờ Nhật.
 - Header: `Cache-Control: public, max-age=60` (ngắn hơn nếu sát nửa đêm JST, `no-store` khi dữ liệu `stale`) như route thời tiết; `404` nếu chưa bật tính năng (không trả feed rỗng giả).
 
-## 3. Nội dung và nguồn (blocker pháp lý nằm ở đây, không phải ở app)
+## 3. Nội dung, nguồn và quyền sử dụng
 
-| Chủ đề | Gợi ý nguồn | Tình trạng quyền (đã kiểm / chưa kiểm) |
+| Chủ đề | Nguồn | Trạng thái quyền / vận hành |
 | --- | --- | --- |
-| Ngày/ngày lễ | CSV ngày lễ của Cabinet Office; “今日は何の日” cần bộ dữ liệu biên tập riêng | CSV có tới 2027; điều khoản và mã hóa **chưa xác nhận**; bản `date` của server nên thay thế thẻ tính tại máy chứ không bắt buộc |
-| Thời tiết | Open-Meteo (đang dùng) hoặc JMA | Gói miễn phí **phi thương mại**; JMA JSON không được tài liệu hóa; xem [weather slice §3, §9](today-life-learning-weather-slice.md) |
-| Tàu điện | ODPT hoặc thông báo biên tập (không cào trang công ty) | ODPT: **chưa đọc được điều khoản** |
-| Tin tức | Tóm tắt tự biên soạn + liên kết nguồn; không sao chép/dịch NHK | Quyền NHK **chưa xác nhận** (không mặc nhiên cho phép) |
-| Mua sắm, Ẩm thực, Mùa & văn hóa | Biên tập (lịch mùa/lễ hội tính theo ngày, thực đơn mùa) | Tự sở hữu nội dung |
-| Tiền bạc | **Chỉ giải thích**: từ vựng, cách đọc số liệu đã công bố. Không tỷ giá trực tiếp trừ khi có giấy phép | J-Quants: **chưa xác nhận** được phép hiển thị lại; tuyệt đối không khuyến nghị mua/bán |
-| Xổ số | **Chỉ giải thích**: từ vựng, đọc số. Không dự đoán, không liên kết cá cược | Dữ liệu kết quả: nguồn và quyền **chưa xác nhận** |
+| Ngày/ngày lễ | Cabinet Office | Backend đã tích hợp; dữ liệu hiện chỉ đến hết 2027 |
+| Thời tiết | MET Norway | CC BY 4.0; backend đã tích hợp cache/rate limit; production cần cấu hình User-Agent đúng yêu cầu |
+| Tàu điện, Tin tức, Mua sắm, Ẩm thực, Mùa & văn hóa | Nội dung biên tập + nguồn theo từng bài | Chỉ bài đã kiểm duyệt, còn hạn và xác nhận quyền sử dụng mới được xuất bản |
+| Tiền bạc | Nội dung biên tập; **chỉ giải thích** từ vựng/số liệu được phép dùng | Không khuyến nghị mua/bán; validator publication phải giữ rào chắn nội dung và quyền |
+| Xổ số | Nội dung biên tập; **chỉ giải thích** từ vựng/đọc số | Không dự đoán, không liên kết cá cược; validator publication phải giữ rào chắn nội dung và quyền |
 
-Cần một công cụ biên tập (admin) cho bài học: bảng `life_lesson` (hoặc mở rộng Daily Radar) với `topic, city, valid_from/valid_until, status (draft|reviewed|published), rights_status (unknown|cleared|blocked), reviewer, source_url`; chỉ `published` + `cleared` + còn hạn mới vào feed; người biên tập tiếng Nhật xác nhận cách đọc. Validator tự động chạy cùng quy tắc ở §2 (đáp án không nằm trong prompt, lựa chọn duy nhất, `https`) và **chặn từ khóa** cho `money`/`lottery` (khuyến nghị, dự đoán, liên kết cá cược).
+Backend đã có schema/migration và trang admin cho bài học, với tạo → kiểm duyệt → xuất bản, RBAC, audit log và validation nội dung/thời hạn/nguồn/giấy phép trước khi publish. Quy tắc client ở §2 vẫn là lớp phòng thủ cuối: feed/thẻ không hợp lệ bị bỏ hoặc từ chối.
 
 ## 4. “Quanh bạn”: vì sao nằm trên máy và khi nào cần server
 
@@ -99,8 +101,9 @@ Giới hạn cần server mới khắc phục: (a) tên địa điểm cụ th�
 3. Ghi nhận hoàn thành bài (nếu cần số liệu): `POST /api/life/lessons/{id}/complete` **có khóa idempotency** (app không retry thay đổi dữ liệu khi không có idempotency). Hiện app không gửi gì về server.
 4. Thông báo/nhắc học: không làm trong phạm vi này.
 
-## 6. Cách kiểm tra khi server xong
+## 6. Cách kiểm tra trước production
 
-1. Chạy `pnpm quality` backend cho route mới và thêm vào `docs/openapi.json` (schema `LifeFeed`, tái sử dụng `LifeText`).
-2. Với response thật: `LifeFeedMapperTests` là hợp đồng — thêm một fixture lấy từ server thật (ẩn dữ liệu nhạy cảm) và chạy.
-3. Mở app (scheme Local, `PRODUCT_BASE_URL` trỏ server): các thẻ mẫu biến mất, nhãn `SAMPLE` không còn, thẻ ngày hiện nhãn `LIVE`. Nếu vẫn thấy `SAMPLE`: kiểm tra `404`, `cityId`, `schemaVersion`, hoặc thẻ bị bỏ do vi phạm quy tắc §2.
+1. Chạy migration, cấu hình `MET_NORWAY_USER_AGENT`, rồi xuất bản ít nhất một bài đã kiểm duyệt và xác nhận quyền sử dụng.
+2. Với response thật: giữ `LifeFeedMapperTests` làm contract test và thêm fixture lấy từ server thật nếu payload thực tế có khác biệt cần khóa lại.
+3. Mở app (scheme Local, `PRODUCT_BASE_URL` trỏ server): response 200 hợp lệ phải thay bài mẫu bằng feed, giữ đúng `cityId`, ngôn ngữ chip và mở được lesson; response 404 phải tiếp tục hiển thị fallback.
+4. Chạy E2E iOS ↔ backend mới và đăng nhập admin thật trước khi coi integration production là VERIFIED.

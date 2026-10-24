@@ -1,6 +1,6 @@
 # Today · Life hub — màn Today sống động, mọi khía cạnh đời sống thành bài học
 
-**Ngày:** 2026-10-24 · **Trạng thái:** client `IMPLEMENTED_LOCAL`; server cần bổ sung: xem [today-life-hub-server-needs.md](today-life-hub-server-needs.md)
+**Ngày:** 2026-10-24 · **Trạng thái:** client `IMPLEMENTED_LOCAL`; backend `IMPLEMENTED_LOCAL` ở `7c039cbc`, còn production gates: xem [today-life-hub-server-needs.md](today-life-hub-server-needs.md)
 **Tiếp nối:** [today-life-learning-weather-slice.md](today-life-learning-weather-slice.md) (lát cắt thời tiết). Ảnh thật từ Simulator: [assets/life-hub/](assets/life-hub/) (bảng tổng hợp: `contact-sheet.png`).
 
 ![Các thẻ của life hub](assets/life-hub/contact-sheet.png)
@@ -18,11 +18,11 @@
 
 | Nhãn trên thẻ | Nghĩa | Chủ đề hiện tại |
 | --- | --- | --- |
-| `LIVE` | Dữ liệu thật từ nguồn qua server | Thời tiết (Open-Meteo, **dev only** về giấy phép) |
+| `LIVE` | Dữ liệu thật từ nguồn qua server | Ngày/ngày lễ Cabinet Office; thời tiết MET Norway (CC BY 4.0); bài biên tập đã được publish + xác nhận quyền |
 | `ON THIS DEVICE` | Tính ngay trên máy, đúng sự thật | Ngày hôm nay (lịch của máy); **Quanh bạn** (vị trí + Apple Maps) |
-| `SAMPLE` | Bài **mẫu viết tay**, chưa phải dữ liệu thật, ghi rõ “Example content · not live data yet” | Tàu điện, mua sắm, tin tức, ẩm thực, mùa & văn hóa, tiền bạc, xổ số |
+| `SAMPLE` | Bài **mẫu viết tay**, chưa phải dữ liệu thật, ghi rõ “Example content · not live data yet” | Fallback khi feed chưa được bật/không có bài đã xuất bản |
 
-Khi server có `GET /api/life/feed` (client đã gọi, đã có hợp đồng, DTO, mapper, kiểm thử), các thẻ mẫu biến mất và thẻ của server thay thế; thẻ ngày của server (biết ngày lễ) thay thẻ tính tại máy; “Quanh bạn” luôn ở trên máy. Server trả 404/lỗi thì hub quay về bản hiện tại. Bài mẫu có thể tắt bằng `-com.flashcardapp.life.samples NO`.
+`GET /api/life/feed` đã được triển khai. Khi trả 200 với feed hợp lệ, các thẻ server thay nội dung mẫu; thẻ ngày server có thể thay thẻ tính tại máy; “Quanh bạn” luôn ở trên máy. Trong giai đoạn chưa hoàn tất production gates, server chủ động trả 404 và hub giữ fallback hiện tại. Bài mẫu có thể tắt bằng `-com.flashcardapp.life.samples NO`.
 
 **Mock không giả làm thật:** nhãn SAMPLE + dòng meta, cùng với lời giải thích “Tip/advice” cho điều không phải dữ kiện. Tiền bạc và xổ số chỉ là giải thích: không tỷ giá, không dự đoán, không khuyến nghị, không liên kết cá cược (có test).
 
@@ -44,10 +44,12 @@ Khi server có `GET /api/life/feed` (client đã gọi, đã có hợp đồng, 
 - Coverage logic mới (đo bằng xcresult): `JapaneseCalendar` 100%, `LifeNearbyStory` 99,3%, `SampleLifeContent` 99%, `LifeFeedMapper` 97%, `LifeDateStory` 95,4%, `TodayLifeHub` 92,2%, `LifeLessonPresenter` 93,9%, `BJTLifeFeedAPI` 91,7%. `LifePlaceProvider` chỉ 37,8% bằng unit test (CoreLocation/MapKit không dựng được trong unit test): kiểm bằng chạy thật trên Simulator.
 - UI test thật: hub (ngày, nút ôn còn nguyên, thẻ ngày), một bài **mẫu** chạy từ Today (gõ 遅れて, chọn cách đọc, lưu; làm lại → “Đã có trong …”, không trùng) và bài thời tiết với backend thật (dev API `localhost:4011`, build setting `PRODUCT_BASE_URL`). Kết quả: **3/3 đạt** (14 s, 78 s, 51 s).
 - Thật trên Simulator: dải thẻ, vuốt snap, chấm trang, quyền vị trí (hộp thoại hệ thống với mô tả đã bản địa hóa) → “Allow While Using App” → bài quanh bạn từ vị trí giả lập → mở bài học có cảnh động.
+- Layout Today/Life card đã được mở ở `UICTContentSizeCategoryAccessibilityXXXL` trên iPhone 17e Simulator sau fix accessibility; screenshot được kiểm bằng mắt, không thấy xung đột Auto Layout.
+- Sau khi backend Life Hub hoàn thành, `LifeFeedMapperTests` chạy lại **6/6 đạt**; regression test khóa `cityID` theo thành phố được request và ngôn ngữ chip theo tham số mapper (`0e53e5a`).
 
 ## 6. Chưa kiểm / giới hạn
 
 - Chuyển động chỉ xem được qua ảnh chụp tĩnh (đã thấy mưa, lá, sóng, tàu, lịch ở các khung); chưa có đo FPS/năng lượng. CAEmitterLayer chạy chỉ khi thẻ ở trong cửa sổ; chưa đo ở iPhone cũ.
-- VoiceOver thật, Dynamic Type lớn, chế độ tối, Reduce Motion bật, iPad, thiết bị thật, ja/vi bằng mắt (chỉ vi trong UI test): chưa kiểm.
+- VoiceOver thật, chế độ tối, Reduce Motion bật, iPad, thiết bị thật, ja/vi bằng mắt (chỉ vi trong UI test): chưa kiểm.
 - Cách đọc/nội dung của bài mẫu và bài do mẫu tạo **chưa có người biên tập Nhật ngữ xác nhận**.
-- Các thẻ mẫu và hợp đồng feed là đề xuất cho server; schema server thật có thể cần điều chỉnh nhỏ.
+- E2E đầy đủ iOS ↔ backend Life Hub mới và đăng nhập admin thật chưa chạy. Backend còn phải chạy migration, cấu hình `MET_NORWAY_USER_AGENT`, xuất bản ít nhất một bài đã kiểm duyệt/xác nhận quyền; dữ liệu ngày lễ hiện đến hết 2027.

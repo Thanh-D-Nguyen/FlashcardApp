@@ -1,8 +1,8 @@
 import Foundation
 @testable import FlashcardApp
 
-/// A server feed as the contract in docs/plans/today-life-hub-server-needs.md describes it. The server does not provide it yet;
-/// these fixtures are what the app is tested against so that it works the day the server answers.
+/// A server feed matching the contract in docs/plans/today-life-hub-server-needs.md.
+/// These fixtures keep the iOS mapper pinned to the implemented backend contract.
 enum LifeFeedFixtures {
     static func text(_ vi: String, _ en: String) -> [String: Any] { ["vi": vi, "en": en] }
 
