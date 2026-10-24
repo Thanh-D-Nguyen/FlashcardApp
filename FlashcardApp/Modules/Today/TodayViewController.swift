@@ -194,22 +194,22 @@ final class TodayHeroView: UIView {
         linesStack.axis = .vertical
         linesStack.spacing = Design.Spacing.xs
         button.accessibilityIdentifier = "today_primary"
-        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 54).isActive = true
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
         button.addAction(UIAction { [weak self] _ in self?.onPrimary?() }, for: .primaryActionTriggered)
 
         let stack = UIStackView(arrangedSubviews: [eyebrow, titleLabel, figureRow, linesStack, button])
         stack.axis = .vertical
         stack.spacing = Design.Spacing.xs
-        stack.setCustomSpacing(Design.Spacing.m, after: titleLabel)
-        stack.setCustomSpacing(Design.Spacing.m, after: figureRow)
-        stack.setCustomSpacing(Design.Spacing.l, after: linesStack)
+        stack.setCustomSpacing(Design.Spacing.s, after: titleLabel)
+        stack.setCustomSpacing(Design.Spacing.s, after: figureRow)
+        stack.setCustomSpacing(Design.Spacing.m, after: linesStack)
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.xl - Design.Spacing.xs),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -(Design.Spacing.xl - Design.Spacing.xs)),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.xl - Design.Spacing.xs),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -(Design.Spacing.xl - Design.Spacing.xs))
+            stack.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
+            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.Spacing.m),
+            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.l),
+            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.l)
         ])
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: TodayHeroView, _) in
             view.updateFigureAxis()
