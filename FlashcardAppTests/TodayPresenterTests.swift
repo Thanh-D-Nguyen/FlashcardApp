@@ -285,7 +285,11 @@ private final class FakeTodayWireframe: TodayWireframeInterface {
     var deckChoosers: [(choices: [TodayDeckChoice], selectedID: String?, select: (String) -> Void)] = []
     var budgetChoosers: [(current: Int, select: (Int) -> Void)] = []
     var levelsOpened = 0
+    var lifeLessons: [(cityID: String, lesson: LifeLesson)] = []
+    var cityChoosers: [(selectedID: String, select: (String) -> Void)] = []
 
+    func showLifeLesson(cityID: String, lesson: LifeLesson) { lifeLessons.append((cityID, lesson)) }
+    func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void) { cityChoosers.append((selectedID, onSelect)) }
     func showStudy(deckId: String, cardIDs: [String]?) { studies.append((deckId, cardIDs)) }
     func showCreateDeck(onFinish: @escaping () -> Void) { createFlows.append(onFinish) }
     func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void) {
@@ -298,4 +302,108 @@ private final class FakeTodayWireframe: TodayWireframeInterface {
 private final class SpyTodayView: TodayViewInterface {
     var renders: [TodayViewState] = []
     func render(_ state: TodayViewState) { renders.append(state) }
+}
+
+
+/// "Learn from Life" next to the review block: independent of it in both directions.
+private final class FakeLife: TodayLifeLoading {
+    var section: TodayLifeSection?
+    var lesson: LifeLesson?
+    var cityID = "tokyo"
+    var onChange: (() -> Void)?
+    var refreshes = 0, retries = 0
+    var selected: [String] = []
+
+    func refresh() { refreshes += 1 }
+    func retry() { retries += 1 }
+    func selectCity(_ id: String) { selected.append(id) }
+    func update(_ section: TodayLifeSection?) { self.section = section; onChange?() }
+}
+
+extension TodayPresenterTests {
+    private func startWithLife(_ plan: TodayPlan, life: FakeLife) -> (TodayPresenter, FakeTodayWireframe, SpyTodayView) {
+        let interactor = FakeTodayInteractor()
+        interactor.result = .success(plan)
+        let wireframe = FakeTodayWireframe()
+        let view = SpyTodayView()
+        let presenter = TodayPresenter(interactor: interactor, wireframe: wireframe, ownerKey: { "owner" }, now: { Date(timeIntervalSince1970: 1_800_000_000) }, life: life)
+        presenter.view = view
+        presenter.viewWillAppear()
+        return (presenter, wireframe, view)
+    }
+
+    private func card() throws -> TodayLifeCard { TodayLifeLoader.card(for: try LifeLessonFixtures.lesson(), language: .vietnamese) }
+
+    func test_theLifeSectionIsAskedForWhenTodayAppearsAndShownBesideTheReviewBlock() throws {
+        let life = FakeLife()
+        life.section = TodayLifeSection(content: .loaded(try card()), exploreValue: "Weather · Tokyo")
+        let (_, _, view) = startWithLife(duePlan(), life: life)
+        XCTAssertEqual(life.refreshes, 1)
+        XCTAssertEqual(view.renders.last?.life, life.section)
+        XCTAssertEqual(view.renders.last?.hero?.ctaTitle, text("Start review"), "The review block is the same with or without a lesson")
+    }
+
+    func test_whenTheLessonFailsTheReviewBlockIsUntouched() throws {
+        let life = FakeLife()
+        let (presenter, _, view) = startWithLife(duePlan(due: 12), life: life)
+        withExtendedLifetime(presenter) {}
+        let reviewOnly = view.renders.last
+        life.update(TodayLifeSection(content: .failed(title: "No", message: "offline"), exploreValue: "Weather · Tokyo"))
+        let afterFailure = try XCTUnwrap(view.renders.last)
+        XCTAssertEqual(afterFailure.hero, reviewOnly?.hero)
+        XCTAssertEqual(afterFailure.rows, reviewOnly?.rows)
+        XCTAssertEqual(afterFailure.progress, reviewOnly?.progress)
+        XCTAssertEqual(afterFailure.hero?.figure, "12", "The number of cards to review is not replaced by anything")
+        XCTAssertNotNil(afterFailure.life)
+        withExtendedLifetime(presenter) {}
+    }
+
+    func test_whenTheSavedProgressCannotBeReadTheLessonOfferIsStillThere() throws {
+        let life = FakeLife()
+        life.section = TodayLifeSection(content: .loaded(try card()), exploreValue: "Weather · Tokyo")
+        let interactor = FakeTodayInteractor()
+        interactor.result = .failure(NSError(domain: "t", code: 1))
+        let view = SpyTodayView()
+        let presenter = TodayPresenter(interactor: interactor, wireframe: FakeTodayWireframe(), ownerKey: { "owner" }, life: life)
+        presenter.view = view
+        presenter.viewWillAppear()
+        XCTAssertEqual(view.renders.last?.phase, .failed)
+        XCTAssertNotNil(view.renders.last?.life)
+    }
+
+    func test_withoutALifeLoaderTodayShowsNoOffer() {
+        start(duePlan())
+        XCTAssertNil(state.life)
+    }
+
+    func test_theLessonOpensOnlyOnceItHasLoaded() throws {
+        let life = FakeLife()
+        let (presenter, wireframe, _) = startWithLife(duePlan(), life: life)
+        life.lesson = try LifeLessonFixtures.lesson()
+        life.section = TodayLifeSection(content: .loading, exploreValue: "x")
+        presenter.openLifeLesson()
+        XCTAssertTrue(wireframe.lifeLessons.isEmpty, "While loading there is nothing to open")
+        life.update(TodayLifeSection(content: .loaded(try card()), exploreValue: "x"))
+        presenter.openLifeLesson()
+        XCTAssertEqual(wireframe.lifeLessons.count, 1)
+        XCTAssertEqual(wireframe.lifeLessons.first?.cityID, "tokyo")
+        XCTAssertEqual(wireframe.lifeLessons.first?.lesson.id, "weather:tokyo:2026-10-24")
+    }
+
+    func test_theCityChoiceStartsFromTheCurrentCityAndAppliesTheChosenOne() {
+        let life = FakeLife()
+        life.cityID = "osaka"
+        let (presenter, wireframe, _) = startWithLife(duePlan(), life: life)
+        presenter.changeLifeCity()
+        XCTAssertEqual(wireframe.cityChoosers.first?.selectedID, "osaka")
+        wireframe.cityChoosers.first?.select("naha")
+        XCTAssertEqual(life.selected, ["naha"])
+    }
+
+    func test_retryAsksTheLessonAgainWithoutReloadingTheReviewPlan() {
+        let life = FakeLife()
+        let (presenter, _, _) = startWithLife(duePlan(), life: life)
+        presenter.retryLife()
+        XCTAssertEqual(life.retries, 1)
+    }
 }

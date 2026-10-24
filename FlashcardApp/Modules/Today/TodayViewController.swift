@@ -18,6 +18,9 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let progressTitle = UILabel()
     private let progressDetail = UILabel()
     private let levelsRow = TodayRowView()
+    private let lifeGroup = UIStackView()
+    private let lifeCard = TodayLifeCardView()
+    private let lifeExploreRow = TodayRowView()
     private var refreshObservers: [NSObjectProtocol] = []
 
     override func viewDidLoad() {
@@ -88,10 +91,18 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         levelsRow.configure(title: NSLocalizedString("Study by level", comment: "Row that opens the JLPT levels"), value: nil)
         levelsRow.accessibilityIdentifier = "today_levels_row"
 
-        [subtitleLabel, heroView, failureView, settingsGroup, progressGroup, levelsRow].forEach(stack.addArrangedSubview)
+        lifeGroup.axis = .vertical
+        lifeGroup.spacing = Design.Spacing.s
+        lifeGroup.isHidden = true
+        lifeCard.accessibilityIdentifier = "today_life_card"
+        lifeExploreRow.accessibilityIdentifier = "today_life_explore_row"
+        [lifeCard, lifeExploreRow].forEach(lifeGroup.addArrangedSubview)
+
+        [subtitleLabel, heroView, failureView, settingsGroup, progressGroup, lifeGroup, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.s, after: subtitleLabel)
         stack.setCustomSpacing(Design.Spacing.xl, after: settingsGroup)
         stack.setCustomSpacing(Design.Spacing.xl, after: progressGroup)
+        stack.setCustomSpacing(Design.Spacing.xl, after: lifeGroup)
 
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -106,6 +117,9 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
 
         heroView.onPrimary = { [weak self] in self?.presenter.primaryAction() }
         failureView.onRetry = { [weak self] in self?.presenter.retry() }
+        lifeCard.onLearn = { [weak self] in self?.presenter.openLifeLesson() }
+        lifeCard.onRetry = { [weak self] in self?.presenter.retryLife() }
+        lifeExploreRow.addAction(UIAction { [weak self] _ in self?.presenter.changeLifeCity() }, for: .touchUpInside)
         // A plain UIControl sends touchUpInside (only a UIButton maps its tap to primaryActionTriggered).
         deckRow.addAction(UIAction { [weak self] _ in self?.presenter.changeDeck() }, for: .touchUpInside)
         timeRow.addAction(UIAction { [weak self] _ in self?.presenter.changeBudget() }, for: .touchUpInside)
@@ -137,6 +151,11 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             progressTitle.text = progress.title
             progressDetail.text = progress.detail
             progressDetail.isHidden = progress.detail == nil
+        }
+        lifeGroup.isHidden = state.life == nil
+        if let life = state.life {
+            lifeCard.configure(life.content)
+            lifeExploreRow.configure(title: NSLocalizedString("Explore topics", comment: "Row under the life lesson; opens the city choice"), value: life.exploreValue)
         }
     }
 }
@@ -350,5 +369,122 @@ final class TodayFailureView: UIView {
     func configure(title: String, message: String) {
         titleLabel.text = title
         messageLabel.text = message
+    }
+}
+
+
+/// The "Learn from Life" offer: a flat surface card (content, never glass) with one lesson, where it comes from, and one action.
+final class TodayLifeCardView: UIView {
+    var onLearn: (() -> Void)?
+    var onRetry: (() -> Void)?
+
+    private let eyebrow = UILabel()
+    private let tagsLabel = UILabel()
+    private let headline = UILabel()
+    private let reading = UILabel()
+    private let summary = UILabel()
+    private let facts = UILabel()
+    private let meta = UILabel()
+    private let spinner = UIActivityIndicatorView(style: .medium)
+    private let statusLabel = UILabel()
+    private let failureIcon = UIImageView(image: UIImage(systemName: "exclamationmark.triangle"))
+    private let learnButton = UIButton(configuration: Design.Button.primary(title: ""))
+    private let retryButton = UIButton(configuration: Design.Button.primary(title: NSLocalizedString("Try again", comment: "")))
+    private let lessonStack = UIStackView()
+    private let stack = UIStackView()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = Design.Color.surface
+        layer.cornerRadius = 20
+        layer.cornerCurve = .continuous
+
+        eyebrow.apply(.eyebrow)
+        eyebrow.accessibilityTraits = .header
+        tagsLabel.apply(.metadata)
+        tagsLabel.textColor = Design.Color.warning
+        headline.apply(.headword)
+        headline.font = Design.TextRole.headword.font.withWeight(.semibold)
+        headline.accessibilityIdentifier = "today_life_headline"
+        reading.apply(.reading)
+        summary.apply(.meaning)
+        facts.apply(.reading)
+        meta.apply(.metadata)
+        statusLabel.apply(.reading)
+        failureIcon.tintColor = Design.Color.warning
+        failureIcon.setContentHuggingPriority(.required, for: .horizontal)
+        failureIcon.isAccessibilityElement = false
+        learnButton.accessibilityIdentifier = "today_life_cta"
+        learnButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        learnButton.addAction(UIAction { [weak self] _ in self?.onLearn?() }, for: .primaryActionTriggered)
+        retryButton.accessibilityIdentifier = "today_life_retry"
+        retryButton.addAction(UIAction { [weak self] _ in self?.onRetry?() }, for: .primaryActionTriggered)
+
+        lessonStack.axis = .vertical
+        lessonStack.spacing = Design.Spacing.xs
+        [tagsLabel, headline, reading, summary, facts, meta].forEach(lessonStack.addArrangedSubview)
+        lessonStack.setCustomSpacing(Design.Spacing.s, after: reading)
+        lessonStack.setCustomSpacing(Design.Spacing.s, after: facts)
+
+        stack.axis = .vertical
+        stack.spacing = Design.Spacing.s
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        [eyebrow, lessonStack, spinner, statusLabel, learnButton, retryButton].forEach(stack.addArrangedSubview)
+        stack.setCustomSpacing(Design.Spacing.m, after: lessonStack)
+        addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.l),
+            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.Spacing.l),
+            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.l),
+            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.l)
+        ])
+    }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    func configure(_ content: TodayLifeSection.Content) {
+        eyebrow.text = NSLocalizedString("LEARN FROM LIFE", comment: "Section label on Today")
+        lessonStack.isHidden = true
+        spinner.isHidden = true
+        statusLabel.isHidden = true
+        learnButton.isHidden = true
+        retryButton.isHidden = true
+        spinner.stopAnimating()
+        accessibilityElements = nil
+        switch content {
+        case .loading:
+            spinner.isHidden = false
+            spinner.startAnimating()
+            statusLabel.isHidden = false
+            statusLabel.text = NSLocalizedString("Loading today's weather lesson…", comment: "")
+            statusLabel.textColor = Design.Color.textSecondary
+            accessibilityElements = [eyebrow, statusLabel]
+        case .failed(let title, let message):
+            statusLabel.isHidden = false
+            statusLabel.text = title + "\n" + message
+            statusLabel.textColor = Design.Color.textPrimary
+            retryButton.isHidden = false
+            accessibilityElements = [eyebrow, statusLabel, retryButton]
+        case .loaded(let card):
+            lessonStack.isHidden = false
+            tagsLabel.text = card.tags.joined(separator: " · ")
+            tagsLabel.isHidden = card.tags.isEmpty
+            headline.text = card.headline
+            reading.text = card.reading
+            summary.text = card.summary
+            facts.text = card.facts
+            meta.text = card.meta
+            var configuration = Design.Button.primary(title: card.ctaTitle)
+            configuration.image = UIImage(systemName: "arrow.right")
+            configuration.imagePlacement = .trailing
+            configuration.imagePadding = Design.Spacing.s
+            learnButton.configuration = configuration
+            learnButton.isHidden = false
+            // VoiceOver: the offer in one phrase, then the button.
+            headline.accessibilityLabel = [card.headline, card.summary, card.facts, card.meta, card.tags.joined(separator: ", ")]
+                .filter { !$0.isEmpty }.joined(separator: ". ")
+            [reading, summary, facts, meta, tagsLabel].forEach { $0.isAccessibilityElement = false }
+            accessibilityElements = [eyebrow, headline, learnButton]
+        }
     }
 }

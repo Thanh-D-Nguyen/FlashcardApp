@@ -961,4 +961,87 @@ final class FlashcardAppUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    // MARK: Learn from Life (needs the local backend with the weather lesson enabled; see docs/plans/today-life-learning-weather-slice.md)
+
+    private func scrollUntilHittable(_ element: XCUIElement, in scroll: XCUIElement, maxSwipes: Int = 6) {
+        var swipes = 0
+        while !element.isHittable && swipes < maxSwipes {
+            scroll.swipeUp()
+            swipes += 1
+        }
+    }
+
+    /// Runs the lesson from Today up to the save step. `answer` is typed into the recall exercise; returns the feedback text of it.
+    @discardableResult
+    private func playLifeLesson(_ app: XCUIApplication, answer: String) throws -> String {
+        let today = app.scrollViews["today_screen"]
+        let cta = app.buttons["today_life_cta"]
+        guard cta.waitForExistence(timeout: 40) else {
+            throw XCTSkip("Today shows no weather lesson: the backend does not offer it (enable it with LIFE_WEATHER_ALLOW_NONCOMMERCIAL=true) or the build points elsewhere.")
+        }
+        scrollUntilHittable(cta, in: today)
+        cta.tap()
+
+        XCTAssertTrue(app.staticTexts["life_story_title"].waitForExistence(timeout: 10), "The story opens")
+        let story = app.scrollViews["life_screen"]
+        let start = app.buttons["life_story_start"]
+        scrollUntilHittable(start, in: story)
+        start.tap()
+
+        let field = app.textFields["life_answer_field"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10), "The recall exercise asks for a typed answer")
+        field.tap()
+        field.typeText(answer)
+        app.buttons["life_primary"].tap()
+        let feedback = app.otherElements["life_feedback"]
+        XCTAssertTrue(feedback.waitForExistence(timeout: 5), "Feedback follows the answer")
+        let text = feedback.label
+        app.buttons["life_primary"].tap()                              // next
+
+        let choice = app.buttons["life_choice_0"]
+        XCTAssertTrue(choice.waitForExistence(timeout: 5), "The second exercise is a choice")
+        choice.tap()
+        app.buttons["life_primary"].tap()                              // check
+        XCTAssertTrue(app.otherElements["life_feedback"].waitForExistence(timeout: 5))
+        app.buttons["life_primary"].tap()                              // see results
+        XCTAssertTrue(app.buttons["life_save_primary"].waitForExistence(timeout: 5), "The save step follows the exercises")
+        return text
+    }
+
+    func testLifeLessonCanBeCompletedSavedAndFoundAgainWithoutDuplicates() throws {
+        let app = makeApp()
+        app.launch()
+
+        // First pass: a wrong answer shows the right one; saving stores the words.
+        let wrong = try playLifeLesson(app, answer: "zzz")
+        app.buttons["life_save_primary"].tap()
+        XCTAssertTrue(app.otherElements["life_save_done"].waitForExistence(timeout: 5), "Saved is reported after the store accepted the words")
+        app.buttons["life_save_primary"].tap()                         // continue
+        XCTAssertTrue(app.staticTexts["life_done_title"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.otherElements["life_done_save"].exists)
+        app.buttons["life_done_back"].tap()
+
+        // The words are in the learner's decks.
+        app.tabBars.buttons["tab_cards"].tap()
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 10))
+        // The deck keeps the name it was created with (another language may have created it on this simulator before).
+        let names = ["Học từ cuộc sống", "Learn from Life", "暮らしから学ぶ"]
+        func lifeDeckExists() -> Bool { names.contains { deckRow(app, named: $0).exists } }
+        var scrolls = 0
+        while !lifeDeckExists() && scrolls < 8 { app.tables["deck_library"].swipeUp(); scrolls += 1 }
+        XCTAssertTrue(lifeDeckExists(), "The Learn from Life deck is in the library")
+        app.tables["deck_library"].swipeDown()
+        app.tabBars.buttons["tab_levels"].tap()
+
+        // Second pass: the answer read from the first feedback ("… Đáp án: 雨 (あめ) — mưa.") is accepted, and nothing is added twice.
+        var answer = "zzz"
+        if let range = wrong.range(of: "Đáp án: "), let end = wrong[range.upperBound...].firstIndex(of: " ") { answer = String(wrong[range.upperBound..<end]) }
+        let again = try playLifeLesson(app, answer: answer)
+        XCTAssertTrue(again.contains("Chính xác"), "A correct answer is confirmed: \(again)")
+        app.buttons["life_save_primary"].tap()
+        let saved = app.otherElements["life_save_done"]
+        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        XCTAssertTrue(saved.label.contains("Đã có trong"), "The same words are reported as already there: \(saved.label)")
+    }
 }

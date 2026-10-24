@@ -44,6 +44,8 @@ struct TodayViewState: Equatable {
     var progress: TodayProgressText?
     var failureTitle: String?
     var failureMessage: String?
+    /// "Learn from Life": independent of the review block above. `nil` hides it.
+    var life: TodayLifeSection?
 }
 
 protocol TodayViewInterface: AnyObject {
@@ -59,6 +61,9 @@ protocol TodayPresenterInterface: AnyObject {
     func changeBudget()
     func openLevels()
     func retry()
+    func openLifeLesson()
+    func changeLifeCity()
+    func retryLife()
 }
 
 final class TodayPresenter {
@@ -68,16 +73,28 @@ final class TodayPresenter {
     private let now: () -> Date
     weak var view: TodayViewInterface?
 
+    private let life: TodayLifeLoading?
+
     private var plan: TodayPlan?
     private var state: TodayViewState?
 
+    /// `life` is optional so that the review block can be exercised alone: without it Today shows no lesson offer.
     init(interactor: TodayInteractorInterface, wireframe: TodayWireframeInterface,
          ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" },
-         now: @escaping () -> Date = Date.init) {
+         now: @escaping () -> Date = Date.init,
+         life: TodayLifeLoading? = nil) {
         self.interactor = interactor
         self.wireframe = wireframe
         self.ownerKey = ownerKey
         self.now = now
+        self.life = life
+        life?.onChange = { [weak self] in self?.lifeChanged() }
+    }
+
+    private func lifeChanged() {
+        guard var current = state else { return }
+        current.life = life?.section
+        publish(current)
     }
 
     // MARK: State
@@ -88,16 +105,20 @@ final class TodayPresenter {
             let plan = try interactor.plan(ownerKey: owner, now: now())
             self.plan = plan
             publish(Self.makeState(plan))
+            life?.refresh()
         } catch {
             logger.error("Reading today's plan failed: \(error.localizedDescription)")
             plan = nil
             publish(TodayViewState(phase: .failed, subtitle: "", hero: nil, rows: nil, progress: nil,
                                    failureTitle: NSLocalizedString("Couldn't read your progress", comment: ""),
                                    failureMessage: NSLocalizedString("The study data on this device couldn't be opened. Your data is not deleted.", comment: "")))
+            life?.refresh()
         }
     }
 
     private func publish(_ state: TodayViewState) {
+        var state = state
+        state.life = life?.section
         self.state = state
         view?.render(state)
     }
@@ -211,4 +232,16 @@ extension TodayPresenter: TodayPresenterInterface {
     func openLevels() { wireframe.showLevels() }
 
     func retry() { reload() }
+
+    func openLifeLesson() {
+        guard let life, case .loaded? = life.section?.content, let lesson = life.lesson else { return }
+        wireframe.showLifeLesson(cityID: life.cityID, lesson: lesson)
+    }
+
+    func changeLifeCity() {
+        guard let life else { return }
+        wireframe.showCityChooser(selectedID: life.cityID) { id in life.selectCity(id) }
+    }
+
+    func retryLife() { life?.retry() }
 }

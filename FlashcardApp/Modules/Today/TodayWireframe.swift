@@ -7,6 +7,8 @@ protocol TodayWireframeInterface: AnyObject {
     func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void)
     func showBudgetChooser(current: Int, onSelect: @escaping (Int) -> Void)
     func showLevels()
+    func showLifeLesson(cityID: String, lesson: LifeLesson)
+    func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void)
 }
 
 final class TodayWireframe: BaseWireframe<TodayViewController> {
@@ -15,7 +17,7 @@ final class TodayWireframe: BaseWireframe<TodayViewController> {
         super.init(viewController: controller)
         controller.title = MainTabbarName.today.title
         controller.tabBarItem = MainTabbarName.today.tabBarItem
-        let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self)
+        let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self, life: TodayLifeLoader())
         presenter.view = controller
         controller.presenter = presenter
     }
@@ -82,6 +84,22 @@ extension TodayWireframe: TodayWireframeInterface {
 
     func showLevels() {
         navigationController?.pushWireframe(HomeWireframe())
+    }
+
+    func showLifeLesson(cityID: String, lesson: LifeLesson) {
+        navigationController?.pushWireframe(LifeLessonWireframe(cityID: cityID, lesson: lesson))
+    }
+
+    func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void) {
+        let language = AppLanguage.current
+        let sheet = UIAlertController(title: NSLocalizedString("Today's weather", comment: "City chooser title"),
+                                      message: NSLocalizedString("Choose a city. Your location is never used.", comment: ""), preferredStyle: .actionSheet)
+        for city in LifeCity.all {
+            let mark = city.id == selectedID ? "✓ " : ""
+            sheet.addAction(UIAlertAction(title: mark + city.displayName(language), style: .default) { _ in onSelect(city.id) })
+        }
+        sheet.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel))
+        present(sheet)
     }
 
     private func present(_ sheet: UIAlertController) {
