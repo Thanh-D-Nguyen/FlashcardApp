@@ -93,11 +93,11 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         dateHeader.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, subtitleLabel, heroView, failureView, hubView, settingsGroup, progressGroup, levelsRow].forEach(stack.addArrangedSubview)
+        [dateHeader, subtitleLabel, heroView, failureView, settingsGroup, progressGroup, levelsRow, hubView].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.s, after: subtitleLabel)
-        stack.setCustomSpacing(Design.Spacing.xl, after: hubView)
-        stack.setCustomSpacing(Design.Spacing.xl, after: settingsGroup)
-        stack.setCustomSpacing(Design.Spacing.xl, after: progressGroup)
+        stack.setCustomSpacing(Design.Spacing.m, after: settingsGroup)
+        stack.setCustomSpacing(Design.Spacing.l, after: progressGroup)
+        stack.setCustomSpacing(Design.Spacing.xl, after: levelsRow)
 
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
