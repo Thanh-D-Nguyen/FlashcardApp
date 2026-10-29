@@ -39,6 +39,7 @@
 		42FA2265229B4B8AAB251BD8 /* ReviewHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */; };
 		430DD442B6FB684FBF7DDF1D /* DeckGeneratorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11873EA3ED9C175FB3CE6F3 /* DeckGeneratorPresenter.swift */; };
 		43A5E88DAED44EB6B50458E6 /* TodayPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013332AF3A84AF1A334EC97 /* TodayPresenterTests.swift */; };
+		448E5AD33E33A2027A240E58 /* RemoteDeckWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE125BAA1B1DA138A039267 /* RemoteDeckWireframe.swift */; };
 		4D2EE12D11D8338888E09709 /* RetiredDictionaryTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */; };
 		4DA0A4903AD1236206790933 /* DebugFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B083C077D5C5F2A240A228 /* DebugFixtures.swift */; };
 		4E29320E05A61128A18B9B39 /* CardSurfaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B799A37BDC22CAB45D3BBCB /* CardSurfaceView.swift */; };
@@ -206,6 +207,7 @@
 		B3336546E67BF4E2637C444B /* JapaneseCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C09BA9E71CCCFC64F02177 /* JapaneseCalendar.swift */; };
 		B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */; };
 		B54706FD42A98427FF57E0FA /* DictionaryAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB0ABC95B2F0626764F789 /* DictionaryAPITests.swift */; };
+		B6D8914AE28F69C26D61146F /* RemoteDeckViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC765A3B4A5F02EC29087FC5 /* RemoteDeckViewController.swift */; };
 		B79BF51CC3AAFB7445C57B4C /* DeckDirectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1349716F3450468B69CADAE0 /* DeckDirectionCell.swift */; };
 		B7D044161C7EB7E739C30D8C /* SettingsPrototypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479E6D17205D798B73B194A /* SettingsPrototypes.swift */; };
 		BC0DC8D74F4731D6344B3D0A /* LifeLessonPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA48EF5D63147D0CB215D3 /* LifeLessonPresenterTests.swift */; };
@@ -218,6 +220,7 @@
 		CE2879DE66B59A1174DED694 /* CardMediaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13B665F5C513DEBDD8A6E8C /* CardMediaTests.swift */; };
 		CEB05FC53BE04032B5E3003F /* ReviewSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBED6F7111DF4107913F896B /* ReviewSchedulerTests.swift */; };
 		CEE55422975D3913CD6E3E0C /* NativeAuthAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A421E34481835A9483C8B14 /* NativeAuthAPI.swift */; };
+		CEE70C3589FAC853280F333C /* RemoteDeckPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDB70F6BFE9167031A74224A /* RemoteDeckPresenterTests.swift */; };
 		CF7FD29A1A4960144F0DAB59 /* TodayLifeCardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EFE07F713C11937D77FC33 /* TodayLifeCardTests.swift */; };
 		CF89FB6725724760B3861841 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA758F99D144FA683A582CF /* TodayViewController.swift */; };
 		CFEB30D5910E8D9EC5B7D8CE /* DeckGeneratorInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */; };
@@ -247,6 +250,7 @@
 		F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */; };
 		FB56D4B862C02A12C9222471 /* LifeLessonTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */; };
 		FD522D81543FA020FD1D49B5 /* LifeLesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AE4F17F125884E0FFDD865 /* LifeLesson.swift */; };
+		FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -340,6 +344,7 @@
 		7DDE228DA5994703B5588750 /* FSRSReferenceVectors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSRSReferenceVectors.swift; sourceTree = "<group>"; };
 		7E69356F010E94232AF06D15 /* RCardExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCardExample.swift; sourceTree = "<group>"; };
 		7E77F62AA897954B5B91A027 /* BulkDeckImport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BulkDeckImport.swift; sourceTree = "<group>"; };
+		7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckPresenter.swift; sourceTree = "<group>"; };
 		7EADC489FA314F64A10F6D80 /* TodayInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInteractorTests.swift; sourceTree = "<group>"; };
 		8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RReviewAttempt.swift; sourceTree = "<group>"; };
 		81651ED770FBD884568B4B44 /* HomeCells.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeCells.swift; sourceTree = "<group>"; };
@@ -461,6 +466,7 @@
 		A17DBB4DB6598E49FA20AFD8 /* LifeLessonDraft.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonDraft.swift; sourceTree = "<group>"; };
 		A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RetiredDictionaryTables.swift; sourceTree = "<group>"; };
 		A9D960AD3C744128A7CA10F5 /* StudyReviewViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyReviewViews.swift; sourceTree = "<group>"; };
+		AC765A3B4A5F02EC29087FC5 /* RemoteDeckViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckViewController.swift; sourceTree = "<group>"; };
 		B13B665F5C513DEBDD8A6E8C /* CardMediaTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardMediaTests.swift; sourceTree = "<group>"; };
 		B1575B578C6A276BCF1B2746 /* CardImageView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardImageView.swift; sourceTree = "<group>"; };
 		B29806379570F82DF1A17172 /* AddCardCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddCardCell.swift; sourceTree = "<group>"; };
@@ -473,6 +479,7 @@
 		BC1146F8134E8611ACF40E4A /* CardReviewPresenterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardReviewPresenterTests.swift; sourceTree = "<group>"; };
 		BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewHistoryStore.swift; sourceTree = "<group>"; };
 		BD84BB8A1D9F862ED0D5788A /* TodayLifeCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayLifeCard.swift; sourceTree = "<group>"; };
+		BDB70F6BFE9167031A74224A /* RemoteDeckPresenterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckPresenterTests.swift; sourceTree = "<group>"; };
 		C0A32B4DA0B2480CB3FFE81E /* TodayPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlannerTests.swift; sourceTree = "<group>"; };
 		C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryServerInteractor.swift; sourceTree = "<group>"; };
 		C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JapaneseText.swift; sourceTree = "<group>"; };
@@ -489,6 +496,7 @@
 		D95722E5A19A0ADF9ED4FD7D /* PictureSearchWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSearchWireframe.swift; sourceTree = "<group>"; };
 		D9D5F2A0E9E416427A083A8A /* CardEditorCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardEditorCell.swift; sourceTree = "<group>"; };
 		DAC395943CED0A7E262119EA /* LifeLessonPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonPresenter.swift; sourceTree = "<group>"; };
+		DBE125BAA1B1DA138A039267 /* RemoteDeckWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckWireframe.swift; sourceTree = "<group>"; };
 		DD255FF4CC4CCC3B0065E07A /* BulkImportViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BulkImportViewController.swift; sourceTree = "<group>"; };
 		E4A2747B21D3110BEA47C8A7 /* LifeLessonViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonViewController.swift; sourceTree = "<group>"; };
 		E778AECBA59C5BBC11CC8023 /* DeckDraftTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeckDraftTests.swift; sourceTree = "<group>"; };
@@ -610,6 +618,15 @@
 				A699BC15E01E547F063AFF2C /* Models */,
 			);
 			path = BJTClient;
+			sourceTree = "<group>";
+		};
+		665A038350706AAE15A4E12D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AC765A3B4A5F02EC29087FC5 /* RemoteDeckViewController.swift */,
+			);
+			name = Views;
+			path = Views;
 			sourceTree = "<group>";
 		};
 		6B27FB1E026157E57DBC65DF /* LifeLesson */ = {
@@ -778,6 +795,7 @@
 				5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */,
 				816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */,
 				BC1146F8134E8611ACF40E4A /* CardReviewPresenterTests.swift */,
+				BDB70F6BFE9167031A74224A /* RemoteDeckPresenterTests.swift */,
 			);
 			path = FlashcardAppTests;
 			sourceTree = "<group>";
@@ -919,6 +937,7 @@
 				978215170D437DC6572B32C6 /* CardStyle */,
 				5A77B3E1BD54DF106032A604 /* ExampleEditor */,
 				A771A3E3D951B5F96A94FBE6 /* CardReview */,
+				97485579B0977726EA6FDC21 /* RemoteDeck */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -1139,6 +1158,17 @@
 				92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		97485579B0977726EA6FDC21 /* RemoteDeck */ = {
+			isa = PBXGroup;
+			children = (
+				7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */,
+				DBE125BAA1B1DA138A039267 /* RemoteDeckWireframe.swift */,
+				665A038350706AAE15A4E12D /* Views */,
+			);
+			name = RemoteDeck;
+			path = RemoteDeck;
 			sourceTree = "<group>";
 		};
 		978215170D437DC6572B32C6 /* CardStyle */ = {
@@ -1565,6 +1595,9 @@
 				E393A1F0CFDDD9238E8394BA /* CardReviewPresenter.swift in Sources */,
 				D1226665E9F9A69198CC896C /* CardReviewWireframe.swift in Sources */,
 				686E5589694681D1642124E9 /* CardReviewViewController.swift in Sources */,
+				FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */,
+				448E5AD33E33A2027A240E58 /* RemoteDeckWireframe.swift in Sources */,
+				B6D8914AE28F69C26D61146F /* RemoteDeckViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1620,6 +1653,7 @@
 				04119AE3634CB24D1AED2201 /* BJTFlashcardLibraryAPITests.swift in Sources */,
 				39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */,
 				AB278DC9303423A9267FE57C /* CardReviewPresenterTests.swift in Sources */,
+				CEE70C3589FAC853280F333C /* RemoteDeckPresenterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
