@@ -108,3 +108,61 @@ Môi trường: Xcode 27.2, scheme `FlashcardApp-Local`, iPhone 17 / iOS 27.0 (c
 - Bộ thẻ trên server không xuất hiện trong app (không có đồng bộ).
 - Dữ liệu thử `DebugFixtures` chỉ có trong bản Debug (`-SeedCardsFixture`, chỉ khi thư viện trống); các ảnh trong thư mục này dùng nó để minh hoạ, còn luồng tạo/sửa/xoá/học được UI test chạy trên giao diện thật.
 - SPM: `SwipeCellKit` và `CollectionViewPagingLayout` đã gỡ; nếu bản dựng phát hành dùng cache cũ, cần resolve lại package.
+
+## 8. Bổ sung (2026-10-29): các mục của tài khoản — Ôn tập · Của tôi · Công khai · Gần đây
+
+Trước đây tab Thẻ chỉ có bộ thẻ cục bộ. Trang web `/vi/flashcards` còn có **Ôn tập thẻ đến hạn**, **Bộ thẻ công khai**, **Gần đây**.
+Mục này đưa chúng vào app; ảnh chụp thật: `account-sections/`. Mọi thứ bên dưới **[Đã kiểm chứng]** bằng cách chạy app với backend
+local (`localhost:18081`) và hai học viên thử (A xem, B sở hữu bộ công khai), không dùng dữ liệu production.
+
+### Tương đương với web
+
+| Web (`flashcards-page-client.tsx`) | iOS | Nguồn dữ liệu |
+| --- | --- | --- |
+| Ôn tập: số thẻ đến hạn, "Bắt đầu" | Mục **Ôn tập**: bảng số thẻ đến hạn + "Bắt đầu ôn tập"; chấm số trên chip | `GET /api/flashcards/reviews/due?limit=50` |
+| Phiên ôn: lật thẻ, Lại/Khó/Tốt/Dễ, tổng kết | `Modules/CardReview`: lật thẻ, 4 mức, thời gian suy nghĩ (`elapsedMs`), chuỗi nhớ, tổng kết, "Ôn tiếp" khi đủ 50 thẻ | `POST /api/flashcards/reviews/{id}` `{rating, elapsedMs}` |
+| Bộ thẻ của tôi | **Của tôi** = bộ trên máy (như cũ, dùng offline) **+** mục "Trên tài khoản" cho bộ của tài khoản chưa có trên máy | `GET /api/flashcards/decks` (lọc `ownerUserId != null`) |
+| Công khai | Mục **Công khai**: bộ công khai của người khác, mới nhất trước | cùng danh sách (lọc `visibility=public` và `ownerUserId == null`) |
+| Gần đây | Mục **Gần đây**: 24 bộ cập nhật mới nhất (của bạn + công khai) | cùng danh sách |
+| Tìm kiếm | Một ô tìm cho từng mục (tên, mô tả; bộ trên máy còn tìm trong thẻ) | phía máy |
+| Mở bộ thẻ, xem thẻ, học | `Modules/RemoteDeck`: đầu trang, danh sách thẻ, **Học**, **Lưu về máy** | `GET /api/flashcards/decks/{id}` |
+| Lưu trữ bộ của mình | Menu "…" → **Lưu trữ** (có xác nhận); bản sao trên máy được giữ | `POST /api/flashcards/decks/{id}/archive` |
+| Tạo bộ / tạo tự động | Đã có (nút ＋ ở mọi mục) | — |
+| Chọn kiểu thẻ | Đã có trong màn Học và dùng lại ở phiên ôn (`CardStyle`) | — |
+
+### Quyết định thiết kế (đã chốt, không hỏi lại)
+
+- **Một nguồn sự thật cho học trên máy**: học vẫn chạy trên bộ **cục bộ**. "Học" một bộ của tài khoản trước hết **lưu bản sao** với đúng id của server
+  (`deck.id`, `deck_card.id`), nên lưu lần hai nhận ra bản sao cũ (dùng chung `DeckGeneratorInteractor.entity(from:)`). Không có đồng bộ hai chiều; xoá bản
+  sao trên máy không động tới server. Chiều thẻ suy ra từ thẻ đầu (mặt trước không có tiếng Nhật, mặt sau có → Việt–Nhật).
+- **Chủ sở hữu**: server xoá `ownerUserId` ở bộ không phải của người gọi (`redactForeignDeck`), nên app không cần biết id của mình để phân loại "của tôi" / "công khai".
+- **Chia dữ liệu theo tài khoản**: bộ nhớ đệm danh sách/thẻ đến hạn gắn với `accountId`; đổi tài khoản hay đăng xuất xoá nó (có test). Dữ liệu dưới 60 giây không tải lại;
+  kéo để làm mới luôn tải lại; làm mới lỗi giữ danh sách cũ và báo bằng hộp thoại.
+- **Đánh giá thẻ không idempotent**: server áp dụng mỗi lần nhận. App gửi **một lần**; lỗi thì ở lại thẻ, người học chọn *Thử lại* (cùng mức, cùng thời gian) hoặc *Bỏ qua* (thẻ vẫn đến hạn).
+  Lỗi `interrupted` (kết nối đứt sau khi gửi) nói rõ "có thể đã được lưu". Chạm hai lần khi đang gửi không gửi lần hai. Thẻ server không còn biết (404) được bỏ qua không báo lỗi.
+  Chỉ đánh giá server đã xác nhận mới vào tổng kết.
+- **Giao diện**: thanh mục ghim dưới tiêu đề lớn, cuộn ngang khi chữ lớn; mục "Ôn tập" mang chấm số; mục chỉ có trên tài khoản hiện lời mời đăng nhập khi chưa đăng nhập, **không** gọi mạng.
+  Bảng ôn tập dùng màu "hero" của app (nền chàm, nút giấy). Bốn mức đánh giá có biểu tượng + chữ + màu (không chỉ màu), lưới 2×2, một cột ở cỡ chữ trợ năng.
+  Nút chính chỉ có một ("Hiện đáp án"); đánh giá chỉ hiện sau khi lật. Lật thẻ dùng lại hiệu ứng của màn Học (giảm chuyển động → mờ dần).
+
+### Kết quả kiểm chứng (chạy thật)
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| Hợp đồng API (`BJTFlashcardLibraryAPITests`) | 11/11: đường dẫn, tham số `limit` (>200 bị từ chối vì server tự cắt), `null` = không có thẻ, id không phải UUID bị từ chối trước khi tạo URL, lỗi 500 không tự thử lại, 404/403 ánh xạ |
+| Logic (`CardReviewPresenterTests` 21, `CardLibraryScopesTests` 23, `RemoteDeckPresenterTests` 10) | đạt; gồm: không đánh giá trước khi lật, không gửi hai lần, thử lại giữ nguyên mức/thời gian, đổi tài khoản không thấy dữ liệu cũ, bộ nhớ đệm 60 giây |
+| `LocalizationTests` | đạt (vi/en/ja cho 53 chuỗi mới, có số nhiều) |
+| Chạy thật, backend local | đăng nhập A → chip "Ôn tập 3" → 3 thẻ được đánh giá (Tốt/Khó/Lại) → server báo **0 thẻ đến hạn** (trước là 3); mục Công khai liệt kê 29 bộ của người khác (27 mẫu + 2 của B); "Trên tài khoản" hiện bộ riêng tư của A; **Học** lưu bản sao (8 → 9 bộ trên máy) rồi mở màn Học; **Lưu trữ** → server không còn bộ đó, danh sách làm mới |
+| UI test | `testCardsShowsFourSectionsAndOpensOnTheLibraryOnTheDevice` (không cần tài khoản), `testLiveReviewPublicAndRecentSectionsReadTheAccount` (cần `TEST_RUNNER_FLASHCARD_E2E_EMAIL/PASSWORD` và **bản build có ký**: không ký thì không ghi được Keychain, đăng nhập báo "Không thể lưu phiên đăng nhập an toàn") |
+| Ảnh | `account-sections/` (sáng; một ảnh tối) |
+
+### Giới hạn đã biết / chưa kiểm chứng
+
+- **Chưa làm**: chia sẻ/hủy chia sẻ bộ và nhân bản qua `cloneToken` (cần liên kết sâu), các chế độ ôn nhập chữ/ghép cặp và gợi ý đáp án nhiễu của web (`/reviews/{id}/distractors`),
+  hàng đợi ôn ngoại tuyến của web (không có khoá idempotency phía server nên không dựng hàng đợi gửi lại), `deckId` để ôn riêng một bộ, kiểu thẻ lấy từ server (`/styles/active`; app vẫn dùng kiểu đã chọn trên máy).
+- Ôn tập lấy tối đa **50 thẻ** mỗi lượt (giống web); hiển thị "50+" khi đủ một lượt. Xong lượt, "Ôn tiếp" tải lượt kế.
+- Ảnh của thẻ trên server không tồn tại (xem §3), nên thẻ của tài khoản không có ảnh.
+- **[Chưa kiểm chứng]** VoiceOver thật (chip của thanh mục hiện hai lần trong cây của XCUITest; đã dùng `UITableViewHeaderFooterView` chuẩn, cần nghe thử), cỡ chữ trợ năng, Reduce Motion bật, iPad, thiết bị thật, tiếng Nhật/Anh trên màn mới (chỉ kiểm tra khoá dịch, chưa xem ảnh), tài khoản production.
+- Bản dịch en/ja do tôi viết, chưa được người bản ngữ rà soát.
+- Môi trường thử: backend local có sẵn các bộ công khai mẫu; tài khoản `cards-a-*/cards-b-*@example.test` được tạo cho phiên này (mật khẩu chỉ nằm trong thư mục tạm của phiên).
+

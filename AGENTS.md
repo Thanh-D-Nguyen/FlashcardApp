@@ -14,6 +14,9 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
   Keycloak/Swagger contracts do not describe the current Go login flow.
 - `Services/AuthSession.swift`: Keychain session lifecycle and stale-response protection.
   API results keep backend UUIDs; remote deck/progress synchronization is not implemented.
+- `Modules/Card` (tab 3, "Thẻ"): bốn mục như web — **Ôn tập** (`Modules/CardReview`, `GET /reviews/due`, đánh giá `POST /reviews/{id}` **một lần, không tự thử lại**),
+  **Của tôi** (bộ trên máy + "Trên tài khoản"), **Công khai**, **Gần đây** (cùng `GET /flashcards/decks`; server xoá `ownerUserId` của bộ không phải của mình) và
+  `Modules/RemoteDeck` (xem/lưu về máy/học/lưu trữ). Học vẫn chạy trên bộ cục bộ: "Học" lưu bản sao với id của server. Chi tiết, giới hạn: `docs/ui-redesign/cards/README.md` §8.
 - `Services/RealmService.swift`: Realm stays the local store for the learner's own data (decks and
   cards `RDesk`/`RCard`, and their own changes to example sentences `RCardExample`; schema 3) and is where
   future caches live (add models to `storedTypes`).

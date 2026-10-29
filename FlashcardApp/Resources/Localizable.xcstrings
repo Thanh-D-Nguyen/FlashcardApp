@@ -12544,6 +12544,1350 @@
           }
         }
       }
+    },
+    "Archive" : {
+      "extractionState" : "manual",
+      "comment" : "Button / menu action",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アーカイブ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lưu trữ"
+          }
+        }
+      }
+    },
+    "Time" : {
+      "extractionState" : "manual",
+      "comment" : "Review summary row",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thời gian"
+          }
+        }
+      }
+    },
+    "My decks" : {
+      "extractionState" : "manual",
+      "comment" : "Cards tab section",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My decks"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイデッキ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Của tôi"
+          }
+        }
+      }
+    },
+    "Learning" : {
+      "extractionState" : "manual",
+      "comment" : "Schedule state of a card",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learning"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "学習中"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang học"
+          }
+        }
+      }
+    },
+    "Studying saves a copy on this device so it also works offline." : {
+      "extractionState" : "manual",
+      "comment" : "Footnote under the Study button of an account deck",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Studying saves a copy on this device so it also works offline."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "学習すると、この端末にコピーが保存され、オフラインでも使えます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Khi học, một bản sao sẽ được lưu trên máy này để dùng cả khi không có mạng."
+          }
+        }
+      }
+    },
+    "Public deck" : {
+      "extractionState" : "manual",
+      "comment" : "Facts line of someone else's public deck",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public deck"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開デッキ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bộ thẻ công khai"
+          }
+        }
+      }
+    },
+    "Archive this deck?" : {
+      "extractionState" : "manual",
+      "comment" : "Alert title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive this deck?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデッキをアーカイブしますか？"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lưu trữ bộ thẻ này?"
+          }
+        }
+      }
+    },
+    "No cards are due right now. Come back later, or study one of your decks." : {
+      "extractionState" : "manual",
+      "comment" : "Review section when nothing is due",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cards are due right now. Come back later, or study one of your decks."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在、期限のカードはありません。後でお越しいただくか、デッキを学習しましょう。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiện chưa có thẻ nào đến hạn. Hãy quay lại sau, hoặc học một bộ thẻ của bạn."
+          }
+        }
+      }
+    },
+    "New" : {
+      "extractionState" : "manual",
+      "comment" : "Schedule state of a card",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mới"
+          }
+        }
+      }
+    },
+    "Sign in to review your cards" : {
+      "extractionState" : "manual",
+      "comment" : "Review section signed out title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to review your cards"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインしてカードを復習"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng nhập để ôn tập thẻ"
+          }
+        }
+      }
+    },
+    "Relearning" : {
+      "extractionState" : "manual",
+      "comment" : "Schedule state of a card the learner forgot",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relearning"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再学習"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Học lại"
+          }
+        }
+      }
+    },
+    "Open this deck" : {
+      "extractionState" : "manual",
+      "comment" : "Accessibility hint of an account deck row",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open this deck"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデッキを開く"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở bộ thẻ này"
+          }
+        }
+      }
+    },
+    "Deck options" : {
+      "extractionState" : "manual",
+      "comment" : "Accessibility label of the deck menu",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deck options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デッキのオプション"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuỳ chọn bộ thẻ"
+          }
+        }
+      }
+    },
+    "Hard" : {
+      "extractionState" : "manual",
+      "comment" : "Review rating",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hard"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "難しい"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Khó"
+          }
+        }
+      }
+    },
+    "Decks that people share will appear here." : {
+      "extractionState" : "manual",
+      "comment" : "Empty public section",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decks that people share will appear here."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有されたデッキがここに表示されます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các bộ thẻ được chia sẻ sẽ hiện ở đây."
+          }
+        }
+      }
+    },
+    "Session complete" : {
+      "extractionState" : "manual",
+      "comment" : "Review summary title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session complete"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復習が完了しました"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoàn thành phiên ôn tập"
+          }
+        }
+      }
+    },
+    "Review" : {
+      "extractionState" : "manual",
+      "comment" : "Schedule state of a card / Cards tab section / review screen title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復習"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ôn tập"
+          }
+        }
+      }
+    },
+    "The connection broke while sending. This rating may already have been saved." : {
+      "extractionState" : "manual",
+      "comment" : "Review: outcome of a rating is unknown",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The connection broke while sending. This rating may already have been saved."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "送信中に接続が切れました。この評価はすでに保存されている可能性があります。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kết nối bị gián đoạn khi gửi. Đánh giá này có thể đã được lưu."
+          }
+        }
+      }
+    },
+    "Yours · Private" : {
+      "extractionState" : "manual",
+      "comment" : "Facts line of the learner's private deck",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yours · Private"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自分のデッキ · 非公開"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Của bạn · Riêng tư"
+          }
+        }
+      }
+    },
+    "Loading your cards…" : {
+      "extractionState" : "manual",
+      "comment" : "Review loading",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading your cards…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カードを読み込み中…"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang tải thẻ của bạn…"
+          }
+        }
+      }
+    },
+    "Nothing recent yet" : {
+      "extractionState" : "manual",
+      "comment" : "Empty recent section title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing recent yet"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近の項目はまだありません"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa có gì gần đây"
+          }
+        }
+      }
+    },
+    "On this device" : {
+      "extractionState" : "manual",
+      "comment" : "A copy of the deck is stored on the device",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this device"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末にあります"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có trên máy này"
+          }
+        }
+      }
+    },
+    "Good" : {
+      "extractionState" : "manual",
+      "comment" : "Review rating",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "良い"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tốt"
+          }
+        }
+      }
+    },
+    "DUE NOW" : {
+      "extractionState" : "manual",
+      "comment" : "Eyebrow above the number of cards to review",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DUE NOW"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "期限"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ĐẾN HẠN"
+          }
+        }
+      }
+    },
+    "Each card comes back at the right moment, based on how well you remember it." : {
+      "extractionState" : "manual",
+      "comment" : "Review hero explanation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each card comes back at the right moment, based on how well you remember it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各カードは、どれだけ覚えているかに応じて最適なタイミングで再登場します。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mỗi thẻ quay lại đúng lúc, tuỳ theo mức bạn nhớ nó."
+          }
+        }
+      }
+    },
+    "Private" : {
+      "extractionState" : "manual",
+      "comment" : "Deck visibility",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非公開"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riêng tư"
+          }
+        }
+      }
+    },
+    "%lld cards due" : {
+      "extractionState" : "manual",
+      "comment" : "Cards waiting for review",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld card due"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld cards due"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "期限のカード%lld枚"
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld thẻ đến hạn"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Recent" : {
+      "extractionState" : "manual",
+      "comment" : "Cards tab section: recently changed decks",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gần đây"
+          }
+        }
+      }
+    },
+    "All caught up" : {
+      "extractionState" : "manual",
+      "comment" : "Nothing is due",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All caught up"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて復習済み"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn đã ôn xong"
+          }
+        }
+      }
+    },
+    "Loading decks…" : {
+      "extractionState" : "manual",
+      "comment" : "Decks loading",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading decks…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デッキを読み込み中…"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang tải bộ thẻ…"
+          }
+        }
+      }
+    },
+    "Decks you create or change will appear here." : {
+      "extractionState" : "manual",
+      "comment" : "Empty recent section",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decks you create or change will appear here."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作成または変更したデッキがここに表示されます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các bộ thẻ bạn tạo hoặc chỉnh sửa sẽ hiện ở đây."
+          }
+        }
+      }
+    },
+    "Leech" : {
+      "extractionState" : "manual",
+      "comment" : "A card the learner keeps forgetting",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leech"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "つまずきカード"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thẻ hay quên"
+          }
+        }
+      }
+    },
+    "Skip this card" : {
+      "extractionState" : "manual",
+      "comment" : "Leave a card that could not be rated; it stays due",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip this card"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このカードをスキップ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bỏ qua thẻ này"
+          }
+        }
+      }
+    },
+    "No public decks yet" : {
+      "extractionState" : "manual",
+      "comment" : "Empty public section title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No public decks yet"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開デッキはまだありません"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa có bộ thẻ công khai"
+          }
+        }
+      }
+    },
+    "remembered" : {
+      "extractionState" : "manual",
+      "comment" : "Caption under the share of cards remembered",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "remembered"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "覚えた"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "đã nhớ"
+          }
+        }
+      }
+    },
+    "Longest streak" : {
+      "extractionState" : "manual",
+      "comment" : "Review summary row",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longest streak"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最長の連続正解"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuỗi nhớ dài nhất"
+          }
+        }
+      }
+    },
+    "“%@” will be removed from your account's library and from the website. A copy saved on this device stays." : {
+      "extractionState" : "manual",
+      "comment" : "Archive deck confirmation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” will be removed from your account's library and from the website. A copy saved on this device stays."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」はアカウントのライブラリとウェブサイトから削除されます。この端末に保存したコピーは残ります。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” sẽ bị gỡ khỏi thư viện tài khoản và trang web. Bản sao đã lưu trên thiết bị này vẫn được giữ."
+          }
+        }
+      }
+    },
+    "Public and recent decks come from your account and the website." : {
+      "extractionState" : "manual",
+      "comment" : "Public/recent signed out message",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public and recent decks come from your account and the website."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開デッキと最近のデッキは、アカウントとウェブサイトから取得されます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bộ thẻ công khai và gần đây đến từ tài khoản và trang web của bạn."
+          }
+        }
+      }
+    },
+    "%lld cards to review" : {
+      "extractionState" : "manual",
+      "comment" : "Under the due count; plural by count",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld card to review"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld cards to review"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "復習するカード%lld枚"
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld thẻ cần ôn"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "You reviewed %lld cards." : {
+      "extractionState" : "manual",
+      "comment" : "Review summary subtitle",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You reviewed %lld card."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You reviewed %lld cards."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld枚のカードを復習しました。"
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bạn đã ôn %lld thẻ."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Easy" : {
+      "extractionState" : "manual",
+      "comment" : "Review rating",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Easy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "簡単"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dễ"
+          }
+        }
+      }
+    },
+    "Save to this device" : {
+      "extractionState" : "manual",
+      "comment" : "Button: copy a deck of the account onto the device",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to this device"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末に保存"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lưu về máy"
+          }
+        }
+      }
+    },
+    "Sign in to see these decks" : {
+      "extractionState" : "manual",
+      "comment" : "Public/recent signed out title",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to see these decks"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインしてデッキを表示"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng nhập để xem các bộ thẻ này"
+          }
+        }
+      }
+    },
+    "On your account" : {
+      "extractionState" : "manual",
+      "comment" : "Header of the decks that live on the account, not on this device",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On your account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウント上のデッキ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trên tài khoản của bạn"
+          }
+        }
+      }
+    },
+    "Loading the deck…" : {
+      "extractionState" : "manual",
+      "comment" : "Deck screen loading",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading the deck…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デッキを読み込み中…"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang tải bộ thẻ…"
+          }
+        }
+      }
+    },
+    "Yours · Public" : {
+      "extractionState" : "manual",
+      "comment" : "Facts line of the learner's public deck",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yours · Public"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自分のデッキ · 公開"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Của bạn · Công khai"
+          }
+        }
+      }
+    },
+    "Your review schedule lives on your account, so it follows you between the app and the website." : {
+      "extractionState" : "manual",
+      "comment" : "Review section signed out message",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your review schedule lives on your account, so it follows you between the app and the website."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復習スケジュールはアカウントに保存されるため、アプリとウェブサイトで共通です。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lịch ôn tập nằm trên tài khoản của bạn, nên đồng bộ giữa ứng dụng và trang web."
+          }
+        }
+      }
+    },
+    "Review more" : {
+      "extractionState" : "manual",
+      "comment" : "Button after a review batch",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review more"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続けて復習"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ôn tiếp"
+          }
+        }
+      }
+    },
+    "No cards are due right now. Come back later." : {
+      "extractionState" : "manual",
+      "comment" : "Review summary when nothing was due",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cards are due right now. Come back later."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在、期限のカードはありません。後でもう一度お越しください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiện chưa có thẻ nào đến hạn. Hãy quay lại sau."
+          }
+        }
+      }
+    },
+    "Again" : {
+      "extractionState" : "manual",
+      "comment" : "Review rating: forgot the card",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Again"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう一度"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lại"
+          }
+        }
+      }
+    },
+    "Sign in to open this deck" : {
+      "extractionState" : "manual",
+      "comment" : "Deck screen signed out",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to open this deck"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインしてこのデッキを開く"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng nhập để mở bộ thẻ này"
+          }
+        }
+      }
+    },
+    "Public" : {
+      "extractionState" : "manual",
+      "comment" : "Cards tab section: decks shared by everyone / visibility",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Công khai"
+          }
+        }
+      }
+    },
+    "Sign in to review your cards." : {
+      "extractionState" : "manual",
+      "comment" : "Review screen: signed out",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to review your cards."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインしてカードを復習しましょう。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng nhập để ôn tập thẻ của bạn."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
