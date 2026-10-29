@@ -15,6 +15,11 @@ protocol CardWireframeInterface: AnyObject {
     /// `onImported` runs with the local deck id after the generator has closed.
     func showDeckGenerator(onImported: @escaping (String) -> Void)
     func showStudy(deckId: String)
+    /// Starts a review of these due cards.
+    func showReview(cards: [DueCard])
+    /// Opens a deck of the account (cards, save to device, study).
+    func showRemoteDeck(deckId: String)
+    func showSignIn(onFinish: @escaping () -> Void)
     func confirmDelete(deckName: String, onConfirm: @escaping () -> Void)
     func showAlert(with title: String?, message: String?)
 }
@@ -62,6 +67,22 @@ extension CardWireframe: CardWireframeInterface {
 
     func showStudy(deckId: String) {
         navigationController?.pushWireframe(CardStudyWireframe(deckId: deckId))
+    }
+
+    func showReview(cards: [DueCard]) {
+        navigationController?.pushWireframe(CardReviewWireframe(initialCards: cards))
+    }
+
+    func showRemoteDeck(deckId: String) {
+        navigationController?.pushWireframe(RemoteDeckWireframe(deckId: deckId))
+    }
+
+    func showSignIn(onFinish: @escaping () -> Void) {
+        let login = MailLoginWireframe(onFinish: onFinish)
+        // Read once: the wireframe hands out its only strong reference to the controller on first access.
+        let loginController = login.viewController
+        loginController.modalPresentationStyle = .fullScreen
+        viewController.present(loginController, animated: true)
     }
 
     func confirmDelete(deckName: String, onConfirm: @escaping () -> Void) {

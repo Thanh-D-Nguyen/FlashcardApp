@@ -176,6 +176,14 @@ final class FakeCardWireframe: CardWireframeInterface {
     func choose(_ method: NewDeckMethod) { chooseMethod?(method) }
     func finishGenerator(deckId: String) { generatorFinish?(deckId) }
     func showStudy(deckId: String) { studied.append(deckId) }
+    var reviews: [[DueCard]] = []
+    var remoteDecks: [String] = []
+    var signIns = 0
+    private var signInFinish: (() -> Void)?
+    func showReview(cards: [DueCard]) { reviews.append(cards) }
+    func showRemoteDeck(deckId: String) { remoteDecks.append(deckId) }
+    func showSignIn(onFinish: @escaping () -> Void) { signIns += 1; signInFinish = onFinish }
+    func finishSignIn() { signInFinish?() }
     func confirmDelete(deckName: String, onConfirm: @escaping () -> Void) { deleteRequests.append(deckName); deleteConfirmation = onConfirm }
     func showAlert(with title: String?, message: String?) { alerts.append(message) }
     func finishEditor() { editorFinish?() }

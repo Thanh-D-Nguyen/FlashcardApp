@@ -90,18 +90,26 @@ final class DeckLibraryCell: UITableViewCell {
     }
 
     func configure(with row: DeckRowModel) {
-        monogramLabel.text = row.monogram
-        titleLabel.text = row.title
-        detailsLabel.text = row.details
-        detailsLabel.isHidden = row.details.isEmpty
-        previewLabel.text = row.preview
-        previewLabel.isHidden = row.preview.isEmpty
         let count = String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), row.cardCount)
         let direction = row.direction == .normal
             ? NSLocalizedString("Japanese – Vietnamese", comment: "") : NSLocalizedString("Vietnamese – Japanese", comment: "")
-        metaLabel.text = [count, direction].joined(separator: " · ")
-        accessibilityIdentifier = "deck_row_\(row.id)"
-        accessibilityLabel = [row.title, row.details, row.preview, count].filter { !$0.isEmpty }.joined(separator: ", ")
-        accessibilityHint = NSLocalizedString("Study this deck", comment: "")
+        configureRow(monogram: row.monogram, title: row.title, details: row.details, preview: row.preview,
+                     meta: [count, direction].joined(separator: " · "), identifier: "deck_row_\(row.id)",
+                     hint: NSLocalizedString("Study this deck", comment: ""),
+                     accessibility: [row.title, row.details, row.preview, count].filter { !$0.isEmpty }.joined(separator: ", "))
+    }
+
+    func configureRow(monogram: String, title: String, details: String, preview: String, meta: String, identifier: String, hint: String,
+                      accessibility: String) {
+        monogramLabel.text = monogram
+        titleLabel.text = title
+        detailsLabel.text = details
+        detailsLabel.isHidden = details.isEmpty
+        previewLabel.text = preview
+        previewLabel.isHidden = preview.isEmpty
+        metaLabel.text = meta
+        accessibilityIdentifier = identifier
+        accessibilityLabel = accessibility
+        accessibilityHint = hint
     }
 }

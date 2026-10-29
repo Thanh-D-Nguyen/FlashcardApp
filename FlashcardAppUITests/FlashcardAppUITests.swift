@@ -354,6 +354,67 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.buttons["setting_sign_in"].waitForExistence(timeout: 10), "No session survives logout")
     }
 
+    // MARK: Cards: the account's sections
+
+    /// The four sections are always there; the learner's own decks (on the device) are the default and work without an account.
+    func testCardsShowsFourSectionsAndOpensOnTheLibraryOnTheDevice() {
+        let app = makeApp()
+        app.launch()
+        openCards(app)
+        // The bar is a pinned table header: the accessibility tree lists its chips twice, so every query takes the first match.
+        func section(_ id: String) -> XCUIElement { app.buttons.matching(identifier: id).firstMatch }
+        let sections = ["cards_scope_review", "cards_scope_mine", "cards_scope_publicDecks", "cards_scope_recent"]
+        for id in sections { XCTAssertTrue(section(id).waitForExistence(timeout: 10), id) }
+        XCTAssertTrue(section("cards_scope_mine").isSelected, "The decks on the device are the default section")
+        section("cards_scope_publicDecks").tap()
+        XCTAssertTrue(section("cards_scope_publicDecks").isSelected)
+        XCTAssertFalse(section("cards_scope_mine").isSelected)
+        attachScreenshot(app, name: "cards-public-section")
+        section("cards_scope_mine").tap()
+        XCTAssertTrue(app.tables["deck_library"].exists, "Going back shows the library again")
+    }
+
+    /// Needs a disposable local account: TEST_RUNNER_FLASHCARD_E2E_EMAIL / TEST_RUNNER_FLASHCARD_E2E_PASSWORD, and a signed build
+    /// (the session goes to the Keychain). The Simulator keeps the Keychain after the app is removed, so an existing session is used as it is.
+    /// Reads the Review section, the Public section and a public deck against the real backend.
+    func testLiveReviewPublicAndRecentSectionsReadTheAccount() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let email = environment["FLASHCARD_E2E_EMAIL"], let password = environment["FLASHCARD_E2E_PASSWORD"] else {
+            throw XCTSkip("No disposable local account supplied")
+        }
+        let app = makeApp()
+        app.launch()
+        let settings = app.tabBars.buttons["tab_settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 40))
+        settings.tap()
+        if app.buttons["setting_sign_in"].waitForExistence(timeout: 10) {
+            app.buttons["setting_sign_in"].tap()
+            XCTAssertTrue(app.buttons["website_login_button"].waitForExistence(timeout: 5))
+            submitLogin(app, email: email, password: password)
+            XCTAssertTrue(app.tabBars.buttons["tab_levels"].waitForExistence(timeout: 20), "Successful login lands on Main")
+        }
+        openCards(app)
+        func section(_ id: String) -> XCUIElement { app.buttons.matching(identifier: id).firstMatch }
+        func deckRows() -> XCUIElement { app.cells.matching(NSPredicate(format: "identifier BEGINSWITH %@", "remote_deck_row_")).firstMatch }
+
+        section("cards_scope_review").tap()
+        let caughtUp = app.staticTexts["Bạn đã ôn xong"]
+        XCTAssertTrue(app.buttons["review_start"].waitForExistence(timeout: 15) || caughtUp.waitForExistence(timeout: 5),
+                      "Review shows what is due, or says nothing is")
+        attachScreenshot(app, name: "cards-review-section")
+
+        section("cards_scope_publicDecks").tap()
+        XCTAssertTrue(deckRows().waitForExistence(timeout: 15), "The public decks of the website are listed")
+        deckRows().tap()
+        XCTAssertTrue(app.buttons["remote_deck_study"].waitForExistence(timeout: 15), "A deck opens with its cards and the Study action")
+        XCTAssertTrue(app.tables["remote_deck_cards"].cells.firstMatch.exists)
+        attachScreenshot(app, name: "cards-public-deck")
+        app.navigationBars.buttons.firstMatch.tap()
+
+        section("cards_scope_recent").tap()
+        XCTAssertTrue(deckRows().waitForExistence(timeout: 15))
+    }
+
     // MARK: Cards: create, study, edit, persist, delete
 
     /// The whole learner journey on real UI and the real Realm store: make a deck, study it (flip, quiz, summary),

@@ -202,6 +202,7 @@
 		AB2A2C601C45C58C5D5AAEA9 /* LifeHubLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7302904DE5CC4BBFCB1F2B4C /* LifeHubLoaderTests.swift */; };
 		ADB7BB2AC1DC8D5E5E70AC79 /* ExampleEditorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */; };
 		AE66FBE633287C4404E0C834 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6D97E81F048800EE625F30D0 /* InfoPlist.xcstrings */; };
+		B087B67706EBF8D07A11ED49 /* CardLibraryScopesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8638FCCE92CCFA71A15C7BDB /* CardLibraryScopesTests.swift */; };
 		B166CC58A7F7F027F6B5B78E /* PictureSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40805D2F66FA9024E7BB65A /* PictureSearchViewController.swift */; };
 		B28AA84089A12FE3D8275660 /* LifeNearbyStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FDA61F512574210B0E0CA6 /* LifeNearbyStory.swift */; };
 		B3336546E67BF4E2637C444B /* JapaneseCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C09BA9E71CCCFC64F02177 /* JapaneseCalendar.swift */; };
@@ -245,6 +246,7 @@
 		E8F7EAB9A2B58980DE5101D7 /* NewDeckOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF8566DD19305209FA80298 /* NewDeckOptionsViewController.swift */; };
 		E91121EA250C574B968C58AA /* ExampleEditorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85AC2F81A5410D56B87F087 /* ExampleEditorPresenter.swift */; };
 		E9CE2A4F18C297D0D9817B1E /* CardStudyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */; };
+		ECC823B204B5AFFC7BE6CB3B /* CardLibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12659E8088253FFDCC6F11F4 /* CardLibraryViews.swift */; };
 		F21B22EB1016302ABF704C86 /* LifeLessonInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A4C5B7933FCF0B57F50A1B /* LifeLessonInteractor.swift */; };
 		F7434E7D17D8A98B636622AF /* LifePlaceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF07F347FD2BD66C45DB801E /* LifePlaceProvider.swift */; };
 		F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */; };
@@ -281,6 +283,7 @@
 		0F0E8CB3E7162557579B81AF /* ExampleEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleEditorViewController.swift; sourceTree = "<group>"; };
 		10E97BC0EB69B9D52A3D4BD5 /* RemoteImageLoader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteImageLoader.swift; sourceTree = "<group>"; };
 		1235E8CD5F0FDD150A00D51E /* AuthSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSession.swift; sourceTree = "<group>"; };
+		12659E8088253FFDCC6F11F4 /* CardLibraryViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryViews.swift; sourceTree = "<group>"; };
 		1349716F3450468B69CADAE0 /* DeckDirectionCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeckDirectionCell.swift; sourceTree = "<group>"; };
 		138D30B83AE6F5AC267278E0 /* LifeHubTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeHubTests.swift; sourceTree = "<group>"; };
 		148097565D410B543AFED0E8 /* CardReviewViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardReviewViewController.swift; sourceTree = "<group>"; };
@@ -355,6 +358,7 @@
 		8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorTests.swift; sourceTree = "<group>"; };
 		857BB1AD3118E84563C080CA /* PictureSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureSuggestion.swift; sourceTree = "<group>"; };
 		85A199F10AB1A863FAA1DA27 /* LifeLessonPreferences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonPreferences.swift; sourceTree = "<group>"; };
+		8638FCCE92CCFA71A15C7BDB /* CardLibraryScopesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryScopesTests.swift; sourceTree = "<group>"; };
 		89FA48EF5D63147D0CB215D3 /* LifeLessonPresenterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonPresenterTests.swift; sourceTree = "<group>"; };
 		8B799A37BDC22CAB45D3BBCB /* CardSurfaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSurfaceView.swift; sourceTree = "<group>"; };
 		8C4FC3548729A597266E3DC5 /* DictionarySuggestionInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySuggestionInteractor.swift; sourceTree = "<group>"; };
@@ -796,6 +800,7 @@
 				816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */,
 				BC1146F8134E8611ACF40E4A /* CardReviewPresenterTests.swift */,
 				BDB70F6BFE9167031A74224A /* RemoteDeckPresenterTests.swift */,
+				8638FCCE92CCFA71A15C7BDB /* CardLibraryScopesTests.swift */,
 			);
 			path = FlashcardAppTests;
 			sourceTree = "<group>";
@@ -1096,6 +1101,7 @@
 				9251ED3229A212E9006C1D1C /* CardViewController.swift */,
 				175275535C56544C7B924F0A /* DeckLibraryCell.swift */,
 				6EF8566DD19305209FA80298 /* NewDeckOptionsViewController.swift */,
+				12659E8088253FFDCC6F11F4 /* CardLibraryViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1598,6 +1604,7 @@
 				FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */,
 				448E5AD33E33A2027A240E58 /* RemoteDeckWireframe.swift in Sources */,
 				B6D8914AE28F69C26D61146F /* RemoteDeckViewController.swift in Sources */,
+				ECC823B204B5AFFC7BE6CB3B /* CardLibraryViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1654,6 +1661,7 @@
 				39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */,
 				AB278DC9303423A9267FE57C /* CardReviewPresenterTests.swift in Sources */,
 				CEE70C3589FAC853280F333C /* RemoteDeckPresenterTests.swift in Sources */,
+				B087B67706EBF8D07A11ED49 /* CardLibraryScopesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
