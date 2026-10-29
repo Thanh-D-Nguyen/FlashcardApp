@@ -7,6 +7,8 @@ final class DeckLibraryCell: UITableViewCell {
 
     private let monogramBox = UIView()
     private let monogramLabel = UILabel()
+    private let unitLabel = UILabel()
+    private let markStack = UIStackView()
     private let titleLabel = UILabel()
     private let detailsLabel = UILabel()
     private let previewLabel = UILabel()
@@ -32,19 +34,27 @@ final class DeckLibraryCell: UITableViewCell {
         monogramLabel.apply(.monogram)
         monogramLabel.numberOfLines = 1
         monogramLabel.textAlignment = .center
-        monogramLabel.translatesAutoresizingMaskIntoConstraints = false
-        monogramBox.addSubview(monogramLabel)
+        unitLabel.apply(.metadata)
+        unitLabel.font = UIFont.preferredFont(forTextStyle: .caption2)
+        unitLabel.textAlignment = .center
+        unitLabel.numberOfLines = 1
+        unitLabel.isHidden = true
+        markStack.axis = .vertical
+        markStack.alignment = .center
+        markStack.translatesAutoresizingMaskIntoConstraints = false
+        [monogramLabel, unitLabel].forEach(markStack.addArrangedSubview)
+        monogramBox.addSubview(markStack)
         monogramBox.setContentHuggingPriority(.required, for: .horizontal)
         monogramBox.setContentCompressionResistancePriority(.required, for: .horizontal)
         let preferredWidth = monogramBox.widthAnchor.constraint(equalToConstant: 56)
         preferredWidth.priority = .defaultHigh
         NSLayoutConstraint.activate([
-            monogramLabel.centerXAnchor.constraint(equalTo: monogramBox.centerXAnchor),
-            monogramLabel.centerYAnchor.constraint(equalTo: monogramBox.centerYAnchor),
+            markStack.centerXAnchor.constraint(equalTo: monogramBox.centerXAnchor),
+            markStack.centerYAnchor.constraint(equalTo: monogramBox.centerYAnchor),
             preferredWidth,
             monogramBox.heightAnchor.constraint(equalTo: monogramBox.widthAnchor),
-            monogramBox.widthAnchor.constraint(greaterThanOrEqualTo: monogramLabel.widthAnchor, constant: Design.Spacing.l),
-            monogramBox.heightAnchor.constraint(greaterThanOrEqualTo: monogramLabel.heightAnchor, constant: Design.Spacing.l)
+            monogramBox.widthAnchor.constraint(greaterThanOrEqualTo: markStack.widthAnchor, constant: Design.Spacing.l),
+            monogramBox.heightAnchor.constraint(greaterThanOrEqualTo: markStack.heightAnchor, constant: Design.Spacing.l)
         ])
 
         titleLabel.apply(.title)
@@ -99,9 +109,15 @@ final class DeckLibraryCell: UITableViewCell {
                      accessibility: [row.title, row.details, row.preview, count].filter { !$0.isEmpty }.joined(separator: ", "))
     }
 
-    func configureRow(monogram: String, title: String, details: String, preview: String, meta: String, identifier: String, hint: String,
-                      accessibility: String) {
+    /// `unit` turns the tile into a count (the number large, its unit small beneath); without it the tile carries a one-line mark.
+    func configureRow(monogram: String, unit: String? = nil, title: String, details: String, preview: String, meta: String,
+                      identifier: String, hint: String, accessibility: String) {
         monogramLabel.text = monogram
+        monogramLabel.font = unit == nil
+            ? Design.TextRole.monogram.font
+            : UIFontMetrics(forTextStyle: .title3).scaledFont(for: Design.TextRole.monogram.font.withSize(24), maximumPointSize: 34)
+        unitLabel.text = unit
+        unitLabel.isHidden = unit == nil
         titleLabel.text = title
         detailsLabel.text = details
         detailsLabel.isHidden = details.isEmpty

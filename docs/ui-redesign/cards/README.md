@@ -69,7 +69,7 @@ Nguồn kỹ năng đã đọc và áp dụng: *UI UX Pro Max* (kiểm tra `ux`:
 
 - **Liquid Glass chỉ ở lớp điều khiển**: thanh điều hướng/tab hệ thống, nút trước/sau khi học (`UIButton.Configuration.glass()`), menu. Thẻ, hàng danh sách, ô nhập **không** có glass.
 - **Hành động chính dùng nền đặc `Design.Button.primary`, không `prominentGlass`**: đo trên ảnh Dark Mode, chữ của `prominentGlass` mờ trên nền xanh nhạt (xem lịch sử trong phiên: `quiz_answered_dark` trước/sau). Nút đặc đạt độ tương phản ở cả hai giao diện.
-- **Thư viện**: tiêu đề lớn + phụ đề "N bộ thẻ", hàng phẳng (không thẻ trong thẻ), ký tự Mincho của thẻ đầu làm "neo" như số kanji ở màn Cấp độ, dòng xem trước "犬 · 猫 · 水 …". Một chạm = học. Sửa/xoá qua vuốt, menu giữ lâu, nút sắp xếp. Trạng thái trống có lời mời và nút duy nhất.
+- **Thư viện**: tiêu đề lớn (phụ đề "N bộ thẻ" đã bỏ ngày 2026-10-29, xem §8), hàng phẳng (không thẻ trong thẻ), ký tự Mincho của thẻ đầu làm "neo" như số kanji ở màn Cấp độ, dòng xem trước "犬 · 猫 · 水 …". Một chạm = học. Sửa/xoá qua vuốt, menu giữ lâu, nút sắp xếp. Trạng thái trống có lời mời và nút duy nhất.
 - **Học**: một thẻ lớn (từ 52 pt, tối đa 96 pt theo Dynamic Type), nhãn ngôn ngữ, nút loa đặt ngay trên thẻ, nút chính đổi theo ngữ cảnh ("Hiện đáp án" → "Thẻ tiếp theo" → "Kết thúc"), nút trước/sau dạng glass, mọi tuỳ chọn ẩn trong menu "…" (hiển thị dần). Trắc nghiệm: lời giải **trên** các lựa chọn, đúng/sai có biểu tượng + chữ + màu (không chỉ màu).
 - **Trình soạn**: form `insetGrouped` hệ thống; chi tiết (tên, mô tả, chiều thẻ) rồi danh sách thẻ; mỗi thẻ chỉ có Mặt trước/Mặt sau, "＋ Cách đọc / ＋ Ghi chú / ＋ Ảnh" hiện dần; thanh trên bàn phím có gợi ý từ điển, "Thẻ 3/12", ô tiếp theo, thêm thẻ, hạ bàn phím.
 - **Chuyển động**: lật 3D 0,45 s; trượt nhẹ khi đổi thẻ; **Giảm chuyển động** → mờ dần 0,15 s, không trượt. Xúc giác (lật, đúng/sai) chỉ khi bật "Âm thanh và rung" trong Cài đặt — công tắc này trước đây được lưu nhưng không có mã nào đọc.
@@ -165,4 +165,24 @@ local (`localhost:18081`) và hai học viên thử (A xem, B sở hữu bộ c�
 - **[Chưa kiểm chứng]** VoiceOver thật (chip của thanh mục hiện hai lần trong cây của XCUITest; đã dùng `UITableViewHeaderFooterView` chuẩn, cần nghe thử), cỡ chữ trợ năng, Reduce Motion bật, iPad, thiết bị thật, tiếng Nhật/Anh trên màn mới (chỉ kiểm tra khoá dịch, chưa xem ảnh), tài khoản production.
 - Bản dịch en/ja do tôi viết, chưa được người bản ngữ rà soát.
 - Môi trường thử: backend local có sẵn các bộ công khai mẫu; tài khoản `cards-a-*/cards-b-*@example.test` được tạo cho phiên này (mật khẩu chỉ nằm trong thư mục tạm của phiên).
+
+### Tinh chỉnh giao diện (2026-10-29, theo *taste-skill*)
+
+Skill `design-taste-frontend` viết cho web nên chỉ áp dụng nguyên tắc, không đổi kiến trúc UIKit. **Design Read:** tab Thẻ của app học tiếng Nhật trên iOS, cho người Việt,
+ngôn ngữ "Biên tập Nhật × Apple native", redesign kiểu *preserve* (token và chữ Mincho giữ nguyên); VARIANCE 5 · MOTION 4 · DENSITY 4.
+
+| Phát hiện khi đối chiếu | Sửa |
+| --- | --- |
+| Dòng phụ có tới 3 dấu chấm giữa (`3 cards · Private · 10 min. ago · On this device`) | Tối đa **một** dấu chấm: tuổi của bộ + một trạng thái (ưu tiên "Có trên máy" hơn "Riêng tư"); số thẻ chuyển lên ô đánh dấu |
+| Ô đánh dấu của bộ công khai là chữ cái Latin lặp lại ("K", "K") | Ô hiện **số thẻ** (số Mincho + đơn vị nhỏ): thông tin thật; chi tiết bộ dùng chữ Nhật đầu tiên của bộ như thư viện trên máy |
+| Bảng Ôn tập có 5 phần chữ (eyebrow "ĐẾN HẠN", số, chú thích, giải thích, nút) và số thẻ lặp ở chip, phụ đề, bảng | Bỏ eyebrow; bỏ phụ đề dưới tiêu đề lớn. **Phụ đề đếm bộ thẻ còn gây lỗi thật**: thanh tiêu đề cao thêm khi đổi mục khiến chữ "Cards" bị cắt; bỏ nó cho bố cục ổn định |
+| Trạng thái tải là vòng xoay | **Khung xương** đúng hình hàng/bảng, nhấp nháy nhẹ (đứng yên khi Giảm chuyển động) |
+| Bốn nút đánh giá bốn màu (đỏ/cam/xanh/chàm) | Một màu nhấn, khác nhau bằng chữ + biểu tượng, đồng bộ với bộ đánh giá của màn Học; không "gợi ý" bằng đèn giao thông |
+| Tổng kết là bảng 6 hàng kẻ ngang | Một con số lớn, bốn mức đánh giá trên một hàng, hai dòng sự kiện; không kẻ ngang; "Xong" là nút đặc khi không còn gì để ôn |
+| Nút không phản hồi khi nhấn | `PressableButton`: lún nhẹ 0,97 bằng spring (đứng yên khi Giảm chuyển động); chip đổi mục có cross-fade 0,2 s |
+| Sau khi lật, thẻ mất từ vừa được hỏi | Từ gốc (kèm cách đọc) hiện nhỏ dưới đáp án: người học đánh giá đúng từ đó |
+| Số thứ tự 1, 2, 3 ở chi tiết bộ thẻ | Bỏ: người dùng tự đếm được |
+
+Kiểm chứng: build, `LocalizationTests`, `CardReviewPresenterTests`, `CardLibraryScopesTests`, `RemoteDeckPresenterTests`, `CardPresenterTests` và 5 UI test thẻ (gồm bản chạy thật với backend local) đều qua (78/78); ảnh chụp thật ở `account-sections/`.
+**[Chưa kiểm chứng]** giao diện tối sau tinh chỉnh, cỡ chữ trợ năng, VoiceOver, tiếng Nhật/Anh trên màn hình thật.
 

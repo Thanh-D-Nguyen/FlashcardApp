@@ -13,7 +13,7 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
     private let cardView = StudyCardView()
     private let stateView = StateView()
     private let summaryView = ReviewSummaryView()
-    private let showAnswerButton = UIButton(configuration: Design.Button.primary(title: NSLocalizedString("Show answer", comment: "")))
+    private let showAnswerButton = PressableButton(configuration: Design.Button.primary(title: NSLocalizedString("Show answer", comment: "")))
     private let ratingGrid = UIStackView()
     private let failureView = ReviewFailureView()
     private let bottomStack = UIStackView()
@@ -138,17 +138,19 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
     private func configureRatings() {
         ratingGrid.axis = .vertical
         ratingGrid.spacing = Design.Spacing.s
-        let items: [(ReviewRating, String, String, UIColor)] = [
-            (.again, NSLocalizedString("Again", comment: "Review rating: forgot the card"), "arrow.counterclockwise", Design.Color.error),
-            (.hard, NSLocalizedString("Hard", comment: "Review rating"), "tortoise", Design.Color.warning),
-            (.good, NSLocalizedString("Good", comment: "Review rating"), "checkmark", Design.Color.success),
-            (.easy, NSLocalizedString("Easy", comment: "Review rating"), "hare", Design.Color.accent)
+        // The four choices carry the same weight and one accent: they differ by word and icon, the way the Study screen's own rating does,
+        // so the rating is not nudged by a traffic-light colour.
+        let items: [(ReviewRating, String, String)] = [
+            (.again, NSLocalizedString("Again", comment: "Review rating: forgot the card"), "arrow.counterclockwise"),
+            (.hard, NSLocalizedString("Hard", comment: "Review rating"), "tortoise"),
+            (.good, NSLocalizedString("Good", comment: "Review rating"), "checkmark"),
+            (.easy, NSLocalizedString("Easy", comment: "Review rating"), "hare")
         ]
         for (index, row) in ratingRows.enumerated() {
             row.spacing = Design.Spacing.s
             row.distribution = .fillEqually
-            for (rating, title, symbol, tint) in items[(index * 2)..<(index * 2 + 2)] {
-                let button = Self.makeRatingButton(title: title, symbol: symbol, tint: tint, identifier: "review_rate_\(rating.rawValue)")
+            for (rating, title, symbol) in items[(index * 2)..<(index * 2 + 2)] {
+                let button = Self.makeRatingButton(title: title, symbol: symbol, identifier: "review_rate_\(rating.rawValue)")
                 button.addAction(UIAction { [weak self] _ in self?.presenter.rate(rating) }, for: .primaryActionTriggered)
                 row.addArrangedSubview(button)
             }
@@ -162,21 +164,21 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
         ratingRows.forEach { $0.axis = large ? .vertical : .horizontal }
     }
 
-    private static func makeRatingButton(title: String, symbol: String, tint: UIColor, identifier: String) -> UIButton {
+    private static func makeRatingButton(title: String, symbol: String, identifier: String) -> UIButton {
         var configuration = UIButton.Configuration.filled()
         configuration.cornerStyle = .capsule
         configuration.buttonSize = .large
         configuration.baseBackgroundColor = Design.Color.surface
         configuration.baseForegroundColor = Design.Color.textPrimary
-        configuration.background.strokeColor = tint.withAlphaComponent(0.55)
+        configuration.background.strokeColor = Design.Color.accent.withAlphaComponent(0.38)
         configuration.background.strokeWidth = 1.5
         configuration.image = UIImage(systemName: symbol)
         configuration.imagePadding = Design.Spacing.s
-        configuration.imageColorTransformer = UIConfigurationColorTransformer { _ in tint }
+        configuration.imageColorTransformer = UIConfigurationColorTransformer { _ in Design.Color.accent }
         var text = AttributedString(title)
         text.font = UIFont.preferredFont(forTextStyle: .headline)
         configuration.attributedTitle = text
-        let button = UIButton(configuration: configuration)
+        let button = PressableButton(configuration: configuration)
         button.accessibilityIdentifier = identifier
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         return button
@@ -233,7 +235,9 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
                 : card.stateLabel
             stateLabel.textColor = card.isLeech ? Design.Color.warning : Design.Color.textSecondary
             let apply = {
-                self.cardView.configure(card: StudyCardState(front: card.front, back: card.back, reading: card.reading, note: "", imageReference: "",
+                // Once the answer is up, the word that was asked stays in view beneath it: the rating judges that word.
+                let asked = card.reading.isEmpty ? card.front : "\(card.front) (\(card.reading))"
+                self.cardView.configure(card: StudyCardState(front: card.front, back: card.back, reading: card.reading, note: asked, imageReference: "",
                                                               isFlipped: card.isFlipped),
                                         direction: .normal, showingBack: card.isFlipped, readingVisible: true, imagesVisible: false,
                                         style: CardStyle.style(forSlug: UserDefaultsStudyPreferences.shared.cardStyleSlug))
@@ -311,7 +315,8 @@ final class ReviewFailureView: UIStackView {
     }
 }
 
-/// End of a batch: how it went, in numbers the learner can read at a glance, and the next step.
+/// End of a batch: how it went at a glance (one figure, the four ratings in a row, two facts) and the next step. No table: the numbers
+/// are few enough to read without a rule under each.
 final class ReviewSummaryView: UIView {
     var onContinue: (() -> Void)?
     var onDone: (() -> Void)?
@@ -320,9 +325,10 @@ final class ReviewSummaryView: UIView {
     private let subtitleLabel = UILabel()
     private let figureLabel = UILabel()
     private let figureCaption = UILabel()
-    private let rows = UIStackView()
-    private let continueButton = UIButton(configuration: Design.Button.primary(title: NSLocalizedString("Review more", comment: "")))
-    private let doneButton = UIButton(configuration: .plain())
+    private let ratings = UIStackView()
+    private let facts = UIStackView()
+    private let continueButton = PressableButton(configuration: Design.Button.primary(title: NSLocalizedString("Review more", comment: "")))
+    private let doneButton = PressableButton(configuration: .plain())
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -339,21 +345,25 @@ final class ReviewSummaryView: UIView {
         figureLabel.minimumScaleFactor = 0.5
         figureCaption.apply(.metadata)
         figureCaption.textAlignment = .center
-        rows.axis = .vertical
-        rows.spacing = 0
+        ratings.distribution = .fillEqually
+        ratings.spacing = Design.Spacing.s
+        facts.axis = .vertical
+        facts.spacing = Design.Spacing.m
         continueButton.accessibilityIdentifier = "review_continue"
         continueButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         continueButton.addAction(UIAction { [weak self] _ in self?.onContinue?() }, for: .primaryActionTriggered)
-        doneButton.configuration?.title = NSLocalizedString("Done", comment: "")
         doneButton.accessibilityIdentifier = "review_done"
+        doneButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         doneButton.addAction(UIAction { [weak self] _ in self?.onDone?() }, for: .primaryActionTriggered)
 
-        let stack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, figureLabel, figureCaption, rows, continueButton, doneButton])
+        let stack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, figureLabel, figureCaption, ratings, facts, continueButton, doneButton])
         stack.axis = .vertical
         stack.spacing = Design.Spacing.m
+        stack.setCustomSpacing(Design.Spacing.s, after: titleLabel)
         stack.setCustomSpacing(Design.Spacing.xl, after: subtitleLabel)
         stack.setCustomSpacing(Design.Spacing.xl, after: figureCaption)
-        stack.setCustomSpacing(Design.Spacing.xl, after: rows)
+        stack.setCustomSpacing(Design.Spacing.xl, after: ratings)
+        stack.setCustomSpacing(Design.Spacing.xl, after: facts)
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
         NSLayoutConstraint.activate([
@@ -363,9 +373,16 @@ final class ReviewSummaryView: UIView {
             stack.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
         accessibilityIdentifier = "review_summary"
+        updateAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: ReviewSummaryView, _) in view.updateAxis() }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    /// Side by side normally; stacked at accessibility sizes so each word keeps its full width.
+    private func updateAxis() {
+        ratings.axis = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? .vertical : .horizontal
+    }
 
     func configure(with summary: ReviewSummary) {
         let empty = summary.total == 0 && summary.skipped == 0
@@ -373,25 +390,30 @@ final class ReviewSummaryView: UIView {
         subtitleLabel.text = empty
             ? NSLocalizedString("No cards are due right now. Come back later.", comment: "")
             : String.localizedStringWithFormat(NSLocalizedString("You reviewed %lld cards.", comment: ""), summary.total)
-        figureLabel.isHidden = summary.total == 0
-        figureCaption.isHidden = summary.total == 0
+        let rated = summary.total > 0
+        figureLabel.isHidden = !rated
+        figureCaption.isHidden = !rated
+        ratings.isHidden = !rated
         figureLabel.text = summary.accuracy.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.current.locale))
         figureCaption.text = NSLocalizedString("remembered", comment: "Caption under the share of cards remembered")
-        rows.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        ratings.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        for (title, count) in [(NSLocalizedString("Again", comment: ""), summary.again), (NSLocalizedString("Hard", comment: ""), summary.hard),
+                               (NSLocalizedString("Good", comment: ""), summary.good), (NSLocalizedString("Easy", comment: ""), summary.easy)] {
+            ratings.addArrangedSubview(Self.makeCount(title: title, count: count))
+        }
+
+        facts.arrangedSubviews.forEach { $0.removeFromSuperview() }
         var entries: [(String, String)] = []
-        if summary.total > 0 {
-            entries += [(NSLocalizedString("Again", comment: ""), "\(summary.again)"), (NSLocalizedString("Hard", comment: ""), "\(summary.hard)"),
-                        (NSLocalizedString("Good", comment: ""), "\(summary.good)"), (NSLocalizedString("Easy", comment: ""), "\(summary.easy)")]
+        if rated {
             entries.append((NSLocalizedString("Longest streak", comment: ""), "\(summary.longestStreak)"))
             entries.append((NSLocalizedString("Time", comment: ""), Self.format(summary.duration)))
         }
         if summary.skipped > 0 { entries.append((NSLocalizedString("Skipped", comment: ""), "\(summary.skipped)")) }
-        for (index, entry) in entries.enumerated() {
-            rows.addArrangedSubview(Self.makeRow(title: entry.0, value: entry.1, separator: index < entries.count - 1))
-        }
-        rows.isHidden = entries.isEmpty
+        entries.forEach { facts.addArrangedSubview(Self.makeFact(title: $0.0, value: $0.1)) }
+        facts.isHidden = entries.isEmpty
+
         continueButton.isHidden = !summary.mayHaveMore
-        continueButton.configuration?.title = NSLocalizedString("Review more", comment: "")
         // With nothing more to review, finishing is the one action: make it the solid button.
         let title = NSLocalizedString("Done", comment: "")
         doneButton.configuration = summary.mayHaveMore ? .plain() : Design.Button.primary(title: title)
@@ -411,10 +433,31 @@ final class ReviewSummaryView: UIView {
         return formatter.string(from: max(duration, 1)) ?? ""
     }
 
-    private static func makeRow(title: String, value: String, separator: Bool) -> UIView {
+    /// One of the four ratings: its count large, its word small beneath.
+    private static func makeCount(title: String, count: Int) -> UIView {
+        let number = UILabel()
+        number.apply(.headword)
+        number.text = count.formatted(.number.locale(AppLanguage.current.locale))
+        number.textAlignment = .center
+        number.isAccessibilityElement = false
+        let label = UILabel()
+        label.apply(.metadata)
+        label.text = title
+        label.textAlignment = .center
+        label.isAccessibilityElement = false
+        let stack = UIStackView(arrangedSubviews: [number, label])
+        stack.axis = .vertical
+        stack.spacing = Design.Spacing.xs
+        stack.isAccessibilityElement = true
+        stack.accessibilityLabel = "\(title), \(count)"
+        return stack
+    }
+
+    private static func makeFact(title: String, value: String) -> UIView {
         let titleLabel = UILabel()
         titleLabel.apply(.reading)
         titleLabel.text = title
+        titleLabel.numberOfLines = 0
         let valueLabel = UILabel()
         valueLabel.apply(.figure)
         valueLabel.text = value
@@ -422,18 +465,8 @@ final class ReviewSummaryView: UIView {
         valueLabel.setContentHuggingPriority(.required, for: .horizontal)
         let row = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
         row.spacing = Design.Spacing.m
-        row.isLayoutMarginsRelativeArrangement = true
-        row.layoutMargins = UIEdgeInsets(top: Design.Spacing.m, left: 0, bottom: Design.Spacing.m, right: 0)
         row.isAccessibilityElement = true
         row.accessibilityLabel = "\(title), \(value)"
-        let container = UIStackView(arrangedSubviews: [row])
-        container.axis = .vertical
-        if separator {
-            let line = UIView()
-            line.backgroundColor = Design.Color.separator
-            line.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-            container.addArrangedSubview(line)
-        }
-        return container
+        return row
     }
 }

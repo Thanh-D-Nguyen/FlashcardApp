@@ -13097,30 +13097,6 @@
         }
       }
     },
-    "DUE NOW" : {
-      "extractionState" : "manual",
-      "comment" : "Eyebrow above the number of cards to review",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DUE NOW"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "期限"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ĐẾN HẠN"
-          }
-        }
-      }
-    },
     "Each card comes back at the right moment, based on how well you remember it." : {
       "extractionState" : "manual",
       "comment" : "Review hero explanation",
@@ -13885,6 +13861,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Đăng nhập để ôn tập thẻ của bạn."
+          }
+        }
+      }
+    },
+    "cards" : {
+      "extractionState" : "manual",
+      "comment" : "Unit under a number of cards, in a small tile",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cards"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "枚"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "thẻ"
           }
         }
       }

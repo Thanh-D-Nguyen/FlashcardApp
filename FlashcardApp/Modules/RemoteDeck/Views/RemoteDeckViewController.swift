@@ -8,7 +8,7 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let stateView = StateView()
     private let header = RemoteDeckHeaderView()
-    private let studyButton = UIButton(configuration: Design.Button.primary(title: NSLocalizedString("Study", comment: "")))
+    private let studyButton = PressableButton(configuration: Design.Button.primary(title: NSLocalizedString("Study", comment: "")))
     private let saveButton = UIButton(configuration: .plain())
     private let noticeLabel = UILabel()
     private let footnoteLabel = UILabel()
@@ -132,7 +132,7 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
         guard newState.phase == .loaded else { return }
 
         header.configure(title: newState.title, details: newState.details, visibility: newState.visibility, isOwned: newState.isOwned,
-                         cardCount: newState.cards.count)
+                         cardCount: newState.cards.count, markSource: newState.cards.first?.front)
         tableView.reloadData()
         view.setNeedsLayout()
 
@@ -171,7 +171,7 @@ extension RemoteDeckViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: RemoteDeckCardCell.reuseIdentifier, for: indexPath)
-        if let cell = cell as? RemoteDeckCardCell { cell.configure(with: state.cards[indexPath.row], position: indexPath.row + 1) }
+        (cell as? RemoteDeckCardCell)?.configure(with: state.cards[indexPath.row])
         return cell
     }
 }
@@ -230,8 +230,9 @@ final class RemoteDeckHeaderView: UIView {
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
-    func configure(title: String, details: String, visibility: ServerDeckVisibility, isOwned: Bool, cardCount: Int) {
-        monogramLabel.text = title.first.map { String($0).uppercased() } ?? "札"
+    /// The mark is the first character of the first card, as in the library on the device; the name's initial only when there is no card.
+    func configure(title: String, details: String, visibility: ServerDeckVisibility, isOwned: Bool, cardCount: Int, markSource: String?) {
+        monogramLabel.text = (markSource ?? title).first.map { String($0).uppercased() } ?? "札"
         titleLabel.text = title
         let count = String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), cardCount)
         let kind = isOwned
@@ -250,7 +251,6 @@ final class RemoteDeckCardCell: UITableViewCell {
     private let frontLabel = UILabel()
     private let readingLabel = UILabel()
     private let backLabel = UILabel()
-    private let positionLabel = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -262,17 +262,10 @@ final class RemoteDeckCardCell: UITableViewCell {
         backLabel.apply(.meaning)
         backLabel.textColor = Design.Color.textSecondary
         backLabel.numberOfLines = 0
-        positionLabel.apply(.figure)
-        positionLabel.textColor = .tertiaryLabel
-        positionLabel.setContentHuggingPriority(.required, for: .horizontal)
-        positionLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
-        positionLabel.isAccessibilityElement = false
         let text = UIStackView(arrangedSubviews: [frontLabel, readingLabel, backLabel])
         text.axis = .vertical
         text.spacing = Design.Spacing.xs
-        let row = UIStackView(arrangedSubviews: [text, positionLabel])
-        row.spacing = Design.Spacing.m
-        row.alignment = .top
+        let row = text
         row.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(row)
         NSLayoutConstraint.activate([
@@ -286,12 +279,11 @@ final class RemoteDeckCardCell: UITableViewCell {
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
-    func configure(with card: ServerDeckCard, position: Int) {
+    func configure(with card: ServerDeckCard) {
         frontLabel.text = card.front
         readingLabel.text = card.reading
         readingLabel.isHidden = card.reading.isEmpty
         backLabel.text = card.back
-        positionLabel.text = "\(position)"
         accessibilityLabel = [card.front, card.reading, card.back].filter { !$0.isEmpty }.joined(separator: ", ")
     }
 }

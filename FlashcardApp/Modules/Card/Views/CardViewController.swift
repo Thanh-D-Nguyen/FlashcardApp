@@ -18,6 +18,7 @@ final class CardViewController: BaseViewController, CardViewInterface {
         case local(DeckRowModel)
         case remote(RemoteDeckRowModel)
         case review(due: Int, capped: Bool)
+        case skeleton(SkeletonCell.Shape, Int)
     }
 
     private struct Section {
@@ -85,6 +86,7 @@ final class CardViewController: BaseViewController, CardViewInterface {
         tableView.keyboardDismissMode = .onDrag
         tableView.register(DeckLibraryCell.self, forCellReuseIdentifier: DeckLibraryCell.reuseIdentifier)
         tableView.register(ReviewHeroCell.self, forCellReuseIdentifier: ReviewHeroCell.reuseIdentifier)
+        tableView.register(SkeletonCell.self, forCellReuseIdentifier: SkeletonCell.reuseIdentifier)
         tableView.register(CardSectionHeaderView.self, forHeaderFooterViewReuseIdentifier: CardSectionHeaderView.reuseIdentifier)
         tableView.register(CardScopeHeaderView.self, forHeaderFooterViewReuseIdentifier: CardScopeHeaderView.reuseIdentifier)
         tableView.accessibilityIdentifier = "deck_library"
@@ -99,9 +101,6 @@ final class CardViewController: BaseViewController, CardViewInterface {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         stateView.accessibilityIdentifier = "deck_library_state"
-        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: CardViewController, _) in
-            controller.updateSubtitle()
-        }
     }
 
     func subscribe() {}
@@ -161,17 +160,20 @@ final class CardViewController: BaseViewController, CardViewInterface {
         stateView.accessibilityIdentifier = "deck_library_state"
         dueCount = state.reviewDueCount
         updateBarItems(for: state)
-        updateSubtitle(for: state)
         tableView.reloadData()
         var isLoading = false
-        if case .loading? = placeholder { isLoading = true }
+        switch state.content {
+        case .remote(.loading), .review(ReviewEntryModel(phase: .loading)): isLoading = true
+        default: break
+        }
         if !isLoading {
             refreshControl.endRefreshing()
             // A new section starts at its top, whatever the previous one was scrolled to; once its rows are there.
             if needsScrollToTop {
                 needsScrollToTop = false
-                tableView.layoutIfNeeded()
-                tableView.setContentOffset(CGPoint(x: 0, y: -tableView.adjustedContentInset.top), animated: false)
+                scrollToTop()
+                // Reaching the top expands the large title, which grows the inset: place the list once more against the final one.
+                DispatchQueue.main.async { [weak self] in self?.scrollToTop() }
             }
         }
         // Attached once in setupUI (changing the bar's height after the list was laid out left the first row under it);
@@ -181,13 +183,23 @@ final class CardViewController: BaseViewController, CardViewInterface {
         searchController.searchBar.alpha = searchable ? 1 : 0.4
     }
 
+    private func scrollToTop() {
+        // Let the bar settle first, then measure the inset it leaves.
+        UIView.performWithoutAnimation {
+            navigationController?.view.layoutIfNeeded()
+            tableView.layoutIfNeeded()
+            tableView.setContentOffset(CGPoint(x: 0, y: -tableView.adjustedContentInset.top), animated: false)
+        }
+    }
+
     private var accountFailure: String?
     private var needsScrollToTop = false
 
     private func reviewPlaceholder(for entry: ReviewEntryModel, into sections: inout [Section]) -> (StateView.State?, (() -> Void)?) {
         switch entry.phase {
         case .loading:
-            return (.loading(NSLocalizedString("Loading your cards…", comment: "")), nil)
+            sections[0].items = [.skeleton(.hero, 0)]
+            return (nil, nil)
         case .signInRequired:
             return (signInPlaceholder(NSLocalizedString("Sign in to review your cards", comment: ""),
                                       message: NSLocalizedString("Your review schedule lives on your account, so it follows you between the app and the website.", comment: "")),
@@ -208,7 +220,8 @@ final class CardViewController: BaseViewController, CardViewInterface {
                                    into sections: inout [Section]) -> (StateView.State?, (() -> Void)?) {
         switch list {
         case .loading:
-            return (.loading(NSLocalizedString("Loading decks…", comment: "")), nil)
+            sections[0].items = (0..<6).map { .skeleton(.deckRow, $0) }
+            return (nil, nil)
         case .signInRequired:
             return (signInPlaceholder(NSLocalizedString("Sign in to see these decks", comment: ""),
                                       message: NSLocalizedString("Public and recent decks come from your account and the website.", comment: "")),
@@ -239,28 +252,6 @@ final class CardViewController: BaseViewController, CardViewInterface {
         navigationItem.rightBarButtonItems = state.scope == .mine ? [addItem, sortItem] : [addItem]
         sortItem.menu = makeSortMenu()
         sortItem.isEnabled = state.deckCount > 1
-    }
-
-    private var subtitleText: String?
-
-    private func updateSubtitle(for state: CardLibraryState) {
-        switch state.content {
-        case .decks(let rows): subtitleText = String.localizedStringWithFormat(NSLocalizedString("%lld decks", comment: "Number of decks in the library"), rows.count)
-        case .remote(.decks(let rows)): subtitleText = String.localizedStringWithFormat(NSLocalizedString("%lld decks", comment: ""), rows.count)
-        case .review(let entry):
-            if case .ready(let due, let capped) = entry.phase, due > 0 {
-                subtitleText = String.localizedStringWithFormat(NSLocalizedString("%lld cards due", comment: "Cards waiting for review"), due)
-                    + (capped ? "+" : "")
-            } else { subtitleText = nil }
-        default: subtitleText = nil
-        }
-        updateSubtitle()
-    }
-
-    private func updateSubtitle() {
-        // Static count line under the large title; dropped at accessibility sizes where the system would truncate it.
-        let large = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
-        navigationItem.subtitle = large ? nil : subtitleText
     }
 
     private func makeSortMenu() -> UIMenu {
@@ -295,6 +286,11 @@ extension CardViewController: UITableViewDataSource, UITableViewDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: ReviewHeroCell.reuseIdentifier, for: indexPath)
             (cell as? ReviewHeroCell)?.configure(due: due, capped: capped) { [weak self] in self?.presenter.startReview() }
             return cell
+        case .skeleton(let shape, let index):
+            let cell = tableView.dequeueReusableCell(withIdentifier: SkeletonCell.reuseIdentifier, for: indexPath)
+            let text = scope == .review ? NSLocalizedString("Loading your cards…", comment: "") : NSLocalizedString("Loading decks…", comment: "")
+            (cell as? SkeletonCell)?.configure(shape, index: index, announcement: text)
+            return cell
         }
     }
 
@@ -322,13 +318,15 @@ extension CardViewController: UITableViewDataSource, UITableViewDelegate {
         switch sections[indexPath.section].items[indexPath.row] {
         case .local(let row): presenter.studyDeck(id: row.id)
         case .remote(let row): presenter.openAccountDeck(id: row.id)
-        case .review: break
+        case .review, .skeleton: break
         }
     }
 
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        if case .review = sections[indexPath.section].items[indexPath.row] { return false }
-        return true
+        switch sections[indexPath.section].items[indexPath.row] {
+        case .review, .skeleton: return false
+        default: return true
+        }
     }
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {

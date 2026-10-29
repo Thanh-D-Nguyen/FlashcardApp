@@ -1,5 +1,127 @@
 import UIKit
 
+/// A button that sinks a little under the finger, so a touch is acknowledged before its action runs. With Reduce Motion it stays still.
+final class PressableButton: UIButton {
+    override var isHighlighted: Bool {
+        didSet {
+            guard oldValue != isHighlighted, !UIAccessibility.isReduceMotionEnabled else { return }
+            UIView.animate(withDuration: 0.22, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0,
+                           options: [.allowUserInteraction, .beginFromCurrentState]) {
+                self.transform = self.isHighlighted ? CGAffineTransform(scaleX: 0.97, y: 0.97) : .identity
+            }
+        }
+    }
+}
+
+/// What a list looks like while it loads: the same shapes as the rows that will replace it, softly pulsing. It replaces a spinner,
+/// so the screen keeps its layout when the content arrives. With Reduce Motion it does not pulse.
+final class SkeletonCell: UITableViewCell {
+    static let reuseIdentifier = "card_skeleton_cell"
+
+    enum Shape {
+        case deckRow
+        case hero
+    }
+
+    private let content = UIView()
+    private var widthConstraints: [NSLayoutConstraint] = []
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundConfiguration = .clear()
+        selectionStyle = .none
+        content.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(content)
+        NSLayoutConstraint.activate([
+            content.topAnchor.constraint(equalTo: contentView.topAnchor),
+            content.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            content.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            content.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+        ])
+    }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        content.layer.removeAnimation(forKey: "pulse")
+        content.subviews.forEach { $0.removeFromSuperview() }
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window != nil else { return content.layer.removeAnimation(forKey: "pulse") }
+        startPulse()
+    }
+
+    private func startPulse() {
+        guard !UIAccessibility.isReduceMotionEnabled, content.layer.animation(forKey: "pulse") == nil else { return }
+        let pulse = CABasicAnimation(keyPath: "opacity")
+        pulse.fromValue = 1
+        pulse.toValue = 0.45
+        pulse.duration = 0.9
+        pulse.autoreverses = true
+        pulse.repeatCount = .infinity
+        pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        content.layer.add(pulse, forKey: "pulse")
+    }
+
+    private func block(radius: CGFloat) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .tertiarySystemFill
+        view.layer.cornerRadius = radius
+        view.layer.cornerCurve = .continuous
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }
+
+    /// `index` varies the line lengths from row to row; only the first skeleton is announced, once, as "loading".
+    func configure(_ shape: Shape, index: Int, announcement: String) {
+        content.subviews.forEach { $0.removeFromSuperview() }
+        isAccessibilityElement = index == 0
+        accessibilityLabel = announcement
+        switch shape {
+        case .hero:
+            let panel = block(radius: Design.Radius.panel)
+            content.addSubview(panel)
+            NSLayoutConstraint.activate([
+                panel.topAnchor.constraint(equalTo: content.topAnchor, constant: Design.Spacing.l),
+                panel.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -Design.Spacing.l),
+                panel.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: Design.Spacing.gutter),
+                panel.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -Design.Spacing.gutter),
+                panel.heightAnchor.constraint(equalToConstant: 250)
+            ])
+        case .deckRow:
+            let tile = block(radius: Design.Spacing.m)
+            let lines = [(CGFloat(14), [0.55, 0.7, 0.45][index % 3]), (CGFloat(11), [0.9, 0.8, 0.95][index % 3]), (CGFloat(11), [0.4, 0.5, 0.35][index % 3])]
+            let text = UIStackView()
+            text.axis = .vertical
+            text.alignment = .leading
+            text.spacing = 9
+            text.translatesAutoresizingMaskIntoConstraints = false
+            content.addSubview(tile)
+            content.addSubview(text)
+            NSLayoutConstraint.activate([
+                tile.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: Design.Spacing.gutter),
+                tile.topAnchor.constraint(equalTo: content.topAnchor, constant: Design.Spacing.m),
+                tile.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -Design.Spacing.m),
+                tile.widthAnchor.constraint(equalToConstant: 56),
+                tile.heightAnchor.constraint(equalToConstant: 56),
+                text.leadingAnchor.constraint(equalTo: tile.trailingAnchor, constant: Design.Spacing.m),
+                text.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -Design.Spacing.gutter),
+                text.centerYAnchor.constraint(equalTo: tile.centerYAnchor)
+            ])
+            for (height, fraction) in lines {
+                let bar = block(radius: height / 2)
+                text.addArrangedSubview(bar)
+                bar.heightAnchor.constraint(equalToConstant: height).isActive = true
+                bar.widthAnchor.constraint(equalTo: text.widthAnchor, multiplier: fraction).isActive = true
+            }
+        }
+        startPulse()
+    }
+}
+
 /// The row of sections under the large title. It stays pinned while the list scrolls, scrolls sideways when the words do not fit
 /// (large text, longer languages), and shows the number of cards due on "Review".
 final class CardScopeBar: UIView {
@@ -35,7 +157,7 @@ final class CardScopeBar: UIView {
             stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
         ])
         for scope in CardLibraryScope.allCases {
-            let chip = UIButton(configuration: .filled())
+            let chip = PressableButton(configuration: .filled())
             chip.accessibilityIdentifier = "cards_scope_\(scope.rawValue)"
             chip.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
             chip.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -52,9 +174,15 @@ final class CardScopeBar: UIView {
 
     func configure(selected: CardLibraryScope, dueCount: Int?) {
         guard selected != self.selected || dueCount != self.dueCount else { return }
+        let selectionChanged = selected != self.selected
         self.selected = selected
         self.dueCount = dueCount
-        refreshChips()
+        // The selection moves from one chip to the next: a short cross-fade says which, instead of a jump.
+        if selectionChanged, window != nil, !UIAccessibility.isReduceMotionEnabled {
+            UIView.transition(with: stack, duration: 0.2, options: [.transitionCrossDissolve, .allowUserInteraction]) { self.refreshChips() }
+        } else {
+            refreshChips()
+        }
     }
 
     private func refreshChips() {
@@ -62,7 +190,7 @@ final class CardScopeBar: UIView {
             let isSelected = scope == selected
             var configuration = UIButton.Configuration.filled()
             configuration.cornerStyle = .capsule
-            configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: Design.Spacing.m, bottom: Design.Spacing.s, trailing: Design.Spacing.m)
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: 11, bottom: Design.Spacing.s, trailing: 11)
             configuration.baseBackgroundColor = isSelected ? Design.Color.accent : Design.Color.surface
             configuration.baseForegroundColor = isSelected ? Design.Color.onAccent : Design.Color.textPrimary
             configuration.background.strokeColor = isSelected ? .clear : Design.Color.separator
@@ -71,7 +199,7 @@ final class CardScopeBar: UIView {
             title.font = UIFont.preferredFont(forTextStyle: .subheadline).withWeight(isSelected ? .semibold : .regular)
             let badge = scope == .review ? dueCount.flatMap { $0 > 0 ? $0 : nil } : nil
             if let badge {
-                var number = AttributedString("  \(badge.formatted(.number.locale(AppLanguage.current.locale)))")
+                var number = AttributedString(" \(badge.formatted(.number.locale(AppLanguage.current.locale)))")
                 number.font = UIFont.preferredFont(forTextStyle: .subheadline).withWeight(.semibold)
                 title += number
             }
@@ -163,11 +291,10 @@ final class ReviewHeroCell: UITableViewCell {
     static let reuseIdentifier = "review_hero_cell"
 
     private let panel = UIView()
-    private let eyebrowLabel = UILabel()
     private let figureLabel = UILabel()
     private let captionLabel = UILabel()
     private let explanationLabel = UILabel()
-    private let startButton = UIButton(configuration: Design.Button.hero(title: NSLocalizedString("Start review", comment: "")))
+    private let startButton = PressableButton(configuration: Design.Button.hero(title: NSLocalizedString("Start review", comment: "")))
     private var onStart: (() -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -180,9 +307,6 @@ final class ReviewHeroCell: UITableViewCell {
         panel.layer.cornerCurve = .continuous
         panel.translatesAutoresizingMaskIntoConstraints = false
 
-        eyebrowLabel.apply(.eyebrow)
-        eyebrowLabel.textColor = Design.Color.onHeroSecondary
-        eyebrowLabel.text = NSLocalizedString("DUE NOW", comment: "Eyebrow above the number of cards to review").uppercased(with: AppLanguage.current.locale)
         figureLabel.apply(.numeralDisplay)
         figureLabel.adjustsFontSizeToFitWidth = true
         figureLabel.minimumScaleFactor = 0.5
@@ -198,11 +322,11 @@ final class ReviewHeroCell: UITableViewCell {
         startButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         startButton.addAction(UIAction { [weak self] _ in self?.onStart?() }, for: .primaryActionTriggered)
 
-        let stack = UIStackView(arrangedSubviews: [eyebrowLabel, figureLabel, captionLabel, explanationLabel, startButton])
+        let stack = UIStackView(arrangedSubviews: [figureLabel, captionLabel, explanationLabel, startButton])
         stack.axis = .vertical
         stack.alignment = .fill
         stack.spacing = Design.Spacing.xs
-        stack.setCustomSpacing(Design.Spacing.m, after: captionLabel)
+        stack.setCustomSpacing(Design.Spacing.s, after: captionLabel)
         stack.setCustomSpacing(Design.Spacing.xl, after: explanationLabel)
         stack.translatesAutoresizingMaskIntoConstraints = false
         panel.addSubview(stack)
@@ -232,22 +356,26 @@ final class ReviewHeroCell: UITableViewCell {
 }
 
 extension DeckLibraryCell {
-    /// A deck of the account: the same row as a deck on the device, with its visibility, age and whether a copy is saved.
+    /// A deck of the account: the same row as a deck on the device. Its decks have no Japanese mark to show (the list carries no cards),
+    /// so the tile carries what the list does know: how many cards. The line under the text keeps to the age and at most one state.
     func configure(with row: RemoteDeckRowModel) {
-        let count = String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), row.cardCount)
-        var facts = [count]
-        if row.isOwned {
-            facts.append(row.visibility == .public ? NSLocalizedString("Public", comment: "") : NSLocalizedString("Private", comment: ""))
-        }
+        var facts: [String] = []
         if let updated = row.updatedAt {
             let formatter = RelativeDateTimeFormatter()
             formatter.locale = AppLanguage.current.locale
             formatter.unitsStyle = .short
             facts.append(formatter.localizedString(for: updated, relativeTo: Date()))
         }
-        if row.isOnDevice { facts.append(NSLocalizedString("On this device", comment: "A copy of the deck is stored on the device")) }
-        configureRow(monogram: row.monogram, title: row.title, details: row.details, preview: "", meta: facts.joined(separator: " · "),
+        // One state at most: that it is on this device matters more than that it is private.
+        if row.isOnDevice {
+            facts.append(NSLocalizedString("On this device", comment: "A copy of the deck is stored on the device"))
+        } else if row.isOwned, row.visibility == .private {
+            facts.append(NSLocalizedString("Private", comment: ""))
+        }
+        let count = String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), row.cardCount)
+        configureRow(monogram: row.cardCount.formatted(.number.locale(AppLanguage.current.locale)),
+                     unit: NSLocalizedString("cards", comment: "Unit under a number of cards, in a small tile"), title: row.title, details: row.details, preview: "", meta: facts.joined(separator: " · "),
                      identifier: "remote_deck_row_\(row.id)", hint: NSLocalizedString("Open this deck", comment: ""),
-                     accessibility: [row.title, row.details, facts.joined(separator: ", ")].filter { !$0.isEmpty }.joined(separator: ", "))
+                     accessibility: ([row.title, row.details, count] + facts).filter { !$0.isEmpty }.joined(separator: ", "))
     }
 }
