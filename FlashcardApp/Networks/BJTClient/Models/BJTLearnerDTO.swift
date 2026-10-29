@@ -36,6 +36,56 @@ struct BJTRemoteDeckDTO: Decodable, Equatable {
     let id: String
     let titleVi: String
     let cards: [Entry]
+    // Present in the Go response; only the library detail screen reads them. `nil` owner means the deck is not the learner's.
+    var titleJa: String? = nil
+    var descriptionVi: String? = nil
+    var descriptionJa: String? = nil
+    var visibility: String? = nil
+    var ownerUserId: String? = nil
+}
+
+/// One row of `GET /api/flashcards/decks`: the learner's own decks and every public deck. The server clears
+/// `ownerUserId` (and `shareToken`) on decks that are not the caller's, so a nil owner means "someone else's".
+struct BJTDeckSummaryDTO: Decodable, Equatable {
+    let id: String
+    let ownerUserId: String?
+    let titleVi: String
+    let titleJa: String?
+    let descriptionVi: String?
+    let descriptionJa: String?
+    let visibility: String
+    let status: String
+    let cardCount: Int
+    let createdAt: String?
+    let updatedAt: String?
+}
+
+/// One entry of `GET /api/flashcards/reviews/due`. `id` is the learner's scheduling row (`user_flashcard`), which the rating is posted to.
+struct BJTDueCardDTO: Decodable, Equatable {
+    struct Content: Decodable, Equatable {
+        let id: String
+        let frontText: String
+        let backText: String
+        let reading: String?
+    }
+
+    let id: String
+    let cardId: String
+    let state: String
+    let intervalDays: Int
+    let lapses: Int
+    let leeched: Bool
+    let card: Content
+}
+
+/// `POST /api/flashcards/reviews/{id}` → `{ "success": true }`.
+struct BJTReviewAckDTO: Decodable, Equatable {
+    let success: Bool
+}
+
+/// `POST /api/flashcards/decks/{id}/archive` → `{ "archived": true }`.
+struct BJTArchiveAckDTO: Decodable, Equatable {
+    let archived: Bool
 }
 
 /// `POST /api/media/search-images`. The Go handler currently always answers 503, so this shape is the one the

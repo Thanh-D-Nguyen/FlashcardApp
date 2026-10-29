@@ -117,7 +117,8 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
 
     // MARK: Transport
 
-    private func perform<Response: Decodable, Body: Encodable>(_ path: [String], method: HTTPMethod, body: Body?) -> Single<Response> {
+    func perform<Response: Decodable, Body: Encodable>(_ path: [String], method: HTTPMethod, body: Body?,
+                                                       query: [String: String] = [:]) -> Single<Response> {
         Single.create { [self] observer in
             guard let bearer = token() else {
                 observer(.failure(LearnerAPIError.signInRequired))
@@ -136,7 +137,11 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
             }
             var headers: HTTPHeaders = ["Accept": "application/json", "Origin": originValue]
             headers.add(.authorization(bearerToken: bearer))
-            let url = path.reduce(base) { $0.appendingPathComponent($1) }
+            var url = path.reduce(base) { $0.appendingPathComponent($1) }
+            if !query.isEmpty, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                components.queryItems = query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) }
+                url = components.url ?? url
+            }
 
             let request: DataRequest
             if let body {
@@ -168,7 +173,7 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
         }
     }
 
-    private static func transportError(_ error: AFError) -> LearnerAPIError {
+    static func transportError(_ error: AFError) -> LearnerAPIError {
         let code = (error.underlyingError as? URLError)?.code
         switch code {
         case .notConnectedToInternet?, .dataNotAllowed?, .cannotFindHost?, .cannotConnectToHost?, .internationalRoamingOff?:
