@@ -260,3 +260,63 @@ final class PictureSuggestionTests: XCTestCase {
         XCTAssertNil(attribution.creditURL)
     }
 }
+
+final class CardPictureTests: XCTestCase {
+    private let api = "https://api.example.test/api"
+
+    private func dto(readUrl: String?, provider: String? = "unsplash", author: String? = "Ana Lee") -> BJTCardImageDTO {
+        BJTCardImageDTO(assetId: "a", mimeType: "image/jpeg", readUrl: readUrl, provider: provider,
+                        sourceUrl: "https://unsplash.com/photos/a", author: author, authorUrl: "http://insecure.test/ana",
+                        license: "Unsplash License", licenseUrl: nil)
+    }
+
+    func test_aProviderAddressIsKeptWithItsCredit() throws {
+        let picture = try XCTUnwrap(CardPicture.make(dto(readUrl: "https://images.unsplash.com/a.jpg"), apiBase: api))
+        XCTAssertEqual(picture.reference, "https://images.unsplash.com/a.jpg")
+        XCTAssertEqual(picture.credit, "Photo by Ana Lee · unsplash · Unsplash License")
+        XCTAssertNil(picture.attribution?.authorURL, "A link that is not https is not kept")
+        XCTAssertEqual(picture.attribution?.creditURL, URL(string: "https://unsplash.com/photos/a"))
+    }
+
+    func test_anAPIMediaPathResolvesAgainstTheConfiguredAPIAddress() throws {
+        let preview = try XCTUnwrap(CardPicture.make(dto(readUrl: "/api/media/1/private-preview", provider: nil, author: nil), apiBase: api))
+        XCTAssertEqual(preview.reference, "https://api.example.test/api/media/1/private-preview")
+        XCTAssertNil(preview.attribution, "An own upload has no credit")
+        XCTAssertEqual(preview.credit, "")
+    }
+
+    func test_addressesTheAppWillNotLoadAreDropped() {
+        for raw in [nil, "", "http://images.test/a.jpg", "file:///etc/passwd", "/other/path.jpg", "//evil.test/api/media/1"] {
+            XCTAssertNil(CardPicture.make(dto(readUrl: raw), apiBase: api), String(describing: raw))
+        }
+        XCTAssertNil(CardPicture.make(nil, apiBase: api))
+    }
+
+    func test_theSessionIsOnlyEverSentToTheAPIsOwnMediaPaths() {
+        let own = URL(string: "https://api.example.test/api/media/1/private-preview")!
+        XCTAssertEqual(APIImageAuthorization.header(for: own, token: "tok", apiBase: api), "Bearer tok")
+        XCTAssertNil(APIImageAuthorization.header(for: own, token: nil, apiBase: api))
+        XCTAssertNil(APIImageAuthorization.header(for: URL(string: "https://images.unsplash.com/a.jpg")!, token: "tok", apiBase: api))
+        XCTAssertNil(APIImageAuthorization.header(for: URL(string: "https://api.example.test.evil.test/api/media/1")!, token: "tok", apiBase: api))
+        XCTAssertNil(APIImageAuthorization.header(for: URL(string: "http://api.example.test/api/media/1")!, token: "tok", apiBase: api))
+        XCTAssertNil(APIImageAuthorization.header(for: URL(string: "https://api.example.test/api/flashcards/decks")!, token: "tok", apiBase: api))
+    }
+
+    func test_theDeckAndReviewPayloadsCarryThePicture() throws {
+        let deck = #"{"id":"d","titleVi":"t","cards":[{"id":"i","position":0,"card":{"id":"c","frontText":"犬","backText":"chó","reading":null,"sourceId":"s","sourceType":"t","primaryImage":{"assetId":"a","mimeType":"image/jpeg","readUrl":"/api/media/a/stream"}}}]}"#
+        let decoded = try JSONDecoder().decode(BJTRemoteDeckDTO.self, from: Data(deck.utf8))
+        XCTAssertEqual(decoded.cards[0].card.primaryImage?.readUrl, "/api/media/a/stream")
+        let due = #"{"id":"i","cardId":"c","state":"new","intervalDays":0,"lapses":0,"leeched":false,"card":{"id":"c","frontText":"犬","backText":"chó","reading":null},"primaryImage":null}"#
+        XCTAssertNil(try JSONDecoder().decode(BJTDueCardDTO.self, from: Data(due.utf8)).primaryImage)
+    }
+
+    func test_theMappersPassThePictureOn() throws {
+        let image = #","primaryImage":{"assetId":"a","mimeType":"image/jpeg","readUrl":"https://images.unsplash.com/a.jpg"}"#
+        let due = #"{"id":"11111111-0000-4000-8000-000000000001","cardId":"c","state":"new","intervalDays":0,"lapses":0,"leeched":false,"card":{"id":"c","frontText":"犬","backText":"chó","reading":null}"# + image + "}"
+        let dueCard = try XCTUnwrap(ServerDeckMapper.dueCard(from: JSONDecoder().decode(BJTDueCardDTO.self, from: Data(due.utf8))))
+        XCTAssertEqual(dueCard.picture?.reference, "https://images.unsplash.com/a.jpg")
+        let deck = #"{"id":"d","titleVi":"t","cards":[{"id":"i","position":0,"card":{"id":"c","frontText":"犬","backText":"chó","reading":null,"sourceId":"s","sourceType":"t""# + image + "}}]}"
+        let detail = ServerDeckMapper.detail(from: try JSONDecoder().decode(BJTRemoteDeckDTO.self, from: Data(deck.utf8)))
+        XCTAssertEqual(detail.cards.first?.picture?.reference, "https://images.unsplash.com/a.jpg")
+    }
+}

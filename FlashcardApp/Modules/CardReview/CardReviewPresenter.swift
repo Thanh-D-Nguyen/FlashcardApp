@@ -21,6 +21,7 @@ struct ReviewCardState: Equatable {
     /// "New", "Relearning" …: where the card is in its schedule. Words, not only a colour.
     let stateLabel: String
     let isLeech: Bool
+    var picture: CardPicture? = nil
 }
 
 struct ReviewSummary: Equatable {
@@ -177,7 +178,8 @@ final class CardReviewPresenter {
         if state.screen == .card, position < cards.count {
             let card = cards[position]
             state.card = ReviewCardState(front: card.front, back: card.back, reading: card.reading, isFlipped: isFlipped,
-                                         stateLabel: Self.label(for: card.state), isLeech: card.isLeech)
+                                         stateLabel: Self.label(for: card.state), isLeech: card.isLeech,
+                                         picture: card.picture)
             state.progressText = String(format: NSLocalizedString("%1$lld of %2$lld", comment: "Study progress: position of total"),
                                         position + 1, cards.count)
             state.progress = cards.isEmpty ? 0 : Float(position) / Float(cards.count)

@@ -251,6 +251,8 @@ final class RemoteDeckCardCell: UITableViewCell {
     private let frontLabel = UILabel()
     private let readingLabel = UILabel()
     private let backLabel = UILabel()
+    private let creditLabel = UILabel()
+    private let pictureView = CardImageView()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -262,10 +264,22 @@ final class RemoteDeckCardCell: UITableViewCell {
         backLabel.apply(.meaning)
         backLabel.textColor = Design.Color.textSecondary
         backLabel.numberOfLines = 0
-        let text = UIStackView(arrangedSubviews: [frontLabel, readingLabel, backLabel])
+        creditLabel.apply(.metadata)
+        creditLabel.textColor = Design.Color.textSecondary
+        creditLabel.numberOfLines = 0
+        pictureView.isCompact = true
+        pictureView.isAccessibilityElement = false
+        pictureView.translatesAutoresizingMaskIntoConstraints = false
+        pictureView.widthAnchor.constraint(equalToConstant: 72).isActive = true
+        pictureView.heightAnchor.constraint(equalToConstant: 56).isActive = true
+        let text = UIStackView(arrangedSubviews: [frontLabel, readingLabel, backLabel, creditLabel])
         text.axis = .vertical
         text.spacing = Design.Spacing.xs
-        let row = text
+        // The picture sits beside the words, top-aligned, and is absent for cards without one.
+        let row = UIStackView(arrangedSubviews: [text, pictureView])
+        row.axis = .horizontal
+        row.alignment = .top
+        row.spacing = Design.Spacing.m
         row.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(row)
         NSLayoutConstraint.activate([
@@ -284,6 +298,20 @@ final class RemoteDeckCardCell: UITableViewCell {
         readingLabel.text = card.reading
         readingLabel.isHidden = card.reading.isEmpty
         backLabel.text = card.back
-        accessibilityLabel = [card.front, card.reading, card.back].filter { !$0.isEmpty }.joined(separator: ", ")
+        creditLabel.text = card.picture?.credit
+        creditLabel.isHidden = (card.picture?.credit ?? "").isEmpty
+        if let picture = card.picture {
+            pictureView.isHidden = false
+            pictureView.setReference(picture.reference)
+        } else {
+            pictureView.cancel()
+            pictureView.isHidden = true
+        }
+        accessibilityLabel = [card.front, card.reading, card.back, card.picture?.credit].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        pictureView.cancel()
     }
 }

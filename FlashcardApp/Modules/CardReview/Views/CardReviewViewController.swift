@@ -237,9 +237,11 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
             let apply = {
                 // Once the answer is up, the word that was asked stays in view beneath it: the rating judges that word.
                 let asked = card.reading.isEmpty ? card.front : "\(card.front) (\(card.reading))"
-                self.cardView.configure(card: StudyCardState(front: card.front, back: card.back, reading: card.reading, note: asked, imageReference: "",
-                                                              isFlipped: card.isFlipped),
-                                        direction: .normal, showingBack: card.isFlipped, readingVisible: true, imagesVisible: false,
+                self.cardView.configure(card: StudyCardState(front: card.front, back: card.back, reading: card.reading, note: asked,
+                                                              imageReference: card.picture?.reference ?? "", isFlipped: card.isFlipped,
+                                                              imageCredit: card.picture?.credit ?? ""),
+                                        direction: .normal, showingBack: card.isFlipped, readingVisible: true,
+                                        imagesVisible: UserDefaultsStudyPreferences.shared.areImagesVisible,
                                         style: CardStyle.style(forSlug: UserDefaultsStudyPreferences.shared.cardStyleSlug))
                 self.cardView.accessibilityHint = NSLocalizedString("Double-tap to flip the card", comment: "")
             }

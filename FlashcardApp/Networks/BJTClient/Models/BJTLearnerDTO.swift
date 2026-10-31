@@ -15,6 +15,22 @@ struct BJTGeneratedDeckDTO: Decodable, Equatable {
     let cardCount: Int
 }
 
+/// The picture of a card (`primaryImage`), from `GET /api/flashcards/decks/{id}` and `GET /api/flashcards/reviews/due`.
+/// `readUrl` is an https provider address (Unsplash hotlink), `/api/media/{id}/stream` (cleared copy) or
+/// `/api/media/{id}/private-preview` (the owner's copy awaiting a rights review; needs the session).
+/// The credit fields describe a picture chosen from a provider and are absent for the learner's own uploads.
+struct BJTCardImageDTO: Decodable, Equatable {
+    let assetId: String
+    let mimeType: String?
+    let readUrl: String?
+    var provider: String? = nil
+    var sourceUrl: String? = nil
+    var author: String? = nil
+    var authorUrl: String? = nil
+    var license: String? = nil
+    var licenseUrl: String? = nil
+}
+
 /// `GET /api/flashcards/decks/{deckId}` → the deck with its cards in position order.
 struct BJTRemoteDeckDTO: Decodable, Equatable {
     struct Entry: Decodable, Equatable {
@@ -25,6 +41,7 @@ struct BJTRemoteDeckDTO: Decodable, Equatable {
             let reading: String?
             let sourceId: String
             let sourceType: String
+            var primaryImage: BJTCardImageDTO? = nil
         }
 
         /// The `deck_card` row id: unique to this deck, so it is safe as a local card key.
@@ -76,6 +93,7 @@ struct BJTDueCardDTO: Decodable, Equatable {
     let lapses: Int
     let leeched: Bool
     let card: Content
+    var primaryImage: BJTCardImageDTO? = nil
 }
 
 /// `POST /api/flashcards/reviews/{id}` → `{ "success": true }`.

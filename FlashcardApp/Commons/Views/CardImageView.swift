@@ -94,11 +94,22 @@ final class CardImageView: UIView {
         case .remote(let url):
             apply(.loading)
             let token = loadToken
-            imageView.kf.setImage(with: url, options: [
+            var options: KingfisherOptionsInfo = [
                 .processor(DownsamplingImageProcessor(size: CGSize(width: maxPixelSize, height: maxPixelSize))),
                 .scaleFactor(1),
                 .cacheOriginalImage
-            ]) { [weak self] result in
+            ]
+            // The learner's own copy awaiting a rights review is served only with the session. It is attached to the API's
+            // address alone, and such a picture is kept in memory only: it must not outlive the session on disk.
+            if let authorization = APIImageAuthorization.header(for: url, token: AuthSession.shared.bearerToken) {
+                options.append(.requestModifier(AnyModifier { request in
+                    var request = request
+                    request.setValue(authorization, forHTTPHeaderField: "Authorization")
+                    return request
+                }))
+                options.append(.cacheMemoryOnly)
+            }
+            imageView.kf.setImage(with: url, options: options) { [weak self] result in
                 guard let self, self.loadToken == token else { return }
                 if case .failure(let error) = result, !error.isTaskCancelled, !error.isNotCurrentTask {
                     self.apply(.failed)
@@ -143,5 +154,20 @@ final class CardImageView: UIView {
         let current = reference
         reference = ""
         setReference(current)
+    }
+}
+
+/// Decides whether a picture request carries the session: only to the API's own host, never to a third-party address.
+enum APIImageAuthorization {
+    static func isAPIAddress(_ url: URL, apiBase: String = EnvironmentConfig.baseUrl()) -> Bool {
+        guard let base = URL(string: apiBase), let scheme = base.scheme?.lowercased(), let host = base.host?.lowercased() else { return false }
+        return url.scheme?.lowercased() == scheme && url.host?.lowercased() == host && url.port == base.port
+            && url.path.hasPrefix("/api/media/")
+    }
+
+    /// `Authorization` for `url`, or `nil` for any other address or when nobody is signed in.
+    static func header(for url: URL, token: String?, apiBase: String = EnvironmentConfig.baseUrl()) -> String? {
+        guard let token, !token.isEmpty, isAPIAddress(url, apiBase: apiBase) else { return nil }
+        return "Bearer " + token
     }
 }

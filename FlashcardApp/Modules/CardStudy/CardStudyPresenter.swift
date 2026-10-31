@@ -16,6 +16,8 @@ struct StudyCardState: Equatable {
     let note: String
     let imageReference: String
     let isFlipped: Bool
+    /// "Photo by …" for a picture chosen from a provider; empty when there is none to show.
+    var imageCredit: String = ""
 }
 
 struct StudyQuizState: Equatable {

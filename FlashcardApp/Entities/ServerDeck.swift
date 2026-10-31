@@ -20,6 +20,48 @@ enum ServerDeckVisibility: String, Equatable {
     case `private`, `public`
 }
 
+/// The picture of a card that lives on the learner's account (`primaryImage` of the deck and review payloads).
+/// Only an address the app may load is kept: https, or the API's own `/api/media/...` path resolved against the
+/// configured API address (which is also the only host the session token is ever sent to).
+struct CardPicture: Equatable {
+    let url: URL
+    let attribution: ImageAttribution?
+
+    /// The value stored on a card / handed to `CardImageView`.
+    var reference: String { url.absoluteString }
+    var credit: String { attribution?.creditLine ?? "" }
+
+    /// `nil` when the card has no picture the app can show. `apiBase` is the configured API address (`…/api`).
+    static func make(_ dto: BJTCardImageDTO?, apiBase: String = EnvironmentConfig.baseUrl()) -> CardPicture? {
+        guard let dto, let raw = dto.readUrl?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty,
+              let url = resolve(raw, apiBase: apiBase) else { return nil }
+        return CardPicture(url: url, attribution: attribution(of: dto, url: url))
+    }
+
+    private static func resolve(_ raw: String, apiBase: String) -> URL? {
+        if raw.hasPrefix("/api/media/") {
+            guard let base = URL(string: apiBase), var components = URLComponents(url: base, resolvingAgainstBaseURL: false) else { return nil }
+            components.path = ""
+            components.query = nil
+            return URL(string: raw, relativeTo: components.url)?.absoluteURL
+        }
+        guard let url = URL(string: raw), url.scheme?.lowercased() == "https", url.host?.isEmpty == false, url.user == nil else { return nil }
+        return url
+    }
+
+    private static func attribution(of dto: BJTCardImageDTO, url: URL) -> ImageAttribution? {
+        func secure(_ raw: String?) -> String? {
+            guard let raw, let link = URL(string: raw), link.scheme?.lowercased() == "https", link.host?.isEmpty == false else { return nil }
+            return raw
+        }
+        let author = dto.author?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let provider = dto.provider?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !provider.isEmpty, !author.isEmpty else { return nil }
+        return ImageAttribution(source: provider, imageURL: url.absoluteString, sourceURL: secure(dto.sourceUrl), author: author,
+                                authorURL: secure(dto.authorUrl), license: dto.license, licenseURL: secure(dto.licenseUrl))
+    }
+}
+
 /// A deck of the account: the learner's own, or a public deck of someone else.
 struct ServerDeck: Equatable, Identifiable {
     let id: String
@@ -49,6 +91,7 @@ struct ServerDeckCard: Equatable, Identifiable {
     let front: String
     let back: String
     let reading: String
+    var picture: CardPicture? = nil
 }
 
 struct ServerDeckDetail: Equatable {
@@ -70,6 +113,7 @@ struct DueCard: Equatable, Identifiable {
     let reading: String
     let lapses: Int
     let isLeech: Bool
+    var picture: CardPicture? = nil
 }
 
 enum ServerDeckMapper {
@@ -86,7 +130,8 @@ enum ServerDeckMapper {
             let back = entry.card.backText.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !front.isEmpty, !back.isEmpty else { return nil }
             return ServerDeckCard(id: entry.id, front: front, back: back,
-                                  reading: entry.card.reading?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+                                  reading: entry.card.reading?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "",
+                                  picture: CardPicture.make(entry.card.primaryImage))
         }
         let deck = make(id: dto.id, owned: dto.ownerUserId != nil, titleVi: dto.titleVi, titleJa: dto.titleJa, descriptionVi: dto.descriptionVi,
                         descriptionJa: dto.descriptionJa, visibility: dto.visibility ?? "private", cardCount: cards.count, updatedAt: nil,
@@ -100,7 +145,7 @@ enum ServerDeckMapper {
         guard UUID(uuidString: dto.id) != nil, !front.isEmpty, !back.isEmpty else { return nil }
         return DueCard(id: dto.id, state: DueCard.State(rawValue: dto.state) ?? .review, front: front, back: back,
                        reading: dto.card.reading?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "",
-                       lapses: dto.lapses, isLeech: dto.leeched)
+                       lapses: dto.lapses, isLeech: dto.leeched, picture: CardPicture.make(dto.primaryImage))
     }
 
     static func date(from iso: String?) -> Date? {

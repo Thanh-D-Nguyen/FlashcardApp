@@ -11,6 +11,7 @@ final class StudyCardView: UIView {
     private let termLabel = UILabel()
     private let readingLabel = UILabel()
     private let noteLabel = UILabel()
+    private let creditLabel = UILabel()
     private let headerRow = UIStackView()
     private let stack = UIStackView()
     private var imageHeight: NSLayoutConstraint!
@@ -57,12 +58,18 @@ final class StudyCardView: UIView {
         noteLabel.apply(.metadata)
         noteLabel.textAlignment = .center
         noteLabel.isAccessibilityElement = false
+        creditLabel.apply(.metadata)
+        creditLabel.font = UIFontMetrics(forTextStyle: .caption2).scaledFont(for: Design.TextRole.metadata.font.withSize(11), maximumPointSize: 18)
+        creditLabel.textAlignment = .center
+        creditLabel.numberOfLines = 2
+        creditLabel.isAccessibilityElement = false
 
         stack.axis = .vertical
         stack.alignment = .fill
         stack.spacing = Design.Spacing.l
         stack.translatesAutoresizingMaskIntoConstraints = false
-        [imageView, termLabel, readingLabel, noteLabel].forEach(stack.addArrangedSubview)
+        [imageView, creditLabel, termLabel, readingLabel, noteLabel].forEach(stack.addArrangedSubview)
+        stack.setCustomSpacing(Design.Spacing.xs, after: imageView)
         stack.setCustomSpacing(Design.Spacing.xs, after: termLabel)
         headerRow.translatesAutoresizingMaskIntoConstraints = false
         addSubview(headerRow)
@@ -100,6 +107,7 @@ final class StudyCardView: UIView {
         termLabel.textColor = style?.foregroundColor ?? Design.TextRole.term.color
         readingLabel.textColor = style?.mutedColor ?? Design.TextRole.reading.color
         noteLabel.textColor = style?.mutedColor ?? Design.TextRole.metadata.color
+        creditLabel.textColor = style?.mutedColor ?? Design.TextRole.metadata.color
         eyebrowLabel.textColor = style?.mutedColor ?? Design.TextRole.eyebrow.color
         speakButton.configuration?.baseForegroundColor = style?.accentColor ?? Design.Color.accent
     }
@@ -130,6 +138,8 @@ final class StudyCardView: UIView {
         imageView.isHidden = !hasImage
         // A quiz leaves room for the options below; a flip card gives the picture more room on the front.
         imageHeight.constant = isQuiz ? 110 : (showingBack ? 140 : 200)
+        creditLabel.text = hasImage ? card.imageCredit : nil
+        creditLabel.isHidden = !hasImage || card.imageCredit.isEmpty
         if hasImage {
             imageView.setReference(card.imageReference)
             imageView.accessibilityLabel = String(format: NSLocalizedString("Picture for %@", comment: ""), card.front)
@@ -137,6 +147,7 @@ final class StudyCardView: UIView {
             imageView.cancel()
         }
         var spoken = [text]
+        if hasImage, !card.imageCredit.isEmpty { spoken.append(card.imageCredit) }
         if !reading.isEmpty, readingVisible { spoken.append(String(format: NSLocalizedString("Reading: %@", comment: ""), reading)) }
         if !note.isEmpty { spoken.append(String(format: NSLocalizedString("Note: %@", comment: ""), note)) }
         accessibilityLabel = ([languageName(japanese: japaneseVisible)] + spoken).joined(separator: ", ")
