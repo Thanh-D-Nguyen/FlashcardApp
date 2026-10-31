@@ -211,3 +211,86 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
         }
     }
 }
+
+/// A card of a deck being created on the account. `primaryImageAssetId` comes from `image-selections` or an upload;
+/// the server rejects a direct `imageUrl`.
+struct AccountDeckCardInput: Encodable, Equatable {
+    let frontText: String
+    let backText: String
+    let reading: String?
+    let primaryImageAssetId: String?
+}
+
+struct AccountDeckInput: Encodable, Equatable {
+    let titleVi: String
+    let visibility: String
+    let cards: [AccountDeckCardInput]
+}
+
+/// Uploading a picture and creating a deck with it: the calls behind the website's deck composer.
+protocol BJTAccountDeckAPIInterface: AnyObject {
+    /// Uploads one JPEG/PNG/WebP/GIF (at most 10 MB; the app sends far less) and returns its asset id. Each call creates a
+    /// server-side asset, but a repeated call is harmless: an unused asset is never shown to anyone.
+    func uploadPicture(data: Data, fileName: String, mimeType: String) -> Single<String>
+    /// Creates a deck with its cards. NOT idempotent: every call creates another deck, so callers never retry it.
+    func createDeck(_ deck: AccountDeckInput) -> Single<BJTGeneratedDeckDTO>
+}
+
+extension BJTLearnerAPI: BJTAccountDeckAPIInterface {
+    private struct PresignBody: Encodable { let fileName: String; let mimeType: String; let purpose: String }
+    private struct CompleteBody: Encodable { let assetId: String; let byteSize: Int }
+
+    /// The server accepts 10 MB; this is a client-side ceiling so a request never carries more than a card picture needs.
+    static let uploadCeilingBytes = 10 * 1024 * 1024
+
+    func uploadPicture(data: Data, fileName: String, mimeType: String) -> Single<String> {
+        guard (1...Self.uploadCeilingBytes).contains(data.count), ["image/jpeg", "image/png", "image/webp", "image/gif"].contains(mimeType) else {
+            return .error(LearnerAPIError.invalidRequest(nil))
+        }
+        let presign: Single<BJTPresignedUploadDTO> = perform(["media", "presign-upload"], method: .post,
+                                                               body: PresignBody(fileName: fileName, mimeType: mimeType, purpose: "flashcard"))
+        return presign.flatMap { [self] presigned -> Single<String> in
+            // The address is derived from the id, not taken from the response: a response cannot redirect the upload.
+            guard UUID(uuidString: presigned.assetId) != nil, presigned.uploadUrl == "/api/media/upload/" + presigned.assetId,
+                  !presigned.uploadToken.isEmpty else { return .error(LearnerAPIError.invalidResponse) }
+            return put(data, mimeType: mimeType, assetId: presigned.assetId, uploadToken: presigned.uploadToken)
+                .andThen(Single.deferred { [self] in
+                    let done: Single<BJTCompletedUploadDTO> = perform(["media", "complete-upload"], method: .post,
+                                                                      body: CompleteBody(assetId: presigned.assetId, byteSize: data.count))
+                    return done.map { _ in presigned.assetId }
+                })
+        }
+    }
+
+    func createDeck(_ deck: AccountDeckInput) -> Single<BJTGeneratedDeckDTO> {
+        guard !deck.titleVi.isEmpty, !deck.cards.isEmpty else { return .error(LearnerAPIError.invalidRequest(nil)) }
+        return perform(["flashcards", "decks"], method: .post, body: deck)
+    }
+
+    private func put(_ data: Data, mimeType: String, assetId: String, uploadToken: String) -> Completable {
+        Completable.create { [self] observer in
+            guard let bearer = token(), let base = URL(string: baseURL()), let scheme = base.scheme, ["https", "http"].contains(scheme),
+                  base.host != nil, var origin = URLComponents(url: base, resolvingAgainstBaseURL: false) else {
+                observer(.error(token() == nil ? LearnerAPIError.signInRequired : LearnerAPIError.server(0)))
+                return Disposables.create()
+            }
+            origin.path = ""
+            guard let originValue = origin.string else {
+                observer(.error(LearnerAPIError.server(0)))
+                return Disposables.create()
+            }
+            var headers: HTTPHeaders = ["Accept": "application/json", "Origin": originValue, "Content-Type": mimeType,
+                                        "X-Media-Upload-Token": uploadToken]
+            headers.add(.authorization(bearerToken: bearer))
+            let url = ["media", "upload", assetId].reduce(base) { $0.appendingPathComponent($1) }
+            let request = session.upload(data, to: url, method: .put, headers: headers, requestModifier: { $0.timeoutInterval = 60 })
+            request.responseData { response in
+                guard self.token() == bearer else { return observer(.error(LearnerAPIError.staleSession)) }
+                if let error = response.error, response.response == nil { return observer(.error(Self.transportError(error))) }
+                guard let status = response.response?.statusCode else { return observer(.error(LearnerAPIError.invalidResponse)) }
+                (200..<300).contains(status) ? observer(.completed) : observer(.error(Self.statusError(status, data: response.data ?? Data())))
+            }
+            return Disposables.create { request.cancel() }
+        }
+    }
+}

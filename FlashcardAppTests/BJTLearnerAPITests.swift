@@ -126,6 +126,80 @@ final class BJTLearnerAPITests: XCTestCase {
         XCTAssertEqual(failure(api.selectImage(handle: "h.sig")), .invalidResponse)
     }
 
+    // MARK: Uploading a picture and creating a deck
+
+    func test_uploadingAPictureGoesPresignPutCompleteWithTheOneTimeToken() throws {
+        let asset = UUID().uuidString.lowercased()
+        LearnerURLProtocol.handler = { request, proto in
+            switch (request.httpMethod, request.url?.path) {
+            case ("POST", "/api/media/presign-upload"?):
+                proto.respond(status: 201, json: #"{"assetId":"\#(asset)","uploadUrl":"/api/media/upload/\#(asset)","uploadToken":"one-time","expiresAt":"2026-10-31T00:00:00Z"}"#)
+            case ("PUT", _):
+                proto.respond(status: 200, json: "{}")
+            default:
+                proto.respond(status: 200, json: #"{"url":"/api/media/\#(asset)/stream","status":"completed"}"#)
+            }
+        }
+        let bytes = Data(repeating: 0xFF, count: 1234)
+        XCTAssertEqual(try result(api.uploadPicture(data: bytes, fileName: "card.jpg", mimeType: "image/jpeg")).get(), asset)
+        let sent = LearnerURLProtocol.requests
+        XCTAssertEqual(sent.map(\.method), ["POST", "PUT", "POST"])
+        XCTAssertEqual(try JSONSerialization.jsonObject(with: sent[0].body) as? [String: String],
+                       ["fileName": "card.jpg", "mimeType": "image/jpeg", "purpose": "flashcard"])
+        XCTAssertEqual(sent[1].url.path, "/api/media/upload/\(asset)")
+        XCTAssertEqual(sent[1].headers["X-Media-Upload-Token"], "one-time")
+        XCTAssertEqual(sent[1].headers["Content-Type"], "image/jpeg")
+        XCTAssertEqual(sent[1].headers["Authorization"], "Bearer opaque-session-token")
+        XCTAssertEqual(sent[1].headers["Origin"], "https://api.test")
+        XCTAssertEqual(sent[1].body, bytes)
+        let completion = try XCTUnwrap(JSONSerialization.jsonObject(with: sent[2].body) as? [String: Any])
+        XCTAssertEqual(completion["assetId"] as? String, asset)
+        XCTAssertEqual(completion["byteSize"] as? Int, 1234)
+    }
+
+    func test_anUploadAddressThatIsNotTheAssetsOwnIsNeverFollowed() {
+        let asset = UUID().uuidString.lowercased()
+        LearnerURLProtocol.handler = { _, proto in
+            proto.respond(status: 201, json: #"{"assetId":"\#(asset)","uploadUrl":"https://evil.test/steal","uploadToken":"t"}"#)
+        }
+        XCTAssertEqual(failure(api.uploadPicture(data: Data([1]), fileName: "a.jpg", mimeType: "image/jpeg")), .invalidResponse)
+        XCTAssertEqual(LearnerURLProtocol.requests.count, 1, "Nothing was uploaded")
+    }
+
+    func test_aRejectedUploadStopsBeforeCompletion() {
+        let asset = UUID().uuidString.lowercased()
+        LearnerURLProtocol.handler = { request, proto in
+            request.httpMethod == "PUT" ? proto.respond(status: 413, json: #"{"error":"file too large"}"#)
+                : proto.respond(status: 201, json: #"{"assetId":"\#(asset)","uploadUrl":"/api/media/upload/\#(asset)","uploadToken":"t"}"#)
+        }
+        XCTAssertEqual(failure(api.uploadPicture(data: Data([1]), fileName: "a.jpg", mimeType: "image/jpeg")), .server(413))
+        XCTAssertEqual(LearnerURLProtocol.requests.map(\.method), ["POST", "PUT"])
+    }
+
+    func test_picturesThatAreEmptyOrNotImagesAreRefusedLocally() {
+        XCTAssertEqual(failure(api.uploadPicture(data: Data(), fileName: "a.jpg", mimeType: "image/jpeg")), .invalidRequest(nil))
+        XCTAssertEqual(failure(api.uploadPicture(data: Data([1]), fileName: "a.svg", mimeType: "image/svg+xml")), .invalidRequest(nil))
+        XCTAssertTrue(LearnerURLProtocol.requests.isEmpty)
+    }
+
+    func test_createDeckSendsTheCardsWithTheirAssetIdsAndNoDirectImageUrl() throws {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 201, json: #"{"id":"\#(self.deckId)","titleVi":"N5","cardCount":2}"#) }
+        let deck = AccountDeckInput(titleVi: "N5", visibility: "private", cards: [
+            AccountDeckCardInput(frontText: "犬", backText: "chó", reading: "いぬ", primaryImageAssetId: "asset-1"),
+            AccountDeckCardInput(frontText: "猫", backText: "mèo", reading: nil, primaryImageAssetId: nil)])
+        XCTAssertEqual(try result(api.createDeck(deck)).get().id, deckId)
+        let sent = try XCTUnwrap(LearnerURLProtocol.requests.first)
+        XCTAssertEqual(sent.url.path, "/api/flashcards/decks")
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: sent.body) as? [String: Any])
+        XCTAssertEqual(body["titleVi"] as? String, "N5")
+        XCTAssertEqual(body["visibility"] as? String, "private")
+        let cards = try XCTUnwrap(body["cards"] as? [[String: Any]])
+        XCTAssertEqual(cards[0]["primaryImageAssetId"] as? String, "asset-1")
+        XCTAssertNil(cards[1]["primaryImageAssetId"])
+        XCTAssertNil(cards[0]["imageUrl"])
+        XCTAssertEqual(failure(api.createDeck(AccountDeckInput(titleVi: "", visibility: "private", cards: []))), .invalidRequest(nil))
+    }
+
     // MARK: Requests that never reach the network
 
     func test_noSessionMeansSignInRequiredWithoutAnyRequest() {

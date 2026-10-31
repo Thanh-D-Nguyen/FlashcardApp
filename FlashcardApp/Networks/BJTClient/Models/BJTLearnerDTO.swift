@@ -129,6 +129,19 @@ struct BJTImageSelectionDTO: Decodable, Equatable {
     let status: String
 }
 
+/// `POST /api/media/presign-upload` → `201`. The upload goes to `uploadUrl` (always `/api/media/upload/{assetId}`) with the
+/// one-time `uploadToken` in `X-Media-Upload-Token`; the token expires after 15 minutes.
+struct BJTPresignedUploadDTO: Decodable, Equatable {
+    let assetId: String
+    let uploadUrl: String
+    let uploadToken: String
+}
+
+/// `POST /api/media/complete-upload` → `{ "url": "/api/media/{id}/stream", "status": "completed" }`.
+struct BJTCompletedUploadDTO: Decodable, Equatable {
+    let status: String
+}
+
 /// `{ "error": "message" }`, written by every Go handler and guard.
 struct BJTErrorBodyDTO: Decodable {
     let error: String?
