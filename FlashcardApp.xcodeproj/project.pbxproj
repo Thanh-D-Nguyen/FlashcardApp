@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		04119AE3634CB24D1AED2201 /* BJTFlashcardLibraryAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */; };
+		07C12B5F488DF621CD3DF025 /* ScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 599E734D29F737C4F99A6EAB /* ScenarioTests.swift */; };
 		5B52DA9D92D2D156B5E21480 /* BJTScenarioAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */; };
 		06B2F221D43E11ABE16D5086 /* BulkDeckImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E77F62AA897954B5B91A027 /* BulkDeckImport.swift */; };
 		0777F2B188FCB684869B509D /* LifeLessonDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17DBB4DB6598E49FA20AFD8 /* LifeLessonDraft.swift */; };
@@ -195,6 +196,7 @@
 		954A1E2E95AA02D9E017EC63 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1575B578C6A276BCF1B2746 /* CardImageView.swift */; };
 		9AA04D45D0CEE19583D9E08A /* BJTLifeFeedDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 708DFED82E76BA66048FA688 /* BJTLifeFeedDTO.swift */; };
 		9ACAE21E616C9A932152F14F /* CardLibraryServerInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */; };
+		BCCF41FFDB430E8475100D93 /* ScenarioInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B2350C2485A25310794A32 /* ScenarioInteractor.swift */; };
 		9F45520656CDB470FEBE6B8F /* AddCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29806379570F82DF1A17172 /* AddCardCell.swift */; };
 		9FE7631C4FF6CC447DF64FD3 /* PictureSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857BB1AD3118E84563C080CA /* PictureSuggestion.swift */; };
 		A41D43AA1968A7309A41509B /* LifeLessonWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037EEB5D2439627D60198C6C /* LifeLessonWireframe.swift */; };
@@ -242,6 +244,11 @@
 		E1B670B1715C47A39296594C /* TodayPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = F862404CBFE94898ABF2CD60 /* TodayPlan.swift */; };
 		E36104E6FEC9F6BAC57C91A3 /* StudySessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416283339F8BEC2533A6E86B /* StudySessionTests.swift */; };
 		E393A1F0CFDDD9238E8394BA /* CardReviewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC6BB1F9EF5A5A874623AC3 /* CardReviewPresenter.swift */; };
+		9E75DCF301AC94A73072DD65 /* ScenarioWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01779D3F9AAABA9D3B3B287 /* ScenarioWireframe.swift */; };
+		C369B4A0C07F5EA4CBED4E90 /* ScenarioPlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020D53C37E48A65708DA43B9 /* ScenarioPlayViewController.swift */; };
+		6C42B2E1C112B80B989117C3 /* ScenarioPlayPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30CD69E3C421583B40F2198 /* ScenarioPlayPresenter.swift */; };
+		DE967724B987DE9F6942A368 /* ScenarioListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CA6AE5C5E9EFDB71029B31 /* ScenarioListViewController.swift */; };
+		DC7CCA5C69AEB115684944B2 /* ScenarioListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4F91644AECBF723438E569 /* ScenarioListPresenter.swift */; };
 		E61CC271FF0C74839A6A7A68 /* SampleLifeContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0043769D035FE684770AAD71 /* SampleLifeContent.swift */; };
 		E6707E4DBD2AF9B620CBA8B5 /* CardStylePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E28153B579630CC76EBBE20 /* CardStylePickerViewController.swift */; };
 		E74DB119AE2D4A839856D92A /* TodayInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EADC489FA314F64A10F6D80 /* TodayInteractorTests.swift */; };
@@ -255,6 +262,7 @@
 		F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */; };
 		FB56D4B862C02A12C9222471 /* LifeLessonTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */; };
 		FD522D81543FA020FD1D49B5 /* LifeLesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AE4F17F125884E0FFDD865 /* LifeLesson.swift */; };
+		1F35A17C9820138795C7C25B /* Scenario.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA52BB82B4B5A5A694B04F /* Scenario.swift */; };
 		FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */; };
 		30AA549E779BBF37E25D37F9 /* DeckPublishInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FF3D0EB58CBE76C1D00ED1 /* DeckPublishInteractor.swift */; };
 		301C77E585F870ADA8E2D3E4 /* DeckPublishTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C35125D09C5559049DEC9E /* DeckPublishTests.swift */; };
@@ -305,8 +313,14 @@
 		362D14002E5CD688453CAFD5 /* TodayLifeHubView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayLifeHubView.swift; sourceTree = "<group>"; };
 		37129E6AA0E1A87ECA2E098E /* CardsIntegrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardsIntegrationTests.swift; sourceTree = "<group>"; };
 		3AC6BB1F9EF5A5A874623AC3 /* CardReviewPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardReviewPresenter.swift; sourceTree = "<group>"; };
+		C01779D3F9AAABA9D3B3B287 /* ScenarioWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioWireframe.swift; sourceTree = "<group>"; };
+		020D53C37E48A65708DA43B9 /* ScenarioPlayViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioPlayViewController.swift; sourceTree = "<group>"; };
+		D30CD69E3C421583B40F2198 /* ScenarioPlayPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioPlayPresenter.swift; sourceTree = "<group>"; };
+		15CA6AE5C5E9EFDB71029B31 /* ScenarioListViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioListViewController.swift; sourceTree = "<group>"; };
+		1D4F91644AECBF723438E569 /* ScenarioListPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioListPresenter.swift; sourceTree = "<group>"; };
 		3C86741EA0524940BAE20852 /* TodayPreferences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayPreferences.swift; sourceTree = "<group>"; };
 		40AE4F17F125884E0FFDD865 /* LifeLesson.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLesson.swift; sourceTree = "<group>"; };
+		95DA52BB82B4B5A5A694B04F /* Scenario.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Scenario.swift; sourceTree = "<group>"; };
 		4130315D22CF035B32AB524C /* StudyExamplesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyExamplesView.swift; sourceTree = "<group>"; };
 		416283339F8BEC2533A6E86B /* StudySessionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudySessionTests.swift; sourceTree = "<group>"; };
 		42CEC9DF9A87C1BC680114F8 /* ServerDeck.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ServerDeck.swift; sourceTree = "<group>"; };
@@ -328,6 +342,7 @@
 		58F523D82C0F0EA33D4FC0A0 /* DeskManagementTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeskManagementTests.swift; sourceTree = "<group>"; };
 		5A7C0DE12F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartUpPresenterTests.swift; sourceTree = "<group>"; };
 		5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTFlashcardLibraryAPITests.swift; sourceTree = "<group>"; };
+		599E734D29F737C4F99A6EAB /* ScenarioTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioTests.swift; sourceTree = "<group>"; };
 		8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTScenarioAPITests.swift; sourceTree = "<group>"; };
 		5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorInteractor.swift; sourceTree = "<group>"; };
 		5E7A11C0D2B94A6F8C3E0A02 /* SettingsRowCellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowCellTests.swift; sourceTree = "<group>"; };
@@ -493,6 +508,7 @@
 		BDB70F6BFE9167031A74224A /* RemoteDeckPresenterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckPresenterTests.swift; sourceTree = "<group>"; };
 		C0A32B4DA0B2480CB3FFE81E /* TodayPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlannerTests.swift; sourceTree = "<group>"; };
 		C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryServerInteractor.swift; sourceTree = "<group>"; };
+		A8B2350C2485A25310794A32 /* ScenarioInteractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioInteractor.swift; sourceTree = "<group>"; };
 		C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JapaneseText.swift; sourceTree = "<group>"; };
 		C97D533A4221CB7602911CF8 /* CardExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleTests.swift; sourceTree = "<group>"; };
 		CBED6F7111DF4107913F896B /* ReviewSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSchedulerTests.swift; sourceTree = "<group>"; };
@@ -807,6 +823,7 @@
 				E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */,
 				BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */,
 				5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */,
+				599E734D29F737C4F99A6EAB /* ScenarioTests.swift */,
 				8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */,
 				816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */,
 				BC1146F8134E8611ACF40E4A /* CardReviewPresenterTests.swift */,
@@ -835,6 +852,7 @@
 				F89F935A6E3E901638562AA0 /* StudySession.swift */,
 				F862404CBFE94898ABF2CD60 /* TodayPlan.swift */,
 				40AE4F17F125884E0FFDD865 /* LifeLesson.swift */,
+				95DA52BB82B4B5A5A694B04F /* Scenario.swift */,
 				0043769D035FE684770AAD71 /* SampleLifeContent.swift */,
 				50FDA61F512574210B0E0CA6 /* LifeNearbyStory.swift */,
 				4920F1B2BD0AB6FF7D632B53 /* LifeDateStory.swift */,
@@ -880,6 +898,7 @@
 				EEB95458093C713F94F09498 /* LifeFeedMapper.swift */,
 				BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */,
 				C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */,
+				A8B2350C2485A25310794A32 /* ScenarioInteractor.swift */,
 				E7FF3D0EB58CBE76C1D00ED1 /* DeckPublishInteractor.swift */,
 			);
 			path = Interactors;
@@ -955,6 +974,7 @@
 				978215170D437DC6572B32C6 /* CardStyle */,
 				5A77B3E1BD54DF106032A604 /* ExampleEditor */,
 				A771A3E3D951B5F96A94FBE6 /* CardReview */,
+				E2A44EF09CC3298ABFE6F0AE /* Scenario */,
 				97485579B0977726EA6FDC21 /* RemoteDeck */,
 			);
 			path = Modules;
@@ -1267,6 +1287,18 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
+		E2A44EF09CC3298ABFE6F0AE /* Scenario */ = {
+			isa = PBXGroup;
+			children = (
+				C01779D3F9AAABA9D3B3B287 /* ScenarioWireframe.swift */,
+				020D53C37E48A65708DA43B9 /* ScenarioPlayViewController.swift */,
+				D30CD69E3C421583B40F2198 /* ScenarioPlayPresenter.swift */,
+				15CA6AE5C5E9EFDB71029B31 /* ScenarioListViewController.swift */,
+				1D4F91644AECBF723438E569 /* ScenarioListPresenter.swift */,
+			);
+			path = Scenario;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1531,6 +1563,7 @@
 				6EDD0178164CD68BD8877687 /* StudySession.swift in Sources */,
 				E1B670B1715C47A39296594C /* TodayPlan.swift in Sources */,
 				FD522D81543FA020FD1D49B5 /* LifeLesson.swift in Sources */,
+				1F35A17C9820138795C7C25B /* Scenario.swift in Sources */,
 				E61CC271FF0C74839A6A7A68 /* SampleLifeContent.swift in Sources */,
 				B28AA84089A12FE3D8275660 /* LifeNearbyStory.swift in Sources */,
 				E7C31A911CDD0869D4462021 /* LifeDateStory.swift in Sources */,
@@ -1616,7 +1649,13 @@
 				0735704A1D76E60CB510F581 /* BJTScenarioAPI.swift in Sources */,
 				5B5C334B7DDEDBF60633B0BA /* ServerDeck.swift in Sources */,
 				9ACAE21E616C9A932152F14F /* CardLibraryServerInteractor.swift in Sources */,
+				BCCF41FFDB430E8475100D93 /* ScenarioInteractor.swift in Sources */,
 				E393A1F0CFDDD9238E8394BA /* CardReviewPresenter.swift in Sources */,
+				9E75DCF301AC94A73072DD65 /* ScenarioWireframe.swift in Sources */,
+				C369B4A0C07F5EA4CBED4E90 /* ScenarioPlayViewController.swift in Sources */,
+				6C42B2E1C112B80B989117C3 /* ScenarioPlayPresenter.swift in Sources */,
+				DE967724B987DE9F6942A368 /* ScenarioListViewController.swift in Sources */,
+				DC7CCA5C69AEB115684944B2 /* ScenarioListPresenter.swift in Sources */,
 				D1226665E9F9A69198CC896C /* CardReviewWireframe.swift in Sources */,
 				686E5589694681D1642124E9 /* CardReviewViewController.swift in Sources */,
 				FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */,
@@ -1677,6 +1716,7 @@
 				D6F91920EAB6485D88168056 /* ReviewHistoryStoreTests.swift in Sources */,
 				ADB7BB2AC1DC8D5E5E70AC79 /* ExampleEditorTests.swift in Sources */,
 				04119AE3634CB24D1AED2201 /* BJTFlashcardLibraryAPITests.swift in Sources */,
+				07C12B5F488DF621CD3DF025 /* ScenarioTests.swift in Sources */,
 				5B52DA9D92D2D156B5E21480 /* BJTScenarioAPITests.swift in Sources */,
 				39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */,
 				AB278DC9303423A9267FE57C /* CardReviewPresenterTests.swift in Sources */,
