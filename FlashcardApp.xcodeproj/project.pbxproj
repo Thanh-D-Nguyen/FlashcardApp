@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		04119AE3634CB24D1AED2201 /* BJTFlashcardLibraryAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */; };
+		5B52DA9D92D2D156B5E21480 /* BJTScenarioAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */; };
 		06B2F221D43E11ABE16D5086 /* BulkDeckImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E77F62AA897954B5B91A027 /* BulkDeckImport.swift */; };
 		0777F2B188FCB684869B509D /* LifeLessonDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17DBB4DB6598E49FA20AFD8 /* LifeLessonDraft.swift */; };
 		09C9E7C973668B17781A93E2 /* CardStylePickerWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B68735DD74CA56A4B76FF1 /* CardStylePickerWireframe.swift */; };
@@ -36,6 +37,7 @@
 		39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */; };
 		40F1DEE5AF06D1D54975B817 /* CardStudyInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9725D887B857CFD895F006A4 /* CardStudyInteractor.swift */; };
 		42B443625AAC94A763A08310 /* BJTLifeLessonDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D726D9ADA91C08C52956B06 /* BJTLifeLessonDTO.swift */; };
+		DFAC4390B1E7226E2B410F24 /* BJTScenarioDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7893E2DAAACED80FCD96D3E6 /* BJTScenarioDTO.swift */; };
 		42FA2265229B4B8AAB251BD8 /* ReviewHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */; };
 		430DD442B6FB684FBF7DDF1D /* DeckGeneratorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11873EA3ED9C175FB3CE6F3 /* DeckGeneratorPresenter.swift */; };
 		43A5E88DAED44EB6B50458E6 /* TodayPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3013332AF3A84AF1A334EC97 /* TodayPresenterTests.swift */; };
@@ -93,6 +95,7 @@
 		87941E1FA68F7D98F1400D0C /* MailLoginPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9321F46D68635E10E86F8D4A /* MailLoginPresenterTests.swift */; };
 		8A0F67C0D739AAAFBE62B0BC /* AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1235E8CD5F0FDD150A00D51E /* AuthSession.swift */; };
 		8B1203261ADACF9A28B15FFB /* BJTFlashcardLibraryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F614949841D71B2C79621354 /* BJTFlashcardLibraryAPI.swift */; };
+		0735704A1D76E60CB510F581 /* BJTScenarioAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7FF9C78D2EDB0CADE15B /* BJTScenarioAPI.swift */; };
 		915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE4FFEAB36A4DDCE00DCC3B /* ExampleEditorWireframe.swift */; };
 		9209760D29A787C100ECF29C /* RDesk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760C29A787C100ECF29C /* RDesk.swift */; };
 		9209760F29A7887800ECF29C /* RCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760E29A7887800ECF29C /* RCard.swift */; };
@@ -325,6 +328,7 @@
 		58F523D82C0F0EA33D4FC0A0 /* DeskManagementTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeskManagementTests.swift; sourceTree = "<group>"; };
 		5A7C0DE12F00A1B2C3D4E5F6 /* StartUpPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartUpPresenterTests.swift; sourceTree = "<group>"; };
 		5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTFlashcardLibraryAPITests.swift; sourceTree = "<group>"; };
+		8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTScenarioAPITests.swift; sourceTree = "<group>"; };
 		5BFF7168675B25AE9473CD00 /* DeckGeneratorInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorInteractor.swift; sourceTree = "<group>"; };
 		5E7A11C0D2B94A6F8C3E0A02 /* SettingsRowCellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowCellTests.swift; sourceTree = "<group>"; };
 		63DD4CFA591F395DBEB705FE /* CardExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExample.swift; sourceTree = "<group>"; };
@@ -333,6 +337,7 @@
 		6CFD7F72896D62FD230A33B5 /* DeckDraftStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeckDraftStore.swift; sourceTree = "<group>"; };
 		6D62027595C24F3BC7F093BF /* DictionaryPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryPresenterTests.swift; sourceTree = "<group>"; };
 		6D726D9ADA91C08C52956B06 /* BJTLifeLessonDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTLifeLessonDTO.swift; sourceTree = "<group>"; };
+		7893E2DAAACED80FCD96D3E6 /* BJTScenarioDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTScenarioDTO.swift; sourceTree = "<group>"; };
 		6D97E81F048800EE625F30D0 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		6E28153B579630CC76EBBE20 /* CardStylePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerViewController.swift; sourceTree = "<group>"; };
 		6E2E2B52C17DF108E4ABC695 /* EditorAccessoryView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EditorAccessoryView.swift; sourceTree = "<group>"; };
@@ -516,6 +521,7 @@
 		EF07F347FD2BD66C45DB801E /* LifePlaceProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifePlaceProvider.swift; sourceTree = "<group>"; };
 		F11873EA3ED9C175FB3CE6F3 /* DeckGeneratorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckGeneratorPresenter.swift; sourceTree = "<group>"; };
 		F614949841D71B2C79621354 /* BJTFlashcardLibraryAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTFlashcardLibraryAPI.swift; sourceTree = "<group>"; };
+		0B2D7FF9C78D2EDB0CADE15B /* BJTScenarioAPI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BJTScenarioAPI.swift; sourceTree = "<group>"; };
 		F7B083C077D5C5F2A240A228 /* DebugFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugFixtures.swift; sourceTree = "<group>"; };
 		F862404CBFE94898ABF2CD60 /* TodayPlan.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayPlan.swift; sourceTree = "<group>"; };
 		F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleStoreTests.swift; sourceTree = "<group>"; };
@@ -801,6 +807,7 @@
 				E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */,
 				BB77118F6E0AFB67F0CFC021 /* ExampleEditorTests.swift */,
 				5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */,
+				8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */,
 				816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */,
 				BC1146F8134E8611ACF40E4A /* CardReviewPresenterTests.swift */,
 				BDB70F6BFE9167031A74224A /* RemoteDeckPresenterTests.swift */,
@@ -1159,6 +1166,7 @@
 				92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */,
 				92F3A0152B4E1C0000BJTM00 /* Models */,
 				F614949841D71B2C79621354 /* BJTFlashcardLibraryAPI.swift */,
+				0B2D7FF9C78D2EDB0CADE15B /* BJTScenarioAPI.swift */,
 			);
 			path = BJTClient;
 			sourceTree = "<group>";
@@ -1208,6 +1216,7 @@
 			children = (
 				99B8794581F1886148A87C14 /* BJTLearnerDTO.swift */,
 				6D726D9ADA91C08C52956B06 /* BJTLifeLessonDTO.swift */,
+				7893E2DAAACED80FCD96D3E6 /* BJTScenarioDTO.swift */,
 				708DFED82E76BA66048FA688 /* BJTLifeFeedDTO.swift */,
 			);
 			path = Models;
@@ -1569,6 +1578,7 @@
 				AA6BD49F05DB11349D36F6F8 /* BJTLifeFeedAPI.swift in Sources */,
 				B5187AEB29DCE000069C349B /* BJTLearnerDTO.swift in Sources */,
 				42B443625AAC94A763A08310 /* BJTLifeLessonDTO.swift in Sources */,
+				DFAC4390B1E7226E2B410F24 /* BJTScenarioDTO.swift in Sources */,
 				9AA04D45D0CEE19583D9E08A /* BJTLifeFeedDTO.swift in Sources */,
 				DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */,
 				B3336546E67BF4E2637C444B /* JapaneseCalendar.swift in Sources */,
@@ -1603,6 +1613,7 @@
 				915A3494901A4011F7E4E700 /* ExampleEditorWireframe.swift in Sources */,
 				2417B315D2617D05A733D9AB /* ExampleEditorViewController.swift in Sources */,
 				8B1203261ADACF9A28B15FFB /* BJTFlashcardLibraryAPI.swift in Sources */,
+				0735704A1D76E60CB510F581 /* BJTScenarioAPI.swift in Sources */,
 				5B5C334B7DDEDBF60633B0BA /* ServerDeck.swift in Sources */,
 				9ACAE21E616C9A932152F14F /* CardLibraryServerInteractor.swift in Sources */,
 				E393A1F0CFDDD9238E8394BA /* CardReviewPresenter.swift in Sources */,
@@ -1666,6 +1677,7 @@
 				D6F91920EAB6485D88168056 /* ReviewHistoryStoreTests.swift in Sources */,
 				ADB7BB2AC1DC8D5E5E70AC79 /* ExampleEditorTests.swift in Sources */,
 				04119AE3634CB24D1AED2201 /* BJTFlashcardLibraryAPITests.swift in Sources */,
+				5B52DA9D92D2D156B5E21480 /* BJTScenarioAPITests.swift in Sources */,
 				39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */,
 				AB278DC9303423A9267FE57C /* CardReviewPresenterTests.swift in Sources */,
 				CEE70C3589FAC853280F333C /* RemoteDeckPresenterTests.swift in Sources */,
