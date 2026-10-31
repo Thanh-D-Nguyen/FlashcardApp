@@ -60,6 +60,8 @@ protocol TodayPresenterInterface: AnyObject {
     func changeDeck()
     func changeBudget()
     func openLevels()
+    /// The everyday-situation lessons, whatever Today is showing: they do not depend on the plan or on the life hub.
+    func openScenarios()
     func retry()
     /// A card of the life hub was tapped (or its button): opens its lesson, asks for the location, or retries, by what the card is.
     func openLifeCard(id: String)
@@ -231,6 +233,8 @@ extension TodayPresenter: TodayPresenterInterface {
     }
 
     func openLevels() { wireframe.showLevels() }
+
+    func openScenarios() { wireframe.showScenarios() }
 
     func retry() { reload() }
 

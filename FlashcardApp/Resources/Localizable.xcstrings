@@ -1,6 +1,78 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "EVERY MOMENT IN JAPAN" : {
+      "comment" : "Eyebrow of the situation lessons card on Today",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EVERY MOMENT IN JAPAN"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本でのあらゆる場面"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MỌI KHOẢNH KHẮC Ở NHẬT"
+          }
+        }
+      }
+    },
+    "A haircut, a clinic visit, the ward office, the bank… Choose what you would say and hear whether it sounds natural." : {
+      "comment" : "Description of the situation lessons card on Today",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A haircut, a clinic visit, the ward office, the bank… Choose what you would say and hear whether it sounds natural."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "美容室、病院、役所、銀行…。自分なら何と言うかを選んで、自然な言い方か確かめましょう。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cắt tóc, đi khám bệnh, ra phường, ngân hàng… Chọn câu bạn sẽ nói và nghe xem có tự nhiên không."
+          }
+        }
+      }
+    },
+    "Practise situations" : {
+      "comment" : "Opens the situation lessons",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Practise situations"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "場面を練習する"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luyện tình huống"
+          }
+        }
+      }
+    },
     "Arriving in Japan" : {
       "comment" : "Situation group",
       "extractionState" : "manual",

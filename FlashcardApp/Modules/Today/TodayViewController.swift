@@ -20,6 +20,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let progressDetail = UILabel()
     private let levelsRow = TodayRowView()
     private let hubView = TodayLifeHubView()
+    private let scenarioBanner = TodayScenarioBannerView()
     private var refreshObservers: [NSObjectProtocol] = []
 
     override func viewDidLoad() {
@@ -93,7 +94,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         dateHeader.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, subtitleLabel, heroView, failureView, settingsGroup, progressGroup, levelsRow, hubView].forEach(stack.addArrangedSubview)
+        [dateHeader, subtitleLabel, heroView, failureView, settingsGroup, progressGroup, levelsRow, hubView, scenarioBanner].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.s, after: subtitleLabel)
         stack.setCustomSpacing(Design.Spacing.m, after: settingsGroup)
         stack.setCustomSpacing(Design.Spacing.l, after: progressGroup)
@@ -114,6 +115,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         failureView.onRetry = { [weak self] in self?.presenter.retry() }
         hubView.onCardAction = { [weak self] id in self?.presenter.openLifeCard(id: id) }
         hubView.onChangeCity = { [weak self] in self?.presenter.changeLifeCity() }
+        scenarioBanner.addAction(UIAction { [weak self] _ in self?.presenter.openScenarios() }, for: .touchUpInside)
         // A plain UIControl sends touchUpInside (only a UIButton maps its tap to primaryActionTriggered).
         deckRow.addAction(UIAction { [weak self] _ in self?.presenter.changeDeck() }, for: .touchUpInside)
         timeRow.addAction(UIAction { [weak self] _ in self?.presenter.changeBudget() }, for: .touchUpInside)

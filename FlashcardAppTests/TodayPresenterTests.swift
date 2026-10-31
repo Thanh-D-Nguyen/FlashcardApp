@@ -259,6 +259,18 @@ final class TodayPresenterTests: XCTestCase {
         presenter.openLevels()
         XCTAssertEqual(wireframe.levelsOpened, 1)
     }
+
+    func test_theSituationsOpenWhateverThePlanIs() {
+        start(TodayPlan(kind: .noDeck))
+        presenter.openScenarios()
+        XCTAssertEqual(wireframe.scenariosOpened, 1)
+
+        interactor.result = .failure(NSError(domain: "test", code: 1))
+        presenter.refresh()
+        XCTAssertEqual(state.phase, .failed)
+        presenter.openScenarios()
+        XCTAssertEqual(wireframe.scenariosOpened, 2, "the situations do not depend on reading the study plan")
+    }
 }
 
 private final class FakeTodayInteractor: TodayInteractorInterface {
@@ -285,6 +297,7 @@ private final class FakeTodayWireframe: TodayWireframeInterface {
     var deckChoosers: [(choices: [TodayDeckChoice], selectedID: String?, select: (String) -> Void)] = []
     var budgetChoosers: [(current: Int, select: (Int) -> Void)] = []
     var levelsOpened = 0
+    var scenariosOpened = 0
     var lifeLessons: [(cityID: String, lesson: LifeLesson)] = []
     var cityChoosers: [(selectedID: String, select: (String) -> Void)] = []
     var settingsOpened = 0
@@ -292,6 +305,7 @@ private final class FakeTodayWireframe: TodayWireframeInterface {
     func showLifeLesson(cityID: String, lesson: LifeLesson) { lifeLessons.append((cityID, lesson)) }
     func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void) { cityChoosers.append((selectedID, onSelect)) }
     func openAppSettings() { settingsOpened += 1 }
+    func showScenarios() { scenariosOpened += 1 }
     func showStudy(deckId: String, cardIDs: [String]?) { studies.append((deckId, cardIDs)) }
     func showCreateDeck(onFinish: @escaping () -> Void) { createFlows.append(onFinish) }
     func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void) {

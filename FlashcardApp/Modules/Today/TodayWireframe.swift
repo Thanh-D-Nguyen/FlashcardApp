@@ -7,6 +7,7 @@ protocol TodayWireframeInterface: AnyObject {
     func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void)
     func showBudgetChooser(current: Int, onSelect: @escaping (Int) -> Void)
     func showLevels()
+    func showScenarios()
     func showLifeLesson(cityID: String, lesson: LifeLesson)
     func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void)
     /// The system page of this app's settings, where the learner can allow the location again.
@@ -86,6 +87,10 @@ extension TodayWireframe: TodayWireframeInterface {
 
     func showLevels() {
         navigationController?.pushWireframe(HomeWireframe())
+    }
+
+    func showScenarios() {
+        navigationController?.pushWireframe(ScenarioListWireframe())
     }
 
     func showLifeLesson(cityID: String, lesson: LifeLesson) {
