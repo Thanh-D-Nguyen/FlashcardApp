@@ -7,8 +7,8 @@
 //  deck is created with `primaryImageAssetId` per card. This is a one-way copy: later edits are not synchronised, and a deck
 //  already saved is not saved again (the link below remembers which account deck came from which device deck).
 //
-//  Server load is bounded: pictures go one at a time, each at most `maximumPictureBytes`, at most `maximumTotalBytes` per
-//  deck. A picture that does not fit is left out (the card is still saved); the deck is created once and never retried.
+//  Server load is bounded: pictures go one at a time, each at most `maximumPictureBytes` (a few hundred KB, the picture is
+//  re-encoded smaller until it fits), at most `maximumTotalBytes` per deck. A picture that does not fit is left out (the card is still saved); the deck is created once and never retried.
 //
 
 import Foundation
@@ -82,8 +82,8 @@ protocol DeckPublishInteractorInterface: AnyObject {
 }
 
 final class DeckPublishInteractor: DeckPublishInteractorInterface {
-    static let maximumPictureBytes = 1_000_000
-    static let maximumTotalBytes = 30_000_000
+    static let maximumPictureBytes = 300_000
+    static let maximumTotalBytes = 20_000_000
 
     private let api: BJTAccountDeckAPIInterface
     private let repository: DeskRepositoryInterface

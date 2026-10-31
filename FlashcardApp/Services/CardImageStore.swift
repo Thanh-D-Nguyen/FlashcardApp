@@ -162,7 +162,7 @@ final class CardImageStore {
     // MARK: Upload
 
     /// Smaller and smaller renditions tried until one fits: (longest edge in pixels, JPEG quality).
-    static let uploadRenditions: [(pixels: Int, quality: CGFloat)] = [(1280, 0.7), (1024, 0.6), (800, 0.5)]
+    static let uploadRenditions: [(pixels: Int, quality: CGFloat)] = [(1280, 0.7), (1024, 0.6), (800, 0.5), (640, 0.45), (480, 0.4)]
 
     /// JPEG bytes of a stored picture that fit in `maximumBytes`, for uploading to the account. The stored file is sent as it is
     /// when it already fits; otherwise it is re-encoded smaller. `nil` when the picture is missing, unreadable or still too large.

@@ -106,7 +106,7 @@ extension CardWireframe: CardWireframeInterface {
             NSLocalizedString("“%@” will be copied to your account as a private deck of %lld cards.", comment: ""), deckName, cardCount)
         if pictureCount > 0 {
             message += "\n" + String.localizedStringWithFormat(
-                NSLocalizedString("%lld pictures are uploaded at a reduced size (up to 1 MB each).", comment: ""), pictureCount)
+                NSLocalizedString("%lld pictures are shrunk and compressed to a few hundred KB each before uploading.", comment: ""), pictureCount)
         }
         message += "\n" + NSLocalizedString("Changes you make here afterwards are not synchronised.", comment: "")
         let save = UIAlertAction(title: NSLocalizedString("Save", comment: ""), style: .default) { _ in onConfirm() }

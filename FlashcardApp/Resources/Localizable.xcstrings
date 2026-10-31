@@ -14054,29 +14054,6 @@
         }
       }
     },
-    "%lld pictures are uploaded at a reduced size (up to 1 MB each)." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld pictures are uploaded at a reduced size (up to 1 MB each)."
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld ảnh được tải lên ở kích thước thu nhỏ (tối đa 1 MB mỗi ảnh)."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 枚の画像は縮小して（1枚あたり最大1 MB）アップロードされます。"
-          }
-        }
-      }
-    },
     "Changes you make here afterwards are not synchronised." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14372,6 +14349,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表と裏のあるカードを少なくとも1枚追加してください。"
+          }
+        }
+      }
+    },
+    "%lld pictures are shrunk and compressed to a few hundred KB each before uploading." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld pictures are shrunk and compressed to a few hundred KB each before uploading."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld ảnh được thu nhỏ và nén xuống vài trăm KB mỗi ảnh trước khi tải lên."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 枚の画像は縮小・圧縮して、1枚あたり数百KBにしてからアップロードされます。"
           }
         }
       }

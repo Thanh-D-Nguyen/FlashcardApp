@@ -183,12 +183,30 @@ final class DeckPublishInteractorTests: XCTestCase {
         XCTAssertFalse(server.hasDeviceCopy(deckId: "99999999-2222-4333-8444-555555555555"))
     }
 
+    func test_aLargeNoisyPictureIsShrunkUnderTheLimit() throws {
+        let side = 1600
+        var generator = SystemRandomNumberGenerator()
+        var pixels = [UInt8](repeating: 0, count: side * side * 4)
+        for index in pixels.indices { pixels[index] = index % 4 == 3 ? 255 : UInt8.random(in: 0...255, using: &generator) }
+        let provider = CGDataProvider(data: Data(pixels) as CFData)!
+        let cgImage = CGImage(width: side, height: side, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: side * 4, space: CGColorSpaceCreateDeviceRGB(),
+                              bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue), provider: provider, decode: nil,
+                              shouldInterpolate: false, intent: .defaultIntent)!
+        let reference = try store.save(image: UIImage(cgImage: cgImage))
+        let stored = try Data(contentsOf: XCTUnwrap(store.fileURL(for: CardImageReference(reference))))
+        XCTAssertGreaterThan(stored.count, DeckPublishInteractor.maximumPictureBytes, "The fixture must start above the limit")
+        let sent = try XCTUnwrap(store.uploadData(for: CardImageReference(reference), maximumBytes: DeckPublishInteractor.maximumPictureBytes))
+        XCTAssertLessThanOrEqual(sent.count, DeckPublishInteractor.maximumPictureBytes)
+        XCTAssertNotNil(UIImage(data: sent), "The smaller rendition is still a picture")
+    }
+
     func test_aStoredPictureIsSentAsItIsWhenSmallAndShrunkWhenLarge() throws {
         let local = try picture()
         let reference = CardImageReference(local)
         let original = try XCTUnwrap(store.uploadData(for: reference, maximumBytes: DeckPublishInteractor.maximumPictureBytes))
         XCTAssertEqual(original, try Data(contentsOf: XCTUnwrap(store.fileURL(for: reference))))
         XCTAssertNil(store.uploadData(for: reference, maximumBytes: 10), "Nothing that small can hold a picture")
+        XCTAssertEqual(DeckPublishInteractor.maximumPictureBytes, 300_000)
         XCTAssertNil(store.uploadData(for: CardImageReference("local-image:nope.jpg"), maximumBytes: 1_000_000))
     }
 }
