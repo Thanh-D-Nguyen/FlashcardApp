@@ -13,7 +13,7 @@ Không có DTO nào được suy ra từ tên endpoint; mỗi dòng dưới đâ
 | Tạo tự động | Cấp độ, loại nội dung, chiều học, số thẻ 5–50 | `POST …/generate`: `name`, `sourceTypes`, `levels`, `limit` (≤0 hoặc >500 → **âm thầm thành 50**), `direction` (`jp_to_vn`, `vn_to_jp`, `both`). Trả bộ thẻ **không có thẻ**. | Không | Có (5–100, bước 5) |
 | Lọc theo chủ đề / "vùng yếu" (`adaptive`) | Có trên giao diện | **Không có**: handler bỏ qua các trường này | Không | **Không hiển thị** (không bịa) |
 | Gợi ý từ điển khi gõ | Chỉ gợi ý cách đọc (`/api/reading-assist`) | `GET /api/search` công khai (headword, reading, nghĩa tiếng Việt, JLPT); `GET /api/search/suggest` không có nghĩa; `POST /api/flashcards/cards/suggest` cần đăng nhập, `ORDER BY RANDOM()`, khớp chuỗi con | Chỉ từ điển offline (Realm), ánh xạ **toàn bộ** kết quả | Chỉ `/api/search` (đã bỏ từ điển offline), có debounce, huỷ, chống kết quả cũ, IME |
-| Gợi ý ảnh | `POST /api/media/search-images` → `{images:[{id,thumbUrl,fullUrl,source}]}` | **Chỉ là stub**: sau khi kiểm tra đầu vào luôn trả **503** ("provider integration is missing") | Chọn từ Ảnh hoặc dán URL https | Thêm "Tìm ảnh…"; xử lý 503 như trạng thái bình thường |
+| Gợi ý ảnh | `POST /api/media/search-images` `{query}` (từ chối trường lạ, kể cả `limit`) → `{results:[{handle,provider,url,sourceUrl,author,authorUrl?,license,licenseUrl?}]}`; chọn: `POST /api/media/image-selections {handle}` → `201 {assetId,status:"pending_review"}` (cập nhật 2026-10-31, commit backend `a94d51b0`; trước đó là stub 503) | `handle` ký HMAC, sống 15 phút, gắn với tài khoản; 429 giới hạn tốc độ; 502/503 khi nhà cung cấp lỗi/chưa cấu hình | Chọn từ Ảnh hoặc dán URL https | "Tìm ảnh…": tìm → xem trước (hiện credit) → "Dùng ảnh này" gọi `image-selections` rồi mới tải ảnh về máy |
 | CSRF cho POST native | Cookie + Origin | `CSRFGuard`: thiếu `Origin`/`Referer` → **403 `forbidden: missing origin`** (đã chạy thật); origin phải nằm trong `CORS_ORIGINS` (local có `http://localhost:18081`) | Login/logout gửi origin của chính API | Dùng lại đúng cách đó; 403 hiển thị là lỗi tích hợp |
 
 Bằng chứng chạy thật (tài khoản local dùng một lần, token không ghi vào repo):
@@ -21,7 +21,7 @@ Bằng chứng chạy thật (tài khoản local dùng một lần, token không
 - Không bearer → `401 {"error":"unauthorized"}`. Có bearer, không `Origin` → `403 {"error":"forbidden: missing origin"}`.
   Có bearer và `Origin: http://localhost:18081` → `200 {"availableCount":80}` (N5, từ vựng).
 - DB local chỉ có thẻ cho **N5 từ vựng (80)**; N4–N1, kanji, ngữ pháp đều trả `0`. Giao diện hiển thị "Không đủ thẻ" đúng như vậy.
-- `POST /api/media/search-images` → `503 image search unavailable: Go API provider integration is missing; configure UNSPLASH_ACCESS_KEY or PIXABAY_API_KEY`.
+- (Trước 2026-10-31) `POST /api/media/search-images` → `503 image search unavailable: Go API provider integration is missing…`. Backend nay đã có nhà cung cấp (Unsplash, Pixabay, Pexels, Wikimedia) qua `UNSPLASH_ACCESS_KEY`/`PIXABAY_API_KEY`/…; **chưa chạy thật trên máy này** vì chưa cấu hình khoá — hợp đồng lấy từ mã Go (`handler_image_selection.go`) và test của nó.
 
 ## 2. Quyết định kiến trúc
 
@@ -62,13 +62,15 @@ và phát âm khi học chọn ja-JP/vi-VN theo từng thẻ (sửa `CardStudyPr
 - Từ khoá: nghĩa đầu tiên của mục từ điển đã chọn; nếu không có, mặt không phải tiếng Nhật; cuối cùng là mặt tiếng Nhật. Người dùng sửa được ô tìm.
 - Chỉ lưu ảnh khi người dùng bấm "Dùng ảnh này"; ảnh tải qua `RemoteImageLoader` (https, ≤10 MB) và lưu bằng `CardImageStore` như ảnh thủ công; ảnh cũ chỉ bị thay khi người dùng chủ động chọn.
 - 503, chưa đăng nhập, 429, offline, 403 origin, rỗng đều có trạng thái riêng; không chặn việc sửa thẻ, vẫn dùng được "Chọn từ Ảnh" và "Dùng địa chỉ web".
-- Ghi nguồn: hợp đồng chỉ có tên nhà cung cấp (`source`), không có tên tác giả/giấy phép, nên chỉ lưu `source`, `id`, URL gốc cạnh file ảnh (`*.attribution.json`, bị dọn cùng ảnh). **Chưa hiển thị trong màn học**, và không đủ để đáp ứng yêu cầu ghi công của Unsplash khi backend bật nhà cung cấp.
-- **Chưa kiểm chứng:** hình dạng phản hồi thành công của Go (stub chưa bao giờ trả 200). DTO theo cách web đọc (`data.images`).
+- Ghi nguồn: mỗi kết quả có `author`, `sourceUrl`, `license` (bắt buộc; thiếu thì bỏ kết quả như web). Lưu cạnh file ảnh (`*.attribution.json`, bị dọn cùng ảnh; bản ghi cũ chỉ có `source` vẫn đọc được). Xem trước hiện "Photo by … · nhà cung cấp · giấy phép" và nút mở trang nguồn; màn học hiện dòng credit dưới ảnh (chưa là liên kết bấm được trong thẻ).
+- Chọn ảnh gọi `image-selections` trước khi tải: server báo lượt tải cho Unsplash (điều khoản của họ) và giữ bản chờ duyệt bên tài khoản. Lỗi/429/handle hết hạn → ở lại màn xem trước và báo lỗi, không lưu gì.
+- **Ảnh của thẻ trên tài khoản:** `GET /flashcards/decks/{id}` và `/flashcards/reviews/due` trả `primaryImage {assetId,mimeType,readUrl,provider?,author?,…}`. `readUrl` là https của nhà cung cấp (Unsplash hotlink), `/api/media/{id}/stream` (đã duyệt) hoặc `/api/media/{id}/private-preview` (bản của chính người dùng, cần phiên). Bearer chỉ gắn cho đường `/api/media/` của chính API, bản private chỉ giữ trong bộ nhớ. Màn bộ thẻ từ xa hiện ảnh nhỏ + credit, phiên ôn tập hiện ảnh (nếu đang bật ảnh), "Lưu về máy/Học" tải ảnh về `CardImageStore` kèm credit (ảnh lỗi thì bỏ qua, không chặn việc lưu).
+- **Chưa làm (cần quyết định sản phẩm):** tải ảnh lên (`presign-upload` → `PUT` → `complete-upload`) và tạo/sửa bộ trên server với `primaryImageAssetId`/`removePrimaryImage` — web làm vậy vì bộ của web nằm trên server, còn bộ do người dùng tạo trên app nằm ở máy và chưa có đồng bộ. `imageUrl` trực tiếp bị server từ chối (`direct_image_url_not_supported`).
 
 ## 5. Việc backend cần làm để hoàn thiện (ngoài phạm vi iOS)
 
-1. Tích hợp nhà cung cấp ảnh cho `/api/media/search-images` (hiện luôn 503) và trả thêm tác giả + giấy phép.
-2. Trường `imageUrl`/liên kết ảnh cho thẻ (`DeckCardInput` chưa có), để ảnh đồng bộ được.
+1. ~~Nhà cung cấp ảnh + tác giả/giấy phép~~ — đã có (2026-10-31). Cần bật khoá nhà cung cấp trên môi trường để chạy thật.
+2. ~~Liên kết ảnh cho thẻ~~ — đã có qua `primaryImageAssetId`; app chưa dùng vì chưa đồng bộ bộ thẻ lên tài khoản.
 3. `Idempotency-Key` cho `POST …/generate`, hoặc cho phép `preview` trả luôn danh sách thẻ, để tạo mà không phải tạo bộ ở server.
 4. Lọc chủ đề cho generate (hiện chỉ có trên giao diện web).
 5. Cho phép origin của app native trong `CORS_ORIGINS` cho từng môi trường (production hiện chưa cấu hình URL).
