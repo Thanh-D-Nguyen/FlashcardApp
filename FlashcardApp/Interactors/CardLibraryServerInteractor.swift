@@ -41,19 +41,22 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
     private let language: () -> AppLanguage
     private let remote: RemoteImageLoader
     private let images: CardImageStore
+    private let links: DeckAccountLinks
 
     init(api: BJTFlashcardLibraryAPIInterface = BJTLearnerAPI.shared,
          repository: DeskRepositoryInterface = DeskManagement.shared,
          auth: AuthSession = .shared,
          language: @escaping () -> AppLanguage = { .current },
          remote: RemoteImageLoader = .shared,
-         images: CardImageStore = .shared) {
+         images: CardImageStore = .shared,
+         links: DeckAccountLinks = .shared) {
         self.api = api
         self.repository = repository
         self.auth = auth
         self.language = language
         self.remote = remote
         self.images = images
+        self.links = links
     }
 
     var isSignedIn: Bool { auth.bearerToken != nil }
@@ -94,7 +97,9 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
     }
 
     func hasDeviceCopy(deckId: String) -> Bool {
-        repository.desk(withId: deckId) != nil
+        if repository.desk(withId: deckId) != nil { return true }
+        // A deck saved to the account from this device has its own id there: it is the same deck, not one to download again.
+        return links.deviceDeckId(forAccount: deckId).map { repository.desk(withId: $0) != nil } ?? false
     }
 
     func saveToDevice(_ detail: ServerDeckDetail) throws -> DeckImportOutcome {

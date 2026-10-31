@@ -253,6 +253,8 @@
 		FB56D4B862C02A12C9222471 /* LifeLessonTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */; };
 		FD522D81543FA020FD1D49B5 /* LifeLesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AE4F17F125884E0FFDD865 /* LifeLesson.swift */; };
 		FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */; };
+		30AA549E779BBF37E25D37F9 /* DeckPublishInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FF3D0EB58CBE76C1D00ED1 /* DeckPublishInteractor.swift */; };
+		301C77E585F870ADA8E2D3E4 /* DeckPublishTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C35125D09C5559049DEC9E /* DeckPublishTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -521,6 +523,8 @@
 		FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayWireframe.swift; sourceTree = "<group>"; };
 		FC556F467C4C588BD4781CDD /* RealmServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmServiceTests.swift; sourceTree = "<group>"; };
 		FE7A3D2A56D8B8BEFB81D360 /* LifeFeed.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeFeed.swift; sourceTree = "<group>"; };
+		E7FF3D0EB58CBE76C1D00ED1 /* DeckPublishInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckPublishInteractor.swift; sourceTree = "<group>"; };
+		81C35125D09C5559049DEC9E /* DeckPublishTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckPublishTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -801,6 +805,7 @@
 				BC1146F8134E8611ACF40E4A /* CardReviewPresenterTests.swift */,
 				BDB70F6BFE9167031A74224A /* RemoteDeckPresenterTests.swift */,
 				8638FCCE92CCFA71A15C7BDB /* CardLibraryScopesTests.swift */,
+				81C35125D09C5559049DEC9E /* DeckPublishTests.swift */,
 			);
 			path = FlashcardAppTests;
 			sourceTree = "<group>";
@@ -868,6 +873,7 @@
 				EEB95458093C713F94F09498 /* LifeFeedMapper.swift */,
 				BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */,
 				C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */,
+				E7FF3D0EB58CBE76C1D00ED1 /* DeckPublishInteractor.swift */,
 			);
 			path = Interactors;
 			sourceTree = "<group>";
@@ -1424,6 +1430,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30AA549E779BBF37E25D37F9 /* DeckPublishInteractor.swift in Sources */,
 				8A0F67C0D739AAAFBE62B0BC /* AuthSession.swift in Sources */,
 				CEE55422975D3913CD6E3E0C /* NativeAuthAPI.swift in Sources */,
 				5A1BC91044F82177CD776D0B /* AppLogger.swift in Sources */,
@@ -1612,6 +1619,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				301C77E585F870ADA8E2D3E4 /* DeckPublishTests.swift in Sources */,
 				60ED6A921E261C7B283249CE /* HomePresenterTests.swift in Sources */,
 				6A11C0DE00000000000000C1 /* LocalizationTests.swift in Sources */,
 				5636E5D7C2043B99B3A911BF /* LevelAPITests.swift in Sources */,

@@ -21,10 +21,17 @@ protocol CardWireframeInterface: AnyObject {
     func showRemoteDeck(deckId: String)
     func showSignIn(onFinish: @escaping () -> Void)
     func confirmDelete(deckName: String, onConfirm: @escaping () -> Void)
+    func confirmUpload(deckName: String, cardCount: Int, pictureCount: Int, onConfirm: @escaping () -> Void)
+    /// A blocking progress alert; `onCancel == nil` shows it without a working Cancel button.
+    func showUploadProgress(message: String, onCancel: (() -> Void)?)
+    func hideUploadProgress(then: @escaping () -> Void)
     func showAlert(with title: String?, message: String?)
 }
 
 final class CardWireframe: BaseWireframe<CardViewController> {
+    private var uploadAlert: UIAlertController?
+    private var uploadCancel: UIAlertAction?
+    private var uploadOnCancel: (() -> Void)?
 
     init() {
         let moduleViewController = CardViewController()
@@ -92,5 +99,44 @@ extension CardWireframe: CardWireframeInterface {
         let delete = UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive) { _ in onConfirm() }
         let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)
         showAlert(with: NSLocalizedString("Delete this deck?", comment: ""), message: message, actions: [delete, cancel])
+    }
+
+    func confirmUpload(deckName: String, cardCount: Int, pictureCount: Int, onConfirm: @escaping () -> Void) {
+        var message = String.localizedStringWithFormat(
+            NSLocalizedString("“%@” will be copied to your account as a private deck of %lld cards.", comment: ""), deckName, cardCount)
+        if pictureCount > 0 {
+            message += "\n" + String.localizedStringWithFormat(
+                NSLocalizedString("%lld pictures are uploaded at a reduced size (up to 1 MB each).", comment: ""), pictureCount)
+        }
+        message += "\n" + NSLocalizedString("Changes you make here afterwards are not synchronised.", comment: "")
+        let save = UIAlertAction(title: NSLocalizedString("Save", comment: ""), style: .default) { _ in onConfirm() }
+        let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)
+        showAlert(with: NSLocalizedString("Save this deck to your account?", comment: ""), message: message, actions: [save, cancel])
+    }
+
+    func showUploadProgress(message: String, onCancel: (() -> Void)?) {
+        if let alert = uploadAlert {
+            alert.message = message
+            uploadOnCancel = onCancel
+            uploadCancel?.isEnabled = onCancel != nil
+            return
+        }
+        let alert = UIAlertController(title: NSLocalizedString("Saving to your account", comment: ""), message: message, preferredStyle: .alert)
+        let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { [weak self] _ in
+            self?.uploadOnCancel?()
+            self?.uploadAlert = nil
+        }
+        cancel.isEnabled = onCancel != nil
+        alert.addAction(cancel)
+        uploadAlert = alert
+        uploadCancel = cancel
+        uploadOnCancel = onCancel
+        (navigationController ?? viewController).present(alert, animated: true)
+    }
+
+    func hideUploadProgress(then: @escaping () -> Void) {
+        guard let alert = uploadAlert else { return then() }
+        uploadAlert = nil
+        alert.dismiss(animated: true, completion: then)
     }
 }

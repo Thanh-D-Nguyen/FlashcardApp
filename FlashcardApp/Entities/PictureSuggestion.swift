@@ -20,6 +20,8 @@ struct ImageAttribution: Codable, Equatable {
     var authorURL: String?
     var license: String?
     var licenseURL: String?
+    /// The server asset created when the learner chose this picture; lets the deck be saved to the account without uploading it again.
+    var assetId: String?
 
     /// "Photo by Ana Lee · unsplash · Unsplash License", the line shown wherever the picture is shown.
     var creditLine: String {
@@ -38,9 +40,16 @@ struct PictureSuggestion: Equatable {
     /// The signed selection handle; valid for 15 minutes and only for the account that searched.
     let handle: String
     let imageURL: URL
-    let attribution: ImageAttribution
+    private(set) var attribution: ImageAttribution
 
     var source: String { attribution.source }
+
+    /// The same picture once the server registered the choice and returned its asset.
+    func registered(assetId: String) -> PictureSuggestion {
+        var copy = self
+        copy.attribution.assetId = assetId
+        return copy
+    }
 
     /// `nil` unless the picture address is https (a card picture is only ever downloaded over a secure connection)
     /// and every credit field the licence needs is present.

@@ -159,6 +159,32 @@ final class CardImageStore {
         return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary).map { UIImage(cgImage: $0) }
     }
 
+    // MARK: Upload
+
+    /// Smaller and smaller renditions tried until one fits: (longest edge in pixels, JPEG quality).
+    static let uploadRenditions: [(pixels: Int, quality: CGFloat)] = [(1280, 0.7), (1024, 0.6), (800, 0.5)]
+
+    /// JPEG bytes of a stored picture that fit in `maximumBytes`, for uploading to the account. The stored file is sent as it is
+    /// when it already fits; otherwise it is re-encoded smaller. `nil` when the picture is missing, unreadable or still too large.
+    func uploadData(for reference: CardImageReference, maximumBytes: Int) -> Data? {
+        guard let url = fileURL(for: reference), let stored = try? Data(contentsOf: url), !stored.isEmpty else { return nil }
+        if stored.count <= maximumBytes { return stored }
+        guard let source = CGImageSourceCreateWithData(stored as CFData, nil) else { return nil }
+        for rendition in Self.uploadRenditions {
+            let options: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: rendition.pixels
+            ]
+            guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
+            let encoded = NSMutableData()
+            guard let destination = CGImageDestinationCreateWithData(encoded, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+            CGImageDestinationAddImage(destination, Self.flattened(image), [kCGImageDestinationLossyCompressionQuality: rendition.quality] as CFDictionary)
+            if CGImageDestinationFinalize(destination), encoded.length <= maximumBytes { return encoded as Data }
+        }
+        return nil
+    }
+
     // MARK: Attribution
 
     static let attributionSuffix = ".attribution.json"

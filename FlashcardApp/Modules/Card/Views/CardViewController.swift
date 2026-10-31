@@ -350,9 +350,20 @@ extension CardViewController: UITableViewDataSource, UITableViewDelegate {
         guard case .local(let row) = sections[indexPath.section].items[indexPath.row] else { return nil }
         let id = row.id
         return UIContextMenuConfiguration(identifier: id as NSString, previewProvider: nil) { [weak self] _ in
-            UIMenu(children: [
+            let account: UIAction
+            if let accountDeckId = self?.presenter.accountDeckId(forDeck: id) {
+                account = UIAction(title: NSLocalizedString("Open on account", comment: ""), image: UIImage(systemName: "person.crop.circle")) { _ in
+                    self?.presenter.openAccountDeck(id: accountDeckId)
+                }
+            } else {
+                account = UIAction(title: NSLocalizedString("Save to account", comment: ""), image: UIImage(systemName: "icloud.and.arrow.up")) { _ in
+                    self?.presenter.uploadDeck(id: id)
+                }
+            }
+            return UIMenu(children: [
                 UIAction(title: NSLocalizedString("Study", comment: ""), image: UIImage(systemName: "rectangle.on.rectangle")) { _ in self?.presenter.studyDeck(id: id) },
                 UIAction(title: NSLocalizedString("Edit", comment: ""), image: UIImage(systemName: "pencil")) { _ in self?.presenter.editDeck(id: id) },
+                account,
                 UIAction(title: NSLocalizedString("Delete", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { _ in self?.presenter.requestDelete(id: id) }
             ])
         }

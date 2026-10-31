@@ -158,6 +158,20 @@ final class FakeDeskInteractor: DeskInteractorInterface {
 }
 
 final class FakeCardWireframe: CardWireframeInterface {
+    var uploadConfirmations: [(name: String, cards: Int, pictures: Int)] = []
+    var progressMessages: [String] = []
+    var progressCancellable: [Bool] = []
+    var hidden = 0
+    private var uploadConfirm: (() -> Void)?
+    private(set) var cancelUpload: (() -> Void)?
+    func confirmUpload(deckName: String, cardCount: Int, pictureCount: Int, onConfirm: @escaping () -> Void) {
+        uploadConfirmations.append((deckName, cardCount, pictureCount)); uploadConfirm = onConfirm
+    }
+    func confirmTheUpload() { uploadConfirm?() }
+    func showUploadProgress(message: String, onCancel: (() -> Void)?) {
+        progressMessages.append(message); progressCancellable.append(onCancel != nil); cancelUpload = onCancel
+    }
+    func hideUploadProgress(then: @escaping () -> Void) { hidden += 1; then() }
     var editors: [String?] = []
     var studied: [String] = []
     var deleteRequests: [String] = []

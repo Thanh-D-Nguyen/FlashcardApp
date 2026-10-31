@@ -120,7 +120,8 @@ final class PictureSearchPresenterTests: XCTestCase {
         XCTAssertEqual(view.selecting, [true, false])
         XCTAssertTrue(picked.isEmpty, "Nothing is saved before the sheet has closed")
         wireframe.completeClose()
-        XCTAssertEqual(picked, [picture("1")])
+        XCTAssertEqual(picked, [picture("1").registered(assetId: "asset-1")])
+        XCTAssertEqual(picked.first?.attribution.assetId, "asset-1", "The asset id travels with the picture")
     }
 
     func test_aRejectedChoiceKeepsTheSheetOpenAndSavesNothing() {

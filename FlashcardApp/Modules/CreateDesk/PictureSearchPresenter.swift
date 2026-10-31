@@ -109,10 +109,11 @@ extension PictureSearchPresenter: PictureSearchPresenterInterface {
         // Assigning replaces (and cancels) an earlier selection, so a double tap registers one choice.
         selection.disposable = interactor.select(picture)
             .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] _ in
+            .subscribe(onSuccess: { [weak self] assetId in
                 guard let self else { return }
                 self.view?.setSelecting(false)
-                self.wireframe.close { [onPick = self.onPick] in onPick(picture) }
+                let chosen = picture.registered(assetId: assetId)
+                self.wireframe.close { [onPick = self.onPick] in onPick(chosen) }
             }, onFailure: { [weak self] error in
                 self?.view?.setSelecting(false)
                 self?.view?.showSelectionFailure(Self.selectionMessage(for: error))

@@ -138,6 +138,10 @@ protocol CardPresenterInterface: AnyObject {
     func studyDeck(id: String)
     func editDeck(id: String)
     func requestDelete(id: String)
+    /// The account deck made from this device deck, when it was saved to the account.
+    func accountDeckId(forDeck id: String) -> String?
+    /// Copies a device deck, with its pictures, to the learner's account.
+    func uploadDeck(id: String)
 }
 
 class CardPresenter {
@@ -163,6 +167,7 @@ class CardPresenter {
     private let interactor: CardInteractorInterface
     private let deskInteractor: DeskInteractorInterface
     private let server: CardLibraryServerInteractorInterface
+    private let publisher: DeckPublishInteractorInterface
     private let wireframe: CardWireframeInterface
     private let defaults: UserDefaults
     private let now: () -> Date
@@ -181,18 +186,21 @@ class CardPresenter {
     private var dueChanged = false
     private let decksRequest = SerialDisposable()
     private let dueRequest = SerialDisposable()
+    private let uploadRequest = SerialDisposable()
 
     init(interactor: CardInteractorInterface,
          deskInteractor: DeskInteractorInterface,
          wireframe: CardWireframeInterface,
          defaults: UserDefaults = .standard,
          server: CardLibraryServerInteractorInterface = CardLibraryServerInteractor(),
+         publisher: DeckPublishInteractorInterface = DeckPublishInteractor(),
          now: @escaping () -> Date = Date.init) {
         self.interactor = interactor
         self.deskInteractor = deskInteractor
         self.wireframe = wireframe
         self.defaults = defaults
         self.server = server
+        self.publisher = publisher
         self.now = now
         self.sort = defaults.string(forKey: Self.sortKey).flatMap(CardLibrarySort.init(rawValue:)) ?? .recent
     }
@@ -200,6 +208,7 @@ class CardPresenter {
     deinit {
         decksRequest.dispose()
         dueRequest.dispose()
+        uploadRequest.dispose()
     }
 
     private func reload() {
@@ -498,5 +507,76 @@ extension CardPresenter: CardPresenterInterface {
             }
             self.reload()
         }
+    }
+
+    func accountDeckId(forDeck id: String) -> String? { publisher.accountDeckId(forDevice: id) }
+
+    func uploadDeck(id: String) {
+        guard let desk = deskInteractor.desk(withId: id) else { return reload() }
+        guard publisher.isSignedIn else {
+            return wireframe.showSignIn { [weak self] in self?.uploadDeck(id: id) }
+        }
+        guard publisher.accountDeckId(forDevice: id) == nil else {
+            return wireframe.showAlert(with: nil, message: DeckPublishError.alreadySaved.errorDescription)
+        }
+        wireframe.confirmUpload(deckName: desk.name, cardCount: desk.cards.count, pictureCount: publisher.pictureCount(ofDeck: id)) { [weak self] in
+            self?.startUpload(deckId: id)
+        }
+    }
+
+    private func startUpload(deckId: String) {
+        var creating = false
+        wireframe.showUploadProgress(message: NSLocalizedString("Preparing…", comment: "Saving a deck to the account"),
+                                     onCancel: { [weak self] in self?.uploadRequest.disposable = Disposables.create() })
+        uploadRequest.disposable = publisher.publish(deckId: deckId)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] update in
+                guard let self else { return }
+                switch update {
+                case .uploading(let done, let total):
+                    self.wireframe.showUploadProgress(
+                        message: String(format: NSLocalizedString("Uploading pictures… %1$lld of %2$lld", comment: ""), done, total),
+                        onCancel: { [weak self] in self?.uploadRequest.disposable = Disposables.create() })
+                case .creating:
+                    creating = true
+                    // Past this point a cancel would leave it unknown whether the deck was created.
+                    self.wireframe.showUploadProgress(message: NSLocalizedString("Saving the deck…", comment: ""), onCancel: nil)
+                case .finished(let report):
+                    self.finishUpload(title: NSLocalizedString("Saved to your account", comment: ""), message: Self.summary(of: report), refresh: true)
+                }
+            }, onError: { [weak self] error in
+                var message = Self.uploadMessage(for: error)
+                if creating, case LearnerAPIError.interrupted = error {
+                    message = NSLocalizedString("The connection was interrupted. The deck may already be on your account: check “On your account” before saving it again.", comment: "")
+                }
+                self?.finishUpload(title: NSLocalizedString("Couldn't save the deck", comment: ""), message: message, refresh: creating)
+            })
+    }
+
+    private func finishUpload(title: String, message: String, refresh shouldRefresh: Bool) {
+        wireframe.hideUploadProgress { [weak self] in
+            self?.wireframe.showAlert(with: title, message: message)
+        }
+        if shouldRefresh {
+            decksChanged = true
+            refresh()
+        }
+    }
+
+    static func uploadMessage(for error: Error) -> String {
+        if let error = error as? DeckPublishError { return error.errorDescription ?? error.localizedDescription }
+        return message(for: error)
+    }
+
+    static func summary(of report: DeckPublishReport) -> String {
+        var lines = [String.localizedStringWithFormat(NSLocalizedString("%lld cards saved as a private deck.", comment: ""), report.cardCount)]
+        let pictures = report.uploaded + report.reused
+        if pictures > 0 {
+            lines.append(String.localizedStringWithFormat(NSLocalizedString("%lld pictures saved with the cards.", comment: ""), pictures))
+        }
+        if report.skipped > 0 {
+            lines.append(String.localizedStringWithFormat(NSLocalizedString("%lld pictures were left out because they were missing or too large.", comment: ""), report.skipped))
+        }
+        return lines.joined(separator: "\n")
     }
 }
