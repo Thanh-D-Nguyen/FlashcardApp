@@ -27,7 +27,12 @@ final class PictureSearchPresenterTests: XCTestCase {
     }
 
     private func picture(_ id: String) -> PictureSuggestion {
-        PictureSuggestion(BJTImageResultDTO(id: id, thumbUrl: "https://i.test/\(id)-t.jpg", fullUrl: "https://i.test/\(id).jpg", source: "unsplash"))!
+        PictureSuggestion(Self.dto(id))!
+    }
+
+    static func dto(_ id: String, url: String? = nil, author: String = "Ana Lee") -> BJTImageResultDTO {
+        BJTImageResultDTO(handle: id, provider: "unsplash", url: url ?? "https://i.test/\(id).jpg", sourceUrl: "https://unsplash.com/photos/\(id)",
+                          author: author, authorUrl: "https://unsplash.com/@ana", license: "Unsplash License", licenseUrl: nil)
     }
 
     /// `observe(on: MainScheduler)` hops once; let it run.
@@ -103,13 +108,35 @@ final class PictureSearchPresenterTests: XCTestCase {
         XCTAssertEqual(interactor.disposed, 1)
     }
 
-    func test_choosingAPictureClosesTheSheetThenHandsItOver() {
+    func test_choosingAPictureRegistersItThenClosesTheSheetThenHandsItOver() {
         let presenter = makePresenter()
         interactor.result.onNext([picture("1")])
         presenter.select(picture("1"))
+        XCTAssertEqual(interactor.selected, [picture("1")])
+        XCTAssertEqual(view.selecting, [true])
+        XCTAssertNil(wireframe.pendingClose, "The sheet stays open until the server accepted the choice")
+        interactor.selection.onNext("asset-1")
+        waitForMain()
+        XCTAssertEqual(view.selecting, [true, false])
         XCTAssertTrue(picked.isEmpty, "Nothing is saved before the sheet has closed")
         wireframe.completeClose()
         XCTAssertEqual(picked, [picture("1")])
+    }
+
+    func test_aRejectedChoiceKeepsTheSheetOpenAndSavesNothing() {
+        let presenter = makePresenter()
+        presenter.select(picture("1"))
+        interactor.selection.onError(LearnerAPIError.rateLimited)
+        waitForMain()
+        XCTAssertEqual(view.selecting, [true, false])
+        XCTAssertEqual(view.failures, [LearnerAPIError.rateLimited.errorDescription])
+        XCTAssertNil(wireframe.pendingClose)
+        XCTAssertTrue(picked.isEmpty)
+    }
+
+    func test_anExpiredHandleAsksForANewSearch() {
+        XCTAssertEqual(PictureSearchPresenter.selectionMessage(for: LearnerAPIError.invalidRequest(nil)),
+                       NSLocalizedString("This result has expired. Search again and choose it once more.", comment: ""))
     }
 
     func test_closingWithoutChoosingSavesNothing() {
@@ -140,7 +167,8 @@ final class CardImageAttributionTests: XCTestCase {
         return try store.save(image: renderer.image { UIColor.systemTeal.setFill(); $0.fill(CGRect(x: 0, y: 0, width: 20, height: 20)) })
     }
 
-    private let attribution = ImageAttribution(source: "unsplash", sourceID: "p1", imageURL: "https://i.test/p1.jpg")
+    private let attribution = ImageAttribution(source: "unsplash", imageURL: "https://i.test/p1.jpg", sourceURL: "https://unsplash.com/photos/p1",
+                                               author: "Ana Lee", authorURL: "https://unsplash.com/@ana", license: "Unsplash License", licenseURL: nil)
 
     func test_theSourceIsKeptWithThePicture() throws {
         let reference = try reference()
@@ -173,23 +201,62 @@ private final class FakePictureSearch: PictureSearchInteractorInterface {
     var terms: [String] = []
     var disposed = 0
     var result = PublishSubject<[PictureSuggestion]>()
+    var selected: [PictureSuggestion] = []
+    var selection = PublishSubject<String>()
     var isSignedIn: Bool { signedIn }
     func search(_ term: String) -> Single<[PictureSuggestion]> {
         terms.append(term)
         result = PublishSubject<[PictureSuggestion]>()
         return result.take(1).asSingle().do(onDispose: { [weak self] in self?.disposed += 1 })
     }
+    func select(_ picture: PictureSuggestion) -> Single<String> {
+        selected.append(picture)
+        selection = PublishSubject<String>()
+        return selection.take(1).asSingle()
+    }
 }
 
 private final class FakePictureWireframe: PictureSearchWireframeInterface {
     var finishSignIn: (() -> Void)?
-    private var closing: (() -> Void)?
-    func close(then: (() -> Void)?) { closing = then }
-    func completeClose() { closing?() }
+    private(set) var pendingClose: (() -> Void)?
+    func close(then: (() -> Void)?) { pendingClose = then }
+    func completeClose() { pendingClose?() }
     func showSignIn(onFinish: @escaping () -> Void) { finishSignIn = onFinish }
 }
 
 private final class SpyPictureView: PictureSearchViewInterface {
     var states: [PictureSearchState] = []
+    var selecting: [Bool] = []
+    var failures: [String] = []
     func render(_ state: PictureSearchState) { states.append(state) }
+    func setSelecting(_ selecting: Bool) { self.selecting.append(selecting) }
+    func showSelectionFailure(_ message: String) { failures.append(message) }
+}
+
+final class PictureSuggestionTests: XCTestCase {
+    func test_aResultKeepsTheCreditItsLicenceAsksFor() throws {
+        let picture = try XCTUnwrap(PictureSuggestion(PictureSearchPresenterTests.dto("p1")))
+        XCTAssertEqual(picture.handle, "p1")
+        XCTAssertEqual(picture.attribution.creditLine, "Photo by Ana Lee · unsplash · Unsplash License")
+        XCTAssertEqual(picture.attribution.creditURL, URL(string: "https://unsplash.com/@ana"))
+    }
+
+    func test_onlySecureAddressesAreAccepted() {
+        XCTAssertNil(PictureSuggestion(PictureSearchPresenterTests.dto("p", url: "http://i.test/f.jpg")))
+        XCTAssertNil(PictureSuggestion(PictureSearchPresenterTests.dto("p", url: "file:///etc/passwd")))
+    }
+
+    func test_aResultWithoutHandleOrAuthorIsDropped() {
+        XCTAssertNil(PictureSuggestion(PictureSearchPresenterTests.dto("")))
+        XCTAssertNil(PictureSuggestion(PictureSearchPresenterTests.dto("p", author: "  ")))
+    }
+
+    func test_aRecordWrittenBeforeTheCreditFieldsExistedStillDecodes() throws {
+        let old = #"{"source":"unsplash","sourceID":"p1","imageURL":"https://i.test/p1.jpg"}"#
+        let attribution = try JSONDecoder().decode(ImageAttribution.self, from: Data(old.utf8))
+        XCTAssertEqual(attribution.source, "unsplash")
+        XCTAssertNil(attribution.author)
+        XCTAssertEqual(attribution.creditLine, "unsplash")
+        XCTAssertNil(attribution.creditURL)
+    }
 }

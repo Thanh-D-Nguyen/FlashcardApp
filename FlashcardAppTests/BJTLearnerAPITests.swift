@@ -98,17 +98,32 @@ final class BJTLearnerAPITests: XCTestCase {
         XCTAssertNil(deck.cards[0].card.reading)
     }
 
-    func test_imageSearchSendsTheQueryAndLimitAndReadsTheImages() throws {
-        LearnerURLProtocol.handler = { _, proto in
-            proto.respond(status: 200, json: #"{"images":[{"id":"1","thumbUrl":"https://i.test/t.jpg","fullUrl":"https://i.test/f.jpg","source":"unsplash"}]}"#)
-        }
-        let images = try result(api.searchImages(query: " con chó ", limit: 6)).get()
-        XCTAssertEqual(images, [BJTImageResultDTO(id: "1", thumbUrl: "https://i.test/t.jpg", fullUrl: "https://i.test/f.jpg", source: "unsplash")])
+    private static let searchBody = #"{"results":[{"handle":"h.sig","provider":"unsplash","url":"https://images.unsplash.com/a.jpg","sourceUrl":"https://unsplash.com/photos/a","author":"Ana Lee","authorUrl":"https://unsplash.com/@ana","license":"Unsplash License"}]}"#
+
+    func test_imageSearchSendsOnlyTheQueryAndReadsTheResults() throws {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 200, json: Self.searchBody) }
+        let images = try result(api.searchImages(query: " con chó ")).get()
+        XCTAssertEqual(images, [BJTImageResultDTO(handle: "h.sig", provider: "unsplash", url: "https://images.unsplash.com/a.jpg",
+                                                  sourceUrl: "https://unsplash.com/photos/a", author: "Ana Lee",
+                                                  authorUrl: "https://unsplash.com/@ana", license: "Unsplash License", licenseUrl: nil)])
         let sent = try XCTUnwrap(LearnerURLProtocol.requests.first)
         XCTAssertEqual(sent.url.path, "/api/media/search-images")
         let body = try XCTUnwrap(JSONSerialization.jsonObject(with: sent.body) as? [String: Any])
-        XCTAssertEqual(body["query"] as? String, "con chó")
-        XCTAssertEqual(body["limit"] as? Int, 6)
+        XCTAssertEqual(body as? [String: String], ["query": "con chó"], "The server rejects any other field")
+    }
+
+    func test_selectingAnImagePostsTheHandleAndReturnsTheAssetId() throws {
+        let asset = UUID().uuidString.lowercased()
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 201, json: #"{"assetId":"\#(asset)","status":"pending_review"}"#) }
+        XCTAssertEqual(try result(api.selectImage(handle: "h.sig")).get(), asset)
+        let sent = try XCTUnwrap(LearnerURLProtocol.requests.first)
+        XCTAssertEqual(sent.url.path, "/api/media/image-selections")
+        XCTAssertEqual(try JSONSerialization.jsonObject(with: sent.body) as? [String: String], ["handle": "h.sig"])
+    }
+
+    func test_anAssetIdThatIsNotAUUIDIsAnInvalidResponse() {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 201, json: #"{"assetId":"../x","status":"pending_review"}"#) }
+        XCTAssertEqual(failure(api.selectImage(handle: "h.sig")), .invalidResponse)
     }
 
     // MARK: Requests that never reach the network
@@ -130,8 +145,9 @@ final class BJTLearnerAPITests: XCTestCase {
         var huge = request; huge.count = 5000
         XCTAssertEqual(failure(api.generateDeck(huge)), .invalidRequest(nil), "The server would silently fall back to 50 cards")
         XCTAssertEqual(failure(api.deck(id: "../../admin")), .invalidRequest(nil), "Only a UUID may become a path segment")
-        XCTAssertEqual(failure(api.searchImages(query: "a", limit: 6)), .invalidRequest(nil))
-        XCTAssertEqual(failure(api.searchImages(query: "ab", limit: 0)), .invalidRequest(nil))
+        XCTAssertEqual(failure(api.searchImages(query: "a")), .invalidRequest(nil))
+        XCTAssertEqual(failure(api.searchImages(query: String(repeating: "x", count: 201))), .invalidRequest(nil))
+        XCTAssertEqual(failure(api.selectImage(handle: "")), .invalidRequest(nil))
     }
 
     // MARK: Status handling

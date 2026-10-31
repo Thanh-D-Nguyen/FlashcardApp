@@ -591,19 +591,13 @@ final class CreateDeskPresenterTests: XCTestCase {
         let presenter = makePresenter()
         presenter.updateField(.front, ofCardAt: 0, text: "犬")
         presenter.findPictures(forCardAt: 0)
-        let picture = PictureSuggestion(BJTImageResultDTO(id: "p1", thumbUrl: "https://img.test/t.jpg", fullUrl: "https://img.test/f.jpg", source: "unsplash"))!
+        let picture = PictureSuggestion(PictureSearchPresenterTests.dto("p1", url: "https://img.test/f.jpg"))!
         wireframe.pickPicture?(picture)
         XCTAssertEqual(interactor.downloaded, [URL(string: "https://img.test/f.jpg")!])
-        XCTAssertEqual(interactor.attributions, [ImageAttribution(source: "unsplash", sourceID: "p1", imageURL: "https://img.test/f.jpg")])
+        XCTAssertEqual(interactor.attributions, [picture.attribution])
+        XCTAssertEqual(interactor.attributions.first?.author, "Ana Lee")
         XCTAssertEqual(presenter.draft.cards[0].imageReference, "local-image:x.jpg")
     }
-
-    func test_pictureSuggestionsOnlyAcceptSecureAddresses() {
-        XCTAssertNil(PictureSuggestion(BJTImageResultDTO(id: "p", thumbUrl: "http://img.test/t.jpg", fullUrl: "https://img.test/f.jpg", source: "x")))
-        XCTAssertNil(PictureSuggestion(BJTImageResultDTO(id: "p", thumbUrl: "https://img.test/t.jpg", fullUrl: "file:///etc/passwd", source: "x")))
-        XCTAssertNil(PictureSuggestion(BJTImageResultDTO(id: "", thumbUrl: "https://img.test/t.jpg", fullUrl: "https://img.test/f.jpg", source: "x")))
-    }
-
 }
 
 // MARK: - Doubles

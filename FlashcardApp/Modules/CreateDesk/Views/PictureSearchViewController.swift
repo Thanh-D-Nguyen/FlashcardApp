@@ -8,6 +8,7 @@ final class PictureSearchViewController: BaseViewController, PictureSearchViewIn
     private let stateView = StateView()
     private var collectionView: UICollectionView!
     private var pictures: [PictureSuggestion] = []
+    private weak var preview: PicturePreviewViewController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,6 +102,16 @@ final class PictureSearchViewController: BaseViewController, PictureSearchViewIn
     }
 }
 
+extension PictureSearchViewController {
+    func setSelecting(_ selecting: Bool) {
+        preview?.setBusy(selecting)
+    }
+
+    func showSelectionFailure(_ message: String) {
+        preview?.showFailure(message)
+    }
+}
+
 extension PictureSearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
@@ -120,6 +131,7 @@ extension PictureSearchViewController: UICollectionViewDataSource, UICollectionV
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let picture = pictures[indexPath.item]
         let preview = PicturePreviewViewController(picture: picture) { [weak self] in self?.presenter.select(picture) }
+        self.preview = preview
         navigationController?.pushViewController(preview, animated: true)
     }
 }
@@ -163,10 +175,10 @@ final class PictureThumbnailCell: UICollectionViewCell {
     }
 
     func configure(_ picture: PictureSuggestion, number: Int) {
-        pictureView.setReference(picture.thumbnailURL.absoluteString)
-        sourceLabel.text = picture.source
+        pictureView.setReference(picture.imageURL.absoluteString)
+        sourceLabel.text = picture.attribution.author ?? picture.source
         accessibilityLabel = String(format: NSLocalizedString("Picture %lld", comment: ""), number)
-        accessibilityValue = picture.source
+        accessibilityValue = picture.attribution.creditLine
     }
 }
 
@@ -175,6 +187,8 @@ final class PicturePreviewViewController: UIViewController {
     private let picture: PictureSuggestion
     private let onUse: () -> Void
     private let pictureView = CardImageView()
+    private let useButton = UIButton(type: .system)
+    private let failureLabel = UILabel()
 
     init(picture: PictureSuggestion, onUse: @escaping () -> Void) {
         self.picture = picture
@@ -193,19 +207,39 @@ final class PicturePreviewViewController: UIViewController {
         pictureView.accessibilityLabel = NSLocalizedString("Picture preview", comment: "")
         pictureView.setReference(picture.imageURL.absoluteString)
 
-        let source = UILabel()
-        source.apply(.metadata)
-        source.textColor = Design.Color.textSecondary
-        source.text = picture.source.isEmpty ? nil : String(format: NSLocalizedString("Source: %@", comment: "Where a picture comes from"), picture.source)
+        let credit = UILabel()
+        credit.apply(.metadata)
+        credit.textColor = Design.Color.textSecondary
+        credit.numberOfLines = 0
+        credit.text = picture.attribution.creditLine
+        credit.accessibilityIdentifier = "picture_credit"
+
+        var linkConfiguration = UIButton.Configuration.plain()
+        linkConfiguration.title = NSLocalizedString("Open source page", comment: "Opens the page a picture comes from")
+        linkConfiguration.image = UIImage(systemName: "arrow.up.right.square")
+        linkConfiguration.imagePadding = Design.Spacing.xs
+        linkConfiguration.contentInsets = .zero
+        let link = UIButton(configuration: linkConfiguration)
+        link.contentHorizontalAlignment = .leading
+        link.isHidden = picture.attribution.creditURL == nil
+        link.addAction(UIAction { [weak self] _ in
+            if let url = self?.picture.attribution.creditURL { UIApplication.shared.open(url) }
+        }, for: .primaryActionTriggered)
+
+        failureLabel.apply(.metadata)
+        failureLabel.textColor = Design.Color.error
+        failureLabel.numberOfLines = 0
+        failureLabel.isHidden = true
+        failureLabel.accessibilityIdentifier = "picture_selection_error"
 
         var configuration = Design.Button.primary(title: NSLocalizedString("Use this picture", comment: ""))
         configuration.image = UIImage(systemName: "checkmark")
         configuration.imagePadding = Design.Spacing.s
-        let use = UIButton(configuration: configuration)
-        use.accessibilityIdentifier = "use_picture"
-        use.addAction(UIAction { [weak self] _ in self?.onUse() }, for: .primaryActionTriggered)
+        useButton.configuration = configuration
+        useButton.accessibilityIdentifier = "use_picture"
+        useButton.addAction(UIAction { [weak self] _ in self?.onUse() }, for: .primaryActionTriggered)
 
-        let stack = UIStackView(arrangedSubviews: [source, use])
+        let stack = UIStackView(arrangedSubviews: [credit, link, failureLabel, useButton])
         stack.axis = .vertical
         stack.spacing = Design.Spacing.m
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -220,5 +254,17 @@ final class PicturePreviewViewController: UIViewController {
             stack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.l)
         ])
+    }
+
+    func setBusy(_ busy: Bool) {
+        useButton.isEnabled = !busy
+        useButton.configuration?.showsActivityIndicator = busy
+        if busy { failureLabel.isHidden = true }
+    }
+
+    func showFailure(_ message: String) {
+        failureLabel.text = message
+        failureLabel.isHidden = false
+        UIAccessibility.post(notification: .announcement, argument: message)
     }
 }

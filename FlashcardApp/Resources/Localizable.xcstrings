@@ -13888,6 +13888,77 @@
           }
         }
       }
+    },
+    "Photo by %@" : {
+      "extractionState" : "manual",
+      "comment" : "Picture credit, for example: Photo by Ana Lee",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo by %@"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ảnh của %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影：%@"
+          }
+        }
+      }
+    },
+    "Open source page" : {
+      "extractionState" : "manual",
+      "comment" : "Opens the page a picture comes from",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open source page"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở trang nguồn"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元のページを開く"
+          }
+        }
+      }
+    },
+    "This result has expired. Search again and choose it once more." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This result has expired. Search again and choose it once more."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kết quả này đã hết hạn. Hãy tìm lại và chọn lại."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この結果は有効期限が切れました。もう一度検索して選び直してください。"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

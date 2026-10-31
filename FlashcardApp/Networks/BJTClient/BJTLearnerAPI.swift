@@ -50,7 +50,11 @@ protocol BJTLearnerAPIInterface: AnyObject {
     func generateDeck(_ request: DeckGenerationRequest) -> Single<BJTGeneratedDeckDTO>
     /// Read-only; safe to repeat.
     func deck(id: String) -> Single<BJTRemoteDeckDTO>
-    func searchImages(query: String, limit: Int) -> Single<[BJTImageResultDTO]>
+    /// Read-only; safe to repeat. The server decides how many results to return and rejects any extra request field.
+    func searchImages(query: String) -> Single<[BJTImageResultDTO]>
+    /// Records the learner's choice (the server registers the download with the picture provider and keeps a pending-review copy)
+    /// and returns the asset id. Each call creates server-side state, so a caller never retries it by itself.
+    func selectImage(handle: String) -> Single<String>
 }
 
 /// Authenticated calls for the learner's flashcards and media, using the opaque session token as a bearer.
@@ -84,7 +88,8 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
     private struct GenerateBody: Encodable {
         let name: String, levels: [String], sourceTypes: [String], direction: String, limit: Int
     }
-    private struct ImageSearchBody: Encodable { let query: String; let limit: Int }
+    private struct ImageSearchBody: Encodable { let query: String }
+    private struct ImageSelectionBody: Encodable { let handle: String }
 
     func previewGeneration(level: GenerationLevel, contentTypes: [GenerationContentType]) -> Single<Int> {
         let body = PreviewBody(levels: [level.rawValue], sourceTypes: contentTypes.map(\.rawValue))
@@ -107,12 +112,21 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
         return perform(["flashcards", "decks", id], method: .get, body: Optional<PreviewBody>.none)
     }
 
-    func searchImages(query: String, limit: Int) -> Single<[BJTImageResultDTO]> {
+    func searchImages(query: String) -> Single<[BJTImageResultDTO]> {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.count >= 2, (1...20).contains(limit) else { return .error(LearnerAPIError.invalidRequest(nil)) }
-        let response: Single<BJTImageSearchResponseDTO> = perform(["media", "search-images"], method: .post,
-                                                                   body: ImageSearchBody(query: trimmed, limit: limit))
-        return response.map { $0.images }
+        // The server accepts 1...200 characters; below two characters the website does not search either.
+        guard (2...200).contains(trimmed.count) else { return .error(LearnerAPIError.invalidRequest(nil)) }
+        let response: Single<BJTImageSearchResponseDTO> = perform(["media", "search-images"], method: .post, body: ImageSearchBody(query: trimmed))
+        return response.map { $0.results }
+    }
+
+    func selectImage(handle: String) -> Single<String> {
+        guard !handle.isEmpty, handle.count <= 16_000 else { return .error(LearnerAPIError.invalidRequest(nil)) }
+        let response: Single<BJTImageSelectionDTO> = perform(["media", "image-selections"], method: .post, body: ImageSelectionBody(handle: handle))
+        return response.map { selection in
+            guard UUID(uuidString: selection.assetId) != nil else { throw LearnerAPIError.invalidResponse }
+            return selection.assetId
+        }
     }
 
     // MARK: Transport

@@ -406,7 +406,8 @@ private final class UnusedAPI: BJTLearnerAPIInterface {
     func previewGeneration(level: GenerationLevel, contentTypes: [GenerationContentType]) -> Single<Int> { fatalError() }
     func generateDeck(_ request: DeckGenerationRequest) -> Single<BJTGeneratedDeckDTO> { fatalError() }
     func deck(id: String) -> Single<BJTRemoteDeckDTO> { fatalError() }
-    func searchImages(query: String, limit: Int) -> Single<[BJTImageResultDTO]> { fatalError() }
+    func searchImages(query: String) -> Single<[BJTImageResultDTO]> { fatalError() }
+    func selectImage(handle: String) -> Single<String> { fatalError() }
 }
 
 private final class NoTokens: AuthTokenManagerInterface {
@@ -418,6 +419,7 @@ private final class NoTokens: AuthTokenManagerInterface {
 
 private final class NoAuth: NativeAuthAPIInterface {
     func login(email: String, password: String) -> Single<NativeLoginResponse> { fatalError() }
+    func loginWithGoogle(idToken: String) -> Single<NativeLoginResponse> { fatalError() }
     func me(token: @escaping () -> String?) -> Single<NativeProfile> { fatalError() }
     func logout(token: @escaping () -> String?) -> Single<Void> { fatalError() }
 }

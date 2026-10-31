@@ -88,17 +88,27 @@ struct BJTArchiveAckDTO: Decodable, Equatable {
     let archived: Bool
 }
 
-/// `POST /api/media/search-images`. The Go handler currently always answers 503, so this shape is the one the
-/// website composer reads (`data.images`) and has NOT been observed in a Go success response.
+/// `POST /api/media/search-images` → `{ "results": [...] }`. Each result carries a short-lived signed `handle` (valid 15 minutes,
+/// bound to the account) plus the attribution the picture's licence asks for; the handle is what `image-selections` consumes.
 struct BJTImageSearchResponseDTO: Decodable, Equatable {
-    let images: [BJTImageResultDTO]
+    let results: [BJTImageResultDTO]
 }
 
 struct BJTImageResultDTO: Decodable, Equatable {
-    let id: String
-    let thumbUrl: String
-    let fullUrl: String
-    let source: String
+    let handle: String
+    let provider: String
+    let url: String
+    let sourceUrl: String
+    let author: String
+    let authorUrl: String?
+    let license: String
+    let licenseUrl: String?
+}
+
+/// `POST /api/media/image-selections` → `201 { "assetId": "…", "status": "pending_review" }`.
+struct BJTImageSelectionDTO: Decodable, Equatable {
+    let assetId: String
+    let status: String
 }
 
 /// `{ "error": "message" }`, written by every Go handler and guard.
