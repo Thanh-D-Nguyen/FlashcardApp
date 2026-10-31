@@ -49,6 +49,57 @@ final class RemoteDeckPresenterTests: XCTestCase {
         presenter.viewDidLoad()
     }
 
+    private func detailWithPicture() -> ServerDeckDetail {
+        let picture = CardPicture(url: URL(string: "https://images.unsplash.com/a.jpg")!, attribution: nil)
+        return ServerDeckDetail(deck: ServerDeck(id: deckId, title: "N5 words", isOwned: false, cardCount: 1),
+                                cards: [ServerDeckCard(id: "aaaaaaaa-0000-4000-8000-000000000000", front: "犬", back: "chó", reading: "", picture: picture)])
+    }
+
+    func test_studyingACopyWithPicturesWaitsForThePicturesBeforeOpeningTheDeck() {
+        server.detailResult = .just(detailWithPicture())
+        let stored = PublishSubject<Int>()
+        server.copyResult = stored.take(1).asSingle()
+        makePresenter()
+        presenter.study()
+        XCTAssertEqual(view.last.busy, .saving)
+        XCTAssertTrue(wireframe.studied.isEmpty, "The deck opens once its pictures are stored")
+        stored.onNext(1)
+        waitForMain()
+        XCTAssertNil(view.last.busy)
+        XCTAssertEqual(wireframe.studied, [deckId])
+    }
+
+    func test_aPictureThatCannotBeCopiedNeverBlocksStudying() {
+        server.detailResult = .just(detailWithPicture())
+        server.copyResult = .error(RemoteImageError.offline)
+        makePresenter()
+        presenter.study()
+        waitForMain()
+        XCTAssertEqual(wireframe.studied, [deckId])
+        XCTAssertNil(view.last.notice)
+    }
+
+    func test_aCopyThatAlreadyExistsDoesNotCopyPicturesAgain() {
+        server.detailResult = .just(detailWithPicture())
+        server.saveOutcome = .success(.alreadyPresent(deckId: deckId))
+        makePresenter()
+        presenter.study()
+        XCTAssertTrue(server.pictureCopies.isEmpty)
+        XCTAssertEqual(wireframe.studied, [deckId])
+    }
+
+    func test_aDeckWithoutPicturesDoesNotLookForAny() {
+        makePresenter()
+        presenter.study()
+        XCTAssertTrue(server.pictureCopies.isEmpty)
+    }
+
+    private func waitForMain() {
+        let done = expectation(description: "main")
+        DispatchQueue.main.async { DispatchQueue.main.async { done.fulfill() } }
+        wait(for: [done], timeout: 2)
+    }
+
     func test_loadsTheDeckAndOffersToStudyIt() {
         makePresenter()
         XCTAssertEqual(view.last.phase, .loaded)

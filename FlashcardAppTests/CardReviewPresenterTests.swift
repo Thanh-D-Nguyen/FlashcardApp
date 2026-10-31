@@ -13,6 +13,8 @@ final class FakeServerInteractor: CardLibraryServerInteractorInterface {
     var archiveResult: Single<Void> = .just(())
     var deviceCopies = Set<String>()
     var saveOutcome: Result<DeckImportOutcome, Error> = .success(.imported(deckId: "x"))
+    var copyResult: Single<Int> = .just(0)
+    private(set) var pictureCopies: [ServerDeckDetail] = []
 
     private(set) var decksCalls = 0
     private(set) var dueLimits: [Int] = []
@@ -33,6 +35,7 @@ final class FakeServerInteractor: CardLibraryServerInteractorInterface {
         saved.append(detail)
         return try saveOutcome.get()
     }
+    func copyPictures(of detail: ServerDeckDetail) -> Single<Int> { pictureCopies.append(detail); return copyResult }
 }
 
 final class SpyReviewView: CardReviewViewInterface {

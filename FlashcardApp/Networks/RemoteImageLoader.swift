@@ -28,8 +28,9 @@ enum RemoteImageError: Error, Equatable, LocalizedError {
 }
 
 /// Downloads one picture for a card. Plain unauthenticated GET to a user-supplied https address: no session
-/// token or header is ever attached, so no credential can leak to a third-party host. Disposing the
-/// subscription cancels the request.
+/// token or header is ever attached, so no credential can leak to a third-party host. The one exception is the
+/// API's own `/api/media/...` address (`APIImageAuthorization`), where the learner's copy needs the session.
+/// Disposing the subscription cancels the request.
 final class RemoteImageLoader {
     static let shared = RemoteImageLoader()
     /// Matches the website composer's upload limit.
@@ -57,15 +58,19 @@ final class RemoteImageLoader {
         request.url?.scheme?.lowercased() == "https" ? request : nil
     }
 
-    func fetch(_ url: URL) -> Single<Data> {
+    /// `authorization` is only attached when `url` is the API's own media address; for any other address it is ignored.
+    func fetch(_ url: URL, authorization: String? = nil) -> Single<Data> {
         Single.create { [session] observer in
-            guard url.scheme?.lowercased() == "https" else {
+            let isAPIAddress = APIImageAuthorization.isAPIAddress(url)
+            guard url.scheme?.lowercased() == "https" || isAPIAddress else {
                 observer(.failure(RemoteImageError.insecureScheme))
                 return Disposables.create()
             }
             let limit = Self.maximumBytes
+            var headers: HTTPHeaders = ["Accept": Self.acceptedContentTypes.joined(separator: ", ")]
+            if isAPIAddress, let authorization { headers.add(name: "Authorization", value: authorization) }
             var request: DataRequest!
-            request = session.request(url, headers: ["Accept": Self.acceptedContentTypes.joined(separator: ", ")])
+            request = session.request(url, headers: headers)
                 // A redirect may only lead to another https address, never to http or a local-network host.
                 .redirect(using: Redirector(behavior: .modify { _, request, _ in Self.allowedRedirect(request) }))
                 .validate(statusCode: 200..<300)

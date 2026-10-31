@@ -1,3 +1,4 @@
+import Alamofire
 import RealmSwift
 import RxSwift
 import XCTest
@@ -34,6 +35,29 @@ private final class FakeLibraryAPI: BJTFlashcardLibraryAPIInterface {
         return submitResult
     }
     func archiveDeck(id: String) -> Single<Void> { archiveResult }
+}
+
+/// Answers every request with a small JPEG, or 404 for the addresses in `missing`.
+private final class PictureURLProtocol: URLProtocol {
+    static var missing = Set<String>()
+    static var requested: [URL] = []
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        Self.requested.append(request.url!)
+        if Self.missing.contains(request.url!.absoluteString) {
+            client?.urlProtocol(self, didReceive: HTTPURLResponse(url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil)!, cacheStoragePolicy: .notAllowed)
+        } else {
+            let renderer = UIGraphicsImageRenderer(size: CGSize(width: 8, height: 8))
+            let jpeg = renderer.jpegData(withCompressionQuality: 0.8) { UIColor.systemTeal.setFill(); $0.fill(CGRect(x: 0, y: 0, width: 8, height: 8)) }
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": "image/jpeg"])!
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: jpeg)
+        }
+        client?.urlProtocolDidFinishLoading(self)
+    }
+    override func stopLoading() {}
 }
 
 /// Mapping of server rows to the values the Cards tab shows, and the use cases that sit between the API and the device's decks.
@@ -193,6 +217,53 @@ final class CardLibraryServerInteractorTests: XCTestCase {
         XCTAssertEqual(stored.cards.first?.frontExtraText, "いぬ", "The reading goes under the Japanese front")
         XCTAssertEqual(try interactor.saveToDevice(detail), .alreadyPresent(deckId: deckId), "Saving twice never duplicates the deck")
         XCTAssertEqual(repository.getAll().count, 1)
+    }
+
+    func test_picturesOfASavedCopyAreStoredLinkedAndCredited() throws {
+        PictureURLProtocol.missing = []
+        PictureURLProtocol.requested = []
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("copy-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let store = CardImageStore(directory: folder)
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [PictureURLProtocol.self]
+        interactor = CardLibraryServerInteractor(api: api, repository: repository,
+                                                 auth: AuthSession(tokens: SignedOutTokens(), api: UnusedNativeAuth()),
+                                                 language: { .english }, remote: RemoteImageLoader(session: Session(configuration: configuration)),
+                                                 images: store)
+        let credit = ImageAttribution(source: "unsplash", imageURL: "https://images.unsplash.com/a.jpg", sourceURL: "https://unsplash.com/photos/a",
+                                      author: "Ana Lee", authorURL: nil, license: "Unsplash License", licenseURL: nil)
+        let ok = "aaaaaaaa-0000-4000-8000-000000000001", broken = "aaaaaaaa-0000-4000-8000-000000000002", plain = "aaaaaaaa-0000-4000-8000-000000000003"
+        let detail = ServerDeckDetail(deck: ServerDeck(id: deckId, title: "N5", isOwned: false, cardCount: 3), cards: [
+            ServerDeckCard(id: ok, front: "犬", back: "chó", reading: "いぬ", picture: CardPicture(url: URL(string: "https://images.unsplash.com/a.jpg")!, attribution: credit)),
+            ServerDeckCard(id: broken, front: "猫", back: "mèo", reading: "ねこ", picture: CardPicture(url: URL(string: "https://images.unsplash.com/gone.jpg")!, attribution: nil)),
+            ServerDeckCard(id: plain, front: "鳥", back: "chim", reading: "とり")
+        ])
+        PictureURLProtocol.missing = ["https://images.unsplash.com/gone.jpg"]
+        _ = try interactor.saveToDevice(detail)
+
+        let finished = expectation(description: "pictures copied")
+        var copied: Int?
+        let subscription = interactor.copyPictures(of: detail).subscribe(onSuccess: { copied = $0; finished.fulfill() }, onFailure: { _ in finished.fulfill() })
+        wait(for: [finished], timeout: 10)
+        subscription.dispose()
+        XCTAssertEqual(copied, 1, "The picture that could not be fetched is skipped")
+        let cards = try XCTUnwrap(repository.desk(withId: deckId)).cards
+        let linked = try XCTUnwrap(cards.first { $0.id == ok }).imageUrl
+        XCTAssertTrue(linked.hasPrefix(CardImageReference.localPrefix))
+        XCTAssertTrue(store.exists(CardImageReference(linked)))
+        XCTAssertEqual(store.attribution(for: linked), credit)
+        XCTAssertEqual(cards.first { $0.id == broken }?.imageUrl, "")
+        XCTAssertEqual(cards.first { $0.id == plain }?.imageUrl, "")
+        XCTAssertEqual(PictureURLProtocol.requested.count, 2, "Cards without a picture request nothing")
+    }
+
+    func test_aDeckWithoutPicturesFetchesNothing() throws {
+        PictureURLProtocol.requested = []
+        let detail = ServerDeckDetail(deck: ServerDeck(id: deckId, title: "N5", isOwned: false, cardCount: 1),
+                                      cards: [ServerDeckCard(id: "i", front: "犬", back: "chó", reading: "")])
+        XCTAssertEqual(try value(interactor.copyPictures(of: detail)), 0)
+        XCTAssertTrue(PictureURLProtocol.requested.isEmpty)
     }
 
     func test_directionIsReadFromTheFirstCard() {

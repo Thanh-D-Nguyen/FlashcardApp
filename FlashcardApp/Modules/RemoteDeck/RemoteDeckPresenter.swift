@@ -100,17 +100,24 @@ final class RemoteDeckPresenter {
 
     private func publish() { view?.render(state) }
 
-    /// Saves the copy on the device when there is none. Returns whether a copy exists afterwards.
-    private func ensureDeviceCopy() -> Bool {
-        guard let detail else { return false }
+    /// Saves the copy on the device when there is none, then (for a new copy) stores its pictures beside it. `done` receives
+    /// whether a copy exists. Pictures are best effort: a picture that cannot be fetched never prevents the copy.
+    private func ensureDeviceCopy(then done: @escaping (Bool) -> Void) {
+        guard let detail else { return done(false) }
+        let outcome: DeckImportOutcome
         do {
-            _ = try interactor.saveToDevice(detail)
-            state.isOnDevice = true
-            return true
+            outcome = try interactor.saveToDevice(detail)
         } catch {
             state.notice = CardPresenter.message(for: error)
-            return false
+            return done(false)
         }
+        state.isOnDevice = true
+        guard case .imported = outcome, detail.cards.contains(where: { $0.picture != nil }) else { return done(true) }
+        state.busy = .saving
+        publish()
+        request.disposable = interactor.copyPictures(of: detail)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { _ in done(true) }, onFailure: { _ in done(true) })
     }
 }
 
@@ -136,9 +143,12 @@ extension RemoteDeckPresenter: RemoteDeckPresenterInterface {
     func study() {
         guard state.canStudy, let detail else { return }
         state.notice = nil
-        guard ensureDeviceCopy() else { return publish() }
-        publish()
-        wireframe.showStudy(deckId: detail.deck.id)
+        ensureDeviceCopy { [weak self] saved in
+            guard let self else { return }
+            self.state.busy = nil
+            self.publish()
+            if saved { self.wireframe.showStudy(deckId: detail.deck.id) }
+        }
     }
 
     func saveToDevice() {
@@ -146,9 +156,10 @@ extension RemoteDeckPresenter: RemoteDeckPresenterInterface {
         state.notice = nil
         state.busy = .saving
         publish()
-        _ = ensureDeviceCopy()
-        state.busy = nil
-        publish()
+        ensureDeviceCopy { [weak self] _ in
+            self?.state.busy = nil
+            self?.publish()
+        }
     }
 
     func archive() {

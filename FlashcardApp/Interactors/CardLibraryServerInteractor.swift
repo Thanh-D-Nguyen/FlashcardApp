@@ -27,6 +27,9 @@ protocol CardLibraryServerInteractorInterface: AnyObject {
     /// The id of the device deck saved from this server deck, when there is one.
     func hasDeviceCopy(deckId: String) -> Bool
     func saveToDevice(_ detail: ServerDeckDetail) throws -> DeckImportOutcome
+    /// Stores the pictures of a just-saved device copy next to it and links them to its cards. Best effort: a picture that
+    /// cannot be fetched is skipped (the card stays without one) and never fails the copy. Emits how many were stored.
+    func copyPictures(of detail: ServerDeckDetail) -> Single<Int>
 }
 
 final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
@@ -36,15 +39,21 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
     private let repository: DeskRepositoryInterface
     private let auth: AuthSession
     private let language: () -> AppLanguage
+    private let remote: RemoteImageLoader
+    private let images: CardImageStore
 
     init(api: BJTFlashcardLibraryAPIInterface = BJTLearnerAPI.shared,
          repository: DeskRepositoryInterface = DeskManagement.shared,
          auth: AuthSession = .shared,
-         language: @escaping () -> AppLanguage = { .current }) {
+         language: @escaping () -> AppLanguage = { .current },
+         remote: RemoteImageLoader = .shared,
+         images: CardImageStore = .shared) {
         self.api = api
         self.repository = repository
         self.auth = auth
         self.language = language
+        self.remote = remote
+        self.images = images
     }
 
     var isSignedIn: Bool { auth.bearerToken != nil }
@@ -100,6 +109,39 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
             throw AppError.databaseWriteFailed(error.localizedDescription)
         }
         return .imported(deckId: detail.deck.id)
+    }
+
+    func copyPictures(of detail: ServerDeckDetail) -> Single<Int> {
+        let pictures = detail.cards.compactMap { card in card.picture.map { (cardId: card.id, picture: $0) } }
+        guard !pictures.isEmpty else { return .just(0) }
+        // One at a time: a deck can hold 200 cards and each picture is up to 10 MB.
+        return Observable.from(pictures)
+            .concatMap { [weak self] item -> Observable<(String, String)> in
+                guard let self else { return .empty() }
+                return self.store(item.picture).asObservable().map { (item.cardId, $0) }.catch { _ in .empty() }
+            }
+            .toArray()
+            // Realm is confined to the thread that opened it: the device deck is only touched on the main thread.
+            .observe(on: MainScheduler.instance)
+            .map { [weak self] stored -> Int in
+                guard let self, !stored.isEmpty, let desk = self.repository.desk(withId: detail.deck.id) else { return 0 }
+                let references = Dictionary(stored, uniquingKeysWith: { first, _ in first })
+                for card in desk.cards { if let reference = references[card.id], card.imageUrl.isEmpty { card.imageUrl = reference } }
+                do { try self.repository.update(desk) } catch { return 0 }
+                return stored.count
+            }
+    }
+
+    /// Fetches one picture (with the session only when it is the API's own copy), stores it and keeps its credit.
+    private func store(_ picture: CardPicture) -> Single<String> {
+        let authorization = APIImageAuthorization.header(for: picture.url, token: auth.bearerToken)
+        return remote.fetch(picture.url, authorization: authorization)
+            .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+            .map { [images] data in
+                let reference = try images.save(imageData: data)
+                if let attribution = picture.attribution { try? images.saveAttribution(attribution, for: reference) }
+                return reference
+            }
     }
 
     /// A deck has no stored direction on the server: read it from the first card (Vietnamese front, Japanese back reverses it).

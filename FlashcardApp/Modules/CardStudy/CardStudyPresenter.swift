@@ -151,6 +151,7 @@ final class CardStudyPresenter {
     private let ownerKey: () -> String
     weak var view: CardStudyViewInterface?
 
+    private var creditCache: [String: String] = [:]
     private var deck: DeskEntity?
     private var session = StudySession(cards: [])
     /// Whose results this session saves, fixed when it starts: a different account never receives them.
@@ -303,6 +304,15 @@ final class CardStudyPresenter {
         if transition != .none, !session.isFinished, session.current != nil { autoSpeakIfNeeded() }
     }
 
+    /// The credit stored next to a picture found through the picture search; read once per picture.
+    private func credit(for reference: String) -> String {
+        guard !reference.isEmpty else { return "" }
+        if let known = creditCache[reference] { return known }
+        let line = CardImageStore.shared.attribution(for: reference)?.creditLine ?? ""
+        creditCache[reference] = line
+        return line
+    }
+
     private func makeState(deck: DeskEntity) -> CardStudyState {
         let current = session.current
         let finished = session.isFinished || current == nil
@@ -310,7 +320,7 @@ final class CardStudyPresenter {
                                   min(session.position + 1, max(session.count, 1)), session.count)
         let card = current.map {
             StudyCardState(front: $0.front, back: $0.back, reading: $0.reading, note: $0.note,
-                           imageReference: $0.imageReference, isFlipped: session.isFlipped)
+                           imageReference: $0.imageReference, isFlipped: session.isFlipped, imageCredit: credit(for: $0.imageReference))
         }
         var quiz: StudyQuizState?
         if session.mode == .quiz, let current { quiz = StudyQuizState(options: session.options, selected: session.selectedOption, correct: current.back) }
