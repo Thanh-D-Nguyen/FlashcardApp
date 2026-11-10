@@ -25,7 +25,14 @@ private final class ControlledAuthAPI: NativeAuthAPIInterface {
     let loginResult = PublishSubject<NativeLoginResponse>()
     let profileResult = PublishSubject<NativeProfile>()
     let logoutResult = PublishSubject<Void>()
+    let deleteResult = PublishSubject<Void>()
+    let googleResult = PublishSubject<NativeLoginResponse>()
+    let appleResult = PublishSubject<NativeLoginResponse>()
     var loginCalls = 0
+    var googleCalls = 0
+    var googleIDToken: String?
+    var appleIDToken: String?
+    var appleNonce: String?
     var cancelled = false
     var email: String?
     var password: String?
@@ -36,6 +43,16 @@ private final class ControlledAuthAPI: NativeAuthAPIInterface {
         self.password = password
         return loginResult.take(1).asSingle().do(onDispose: { self.cancelled = true })
     }
+    func loginWithGoogle(idToken: String) -> Single<NativeLoginResponse> {
+        googleCalls += 1
+        googleIDToken = idToken
+        return googleResult.take(1).asSingle().do(onDispose: { self.cancelled = true })
+    }
+    func loginWithApple(idToken: String, nonce: String) -> Single<NativeLoginResponse> {
+        appleIDToken = idToken
+        appleNonce = nonce
+        return appleResult.take(1).asSingle()
+    }
     func me(token: @escaping () -> String?) -> Single<NativeProfile> {
         bearer = token()
         return profileResult.take(1).asSingle()
@@ -43,6 +60,10 @@ private final class ControlledAuthAPI: NativeAuthAPIInterface {
     func logout(token: @escaping () -> String?) -> Single<Void> {
         bearer = token()
         return logoutResult.take(1).asSingle()
+    }
+    func deleteAccount(token: @escaping () -> String?) -> Single<Void> {
+        bearer = token()
+        return deleteResult.take(1).asSingle()
     }
 }
 
@@ -62,6 +83,45 @@ final class AuthSessionTests: XCTestCase {
 
     private func profile(id: String? = nil) -> NativeProfile {
         NativeProfile(id: id ?? userID, displayName: "Learner", email: "learner@example.com")
+    }
+
+    func testAccountDeletionClearsOnlyAfterServerConfirmation() {
+        tokens.accessToken = "opaque-test-token"
+        tokens.userId = userID
+        var completed = false
+        session.deleteAccount().subscribe(onSuccess: { completed = true }, onFailure: { XCTFail("\($0)") }).disposed(by: bag)
+        XCTAssertEqual(api.bearer, "opaque-test-token")
+        XCTAssertNotNil(session.currentUser)
+        XCTAssertFalse(completed)
+        api.deleteResult.onNext(())
+        XCTAssertTrue(completed)
+        XCTAssertNil(session.currentUser)
+        XCTAssertNil(tokens.accessToken)
+    }
+
+    func testAccountDeletionFailurePreservesSessionAndDataAccess() {
+        tokens.accessToken = "opaque-test-token"
+        tokens.userId = userID
+        var error: Error?
+        session.deleteAccount().subscribe(onFailure: { error = $0 }).disposed(by: bag)
+        api.deleteResult.onError(NativeAuthError.offline)
+        XCTAssertNotNil(error)
+        XCTAssertEqual(tokens.accessToken, "opaque-test-token")
+        XCTAssertEqual(session.currentUser?.id, userID)
+    }
+
+    func testOldAccountDeletionCannotClearNewLogin() {
+        tokens.accessToken = "old-test-token"
+        tokens.userId = userID
+        var error: Error?
+        session.deleteAccount().subscribe(onFailure: { error = $0 }).disposed(by: bag)
+        session.login(email: "user@example.com", password: "test")
+            .subscribe(onFailure: { XCTFail("\($0)") }).disposed(by: bag)
+        api.loginResult.onNext(NativeLoginResponse(ok: true, token: "new-test-token"))
+        api.profileResult.onNext(profile())
+        api.deleteResult.onNext(())
+        XCTAssertEqual(tokens.accessToken, "new-test-token")
+        XCTAssertEqual(error as? NativeAuthError, .staleSession)
     }
 
     func testInvalidInputNeverStartsRequest() {
@@ -88,6 +148,132 @@ final class AuthSessionTests: XCTestCase {
         XCTAssertEqual(tokens.accessToken, "opaque-test-token")
         XCTAssertEqual(tokens.userId, userID)
         XCTAssertEqual(user?.id, userID)
+    }
+
+    // MARK: Google
+
+    private let googleToken = "header.payload.signature"
+
+    func testAppleTokenIsExchangedAndNeverStoredInKeychain() {
+        var user: SocialUserEntity?
+        session.loginWithApple(idToken: "apple.jwt.signature", nonce: "random-proof-of-request")
+            .subscribe(onSuccess: { user = $0 }, onFailure: { XCTFail("\($0)") }).disposed(by: bag)
+        XCTAssertEqual(api.appleIDToken, "apple.jwt.signature")
+        XCTAssertEqual(api.appleNonce, "random-proof-of-request")
+        api.appleResult.onNext(NativeLoginResponse(ok: true, token: "opaque-session"))
+        XCTAssertNil(tokens.accessToken)
+        api.profileResult.onNext(profile())
+        XCTAssertEqual(tokens.accessToken, "opaque-session")
+        XCTAssertEqual(user?.id, userID)
+    }
+
+    func testMalformedAppleProofNeverCallsBackend() {
+        for (token, nonce) in [("", "valid-long-nonce"), ("a.b.c", ""), ("contains space", "valid-long-nonce"),
+                               ("a.b.c", "bad"), (String(repeating: "x", count: 4001), "valid-long-nonce")] {
+            var error: Error?
+            session.loginWithApple(idToken: token, nonce: nonce)
+                .subscribe(onFailure: { error = $0 }).disposed(by: bag)
+            XCTAssertEqual(error as? NativeAuthError, .appleCredentialsRejected)
+        }
+        XCTAssertNil(api.appleIDToken)
+    }
+
+    func testGoogleLoginPersistsOnlyTheApplicationSessionAfterTheProfileConfirmsIt() {
+        var user: SocialUserEntity?
+        session.loginWithGoogle(idToken: googleToken)
+            .subscribe(onSuccess: { user = $0 }, onFailure: { XCTFail("\($0)") }).disposed(by: bag)
+        XCTAssertEqual(api.googleIDToken, googleToken)
+        api.googleResult.onNext(NativeLoginResponse(ok: true, token: "opaque-test-token"))
+        XCTAssertNil(tokens.accessToken, "Nothing is stored before the profile confirms the session")
+        XCTAssertEqual(api.bearer, "opaque-test-token", "The profile is fetched with the application token")
+        api.profileResult.onNext(profile())
+        XCTAssertEqual(tokens.accessToken, "opaque-test-token")
+        XCTAssertNotEqual(tokens.accessToken, googleToken)
+        XCTAssertEqual(tokens.userId, userID)
+        XCTAssertEqual(user?.id, userID)
+        XCTAssertEqual(session.bearerToken, "opaque-test-token")
+    }
+
+    func testMalformedGoogleTokenNeverReachesTheServer() {
+        for token in ["", String(repeating: "a", count: 4001), "has space.in.it", "line\nbreak", "ünicode.token.value"] {
+            var error: Error?
+            session.loginWithGoogle(idToken: token).subscribe(onFailure: { error = $0 }).disposed(by: bag)
+            XCTAssertEqual(error as? NativeAuthError, .googleCredentialsRejected)
+        }
+        XCTAssertEqual(api.googleCalls, 0)
+    }
+
+    func testGoogleServerFailuresDoNotAuthenticate() {
+        for failure in [NativeAuthError.googleCredentialsRejected, .googleAccountConflict, .rateLimited, .unavailable, .offline] {
+            api = ControlledAuthAPI()
+            session = AuthSession(tokens: tokens, api: api)
+            var error: Error?
+            session.loginWithGoogle(idToken: googleToken).subscribe(onFailure: { error = $0 }).disposed(by: bag)
+            api.googleResult.onError(failure)
+            XCTAssertEqual(error as? NativeAuthError, failure)
+            XCTAssertNil(tokens.accessToken)
+            XCTAssertNil(session.currentUser)
+        }
+    }
+
+    func testGoogleResponseWithoutAUsableTokenOrProfileCannotAuthenticate() {
+        session.loginWithGoogle(idToken: googleToken).subscribe(onFailure: { _ in }).disposed(by: bag)
+        api.googleResult.onNext(NativeLoginResponse(ok: false, token: "opaque-test-token"))
+        XCTAssertNil(api.bearer)
+        XCTAssertNil(tokens.accessToken)
+
+        api = ControlledAuthAPI()
+        session = AuthSession(tokens: tokens, api: api)
+        session.loginWithGoogle(idToken: googleToken).subscribe(onFailure: { _ in }).disposed(by: bag)
+        api.googleResult.onNext(NativeLoginResponse(ok: true, token: "opaque-test-token"))
+        api.profileResult.onNext(profile(id: "invalid-id"))
+        XCTAssertNil(tokens.accessToken)
+    }
+
+    func testLogoutWhileTheGoogleExchangeIsInFlightRejectsTheStaleSession() {
+        session.loginWithGoogle(idToken: googleToken)
+            .subscribe(onSuccess: { _ in XCTFail("Stale Google login succeeded") }, onFailure: { _ in }).disposed(by: bag)
+        api.googleResult.onNext(NativeLoginResponse(ok: true, token: "opaque-test-token"))
+        session.logout().subscribe(onFailure: { _ in }).disposed(by: bag)
+        api.profileResult.onNext(profile())
+        XCTAssertNil(tokens.accessToken)
+        XCTAssertNil(session.currentUser)
+    }
+
+    func testDisposingTheGoogleLoginCancelsTheRequestAndKeepsNoSession() {
+        let request = session.loginWithGoogle(idToken: googleToken)
+            .subscribe(onSuccess: { _ in XCTFail("Cancelled Google login succeeded") })
+        request.dispose()
+        XCTAssertTrue(api.cancelled)
+        api.googleResult.onNext(NativeLoginResponse(ok: true, token: "opaque-test-token"))
+        api.profileResult.onNext(profile())
+        XCTAssertNil(tokens.accessToken)
+    }
+
+    func testKeychainFailureAfterGoogleLoginLeavesNoSession() {
+        tokens.saveError = NativeAuthError.unavailable
+        var error: Error?
+        session.loginWithGoogle(idToken: googleToken).subscribe(onFailure: { error = $0 }).disposed(by: bag)
+        api.googleResult.onNext(NativeLoginResponse(ok: true, token: "opaque-test-token"))
+        api.profileResult.onNext(profile())
+        XCTAssertEqual(error as? NativeAuthError, .storageFailed)
+        XCTAssertNil(session.currentUser)
+        XCTAssertNil(tokens.accessToken)
+    }
+
+    func testLogoutAfterGoogleLoginUsesTheSameSessionTeardown() {
+        session.loginWithGoogle(idToken: googleToken).subscribe(onFailure: { _ in }).disposed(by: bag)
+        api.googleResult.onNext(NativeLoginResponse(ok: true, token: "opaque-test-token"))
+        api.profileResult.onNext(profile())
+        XCTAssertNotNil(session.currentUser)
+        var result: LogoutResult?
+        session.logout().subscribe(onSuccess: { result = $0 }).disposed(by: bag)
+        XCTAssertEqual(api.bearer, "opaque-test-token")
+        api.logoutResult.onNext(())
+        XCTAssertEqual(result, .revoked)
+        XCTAssertNil(session.currentUser)
+        XCTAssertNil(session.bearerToken)
+        XCTAssertNil(tokens.accessToken)
     }
 
     func testLoginFailureDoesNotAuthenticate() {
@@ -360,6 +546,88 @@ final class NativeAuthAPITests: XCTestCase {
         wait(for: [done], timeout: 3)
     }
 
+    private func body(of request: URLRequest) -> Data {
+        var body = request.httpBody ?? Data()
+        if let stream = request.httpBodyStream {
+            stream.open()
+            defer { stream.close() }
+            var bytes = [UInt8](repeating: 0, count: 1024)
+            while stream.hasBytesAvailable {
+                let count = stream.read(&bytes, maxLength: bytes.count)
+                if count <= 0 { break }
+                body.append(contentsOf: bytes.prefix(count))
+            }
+        }
+        return body
+    }
+
+    func testGoogleLoginPostsOnlyTheIDTokenAsJSONWithoutBearer() {
+        let done = expectation(description: "google login")
+        AuthURLProtocol.handler = { [self] request, transport in
+            XCTAssertEqual(request.url?.absoluteString, "https://auth.invalid/api/auth/google")
+            XCTAssertEqual(request.httpMethod, "POST")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+            XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
+            let payload = try? JSONSerialization.jsonObject(with: body(of: request)) as? [String: String]
+            XCTAssertEqual(payload, ["idToken": "header.payload.signature"], "The body carries the ID token and nothing else")
+            transport.reply(status: 200, body: #"{"ok":true,"token":"opaque-test-token"}"#)
+        }
+        api.loginWithGoogle(idToken: "header.payload.signature")
+            .subscribe(onSuccess: { response in
+                XCTAssertTrue(response.ok)
+                XCTAssertEqual(response.token, "opaque-test-token")
+                done.fulfill()
+            }, onFailure: { XCTFail("\($0)"); done.fulfill() }).disposed(by: bag)
+        wait(for: [done], timeout: 3)
+    }
+
+    func testGoogleLoginFailureStatusesAreClassifiedAndNeverAuthenticate() {
+        let cases: [(Int, String, NativeAuthError)] = [
+            (400, #"{"error":"invalid request"}"#, .unavailable),
+            (401, #"{"error":"invalid Google credentials"}"#, .googleCredentialsRejected),
+            (409, #"{"error":"account already exists; sign in with your existing method"}"#, .googleAccountConflict),
+            (429, #"{"error":"too many requests"}"#, .rateLimited),
+            (500, #"{"error":"internal error"}"#, .unavailable),
+            (503, #"{"error":"service unavailable"}"#, .unavailable),
+            (200, #"{"ok":true}"#, .invalidResponse),
+            (200, #"{"ok":true,"tok"#, .invalidResponse)
+        ]
+        for (status, body, expected) in cases {
+            let done = expectation(description: "google \(status)")
+            AuthURLProtocol.handler = { _, transport in transport.reply(status: status, body: body) }
+            api.loginWithGoogle(idToken: "header.payload.signature")
+                .subscribe(onSuccess: { _ in XCTFail("Accepted \(status) \(body)"); done.fulfill() }, onFailure: { error in
+                    XCTAssertEqual(error as? NativeAuthError, expected, "status \(status)")
+                    done.fulfill()
+                }).disposed(by: bag)
+            wait(for: [done], timeout: 3)
+        }
+    }
+
+    func testGoogleLoginWithoutConnectivityIsReportedAsOffline() {
+        let done = expectation(description: "offline")
+        AuthURLProtocol.handler = { _, transport in
+            transport.client?.urlProtocol(transport, didFailWithError: URLError(.notConnectedToInternet))
+        }
+        api.loginWithGoogle(idToken: "header.payload.signature")
+            .subscribe(onSuccess: { _ in XCTFail("Accepted offline"); done.fulfill() }, onFailure: { error in
+                XCTAssertEqual(error as? NativeAuthError, .offline)
+                done.fulfill()
+            }).disposed(by: bag)
+        wait(for: [done], timeout: 3)
+    }
+
+    func testEmailLoginDoesNotTreatConflictAsAGoogleConflict() {
+        let done = expectation(description: "email 409")
+        AuthURLProtocol.handler = { _, transport in transport.reply(status: 409, body: #"{"error":"conflict"}"#) }
+        api.login(email: "user@example.com", password: "test")
+            .subscribe(onSuccess: { _ in XCTFail("Accepted 409"); done.fulfill() }, onFailure: { error in
+                XCTAssertEqual(error as? NativeAuthError, .unavailable)
+                done.fulfill()
+            }).disposed(by: bag)
+        wait(for: [done], timeout: 3)
+    }
+
     func testMeResolvesBearerOnSubscription() {
         let done = expectation(description: "profile")
         var token = "old-test-token"
@@ -420,6 +688,21 @@ final class NativeAuthAPITests: XCTestCase {
         api.logout(token: { "opaque-test-token" })
             .subscribe(onSuccess: { _ in XCTFail("Accepted failed logout"); done.fulfill() }, onFailure: { _ in done.fulfill() })
             .disposed(by: bag)
+        wait(for: [done], timeout: 3)
+    }
+
+    func testAccountDeletionUsesBearerPostAndRejectsFalseResponse() {
+        let done = expectation(description: "delete account")
+        AuthURLProtocol.handler = { request, transport in
+            XCTAssertEqual(request.url?.path, "/api/auth/delete")
+            XCTAssertEqual(request.httpMethod, "POST")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Origin"), "https://auth.invalid")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer opaque-test-token")
+            transport.reply(status: 200, body: #"{"ok":false}"#)
+        }
+        api.deleteAccount(token: { "opaque-test-token" })
+            .subscribe(onSuccess: { _ in XCTFail("Accepted failed deletion"); done.fulfill() },
+                       onFailure: { _ in done.fulfill() }).disposed(by: bag)
         wait(for: [done], timeout: 3)
     }
 

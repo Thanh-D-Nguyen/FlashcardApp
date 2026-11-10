@@ -50,13 +50,37 @@ final class AuthSession {
         let email = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard email.range(of: #"^[^\s@]+@[^\s@]+\.[^\s@]+$"#, options: .regularExpression) != nil,
               !password.isEmpty, password.utf8.count <= 1024 else { return .error(NativeAuthError.invalidInput) }
-        return Single.create { [self] observer in
+        return signIn { [api] in api.login(email: email, password: password) }
+    }
+
+    /// Exchanges a Google ID token for the website's own session. The Google token is used for this one request and is
+    /// never stored: the session that is kept (Keychain, bearer header, profile) is the application token only.
+    func loginWithGoogle(idToken: String) -> Single<SocialUserEntity> {
+        // The server accepts 1...4000 bytes of a compact JWS; anything else cannot be a Google ID token.
+        guard !idToken.isEmpty, idToken.utf8.count <= 4000, NativeAuthAPI.isValidToken(idToken) else {
+            return .error(NativeAuthError.googleCredentialsRejected)
+        }
+        return signIn { [api] in api.loginWithGoogle(idToken: idToken) }
+    }
+
+    func loginWithApple(idToken: String, nonce: String) -> Single<SocialUserEntity> {
+        guard !idToken.isEmpty, idToken.utf8.count <= 4000, NativeAuthAPI.isValidToken(idToken),
+              (8...256).contains(nonce.utf8.count), NativeAuthAPI.isValidToken(nonce) else {
+            return .error(NativeAuthError.appleCredentialsRejected)
+        }
+        return signIn { [api] in api.loginWithApple(idToken: idToken, nonce: nonce) }
+    }
+
+    /// Shared tail of every sign-in method: exchange credentials for an application token, confirm it with the profile,
+    /// and only then persist it. A newer attempt, `clear()` or disposal invalidates the attempt (`generation`).
+    private func signIn(_ exchange: @escaping () -> Single<NativeLoginResponse>) -> Single<SocialUserEntity> {
+        Single.create { [self] observer in
             lock.lock()
             let attempt = UUID()
             generation = attempt
             lock.unlock()
 
-            let request = api.login(email: email, password: password)
+            let request = exchange()
                 .flatMap { [self] response -> Single<(NativeProfile, String)> in
                     guard isCurrent(attempt) else { return .error(NativeAuthError.staleSession) }
                     guard response.ok, NativeAuthAPI.isValidToken(response.token) else {
@@ -139,6 +163,27 @@ final class AuthSession {
                     if let storageError { throw storageError }
                     return result
                 }
+        }
+    }
+
+    /// Preserve the local account on request failure; only clear it after server confirmation.
+    func deleteAccount() -> Single<Void> {
+        Single.deferred { [self] in
+            lock.lock()
+            let attempt = generation
+            let token = isSignedOut ? nil : tokens.accessToken
+            lock.unlock()
+            guard let token, NativeAuthAPI.isValidToken(token) else {
+                return .error(NativeAuthError.unauthorized)
+            }
+            return api.deleteAccount(token: { token }).map { [self] in
+                lock.lock()
+                defer { lock.unlock() }
+                guard generation == attempt, tokens.accessToken == token, !isSignedOut else {
+                    throw NativeAuthError.staleSession
+                }
+                try clear()
+            }
         }
     }
 

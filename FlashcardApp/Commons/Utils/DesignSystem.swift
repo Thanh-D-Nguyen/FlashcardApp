@@ -117,6 +117,16 @@ enum Design {
         case heroFigure
         /// Screen headline in an editorial serif (New York for Latin and Vietnamese, Hiragino Mincho for kana and kanji).
         case display
+        /// The headword at the top of a dictionary entry: the largest, most carefully set text on the screen.
+        case entryHeadword
+        /// One kanji shown as a character to study (its stroke forms must stay legible): Mincho, very large.
+        case kanjiGlyph
+        /// Titles of the sections of a dictionary entry, in sentence case.
+        case sectionTitle
+        /// A Japanese example sentence: comfortable for long reading sessions.
+        case sentence
+        /// The title of a magazine article: Mincho, so a Japanese headline reads like print.
+        case articleTitle
 
         var font: UIFont {
             switch self {
@@ -135,13 +145,19 @@ enum Design {
             case .term: return UIFontMetrics(forTextStyle: .largeTitle).scaledFont(for: .systemFont(ofSize: 52, weight: .semibold), maximumPointSize: 96)
             case .answer: return .preferredFont(forTextStyle: .title2)
             case .display: return Self.editorialSerif(.largeTitle)
-            case .heroFigure: return Self.mincho(size: 64, style: .largeTitle, maximum: 96)
+            case .entryHeadword: return Self.mincho(size: 52, style: .largeTitle, maximum: 88)
+            case .kanjiGlyph: return Self.mincho(size: 120, style: .largeTitle, maximum: 190)
+            case .sectionTitle: return .preferredFont(forTextStyle: .subheadline).withWeight(.semibold)
+            case .sentence: return .preferredFont(forTextStyle: .title3)
+            case .articleTitle: return Self.mincho(size: 28, style: .title1, maximum: 44)
+            case .heroFigure: return Self.mincho(size: 36, style: .largeTitle, maximum: 56)
             }
         }
 
         var color: UIColor {
             switch self {
-            case .title, .headword, .meaning, .explanation, .figure, .term, .answer, .display: return Color.textPrimary
+            case .title, .headword, .meaning, .explanation, .figure, .term, .answer, .display, .entryHeadword, .kanjiGlyph, .sentence, .articleTitle: return Color.textPrimary
+            case .sectionTitle: return Color.textSecondary
             case .reading, .metadata: return Color.textSecondary
             case .mark, .numeral, .monogram: return Color.accent
             case .numeralDisplay, .heroFigure: return Color.onHero
@@ -220,6 +236,33 @@ enum Design {
             configuration.image = UIImage(systemName: "arrow.right")
             configuration.imagePlacement = .trailing
             configuration.imagePadding = Design.Spacing.s
+            return configuration
+        }
+
+        /// The icon-only action on the `hero` block: a 44 pt paper disc with an indigo play symbol. Its words are the accessibility label.
+        static func heroIcon() -> UIButton.Configuration {
+            var configuration = UIButton.Configuration.filled()
+            configuration.cornerStyle = .capsule
+            configuration.image = UIImage(systemName: "play.fill")
+            configuration.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 16, weight: .bold)
+            configuration.contentInsets = .zero
+            configuration.baseBackgroundColor = Color.onHero
+            configuration.baseForegroundColor = Color.heroDeep
+            return configuration
+        }
+
+        /// A quiet capsule on the `hero` block for a setting the learner can change, such as the session length.
+        static func heroChip(title: String) -> UIButton.Configuration {
+            var configuration = UIButton.Configuration.filled()
+            configuration.cornerStyle = .capsule
+            configuration.buttonSize = .medium
+            configuration.image = UIImage(systemName: "timer")
+            configuration.imagePadding = Design.Spacing.xs
+            configuration.baseBackgroundColor = Color.onHero.withAlphaComponent(0.16)
+            configuration.baseForegroundColor = Color.onHero
+            var text = AttributedString(title)
+            text.font = UIFont.preferredFont(forTextStyle: .subheadline)
+            configuration.attributedTitle = text
             return configuration
         }
     }

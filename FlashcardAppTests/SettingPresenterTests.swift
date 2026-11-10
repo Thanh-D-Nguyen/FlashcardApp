@@ -22,6 +22,12 @@ final class MockSettingInteractor: SettingInteractorInterface {
     func getCurrentUser() -> SocialUserEntity? { currentUser }
 
     var logoutSessionResult: Single<LogoutResult>?
+    var deleteAccountResult: Single<Void> = .just(())
+    var deletionCalls = 0
+    func deleteAccountSession() -> Single<Void> {
+        deletionCalls += 1
+        return deleteAccountResult
+    }
     func logoutSession() -> Single<LogoutResult> {
         logoutSessionResult ?? .deferred { try self.logout(); return .just(.revoked) }
     }
@@ -35,7 +41,30 @@ final class MockSettingInteractor: SettingInteractorInterface {
     }
 
     var appearance = "system"
+    var language = "system"
+    func getLanguage() -> String { language }
+    func setLanguage(_ value: String) { language = value }
     var notificationStatus: UNAuthorizationStatus = .authorized
+    var reminderHour = 20
+    var scheduledHours: [Int] = []
+    var reminderCancelCount = 0
+    var scheduleError: Error?
+    var deferSchedules = false
+    var pendingScheduleCompletions: [(Error?) -> Void] = []
+    func getReminderHour() -> Int { reminderHour }
+    func setReminderHour(_ hour: Int) { reminderHour = hour }
+    func scheduleDailyReminder(hour: Int, completion: @escaping (Error?) -> Void) {
+        scheduledHours.append(hour)
+        if deferSchedules {
+            pendingScheduleCompletions.append(completion)
+        } else {
+            completion(scheduleError)
+        }
+    }
+    func finishNextSchedule(error: Error? = nil) {
+        pendingScheduleCompletions.removeFirst()(error)
+    }
+    func cancelDailyReminder() { reminderCancelCount += 1 }
     func getAppearance() -> String { appearance }
     func setAppearance(_ value: String) { appearance = value }
     func getNotificationAuthorizationStatus() -> UNAuthorizationStatus { notificationStatus }
@@ -55,6 +84,10 @@ final class MockSettingInteractor: SettingInteractorInterface {
 
 final class MockSettingWireframe: SettingWireframeInterface {
     var logoutConfirmationHandler: (() -> Void)?
+    var deleteConfirmationHandler: (() -> Void)?
+    func showDeleteAccountConfirmation(onConfirm: @escaping () -> Void) {
+        deleteConfirmationHandler = onConfirm
+    }
     var navigateToWelcomeCalled = false
     var lastErrorMessage: String?
 
@@ -77,11 +110,24 @@ final class MockSettingWireframe: SettingWireframeInterface {
         logoutNoticeDismissed = onDismiss
     }
 
+    var accountDeletedNoticeMessage: String?
+    var accountDeletedNoticeDismissed: (() -> Void)?
+    func showAccountDeletedNotice(message: String, onDismiss: @escaping () -> Void) {
+        accountDeletedNoticeMessage = message
+        accountDeletedNoticeDismissed = onDismiss
+    }
+
     var deniedAlertCount = 0
     func showNotificationDeniedAlert() { deniedAlertCount += 1 }
+    var languageReloadCount = 0
+    func reloadInterfaceForLanguage() { languageReloadCount += 1 }
     var openSystemSettingsCount = 0
     func openSystemSettings() { openSystemSettingsCount += 1 }
     func showPrivacyPolicy() {}
+    var termsOpened = false
+    func showTermsOfService() { termsOpened = true }
+    var supportOpened = false
+    func showContactSupport() { supportOpened = true }
     func showAbout() {}
 }
 
@@ -129,19 +175,38 @@ final class SettingPresenterTests: XCTestCase {
         }
     }
 
-    func test_viewDidLoad_preferencesSectionHasAppearanceAndTwoToggles() {
+    func test_legalAndSupportLinksExistAndRouteToWireframe() {
+        presenter.viewDidLoad()
+        let generalItems = presenter.sectionsRelay.value[2].items
+        let actions = generalItems.compactMap { item -> NavigationConfig? in
+            if case .navigation(let config) = item { return config }
+            return nil
+        }
+        XCTAssertTrue(actions.contains(where: { $0.id == "terms" }))
+        XCTAssertTrue(actions.contains(where: { $0.id == "support" }))
+
+        presenter.handleNavigationTap(config: NavigationConfig(id: "terms", title: "Terms of Service", iconName: "doc.text"))
+        presenter.handleNavigationTap(config: NavigationConfig(id: "support", title: "Contact Support", iconName: "bubble.left"))
+        XCTAssertTrue(mockWireframe.termsOpened)
+        XCTAssertTrue(mockWireframe.supportOpened)
+    }
+
+    func test_viewDidLoad_preferencesSectionShowsReminderTimeWhenEnabled() {
         presenter.viewDidLoad()
 
         let sections = presenter.sectionsRelay.value
         let prefItems = sections[1].items
-        guard prefItems.count == 3 else { return XCTFail("Expected three preferences") }
+        guard prefItems.count == 4 else { return XCTFail("Expected four preferences") }
         guard case .choice(let appearance) = prefItems[0],
               case .toggle(let notifications) = prefItems[1],
-              case .toggle(let sound) = prefItems[2] else {
-            return XCTFail("Expected appearance choice, notifications toggle and sound toggle")
+              case .choice(let reminderTime) = prefItems[2],
+              case .toggle(let sound) = prefItems[3] else {
+            return XCTFail("Expected appearance, notifications, reminder time and sound")
         }
         XCTAssertEqual(appearance.id, "appearance")
         XCTAssertEqual(notifications.id, "notification")
+        XCTAssertEqual(reminderTime.id, "reminder_time")
+        XCTAssertEqual(reminderTime.selectedID, "20")
         XCTAssertEqual(sound.id, "sound")
     }
 
@@ -209,16 +274,41 @@ final class SettingPresenterTests: XCTestCase {
         XCTAssertEqual(AppearanceOption.resolve(""), .system)
     }
 
-    func test_languageRowShowsTheAppLanguageAndOpensSystemSettings() throws {
+    func test_languageChoiceDefaultsToTheSystemLanguageAndOffersThreeLanguages() throws {
         presenter.viewDidLoad()
         let general = presenter.sectionsRelay.value[2].items
-        guard case .navigation(let language) = try XCTUnwrap(general.first) else { return XCTFail("Expected the language row") }
+        guard case .choice(let language) = try XCTUnwrap(general.first) else { return XCTFail("Expected the language choice") }
         XCTAssertEqual(language.id, "language")
-        XCTAssertEqual(language.subText, AppLanguage.current.nativeName, "The value is the language in its own words")
+        XCTAssertEqual(language.options.map(\.id), ["system", "vi", "en", "ja"])
+        XCTAssertEqual(language.selectedID, "system", "Without a choice the app follows the device language")
+        XCTAssertEqual(mockWireframe.openSystemSettingsCount, 0, "The app no longer hands the language over to iOS Settings")
+    }
 
-        presenter.handleNavigationTap(config: language)
+    func test_pickingALanguageStoresItAndRebuildsTheInterfaceOnlyWhenItChanges() throws {
+        presenter.viewDidLoad()
 
-        XCTAssertEqual(mockWireframe.openSystemSettingsCount, 1, "iOS owns the per-app language; the row hands over to Settings")
+        presenter.selectChoice(id: "language", optionID: "ja")
+
+        XCTAssertEqual(mockInteractor.language, "ja")
+        XCTAssertEqual(mockWireframe.languageReloadCount, 1, "Every open screen must read the new language, so the interface is rebuilt")
+        guard case .choice(let language) = presenter.sectionsRelay.value[2].items[0] else { return XCTFail("Expected the language choice") }
+        XCTAssertEqual(language.selectedID, "ja")
+
+        presenter.selectChoice(id: "language", optionID: "ja")
+        XCTAssertEqual(mockWireframe.languageReloadCount, 1, "Choosing the language already in use changes nothing")
+
+        presenter.selectChoice(id: "language", optionID: "system")
+        XCTAssertEqual(mockInteractor.language, "system", "Going back to the system language is a choice too")
+        XCTAssertEqual(mockWireframe.languageReloadCount, 2)
+    }
+
+    func test_unknownLanguageOptionIsIgnored() {
+        presenter.viewDidLoad()
+
+        presenter.selectChoice(id: "language", optionID: "fr")
+
+        XCTAssertEqual(mockInteractor.language, "system")
+        XCTAssertEqual(mockWireframe.languageReloadCount, 0)
     }
 
     // MARK: - Notification permission
@@ -258,6 +348,8 @@ final class SettingPresenterTests: XCTestCase {
         presenter.toggleNotification(to: true)
 
         XCTAssertEqual(mockInteractor.permissionRequests, 1)
+        XCTAssertEqual(mockInteractor.scheduledHours, [20])
+        XCTAssertTrue(mockInteractor.notificationEnabled)
         XCTAssertEqual(mockInteractor.notificationStatus, .authorized, "The cached status must follow the answer, or the switch snaps back off")
         guard case .toggle(let notifications) = presenter.sectionsRelay.value[1].items[1] else {
             return XCTFail("Expected notifications toggle")
@@ -306,6 +398,143 @@ final class SettingPresenterTests: XCTestCase {
 
         XCTAssertEqual(mockInteractor.permissionRequests, 0)
         XCTAssertFalse(mockInteractor.notificationEnabled)
+        XCTAssertEqual(mockInteractor.reminderCancelCount, 1)
+    }
+
+    func test_scheduleFailureKeepsNotificationOffAndReportsError() {
+        mockInteractor.notificationEnabled = false
+        mockInteractor.scheduleError = NSError(domain: "test", code: 5)
+        presenter.viewDidLoad()
+
+        presenter.toggleNotification(to: true)
+
+        XCTAssertEqual(mockInteractor.scheduledHours, [20])
+        XCTAssertFalse(mockInteractor.notificationEnabled)
+        XCTAssertNotNil(mockWireframe.lastErrorMessage)
+    }
+
+    func test_choosingReminderHourReschedulesBeforePersistingTime() {
+        presenter.viewDidLoad()
+
+        presenter.selectChoice(id: "reminder_time", optionID: "7")
+
+        XCTAssertEqual(mockInteractor.scheduledHours, [7])
+        XCTAssertEqual(mockInteractor.reminderHour, 7)
+        presenter.selectChoice(id: "reminder_time", optionID: "24")
+        XCTAssertEqual(mockInteractor.scheduledHours, [7])
+    }
+
+    func test_failedHourChangeRetainsPreviousTime() {
+        mockInteractor.scheduleError = NSError(domain: "test", code: 6)
+        presenter.viewDidLoad()
+
+        presenter.selectChoice(id: "reminder_time", optionID: "9")
+
+        XCTAssertEqual(mockInteractor.reminderHour, 20)
+        XCTAssertNotNil(mockWireframe.lastErrorMessage)
+    }
+
+    func test_rapidReminderHourChangesScheduleInOrderAndPersistTheLastHour() {
+        mockInteractor.deferSchedules = true
+        presenter.viewDidLoad()
+
+        presenter.selectChoice(id: "reminder_time", optionID: "7")
+        presenter.selectChoice(id: "reminder_time", optionID: "9")
+        XCTAssertEqual(mockInteractor.scheduledHours, [7], "Never issue overlapping requests for the same notification ID")
+
+        mockInteractor.finishNextSchedule()
+        XCTAssertEqual(mockInteractor.scheduledHours, [7, 9])
+        XCTAssertEqual(mockInteractor.reminderHour, 20, "A superseded request must not persist its hour")
+        mockInteractor.finishNextSchedule()
+        XCTAssertEqual(mockInteractor.reminderHour, 9)
+    }
+
+    func test_disablingReminderDuringScheduleCancelsLateResult() {
+        mockInteractor.deferSchedules = true
+        presenter.viewDidLoad()
+
+        presenter.selectChoice(id: "reminder_time", optionID: "7")
+        presenter.toggleNotification(to: false)
+        XCTAssertFalse(mockInteractor.notificationEnabled)
+        XCTAssertEqual(mockInteractor.reminderCancelCount, 1)
+
+        mockInteractor.finishNextSchedule()
+        XCTAssertFalse(mockInteractor.notificationEnabled)
+        XCTAssertEqual(mockInteractor.reminderHour, 20)
+        XCTAssertEqual(mockInteractor.reminderCancelCount, 2)
+    }
+
+    func test_newestSoundAndHourChangesAreAppliedWithoutOverlappingAdds() {
+        mockInteractor.deferSchedules = true
+        presenter.viewDidLoad()
+
+        presenter.toggleSound(to: false)
+        presenter.selectChoice(id: "reminder_time", optionID: "8")
+        presenter.selectChoice(id: "reminder_time", optionID: "9")
+        XCTAssertEqual(mockInteractor.scheduledHours, [20])
+
+        mockInteractor.finishNextSchedule()
+        XCTAssertEqual(mockInteractor.scheduledHours, [20, 9])
+        mockInteractor.finishNextSchedule()
+        XCTAssertFalse(mockInteractor.soundEnabled)
+        XCTAssertEqual(mockInteractor.reminderHour, 9)
+    }
+
+    func test_soundChangeReschedulesActiveReminder() {
+        presenter.viewDidLoad()
+
+        presenter.toggleSound(to: false)
+
+        XCTAssertFalse(mockInteractor.soundEnabled)
+        XCTAssertEqual(mockInteractor.scheduledHours, [20])
+    }
+
+    func test_dailyReminderRequestRepeatsAtChosenHourAndRespectsSoundSetting() {
+        let request = DailyStudyReminder.makeRequest(hour: 7, soundEnabled: false)
+        XCTAssertEqual(request.identifier, DailyStudyReminder.identifier)
+        let trigger = request.trigger as? UNCalendarNotificationTrigger
+        XCTAssertEqual(trigger?.dateComponents.hour, 7)
+        XCTAssertEqual(trigger?.dateComponents.minute, 0)
+        XCTAssertEqual(trigger?.repeats, true)
+        XCTAssertNil(request.content.sound)
+    }
+
+    func test_dailyReminderReconcilesChangedHourSoundAndLanguage() {
+        let current = DailyStudyReminder.makeRequest(hour: 7, soundEnabled: true)
+        XCTAssertFalse(DailyStudyReminder.needsRescheduling(existing: current, hour: 7, soundEnabled: true))
+        XCTAssertTrue(DailyStudyReminder.needsRescheduling(existing: current, hour: 8, soundEnabled: true))
+        XCTAssertTrue(DailyStudyReminder.needsRescheduling(existing: current, hour: 7, soundEnabled: false))
+
+        let obsoleteContent = UNMutableNotificationContent()
+        obsoleteContent.title = "Old language"
+        obsoleteContent.body = current.content.body
+        obsoleteContent.sound = .default
+        let obsolete = UNNotificationRequest(identifier: DailyStudyReminder.identifier,
+            content: obsoleteContent, trigger: current.trigger)
+        XCTAssertTrue(DailyStudyReminder.needsRescheduling(existing: obsolete, hour: 7, soundEnabled: true))
+        XCTAssertTrue(DailyStudyReminder.needsRescheduling(existing: nil, hour: 7, soundEnabled: true))
+    }
+
+    func test_dailyReminderCancelsPendingRequestWhenSystemPermissionIsRevoked() {
+        XCTAssertTrue(DailyStudyReminder.canSchedule(enabled: true, authorization: .authorized))
+        XCTAssertTrue(DailyStudyReminder.canSchedule(enabled: true, authorization: .provisional))
+        XCTAssertTrue(DailyStudyReminder.canSchedule(enabled: true, authorization: .ephemeral))
+        XCTAssertFalse(DailyStudyReminder.canSchedule(enabled: true, authorization: .denied))
+        XCTAssertFalse(DailyStudyReminder.canSchedule(enabled: true, authorization: .notDetermined))
+        XCTAssertFalse(DailyStudyReminder.canSchedule(enabled: false, authorization: .authorized))
+    }
+
+    func test_reminderTapNotifiesObserversAndDoesNotLeaveAConsumedIntent() {
+        _ = DailyStudyReminder.consumeOpenReview()
+        var received = 0
+        let center = NotificationCenter()
+        let observer = center.addObserver(forName: DailyStudyReminder.openReviewNotification,
+                                          object: nil, queue: nil) { _ in received += 1 }
+        defer { center.removeObserver(observer) }
+        DailyStudyReminder.requestOpenReview(center: center)
+        XCTAssertEqual(received, 1)
+        XCTAssertTrue(DailyStudyReminder.consumeOpenReview())
+        XCTAssertFalse(DailyStudyReminder.consumeOpenReview())
     }
 
     // MARK: - Toggle actions
@@ -345,6 +574,42 @@ final class SettingPresenterTests: XCTestCase {
     }
 
     // MARK: - Logout
+
+    func testDeleteAccountRequiresConfirmationThenShowsSuccessOnlyAfterServerReply() {
+        let pending = PublishSubject<Void>()
+        mockInteractor.currentUser = SocialUserEntity(id: "7c2218b4-590b-49b2-8be0-076fd9992135")
+        mockInteractor.deleteAccountResult = pending.take(1).asSingle()
+        presenter.viewDidLoad()
+        guard let last = presenter.sectionsRelay.value.last,
+              last.items.contains(where: { if case .destructive(let item) = $0 { return item.id == "delete_account" }; return false }) else {
+            return XCTFail("Account deletion must be discoverable when signed in")
+        }
+        presenter.handleNavigationTap(config: NavigationConfig(id: "delete_account", title: "Delete Account", iconName: "trash"))
+        XCTAssertNotNil(mockWireframe.deleteConfirmationHandler)
+        XCTAssertEqual(mockInteractor.deletionCalls, 0)
+        let confirm = mockWireframe.deleteConfirmationHandler
+        confirm?()
+        confirm?()
+        XCTAssertEqual(mockInteractor.deletionCalls, 1)
+        XCTAssertFalse(mockWireframe.navigateToWelcomeCalled)
+        pending.onNext(())
+        XCTAssertNotNil(mockWireframe.accountDeletedNoticeMessage)
+        XCTAssertTrue(mockWireframe.accountDeletedNoticeMessage?.contains("Apple") == true)
+        XCTAssertFalse(mockWireframe.navigateToWelcomeCalled)
+        mockWireframe.accountDeletedNoticeDismissed?()
+        XCTAssertTrue(mockWireframe.navigateToWelcomeCalled)
+    }
+
+    func testDeleteAccountFailureDoesNotNavigateOrLogOut() {
+        mockInteractor.currentUser = SocialUserEntity(id: "7c2218b4-590b-49b2-8be0-076fd9992135")
+        mockInteractor.deleteAccountResult = .error(NativeAuthError.offline)
+        presenter.viewDidLoad()
+        presenter.handleNavigationTap(config: NavigationConfig(id: "delete_account", title: "Delete Account", iconName: "trash"))
+        mockWireframe.deleteConfirmationHandler?()
+        XCTAssertFalse(mockWireframe.navigateToWelcomeCalled)
+        XCTAssertEqual(mockInteractor.deletionCalls, 1)
+        XCTAssertNotNil(mockWireframe.lastErrorMessage)
+    }
 
     func test_requestLogout_showsConfirmation() {
         presenter.viewDidLoad()

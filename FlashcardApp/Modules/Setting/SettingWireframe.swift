@@ -10,12 +10,17 @@ import SafariServices
 
 protocol SettingWireframeInterface: AnyObject {
     func showLogoutConfirmation(onConfirm: @escaping () -> Void)
+    func showDeleteAccountConfirmation(onConfirm: @escaping () -> Void)
     func navigateToWelcome()
     func showLogoutNotice(message: String, onDismiss: @escaping () -> Void)
+    func showAccountDeletedNotice(message: String, onDismiss: @escaping () -> Void)
     func showError(message: String)
     func showNotificationDeniedAlert()
+    func reloadInterfaceForLanguage()
     func openSystemSettings()
     func showPrivacyPolicy()
+    func showTermsOfService()
+    func showContactSupport()
     func showAbout()
 }
 
@@ -64,9 +69,26 @@ extension SettingWireframe: SettingWireframeInterface {
         )
     }
 
+    func showDeleteAccountConfirmation(onConfirm: @escaping () -> Void) {
+        let confirm = UIAlertAction(title: NSLocalizedString("Delete Account", comment: ""), style: .destructive) { _ in
+            onConfirm()
+        }
+        let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)
+        showAlert(
+            with: NSLocalizedString("Delete Account", comment: ""),
+            message: NSLocalizedString("Permanently delete your account and its online data? This cannot be undone. Decks saved on this device will remain.", comment: "Account deletion warning"),
+            actions: [confirm, cancel]
+        )
+    }
+
     func showLogoutNotice(message: String, onDismiss: @escaping () -> Void) {
         let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { _ in onDismiss() }
         showAlert(with: NSLocalizedString("Log Out", comment: ""), message: message, actions: [okAction])
+    }
+
+    func showAccountDeletedNotice(message: String, onDismiss: @escaping () -> Void) {
+        let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { _ in onDismiss() }
+        showAlert(with: NSLocalizedString("Account Deleted", comment: ""), message: message, actions: [okAction])
     }
 
     func showNotificationDeniedAlert() {
@@ -87,13 +109,36 @@ extension SettingWireframe: SettingWireframeInterface {
         )
     }
 
+    func reloadInterfaceForLanguage() {
+        // Screens keep the strings they were built with, so the tab interface is rebuilt in the new language.
+        // The Settings tab stays selected, since the user is there. Deferred so the picker's menu can finish first.
+        let appRoot = navigationController?.navigationController ?? navigationController
+        DispatchQueue.main.async {
+            appRoot?.setRootWireframe(MainWireframe(selectedTab: .settings), animated: false)
+        }
+    }
+
     func openSystemSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)
     }
 
     func showPrivacyPolicy() {
-        guard let url = URL(string: EnvironmentConfig.baseUrl())?.deletingLastPathComponent().appendingPathComponent("\(AppLanguage.current.rawValue)/privacy") else { return }
+        openPublicPage("privacy")
+    }
+
+    func showTermsOfService() {
+        openPublicPage("terms")
+    }
+
+    func showContactSupport() {
+        openPublicPage("feedback")
+    }
+
+    private func openPublicPage(_ page: String) {
+        // Legal and support pages are public on the website, including when the app uses a local API.
+        guard let site = URL(string: "https://kiokoto.com") else { return }
+        let url = site.appendingPathComponent(AppLanguage.current.rawValue).appendingPathComponent(page)
         let safari = SFSafariViewController(url: url)
         viewController.present(safari, animated: true)
     }

@@ -119,6 +119,7 @@ protocol SettingPresenterInterface: AnyObject {
     func viewDidLoad()
     func viewWillAppear()
     func viewWillDisappear()
+    func updateNotificationAuthorizationStatus(_ status: UNAuthorizationStatus)
     func didSelectItem(at indexPath: IndexPath)
     func toggleDarkMode(to value: Bool)
     func toggleNotification(to value: Bool)
@@ -137,6 +138,10 @@ final class SettingPresenter: SettingPresenterInterface {
     private let disposeBag = DisposeBag()
     private var refreshRequest: Disposable?
     private var isLoggingOut = false
+    private var isDeletingAccount = false
+    private var reminderChangeID = 0
+    private var reminderScheduleInFlight = false
+    private var pendingReminderSchedule: (() -> Void)?
 
     let sectionsRelay = BehaviorRelay<[SettingSection]>(value: [])
 
@@ -179,6 +184,11 @@ extension SettingPresenter {
         refreshRequest = nil
     }
 
+    func updateNotificationAuthorizationStatus(_ status: UNAuthorizationStatus) {
+        interactor.setNotificationAuthorizationStatus(status)
+        reloadSections()
+    }
+
     func didSelectItem(at indexPath: IndexPath) {
         let sections = sectionsRelay.value
         guard indexPath.section < sections.count,
@@ -207,39 +217,122 @@ extension SettingPresenter {
     }
 
     func toggleNotification(to value: Bool) {
+        reminderChangeID += 1
+        let changeID = reminderChangeID
         guard value else {
+            pendingReminderSchedule = nil
             interactor.setNotificationEnabled(false)
+            interactor.cancelDailyReminder()
             reloadSections()
             return
         }
         interactor.requestNotificationPermission { [weak self] granted in
             guard let self else { return }
+            guard changeID == self.reminderChangeID else { return }
             self.interactor.setNotificationAuthorizationStatus(granted ? .authorized : .denied)
-            self.interactor.setNotificationEnabled(granted)
-            if !granted {
+            guard granted else {
+                self.interactor.setNotificationEnabled(false)
                 self.wireframe.showNotificationDeniedAlert()
+                self.reloadSections()
+                return
+            }
+            self.scheduleReminder(hour: self.interactor.getReminderHour()) { [weak self] error in
+                guard let self else { return }
+                guard changeID == self.reminderChangeID else {
+                    if !self.interactor.getNotificationEnabled() { self.interactor.cancelDailyReminder() }
+                    return
+                }
+                self.interactor.setNotificationEnabled(error == nil)
+                if error != nil { self.showReminderScheduleError() }
+                self.reloadSections()
+            }
+        }
+    }
+
+    func toggleSound(to value: Bool) {
+        let oldValue = interactor.getSoundEnabled()
+        interactor.setSoundEnabled(value)
+        guard interactor.getNotificationEnabled(), oldValue != value else {
+            reloadSections()
+            return
+        }
+        reminderChangeID += 1
+        let changeID = reminderChangeID
+        scheduleReminder(hour: interactor.getReminderHour()) { [weak self] error in
+            guard let self, changeID == self.reminderChangeID else { return }
+            if error != nil {
+                self.interactor.setSoundEnabled(oldValue)
+                self.showReminderScheduleError()
             }
             self.reloadSections()
         }
     }
 
-    func toggleSound(to value: Bool) {
-        interactor.setSoundEnabled(value)
-        reloadSections()
+    private func showReminderScheduleError() {
+        wireframe.showError(message: NSLocalizedString("Could not schedule your study reminder. Please try again.", comment: "Notification scheduling failure"))
+    }
+
+    private func scheduleReminder(hour: Int, completion: @escaping (Error?) -> Void) {
+        let perform = { [weak self] in
+            guard let self else { return }
+            self.reminderScheduleInFlight = true
+            self.interactor.scheduleDailyReminder(hour: hour) { [weak self] error in
+                guard let self else { return }
+                completion(error)
+                self.reminderScheduleInFlight = false
+                if let pending = self.pendingReminderSchedule {
+                    self.pendingReminderSchedule = nil
+                    pending()
+                } else if !self.interactor.getNotificationEnabled() {
+                    // Disabling during an in-flight add must not leave a reminder behind.
+                    self.interactor.cancelDailyReminder()
+                }
+            }
+        }
+        if reminderScheduleInFlight {
+            pendingReminderSchedule = perform
+        } else {
+            perform()
+        }
     }
 
     func selectChoice(id: String, optionID: String) {
-        guard id == "appearance", let option = AppearanceOption(rawValue: optionID) else { return }
-        interactor.setAppearance(option.rawValue)
-        applyAppearance(option)
-        reloadSections()
+        switch id {
+        case "appearance":
+            guard let option = AppearanceOption(rawValue: optionID) else { return }
+            interactor.setAppearance(option.rawValue)
+            applyAppearance(option)
+            reloadSections()
+        case "language":
+            guard let option = LanguageOption(rawValue: optionID),
+                  option != LanguageOption.resolve(interactor.getLanguage()) else { return }
+            interactor.setLanguage(option.rawValue)
+            reloadSections()
+            wireframe.reloadInterfaceForLanguage()
+        case "reminder_time":
+            guard let hour = Int(optionID), (0..<24).contains(hour),
+                  hour != interactor.getReminderHour(), interactor.getNotificationEnabled() else { return }
+            reminderChangeID += 1
+            let changeID = reminderChangeID
+            scheduleReminder(hour: hour) { [weak self] error in
+                guard let self, changeID == self.reminderChangeID else { return }
+                if error == nil {
+                    self.interactor.setReminderHour(hour)
+                } else {
+                    self.showReminderScheduleError()
+                }
+                self.reloadSections()
+            }
+        default:
+            return
+        }
     }
 
     func requestLogout() {
-        guard !isLoggingOut else { return }
+        guard !isLoggingOut, !isDeletingAccount else { return }
         wireframe.showLogoutConfirmation { [weak self] in
             guard let self else { return }
-            guard !self.isLoggingOut else { return }
+            guard !self.isLoggingOut, !self.isDeletingAccount else { return }
             self.isLoggingOut = true
             self.refreshRequest?.dispose()
             self.interactor.logoutSession()
@@ -266,17 +359,45 @@ extension SettingPresenter {
         }
     }
 
+    func requestDeleteAccount() {
+        guard !isDeletingAccount, !isLoggingOut, interactor.getCurrentUser() != nil else { return }
+        wireframe.showDeleteAccountConfirmation { [weak self] in
+            guard let self, !self.isDeletingAccount, !self.isLoggingOut,
+                  self.interactor.getCurrentUser() != nil else { return }
+            self.isDeletingAccount = true
+            self.refreshRequest?.dispose()
+            self.interactor.deleteAccountSession()
+                .observe(on: MainScheduler.instance)
+                .subscribe(onSuccess: { [weak self] in
+                    guard let self else { return }
+                    self.isDeletingAccount = false
+                    self.reloadSections()
+                    self.wireframe.showAccountDeletedNotice(
+                        message: NSLocalizedString("Your online account has been deleted. If you used Sign in with Apple, open iPhone Settings > your name > Sign in with Apple, select this app, and stop using Sign in with Apple to revoke access.", comment: "Manual Apple credential revocation after account deletion"),
+                        onDismiss: { [weak self] in self?.wireframe.navigateToWelcome() })
+                }, onFailure: { [weak self] error in
+                    self?.isDeletingAccount = false
+                    self?.reloadSections()
+                    self?.wireframe.showError(message: error.localizedDescription)
+                })
+                .disposed(by: self.disposeBag)
+        }
+    }
+
     func handleNavigationTap(config: NavigationConfig) {
         switch config.id {
         case "logout":
             requestLogout()
+        case "delete_account":
+            requestDeleteAccount()
         case "notifications_system":
-            wireframe.openSystemSettings()
-        case "language":
-            // iOS keeps the per-app language (Settings ▸ FlashcardApp ▸ Language); there is no in-app picker.
             wireframe.openSystemSettings()
         case "privacy":
             wireframe.showPrivacyPolicy()
+        case "terms":
+            wireframe.showTermsOfService()
+        case "support":
+            wireframe.showContactSupport()
         case "about":
             wireframe.showAbout()
         default:
@@ -363,6 +484,16 @@ private extension SettingPresenter {
             subtitle: notificationSubtitle
         )))
 
+        if notificationEnabled {
+            preferencesItems.append(.choice(ChoiceConfig(
+                id: "reminder_time",
+                title: NSLocalizedString("Daily reminder time", comment: "Time of local daily notification"),
+                iconName: "clock",
+                options: (0..<24).map { ChoiceOption(id: String($0), title: String(format: "%02d:00", $0)) },
+                selectedID: String(interactor.getReminderHour())
+            )))
+        }
+
         if notificationStatus == .denied {
             preferencesItems.append(.navigation(NavigationConfig(
                 id: "notifications_system",
@@ -383,16 +514,27 @@ private extension SettingPresenter {
         let generalSection = SettingSection(
             title: NSLocalizedString("General", comment: ""),
             items: [
-                .navigation(NavigationConfig(
+                .choice(ChoiceConfig(
                     id: "language",
                     title: NSLocalizedString("Language", comment: ""),
                     iconName: "globe",
-                    subText: AppLanguage.current.nativeName
+                    options: LanguageOption.allCases.map { ChoiceOption(id: $0.rawValue, title: $0.title) },
+                    selectedID: LanguageOption.resolve(interactor.getLanguage()).rawValue
                 )),
                 .navigation(NavigationConfig(
                     id: "privacy",
                     title: NSLocalizedString("Privacy Policy", comment: ""),
                     iconName: "hand.raised"
+                )),
+                .navigation(NavigationConfig(
+                    id: "terms",
+                    title: NSLocalizedString("Terms of Service", comment: ""),
+                    iconName: "doc.text"
+                )),
+                .navigation(NavigationConfig(
+                    id: "support",
+                    title: NSLocalizedString("Contact Support", comment: ""),
+                    iconName: "bubble.left"
                 ))
             ]
         )
@@ -419,6 +561,12 @@ private extension SettingPresenter {
                         id: "logout",
                         title: NSLocalizedString("Log Out", comment: ""),
                         iconName: "rectangle.portrait.and.arrow.right",
+                        disclosure: false
+                    )),
+                    .destructive(NavigationConfig(
+                        id: "delete_account",
+                        title: NSLocalizedString("Delete Account", comment: ""),
+                        iconName: "trash",
                         disclosure: false
                     ))
                 ]

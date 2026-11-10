@@ -14,6 +14,7 @@ enum MainTabbarName: Int {
     case dictionary
     case setting
     case today
+    case discover
     
     var title: String {
         switch self {
@@ -29,6 +30,8 @@ enum MainTabbarName: Int {
                 return NSLocalizedString("Dictionary", comment: "")
             case .setting:
                 return NSLocalizedString("Settings", comment: "")
+            case .discover:
+                return NSLocalizedString("Discover", comment: "Tab and screen title")
         }
     }
     
@@ -46,6 +49,8 @@ enum MainTabbarName: Int {
                 return UIImage(systemName: "character.book.closed")
             case .setting:
                 return UIImage(systemName: "gearshape")
+            case .discover:
+                return UIImage(systemName: "safari")
         }
     }
 
@@ -64,6 +69,8 @@ enum MainTabbarName: Int {
                 return UIImage(systemName: "character.book.closed.fill")
             case .setting:
                 return UIImage(systemName: "gearshape.fill")
+            case .discover:
+                return UIImage(systemName: "safari.fill")
         }
     }
 

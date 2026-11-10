@@ -41,7 +41,7 @@ final class LocalizationTests: XCTestCase {
     func test_translationsAreFilledInAndKeepTheirPlaceholders() throws {
         let english = try table("en")
         // Brand names, addresses and loanwords that legitimately read the same in the other languages.
-        let sameAsKey: Set<String> = ["email@domain.com", "OK", "Kanji"]
+        let sameAsKey: Set<String> = ["email@domain.com", "OK", "Kanji", "Loto", "Loto 6", "Loto 7"]
         for language in ["vi", "ja"] {
             let strings = try table(language)
             for (key, value) in strings {
@@ -84,5 +84,51 @@ final class LocalizationTests: XCTestCase {
 
     func test_languageNamesAreWrittenInTheirOwnLanguage() {
         XCTAssertEqual(AppLanguage.allCases.map(\.nativeName), ["Tiếng Việt", "English", "日本語"])
+    }
+
+    func test_languageOptionPinsOnlyTheLanguagesItNamesAndFallsBackToTheSystem() {
+        XCTAssertNil(LanguageOption.system.appleLanguages, "System removes the override so iOS picks the device language")
+        XCTAssertEqual(LanguageOption.japanese.appleLanguages, ["ja"])
+        XCTAssertNil(LanguageOption.system.appLanguage)
+        XCTAssertEqual(LanguageOption.vietnamese.appLanguage, .vietnamese)
+        XCTAssertEqual(LanguageOption.resolve("en"), .english)
+        XCTAssertEqual(LanguageOption.resolve("fr"), .system, "An unsupported stored value follows the system")
+        XCTAssertEqual(LanguageOption.allCases.map(\.title), [NSLocalizedString("System", comment: ""), "Tiếng Việt", "English", "日本語"])
+    }
+
+    /// Changing the language in the app must change the strings at once, without a relaunch.
+    func test_activatingALanguageChangesTheStringsWhileTheAppRuns() {
+        // Other suites read strings built at launch; leave the process in the launch-time language.
+        defer { AppLocalization.reset() }
+
+        AppLocalization.activate(.vietnamese)
+        XCTAssertEqual(NSLocalizedString("Cancel", comment: ""), "Huỷ")
+        XCTAssertEqual(AppLanguage.current, .vietnamese)
+
+        AppLocalization.activate(.japanese)
+        XCTAssertEqual(NSLocalizedString("Cancel", comment: ""), "キャンセル")
+        XCTAssertEqual(AppLanguage.current, .japanese)
+
+        AppLocalization.activate(.english)
+        XCTAssertEqual(NSLocalizedString("Cancel", comment: ""), "Cancel")
+        XCTAssertEqual(AppLanguage.current, .english)
+    }
+
+    /// iOS reads `AppleLanguages` when the app launches, so the in-app choice has to be written there.
+    func test_savedLanguageIsWrittenToAppleLanguagesForTheNextLaunch() throws {
+        let preferences = UserDefaultsPreferences.shared
+        let defaults = UserDefaults.standard
+        defer { preferences.language = LanguageOption.system.rawValue }
+
+        preferences.language = LanguageOption.vietnamese.rawValue
+
+        XCTAssertEqual(preferences.language, "vi")
+        XCTAssertEqual(defaults.stringArray(forKey: "AppleLanguages"), ["vi"])
+
+        preferences.language = LanguageOption.system.rawValue
+
+        // Read the app's own domain: the global list still answers `object(forKey:)` once the override is gone.
+        let appDomain = try XCTUnwrap(Bundle.main.bundleIdentifier)
+        XCTAssertNil(defaults.persistentDomain(forName: appDomain)?["AppleLanguages"], "Following the system must not keep a stale language")
     }
 }

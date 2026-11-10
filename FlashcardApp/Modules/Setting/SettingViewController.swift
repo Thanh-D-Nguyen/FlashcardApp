@@ -68,9 +68,9 @@ final class SettingViewController: BaseViewController {
     private func refreshNotificationStatus() {
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
             guard let self else { return }
-            UserDefaultsPreferences.shared.notificationAuthorizationStatus = settings.authorizationStatus
             DispatchQueue.main.async {
-                self.presenter.viewWillAppear()
+                self.presenter.updateNotificationAuthorizationStatus(settings.authorizationStatus)
+                DailyStudyReminder.restoreIfNeeded()
             }
         }
     }

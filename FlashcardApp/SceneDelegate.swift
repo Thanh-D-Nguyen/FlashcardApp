@@ -5,6 +5,7 @@
 //  Created by タイン・グエン on 2023/02/19.
 //
 
+import GoogleSignIn
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -12,6 +13,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        if connectionOptions.notificationResponse?.notification.request.identifier == DailyStudyReminder.identifier {
+            DailyStudyReminder.requestOpenReview()
+        }
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         // The Settings choice is persisted; apply it from the first frame, not only while Settings is used.
@@ -21,6 +25,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         initialViewController.setRootWireframe(startUpWireFrame)
         window?.rootViewController = initialViewController
         window?.makeKeyAndVisible()
+    }
+
+    /// Google's sign-in redirect returns through the app's reversed-client-ID URL scheme.
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        for context in URLContexts {
+            _ = GIDSignIn.sharedInstance.handle(context.url)
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -41,8 +52,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
+        // Reconcile authorization revoked in Settings while the app was in the background.
+        DailyStudyReminder.restoreIfNeeded()
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
