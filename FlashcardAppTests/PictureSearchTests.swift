@@ -135,6 +135,12 @@ final class PictureSearchPresenterTests: XCTestCase {
         XCTAssertTrue(picked.isEmpty)
     }
 
+    func test_aServerThatCannotFetchThePictureSaysToChooseAnother() {
+        XCTAssertEqual(PictureSearchPresenter.selectionMessage(for: LearnerAPIError.server(502)),
+                       NSLocalizedString("This picture's source is not responding. Choose another picture.", comment: ""))
+        XCTAssertEqual(PictureSearchPresenter.selectionMessage(for: LearnerAPIError.server(500)), LearnerAPIError.server(500).errorDescription)
+    }
+
     func test_anExpiredHandleAsksForANewSearch() {
         XCTAssertEqual(PictureSearchPresenter.selectionMessage(for: LearnerAPIError.invalidRequest(nil)),
                        NSLocalizedString("This result has expired. Search again and choose it once more.", comment: ""))

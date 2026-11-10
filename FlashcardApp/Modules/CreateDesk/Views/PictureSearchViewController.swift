@@ -1,6 +1,6 @@
 import UIKit
 
-/// Search results as a grid of thumbnails. Tapping one previews it full size; only "Use this picture" saves it.
+/// Search results as a grid of thumbnails. Tapping one uses it for the card straight away and closes the search.
 final class PictureSearchViewController: BaseViewController, PictureSearchViewInterface {
     var presenter: PictureSearchPresenterInterface!
 
@@ -8,7 +8,7 @@ final class PictureSearchViewController: BaseViewController, PictureSearchViewIn
     private let stateView = StateView()
     private var collectionView: UICollectionView!
     private var pictures: [PictureSuggestion] = []
-    private weak var preview: PicturePreviewViewController?
+    private let busyView = UIActivityIndicatorView(style: .large)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,6 +64,13 @@ final class PictureSearchViewController: BaseViewController, PictureSearchViewIn
             collectionView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor)
         ])
         stateView.accessibilityIdentifier = "picture_search_state"
+        busyView.hidesWhenStopped = true
+        busyView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(busyView)
+        NSLayoutConstraint.activate([
+            busyView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            busyView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
+        ])
     }
 
     func subscribe() {}
@@ -104,11 +111,17 @@ final class PictureSearchViewController: BaseViewController, PictureSearchViewIn
 
 extension PictureSearchViewController {
     func setSelecting(_ selecting: Bool) {
-        preview?.setBusy(selecting)
+        selecting ? busyView.startAnimating() : busyView.stopAnimating()
+        // Saving the picture takes a moment: a second tap must not choose another one meanwhile.
+        collectionView.isUserInteractionEnabled = !selecting
+        collectionView.alpha = selecting ? 0.5 : 1
     }
 
     func showSelectionFailure(_ message: String) {
-        preview?.showFailure(message)
+        UIAccessibility.post(notification: .announcement, argument: message)
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -129,10 +142,7 @@ extension PictureSearchViewController: UICollectionViewDataSource, UICollectionV
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let picture = pictures[indexPath.item]
-        let preview = PicturePreviewViewController(picture: picture) { [weak self] in self?.presenter.select(picture) }
-        self.preview = preview
-        navigationController?.pushViewController(preview, animated: true)
+        presenter.select(pictures[indexPath.item])
     }
 }
 
@@ -179,92 +189,5 @@ final class PictureThumbnailCell: UICollectionViewCell {
         sourceLabel.text = picture.attribution.author ?? picture.source
         accessibilityLabel = String(format: NSLocalizedString("Picture %lld", comment: ""), number)
         accessibilityValue = picture.attribution.creditLine
-    }
-}
-
-/// Full-size look at one result, with where it comes from, before it is saved to the card.
-final class PicturePreviewViewController: UIViewController {
-    private let picture: PictureSuggestion
-    private let onUse: () -> Void
-    private let pictureView = CardImageView()
-    private let useButton = UIButton(type: .system)
-    private let failureLabel = UILabel()
-
-    init(picture: PictureSuggestion, onUse: @escaping () -> Void) {
-        self.picture = picture
-        self.onUse = onUse
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        title = NSLocalizedString("Preview", comment: "")
-        view.backgroundColor = Design.Color.background
-        navigationItem.largeTitleDisplayMode = .never
-        pictureView.translatesAutoresizingMaskIntoConstraints = false
-        pictureView.accessibilityLabel = NSLocalizedString("Picture preview", comment: "")
-        pictureView.setReference(picture.imageURL.absoluteString)
-
-        let credit = UILabel()
-        credit.apply(.metadata)
-        credit.textColor = Design.Color.textSecondary
-        credit.numberOfLines = 0
-        credit.text = picture.attribution.creditLine
-        credit.accessibilityIdentifier = "picture_credit"
-
-        var linkConfiguration = UIButton.Configuration.plain()
-        linkConfiguration.title = NSLocalizedString("Open source page", comment: "Opens the page a picture comes from")
-        linkConfiguration.image = UIImage(systemName: "arrow.up.right.square")
-        linkConfiguration.imagePadding = Design.Spacing.xs
-        linkConfiguration.contentInsets = .zero
-        let link = UIButton(configuration: linkConfiguration)
-        link.contentHorizontalAlignment = .leading
-        link.isHidden = picture.attribution.creditURL == nil
-        link.addAction(UIAction { [weak self] _ in
-            if let url = self?.picture.attribution.creditURL { UIApplication.shared.open(url) }
-        }, for: .primaryActionTriggered)
-
-        failureLabel.apply(.metadata)
-        failureLabel.textColor = Design.Color.error
-        failureLabel.numberOfLines = 0
-        failureLabel.isHidden = true
-        failureLabel.accessibilityIdentifier = "picture_selection_error"
-
-        var configuration = Design.Button.primary(title: NSLocalizedString("Use this picture", comment: ""))
-        configuration.image = UIImage(systemName: "checkmark")
-        configuration.imagePadding = Design.Spacing.s
-        useButton.configuration = configuration
-        useButton.accessibilityIdentifier = "use_picture"
-        useButton.addAction(UIAction { [weak self] _ in self?.onUse() }, for: .primaryActionTriggered)
-
-        let stack = UIStackView(arrangedSubviews: [credit, link, failureLabel, useButton])
-        stack.axis = .vertical
-        stack.spacing = Design.Spacing.m
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(pictureView)
-        view.addSubview(stack)
-        NSLayoutConstraint.activate([
-            pictureView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Design.Spacing.l),
-            pictureView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            pictureView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            pictureView.bottomAnchor.constraint(equalTo: stack.topAnchor, constant: -Design.Spacing.l),
-            stack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.l)
-        ])
-    }
-
-    func setBusy(_ busy: Bool) {
-        useButton.isEnabled = !busy
-        useButton.configuration?.showsActivityIndicator = busy
-        if busy { failureLabel.isHidden = true }
-    }
-
-    func showFailure(_ message: String) {
-        failureLabel.text = message
-        failureLabel.isHidden = false
-        UIAccessibility.post(notification: .announcement, argument: message)
     }
 }

@@ -235,7 +235,8 @@ final class LevelCell: UITableViewCell {
 /// the screen asks the user to start; everything else is an alternative.
 final class FeaturedLevelCell: UITableViewCell {
     static let reuseIdentifier = "featured_level_cell"
-    private static let startTitle = NSLocalizedString("Start studying vocabulary", comment: "")
+    // Computed, not stored: a stored static would keep the language it was first read in.
+    private static var startTitle: String { NSLocalizedString("Start studying vocabulary", comment: "") }
 
     let numeralLabel = UILabel()
     var onStart: (() -> Void)?

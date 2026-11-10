@@ -124,6 +124,9 @@ extension PictureSearchPresenter: PictureSearchPresenterInterface {
         switch error {
         // The signed result is only valid for 15 minutes.
         case LearnerAPIError.invalidRequest: return NSLocalizedString("This result has expired. Search again and choose it once more.", comment: "")
+        // The server could not fetch this picture from its source: another result may work.
+        case LearnerAPIError.server(let status) where (502...504).contains(status):
+            return NSLocalizedString("This picture's source is not responding. Choose another picture.", comment: "")
         case let error as LearnerAPIError: return error.errorDescription ?? error.localizedDescription
         default: return error.localizedDescription
         }

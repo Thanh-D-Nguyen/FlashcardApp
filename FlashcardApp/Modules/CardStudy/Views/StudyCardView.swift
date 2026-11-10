@@ -11,7 +11,8 @@ final class StudyCardView: UIView {
     private let termLabel = UILabel()
     private let readingLabel = UILabel()
     private let noteLabel = UILabel()
-    private let creditLabel = UILabel()
+    private let creditButton = SmallTargetButton(type: .system)
+    private var credit = ""
     private let headerRow = UIStackView()
     private let stack = UIStackView()
     private var imageHeight: NSLayoutConstraint!
@@ -58,22 +59,30 @@ final class StudyCardView: UIView {
         noteLabel.apply(.metadata)
         noteLabel.textAlignment = .center
         noteLabel.isAccessibilityElement = false
-        creditLabel.apply(.metadata)
-        creditLabel.font = UIFontMetrics(forTextStyle: .caption2).scaledFont(for: Design.TextRole.metadata.font.withSize(11), maximumPointSize: 18)
-        creditLabel.textAlignment = .center
-        creditLabel.numberOfLines = 2
-        creditLabel.isAccessibilityElement = false
+        // The credit is a footnote, not part of what is being learned: one tap on the picture's corner shows it.
+        var info = UIButton.Configuration.filled()
+        info.image = UIImage(systemName: "info.circle")
+        info.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 9, weight: .regular)
+        info.cornerStyle = .capsule
+        info.baseBackgroundColor = UIColor.black.withAlphaComponent(0.22)
+        info.baseForegroundColor = UIColor.white.withAlphaComponent(0.85)
+        info.contentInsets = NSDirectionalEdgeInsets(top: 3, leading: 3, bottom: 3, trailing: 3)
+        creditButton.configuration = info
+        creditButton.accessibilityLabel = NSLocalizedString("Picture credit", comment: "Info button on a study card picture that shows who made it")
+        creditButton.accessibilityIdentifier = "study_credit"
+        creditButton.translatesAutoresizingMaskIntoConstraints = false
+        creditButton.addTarget(self, action: #selector(showCredit), for: .primaryActionTriggered)
 
         stack.axis = .vertical
         stack.alignment = .fill
         stack.spacing = Design.Spacing.l
         stack.translatesAutoresizingMaskIntoConstraints = false
-        [imageView, creditLabel, termLabel, readingLabel, noteLabel].forEach(stack.addArrangedSubview)
-        stack.setCustomSpacing(Design.Spacing.xs, after: imageView)
+        [imageView, termLabel, readingLabel, noteLabel].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.xs, after: termLabel)
         headerRow.translatesAutoresizingMaskIntoConstraints = false
         addSubview(headerRow)
         addSubview(stack)
+        addSubview(creditButton)
         imageHeight = imageView.heightAnchor.constraint(equalToConstant: 200)
         NSLayoutConstraint.activate([
             headerRow.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
@@ -86,6 +95,8 @@ final class StudyCardView: UIView {
             stack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -Design.Spacing.xl),
             speakButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 44),
             speakButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
+            creditButton.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -6),
+            creditButton.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -6),
             imageHeight
         ])
         isAccessibilityElement = true
@@ -107,9 +118,36 @@ final class StudyCardView: UIView {
         termLabel.textColor = style?.foregroundColor ?? Design.TextRole.term.color
         readingLabel.textColor = style?.mutedColor ?? Design.TextRole.reading.color
         noteLabel.textColor = style?.mutedColor ?? Design.TextRole.metadata.color
-        creditLabel.textColor = style?.mutedColor ?? Design.TextRole.metadata.color
         eyebrowLabel.textColor = style?.mutedColor ?? Design.TextRole.eyebrow.color
         speakButton.configuration?.baseForegroundColor = style?.accentColor ?? Design.Color.accent
+    }
+
+    @objc private func showCredit() {
+        guard !credit.isEmpty else { return }
+        var responder: UIResponder? = self
+        while let next = responder?.next, !(next is UIViewController) { responder = next }
+        guard let presenter = responder?.next as? UIViewController else { return }
+        let label = UILabel()
+        label.apply(.meaning)
+        label.numberOfLines = 0
+        label.text = credit
+        let controller = UIViewController()
+        controller.view.backgroundColor = Design.Color.surface
+        label.translatesAutoresizingMaskIntoConstraints = false
+        controller.view.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: controller.view.topAnchor, constant: Design.Spacing.m),
+            label.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor, constant: -Design.Spacing.m),
+            label.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor, constant: Design.Spacing.m),
+            label.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor, constant: -Design.Spacing.m)
+        ])
+        controller.modalPresentationStyle = .popover
+        controller.preferredContentSize = controller.view.systemLayoutSizeFitting(CGSize(width: 260, height: UIView.layoutFittingCompressedSize.height),
+                                                                                  withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
+        controller.popoverPresentationController?.sourceView = creditButton
+        controller.popoverPresentationController?.permittedArrowDirections = [.up, .down]
+        controller.popoverPresentationController?.delegate = CreditPopoverStyle.shared
+        presenter.present(controller, animated: true)
     }
 
     private func languageName(japanese: Bool) -> String {
@@ -138,8 +176,8 @@ final class StudyCardView: UIView {
         imageView.isHidden = !hasImage
         // A quiz leaves room for the options below; a flip card gives the picture more room on the front.
         imageHeight.constant = isQuiz ? 110 : (showingBack ? 140 : 200)
-        creditLabel.text = hasImage ? card.imageCredit : nil
-        creditLabel.isHidden = !hasImage || card.imageCredit.isEmpty
+        credit = card.imageCredit
+        creditButton.isHidden = !hasImage || credit.isEmpty
         if hasImage {
             imageView.setReference(card.imageReference)
             imageView.accessibilityLabel = String(format: NSLocalizedString("Picture for %@", comment: ""), card.front)
@@ -151,5 +189,18 @@ final class StudyCardView: UIView {
         if !reading.isEmpty, readingVisible { spoken.append(String(format: NSLocalizedString("Reading: %@", comment: ""), reading)) }
         if !note.isEmpty { spoken.append(String(format: NSLocalizedString("Note: %@", comment: ""), note)) }
         accessibilityLabel = ([languageName(japanese: japaneseVisible)] + spoken).joined(separator: ", ")
+    }
+}
+
+/// Keeps the credit a popover on iPhone instead of a sheet.
+private final class CreditPopoverStyle: NSObject, UIPopoverPresentationControllerDelegate {
+    static let shared = CreditPopoverStyle()
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle { .none }
+}
+
+/// A small button that still has a 44 pt touch target.
+private final class SmallTargetButton: UIButton {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        bounds.insetBy(dx: min(0, (bounds.width - 44) / 2), dy: min(0, (bounds.height - 44) / 2)).contains(point)
     }
 }

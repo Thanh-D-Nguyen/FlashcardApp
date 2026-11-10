@@ -11,6 +11,8 @@ final class FakeServerInteractor: CardLibraryServerInteractorInterface {
     /// Consumed in order, one per `submit`; an exhausted queue succeeds.
     var submitResults: [Single<Void>] = []
     var archiveResult: Single<Void> = .just(())
+    var reportResult: Single<Void> = .just(())
+    var blockResult: Single<Void> = .just(())
     var deviceCopies = Set<String>()
     var saveOutcome: Result<DeckImportOutcome, Error> = .success(.imported(deckId: "x"))
     var copyResult: Single<Int> = .just(0)
@@ -20,6 +22,8 @@ final class FakeServerInteractor: CardLibraryServerInteractorInterface {
     private(set) var dueLimits: [Int] = []
     private(set) var submissions: [(rating: ReviewRating, cardId: String, elapsed: TimeInterval)] = []
     private(set) var archived: [String] = []
+    private(set) var reported: [(String, String)] = []
+    private(set) var blocked: [String] = []
     private(set) var saved: [ServerDeckDetail] = []
 
     func decks() -> Single<[ServerDeck]> { decksCalls += 1; return decksResult }
@@ -30,6 +34,8 @@ final class FakeServerInteractor: CardLibraryServerInteractorInterface {
         return submitResults.isEmpty ? .just(()) : submitResults.removeFirst()
     }
     func archive(deckId: String) -> Single<Void> { archived.append(deckId); return archiveResult }
+    func report(deckId: String, reason: String) -> Single<Void> { reported.append((deckId, reason)); return reportResult }
+    func blockAuthor(deckId: String) -> Single<Void> { blocked.append(deckId); return blockResult }
     func hasDeviceCopy(deckId: String) -> Bool { deviceCopies.contains(deckId) }
     func saveToDevice(_ detail: ServerDeckDetail) throws -> DeckImportOutcome {
         saved.append(detail)

@@ -14,13 +14,14 @@ final class CardImageView: UIView {
     private let failureIcon = UIImageView(image: UIImage(systemName: "photo.badge.exclamationmark"))
     private let failureLabel = UILabel()
     private let failureStack = UIStackView()
+    private let retryTap = UITapGestureRecognizer()
 
     private(set) var state: State = .empty
     private var reference = ""
     private var loadToken = UUID()
     private let store: CardImageStore
     /// Thumbnails show only the icon on failure; large presentations also say why and offer a retry by tap.
-    var isCompact = false { didSet { failureLabel.isHidden = isCompact } }
+    var isCompact = false { didSet { failureLabel.isHidden = isCompact; retryTap.isEnabled = state == .failed && !isCompact } }
     var onStateChange: ((State) -> Void)?
 
     init(store: CardImageStore = .shared) {
@@ -58,7 +59,11 @@ final class CardImageView: UIView {
             failureStack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: Design.Spacing.s),
             failureStack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -Design.Spacing.s)
         ])
-        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(retryIfFailed)))
+        // A tap that retries a failed load must not swallow the touch of a list that is selecting this picture.
+        retryTap.addTarget(self, action: #selector(retryIfFailed))
+        retryTap.cancelsTouchesInView = false
+        retryTap.isEnabled = false
+        addGestureRecognizer(retryTap)
         isAccessibilityElement = true
         accessibilityTraits = .image
     }
@@ -141,6 +146,7 @@ final class CardImageView: UIView {
 
     private func apply(_ newState: State) {
         state = newState
+        retryTap.isEnabled = newState == .failed && !isCompact
         spinner.stopAnimating()
         failureStack.isHidden = newState != .failed
         imageView.isHidden = newState != .loaded
