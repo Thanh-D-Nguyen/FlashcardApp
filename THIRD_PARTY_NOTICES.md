@@ -30,3 +30,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## KanjiVG (Ulrich Apel)
+
+`FlashcardApp/Resources/HandwritingTemplates.bin` is derived from KanjiVG release r20260714 (<https://kanjivg.tagaini.net>,
+<https://github.com/KanjiVG/kanjivg>): the stroke shapes of each character, resampled to 12 points per stroke by
+`scripts/build-handwriting-templates.py`. Copyright (C) 2009-2011 Ulrich Apel. KanjiVG is distributed under the Creative
+Commons Attribution-Share Alike 3.0 licence (<https://creativecommons.org/licenses/by-sa/3.0/>); this derived file is shared
+under the same licence. The stroke-order drawings in dictionary entries use the same data, served by the backend.
