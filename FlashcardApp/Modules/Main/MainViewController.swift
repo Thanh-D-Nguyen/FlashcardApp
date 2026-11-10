@@ -23,7 +23,29 @@ final class MainViewController: BaseViewController {
         super.viewDidLoad()
         setupUI()
         subscribe()
+        NotificationCenter.default.addObserver(self, selector: #selector(openReminderReview),
+                                               name: DailyStudyReminder.openReviewNotification, object: nil)
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-OpenStudyReminder") { DailyStudyReminder.requestOpenReview() }
+        #endif
         presenter.viewDidLoad()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        openReminderReview()
+    }
+
+    @objc private func openReminderReview() {
+        guard view.window != nil, presentedViewController == nil,
+              let tabs = children.compactMap({ $0 as? MainTabbarController }).first,
+              tabs.viewControllers?.indices.contains(MainTab.cards.rawValue) == true,
+              let cardsNavigation = tabs.viewControllers?[MainTab.cards.rawValue] as? UINavigationController,
+              let cards = cardsNavigation.viewControllers.first as? CardViewController,
+              DailyStudyReminder.consumeOpenReview() else { return }
+        tabs.selectedIndex = MainTab.cards.rawValue
+        cards.loadViewIfNeeded()
+        cards.presenter.selectScope(.review)
     }
     
     func setupUI() {

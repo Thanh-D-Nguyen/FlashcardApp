@@ -17,11 +17,11 @@ final class MainWireframe: BaseWireframe<MainViewController> {
 
     private let storyboard = UIStoryboard(name: "Main", bundle: nil)
 
-    init() {
+    init(selectedTab: MainTab = .today) {
         let moduleViewController = storyboard.instantiateViewController(ofType: MainViewController.self)
         super.init(viewController: moduleViewController)
         let interactor = MainInteractor()
-        let presenter = MainPresenter(interactor: interactor, wireframe: self)
+        let presenter = MainPresenter(interactor: interactor, wireframe: self, selectedTab: selectedTab)
         moduleViewController.presenter = presenter
     }
 
