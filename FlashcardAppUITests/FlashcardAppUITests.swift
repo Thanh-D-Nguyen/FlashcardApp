@@ -54,7 +54,9 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(result.waitForExistence(timeout: 15))
         XCTAssertTrue(result.label.contains("日本"))
         result.tap()
-        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 3))
+        // A result opens its own detail screen (the entry), not a dialog; the full journeys are in DictionaryUITests.
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "entry_title").firstMatch.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.alerts.firstMatch.exists)
     }
 
     func testOfflineCardsAndAccountEntryRemainReachable() {
@@ -66,6 +68,20 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 10))
         app.tabBars.buttons["tab_settings"].tap()
         XCTAssertTrue(app.tables.firstMatch.waitForExistence(timeout: 5))
+    }
+
+    func testReminderTapOpensCardsReviewOnColdStart() {
+        let app = makeApp()
+        app.launchArguments += ["-OpenStudyReminder", "-disableAds"]
+        app.launch()
+
+        let cards = app.tabBars.buttons["tab_cards"]
+        XCTAssertTrue(cards.waitForExistence(timeout: 40))
+        XCTAssertTrue(cards.isSelected)
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 10))
+        let reviewScope = app.buttons.matching(identifier: "cards_scope_review").firstMatch
+        XCTAssertTrue(reviewScope.waitForExistence(timeout: 10))
+        XCTAssertTrue(reviewScope.isSelected, "The reminder must select the Review section regardless of language or login state")
     }
 
     func testCardEditorKeepsToolbarAboveKeyboardAndCanDiscard() {
@@ -611,6 +627,52 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5), "Closing the generator returns to the library")
     }
 
+    /// Needs a disposable local account (TEST_RUNNER_FLASHCARD_E2E_EMAIL / _PASSWORD) and a signed (ad-hoc) build for the Keychain.
+    /// The real server creates the deck and the app imports its real cards: the editor opens with filled-in cards and the
+    /// deck is in the library. Generation is not idempotent, so this runs once per tap and the deck is deleted afterwards.
+    func testLiveAutoGenerateCreatesARealDeckWithServerCards() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let email = environment["FLASHCARD_E2E_EMAIL"], let password = environment["FLASHCARD_E2E_PASSWORD"] else {
+            throw XCTSkip("No disposable local account supplied")
+        }
+        let app = makeApp()
+        app.launch()
+        openLogin(app)
+        submitLogin(app, email: email, password: password)
+        XCTAssertTrue(app.tabBars.buttons["tab_levels"].waitForExistence(timeout: 20), "Successful login lands on Main")
+        openCards(app)
+
+        let name = "UI gen \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        app.buttons["create_deck_button"].tap()
+        XCTAssertTrue(app.buttons["new_deck_auto"].waitForExistence(timeout: 5))
+        app.buttons["new_deck_auto"].tap()
+        let nameField = app.textFields["generator_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        // The field starts with a suggested name: delete it, then type ours.
+        nameField.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: (nameField.value as? String ?? "").count))
+        nameField.typeText(name)
+        app.keyboards.buttons["Done"].tap()
+
+        // The server counts the cards it can supply (N5 vocabulary is the seeded content) before anything is created.
+        let generate = app.buttons["generate_deck"]
+        let enabled = NSPredicate(format: "isEnabled == true")
+        XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: enabled, object: generate)], timeout: 20), .completed,
+                       "The server reports enough N5 cards to generate")
+        attachScreenshot(app, name: "generator-ready")
+        generate.tap()
+
+        // The deck opens in the editor with the server's cards.
+        let firstFront = app.textViews.matching(identifier: "card_front").element(boundBy: 0)
+        XCTAssertTrue(firstFront.waitForExistence(timeout: 30), "The generated cards are opened for review")
+        XCTAssertFalse((firstFront.value as? String ?? "").isEmpty, "The first card has real front text")
+        attachScreenshot(app, name: "generated-deck-editor")
+        app.buttons["close_deck_editor"].tap()
+        XCTAssertTrue(app.tables["deck_library"].waitForExistence(timeout: 5))
+        XCTAssertTrue(deckRow(app, named: name).waitForExistence(timeout: 10), "The generated deck is in the library")
+    }
+
     /// After the flip the card shows example sentences from the dictionary API (hidden before it), which can be hidden,
     /// read aloud and copied; the card style is chosen from a sheet and remembered.
     func testStudyShowsExampleSentencesAfterTheFlipAndTheCardStyleCanBeChosen() {
@@ -703,8 +765,9 @@ final class FlashcardAppUITests: XCTestCase {
         let choice = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", name)).firstMatch
         XCTAssertTrue(choice.waitForExistence(timeout: 5))
         choice.tap()
-        XCTAssertTrue(app.staticTexts["today_hero_title"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["today_hero_title"].label, name)
+        // The deck's name is the hero's title, and the title is the control that changes the deck.
+        XCTAssertTrue(app.buttons["today_deck_row"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["today_deck_row"].label.hasSuffix(name), "The hero names the deck being studied")
         XCTAssertTrue(app.staticTexts["today_figure"].label.hasPrefix("2"), "A new deck of two cards: practise it, nothing is 'due'")
         attachScreenshot(app, name: "today-practice")
 
@@ -1025,19 +1088,19 @@ final class FlashcardAppUITests: XCTestCase {
 
     // MARK: Learn from Life (the hub on Today)
 
-    /// Brings a hub card's button into view: the card strip scrolls sideways, Today scrolls down.
+    /// Brings a hub card into view to be tapped: the card strip scrolls sideways, Today scrolls down. A ready card is opened by a tap on it.
     private func revealLifeCard(_ app: XCUIApplication, idPrefix: String, timeout: TimeInterval = 40) -> XCUIElement? {
-        let button = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "life_card_action_\(idPrefix)")).firstMatch
+        let card = app.otherElements.matching(NSPredicate(format: "identifier BEGINSWITH %@", "life_card_\(idPrefix)")).firstMatch
         let strip = app.scrollViews["today_life_cards"]
         guard strip.waitForExistence(timeout: timeout) else { return nil }
         let today = app.scrollViews["today_screen"]
         var attempts = 0
-        while !(button.exists && button.isHittable) && attempts < 14 {
-            if strip.isHittable, !button.exists || button.frame.minX > app.frame.maxX || button.frame.maxX < 0 { strip.swipeLeft() }
+        while !(card.exists && card.isHittable) && attempts < 14 {
+            if strip.isHittable, !card.exists || card.frame.minX > app.frame.maxX || card.frame.maxX < 0 { strip.swipeLeft() }
             else { today.swipeUp() }
             attempts += 1
         }
-        return button.exists && button.isHittable ? button : nil
+        return card.exists && card.isHittable ? card : nil
     }
 
     /// Opens a lesson from Today and runs it to the save step, typing `answer` into the recall exercise and picking choice `pick`.
@@ -1097,8 +1160,36 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(strip.waitForExistence(timeout: 10))
         // The date card is worked out on the device; it needs no server.
         XCTAssertNotNil(revealLifeCard(app, idPrefix: "date:"), "A date card is on Today")
-        try XCTSkipUnless(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "life_card_action_sample:")).count > 0 || revealLifeCard(app, idPrefix: "sample:transit", timeout: 5) != nil,
+        try XCTSkipUnless(app.otherElements.matching(NSPredicate(format: "identifier BEGINSWITH %@", "life_card_sample:")).count > 0 || revealLifeCard(app, idPrefix: "sample:transit", timeout: 5) != nil,
                           "The backend already provides a life feed: no example cards to check.")
+    }
+
+    /// Today leads with the life hub: at the default text size its first card is above the tab bar without scrolling, and the deck
+    /// being studied comes below it (the learner scrolls for that).
+    func testTodayLeadsWithTheLifeHubAndItsFirstCardIsVisibleWithoutScrolling() throws {
+        let app = makeApp()
+        // Sample decks, so that Today has a deck being studied (the block this layout is about).
+        app.launchArguments += ["-SeedCardsFixture"]
+        app.launch()
+        XCTAssertTrue(app.buttons["today_primary"].waitForExistence(timeout: 40), "Today is the first screen")
+        XCTAssertTrue(app.otherElements["today_life_hub"].waitForExistence(timeout: 40), "The life hub is on Today")
+        // Several sample decks: Today asks for one first. Choose the first; the deck then is the hero's block.
+        let primary = app.buttons["today_primary"]
+        if primary.label.contains("Chọn bộ thẻ") {
+            primary.tap()
+            let choice = app.sheets.buttons.element(boundBy: 0)
+            XCTAssertTrue(choice.waitForExistence(timeout: 5), "The deck chooser lists the sample decks")
+            choice.tap()
+        }
+        XCTAssertTrue(app.buttons["today_deck_row"].waitForExistence(timeout: 10), "The deck being studied is on Today")
+        let tabBarTop = app.tabBars.firstMatch.frame.minY
+        let hub = app.otherElements["today_life_hub"].frame
+        let deck = app.buttons["today_deck_row"].frame
+        let firstCard = app.otherElements.matching(NSPredicate(format: "identifier BEGINSWITH 'life_card_'")).firstMatch.frame
+        let report = "tab bar top \(tabBarTop), hub \(hub), deck \(deck), first card \(firstCard)"
+        XCTAssertLessThan(hub.minY, deck.minY, "The life hub comes before the deck being studied. \(report)")
+        XCTAssertLessThanOrEqual(firstCard.maxY, tabBarTop, "The first life card is above the tab bar without scrolling. \(report)")
+        attachScreenshot(app, name: "today-hub-first")
     }
 
     func testAnExampleLessonRunsFromTodayAndItsWordsAreSavedOnceOnly() throws {
