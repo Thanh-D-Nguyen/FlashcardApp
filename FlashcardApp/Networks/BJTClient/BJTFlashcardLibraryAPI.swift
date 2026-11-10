@@ -17,6 +17,10 @@ protocol BJTFlashcardLibraryAPIInterface: AnyObject {
     func submitReview(userFlashcardId: String, rating: ReviewRating, elapsedMs: Int?) -> Single<Void>
     /// Hides one of the learner's own decks from every list. Safe to repeat.
     func archiveDeck(id: String) -> Single<Void>
+    /// Submits a moderation report once; retries must be initiated by the learner.
+    func reportDeck(id: String, reason: String) -> Single<Void>
+    /// Hides public decks from this author for the signed-in account.
+    func blockDeckAuthor(id: String) -> Single<Void>
 }
 
 extension BJTLearnerAPI: BJTFlashcardLibraryAPIInterface {
@@ -24,6 +28,8 @@ extension BJTLearnerAPI: BJTFlashcardLibraryAPIInterface {
     private static let maximumLimit = 200
 
     private struct ReviewBody: Encodable { let rating: String; let elapsedMs: Int? }
+    private struct ReportBody: Encodable { let reason: String }
+    private struct ModerationAck: Decodable { let success: Bool }
 
     func libraryDecks(limit: Int) -> Single<[BJTDeckSummaryDTO]> {
         guard (1...Self.maximumLimit).contains(limit) else { return .error(LearnerAPIError.invalidRequest(nil)) }
@@ -54,5 +60,19 @@ extension BJTLearnerAPI: BJTFlashcardLibraryAPIInterface {
         return response.map { ack in
             guard ack.archived else { throw LearnerAPIError.invalidResponse }
         }
+    }
+
+    func reportDeck(id: String, reason: String) -> Single<Void> {
+        guard UUID(uuidString: id) != nil, ["spam", "abuse", "sexual", "other"].contains(reason) else {
+            return .error(LearnerAPIError.invalidRequest(nil))
+        }
+        let response: Single<ModerationAck> = perform(["flashcards", "decks", id, "report"], method: .post, body: ReportBody(reason: reason))
+        return response.map { ack in guard ack.success else { throw LearnerAPIError.invalidResponse } }
+    }
+
+    func blockDeckAuthor(id: String) -> Single<Void> {
+        guard UUID(uuidString: id) != nil else { return .error(LearnerAPIError.invalidRequest(nil)) }
+        let response: Single<ModerationAck> = perform(["flashcards", "decks", id, "block-author"], method: .post, body: Optional<ReviewBody>.none)
+        return response.map { ack in guard ack.success else { throw LearnerAPIError.invalidResponse } }
     }
 }

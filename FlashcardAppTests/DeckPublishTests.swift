@@ -217,6 +217,8 @@ private final class FakeLibraryNoop: BJTFlashcardLibraryAPIInterface {
     func dueCards(limit: Int) -> Single<[BJTDueCardDTO]> { .just([]) }
     func submitReview(userFlashcardId: String, rating: ReviewRating, elapsedMs: Int?) -> Single<Void> { .just(()) }
     func archiveDeck(id: String) -> Single<Void> { .just(()) }
+    func reportDeck(id: String, reason: String) -> Single<Void> { .just(()) }
+    func blockDeckAuthor(id: String) -> Single<Void> { .just(()) }
 }
 
 private final class FakePublisher: DeckPublishInteractorInterface {

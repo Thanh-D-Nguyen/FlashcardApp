@@ -11,15 +11,23 @@ final class SpyRemoteDeckView: RemoteDeckViewInterface {
 final class FakeRemoteDeckWireframe: RemoteDeckWireframeInterface {
     private(set) var studied: [String] = []
     private(set) var archiveRequests: [String] = []
+    private(set) var reportRequests = 0
+    private(set) var blockRequests = 0
     private(set) var signIns = 0
     private(set) var leaveCount = 0
     private var confirmation: (() -> Void)?
+    private var reportSelection: ((String) -> Void)?
+    private var blockConfirmation: (() -> Void)?
     private var signInFinish: (() -> Void)?
     func showStudy(deckId: String) { studied.append(deckId) }
     func showSignIn(onFinish: @escaping () -> Void) { signIns += 1; signInFinish = onFinish }
     func confirmArchive(deckName: String, onConfirm: @escaping () -> Void) { archiveRequests.append(deckName); confirmation = onConfirm }
+    func chooseReportReason(onSelect: @escaping (String) -> Void) { reportRequests += 1; reportSelection = onSelect }
+    func confirmBlockAuthor(onConfirm: @escaping () -> Void) { blockRequests += 1; blockConfirmation = onConfirm }
     func leave() { leaveCount += 1 }
     func confirm() { confirmation?() }
+    func selectReportReason(_ reason: String) { reportSelection?(reason) }
+    func confirmBlock() { blockConfirmation?() }
     func finishSignIn() { signInFinish?() }
 }
 
@@ -194,5 +202,41 @@ final class RemoteDeckPresenterTests: XCTestCase {
         XCTAssertEqual(wireframe.leaveCount, 0)
         XCTAssertNotNil(view.last.notice)
         XCTAssertNil(view.last.busy)
+    }
+
+    func test_reportRequiresForeignPublicDeckAndReasonSelection() {
+        makePresenter()
+        presenter.report()
+        XCTAssertEqual(wireframe.reportRequests, 1)
+        XCTAssertTrue(server.reported.isEmpty)
+        wireframe.selectReportReason("spam")
+        XCTAssertEqual(server.reported.map { $0.1 }, ["spam"])
+        XCTAssertNil(view.last.busy)
+        XCTAssertNotNil(view.last.notice)
+
+        server.detailResult = .just(detail(owned: true))
+        presenter.retry()
+        presenter.report()
+        XCTAssertEqual(wireframe.reportRequests, 1)
+    }
+
+    func test_blockRequiresConfirmationAndLeavesOnlyOnSuccess() {
+        makePresenter()
+        presenter.blockAuthor()
+        XCTAssertEqual(wireframe.blockRequests, 1)
+        XCTAssertTrue(server.blocked.isEmpty)
+        wireframe.confirmBlock()
+        XCTAssertEqual(server.blocked, [deckId])
+        XCTAssertEqual(wireframe.leaveCount, 1)
+    }
+
+    func test_failedBlockDoesNotCloseDeck() {
+        server.blockResult = .error(LearnerAPIError.offline)
+        makePresenter()
+        presenter.blockAuthor()
+        wireframe.confirmBlock()
+        XCTAssertEqual(wireframe.leaveCount, 0)
+        XCTAssertNil(view.last.busy)
+        XCTAssertNotNil(view.last.notice)
     }
 }

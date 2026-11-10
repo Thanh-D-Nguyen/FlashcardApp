@@ -21,6 +21,7 @@ struct RemoteDeckState: Equatable {
     enum Busy: Equatable {
         case saving
         case archiving
+        case moderating
     }
 
     var phase: Phase = .loading
@@ -49,6 +50,8 @@ protocol RemoteDeckPresenterInterface: AnyObject {
     func study()
     func saveToDevice()
     func archive()
+    func report()
+    func blockAuthor()
 }
 
 final class RemoteDeckPresenter {
@@ -171,6 +174,51 @@ extension RemoteDeckPresenter: RemoteDeckPresenterInterface {
             self.state.notice = nil
             self.publish()
             self.request.disposable = self.interactor.archive(deckId: self.deckId)
+                .observe(on: MainScheduler.instance)
+                .subscribe(onSuccess: { [weak self] in
+                    guard let self else { return }
+                    self.state.busy = nil
+                    self.wireframe.leave()
+                }, onFailure: { [weak self] error in
+                    guard let self else { return }
+                    self.state.busy = nil
+                    self.state.notice = CardPresenter.message(for: error)
+                    self.publish()
+                })
+        }
+    }
+
+    func report() {
+        guard state.phase == .loaded, !state.isOwned, state.visibility == .public, state.busy == nil else { return }
+        wireframe.chooseReportReason { [weak self] reason in
+            guard let self, self.state.phase == .loaded, self.state.busy == nil else { return }
+            self.state.busy = .moderating
+            self.state.notice = nil
+            self.publish()
+            self.request.disposable = self.interactor.report(deckId: self.deckId, reason: reason)
+                .observe(on: MainScheduler.instance)
+                .subscribe(onSuccess: { [weak self] in
+                    guard let self else { return }
+                    self.state.busy = nil
+                    self.state.notice = NSLocalizedString("Report received. Thank you for helping keep the community safe.", comment: "")
+                    self.publish()
+                }, onFailure: { [weak self] error in
+                    guard let self else { return }
+                    self.state.busy = nil
+                    self.state.notice = CardPresenter.message(for: error)
+                    self.publish()
+                })
+        }
+    }
+
+    func blockAuthor() {
+        guard state.phase == .loaded, !state.isOwned, state.visibility == .public, state.busy == nil else { return }
+        wireframe.confirmBlockAuthor { [weak self] in
+            guard let self, self.state.phase == .loaded, self.state.busy == nil else { return }
+            self.state.busy = .moderating
+            self.state.notice = nil
+            self.publish()
+            self.request.disposable = self.interactor.blockAuthor(deckId: self.deckId)
                 .observe(on: MainScheduler.instance)
                 .subscribe(onSuccess: { [weak self] in
                     guard let self else { return }

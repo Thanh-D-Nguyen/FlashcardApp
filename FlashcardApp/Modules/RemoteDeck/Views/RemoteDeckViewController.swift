@@ -162,6 +162,14 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
                 self?.presenter.archive()
             })
         }
+        if !state.isOwned && state.visibility == .public {
+            children.append(UIAction(title: NSLocalizedString("Report deck", comment: ""), image: UIImage(systemName: "flag")) { [weak self] _ in
+                self?.presenter.report()
+            })
+            children.append(UIAction(title: NSLocalizedString("Block author", comment: ""), image: UIImage(systemName: "person.crop.circle.badge.xmark"), attributes: .destructive) { [weak self] _ in
+                self?.presenter.blockAuthor()
+            })
+        }
         return UIMenu(children: children)
     }
 }

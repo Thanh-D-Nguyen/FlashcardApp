@@ -24,6 +24,8 @@ protocol CardLibraryServerInteractorInterface: AnyObject {
     /// Sends one rating. Never call it twice for one learner action.
     func submit(_ rating: ReviewRating, for card: DueCard, elapsed: TimeInterval) -> Single<Void>
     func archive(deckId: String) -> Single<Void>
+    func report(deckId: String, reason: String) -> Single<Void>
+    func blockAuthor(deckId: String) -> Single<Void>
     /// The id of the device deck saved from this server deck, when there is one.
     func hasDeviceCopy(deckId: String) -> Bool
     func saveToDevice(_ detail: ServerDeckDetail) throws -> DeckImportOutcome
@@ -94,6 +96,14 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
 
     func archive(deckId: String) -> Single<Void> {
         api.archiveDeck(id: deckId).do(onError: signOutIfRejected)
+    }
+
+    func report(deckId: String, reason: String) -> Single<Void> {
+        api.reportDeck(id: deckId, reason: reason).do(onError: signOutIfRejected)
+    }
+
+    func blockAuthor(deckId: String) -> Single<Void> {
+        api.blockDeckAuthor(id: deckId).do(onError: signOutIfRejected)
     }
 
     func hasDeviceCopy(deckId: String) -> Bool {

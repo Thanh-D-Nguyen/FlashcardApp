@@ -24,6 +24,8 @@ private final class FakeLibraryAPI: BJTFlashcardLibraryAPIInterface {
     var due: Single<[BJTDueCardDTO]> = .just([])
     var submitResult: Single<Void> = .just(())
     var archiveResult: Single<Void> = .just(())
+    var reportResult: Single<Void> = .just(())
+    var blockResult: Single<Void> = .just(())
     private(set) var submissions: [(id: String, rating: ReviewRating, elapsedMs: Int?)] = []
     private(set) var deckLimits: [Int] = []
 
@@ -35,6 +37,8 @@ private final class FakeLibraryAPI: BJTFlashcardLibraryAPIInterface {
         return submitResult
     }
     func archiveDeck(id: String) -> Single<Void> { archiveResult }
+    func reportDeck(id: String, reason: String) -> Single<Void> { reportResult }
+    func blockDeckAuthor(id: String) -> Single<Void> { blockResult }
 }
 
 /// Answers every request with a small JPEG, or 404 for the addresses in `missing`.
