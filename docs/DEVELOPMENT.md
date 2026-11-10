@@ -18,8 +18,12 @@ Bốn tab hoạt động:
 
 - Cấp độ: GET `/api/levels`; chọn J5–J1+ để đọc từ vựng, kanji, ngữ pháp,
   phân trang 30 mục và xem nghĩa.
-- Từ điển: GET `/api/search`, scope `lexeme`, `kanji`, `grammar`, `example`.
-  Đổi từ khóa hủy request cũ; có trạng thái tải, trống, lỗi và tải lại.
+- Từ điển: GET `/api/search`, scope `lexeme`, `kanji`, `grammar`, `example` (30 kết quả/trang, `offset`). Đổi từ khóa hủy request
+  cũ; có trạng thái tải, trống, lỗi và thử lại; lịch sử tìm/xem gần đây (cục bộ). Chạm một kết quả mở **màn chi tiết** riêng cho
+  từ vựng (`/content/lexemes/{id}`, trọng âm, kanji trong từ, câu ví dụ), kanji (`/kanji/{id}`, thứ tự nét từ SVG KanjiVG đã kiểm
+  hash), ngữ pháp (`/content/grammar/{id}`) và câu. **Lưu** = bookmark của tài khoản (`/bookmarks/...`, cần đăng nhập; màn Đã lưu ở
+  nút dấu trang); **Thêm vào thẻ** ghi vào bộ thẻ cục bộ do người học chọn; **Quét chữ** (Vision, trên máy) và **giọng nói**
+  (Speech) điền ô tìm. Chi tiết, ma trận API và bằng chứng: `docs/ui-redesign/dictionary/README.md`.
 - Thẻ: thư viện bộ thẻ Realm cục bộ (tìm, sắp xếp, sửa, xoá), trình soạn bộ thẻ (cách đọc, ghi chú, ảnh từ Ảnh hoặc `https`, nhập hàng loạt, bản nháp) và màn học (lật, xáo trộn, trắc nghiệm, đọc to). Ảnh của thẻ nằm cục bộ vì backend Go chưa lưu ảnh cho thẻ; chi tiết, ma trận tương đương web và bằng chứng ở `docs/ui-redesign/cards/README.md`.
 - Cài đặt: giao diện, âm thanh, thông báo và tài khoản của website.
 
@@ -55,6 +59,35 @@ không còn mô tả đúng luồng đăng nhập này:
    xác nhận kết thúc phiên. Token và UUID nằm chung một mục Keychain (ghi nguyên tử); build không ký
    (`CODE_SIGNING_ALLOWED=NO`) không có Keychain nên đăng nhập báo lỗi lưu phiên, test Keychain bị skip.
 
+### Đăng nhập bằng Google
+
+Nút "Continue with Google" dùng GoogleSignIn SDK chỉ để lấy **Google ID token**; token này gửi một lần tới
+POST `/api/auth/google` (`{"idToken": "..."}` → `{"ok": true, "token": "..."}`), rồi `AuthSession` làm đúng như đăng nhập
+email: gọi `/auth/me`, lưu token ứng dụng + UUID vào Keychain. ID token của Google không bao giờ được lưu; SDK bị
+`signOut()` ngay sau khi lấy token. Server không tự liên kết tài khoản trùng email: trả 409 và app báo
+"đăng nhập bằng email và mật khẩu". 401 = Google token bị từ chối, 429 = quá nhiều lần, 500/503 = dịch vụ lỗi, mất mạng
+hiện thông báo riêng; đóng cửa sổ Google không phải lỗi.
+
+Hai loại OAuth client, đừng nhầm:
+
+| Build setting | Loại client | Dùng để |
+| --- | --- | --- |
+| `GOOGLE_SERVER_CLIENT_ID` (`BaseConfig.xcconfig`) | **Web application** (`112477118682-4b6pb2ph8i2lrbao13l90rvn5qitra4g…`) | `GIDServerClientID`: Google đặt làm `aud` của ID token, backend xác minh đúng giá trị này |
+| `GOOGLE_IOS_CLIENT_ID_PREFIX` (mỗi môi trường) | **iOS**, gắn với bundle ID | `GIDClientID` + URL scheme `com.googleusercontent.apps.<prefix>` (suy ra tự động) |
+
+Cần **hai** iOS client: `com.ds.FlashcardApp.dev` (Local) và `com.ds.FlashcardApp` (Production). Điền phần trước
+`.apps.googleusercontent.com` của client iOS vào `DevelopmentConfig.xcconfig` / `ReleaseConfig.xcconfig` (không phải bí mật)
+hoặc vào `local.local.xcconfig` / `production.local.xcconfig` (đã ignore). Để trống thì nút Google bị ẩn; Release để trống sẽ
+cảnh báo khi build. `scripts/validate-environment.sh` chặn prefix sai định dạng hoặc trùng Web client; app cũng tự tắt
+Google nếu client ID hỏng, bị đảo, hoặc URL scheme không khớp (`GoogleSignInConfiguration`). Backend local phải xác minh
+cùng Web client ID (`GOOGLE_OAUTH_CLIENT_ID`), nếu không đặt `GOOGLE_SERVER_CLIENT_ID` khác trong `local.local.xcconfig`.
+Trạng thái hiện tại: client iOS của **Production** (`com.ds.FlashcardApp`) đã điền trong `ReleaseConfig.xcconfig`;
+client của **Local** (`com.ds.FlashcardApp.dev`) chưa có nên nút Google ẩn khi chạy scheme Local/Debug. Tạo client iOS cho bundle
+`.dev` rồi điền vào `DevelopmentConfig.xcconfig` hoặc `local.local.xcconfig`. Để thử nút trên build Local mà chưa có client `.dev`,
+truyền `GOOGLE_IOS_CLIENT_ID_PREFIX=<prefix>` như build setting (UI test `GoogleLoginUITests` chạy theo cách này; hiện nút và mở hộp thoại
+đồng ý của hệ thống, nhưng Google có thể từ chối đăng nhập thật vì client gắn với bundle khác).
+Cần build có ký (Keychain) để chạy luồng Google; build `CODE_SIGNING_ALLOWED=NO` không có Keychain.
+
 Login/logout gửi `Origin` (scheme/host/port của API) theo CSRF allowlist của server.
 Không lưu cookie website/token vào UserDefaults hoặc log. Hủy request khi màn
 đăng nhập đóng; kết quả đến muộn không được khôi phục phiên đã đăng xuất. Lỗi 401
@@ -77,9 +110,10 @@ backend đang chạy. OpenAPI cũ chưa đủ để khẳng định mọi endpoi
 | Alamofire | Request API, validation và cancellation |
 | realm-swift | Bộ thẻ của người học và schema đang dùng |
 | Kingfisher | Tải/cache ảnh của thẻ đã lưu và avatar |
+| GoogleSignIn (10.x) | Chỉ lấy Google ID token cho `/auth/google`; kéo theo AppAuth, GTMAppAuth, GTMSessionFetcher, AppCheckCore |
 
 `Package.resolved` gồm các package trên và `realm-core` là dependency bắc cầu.
-Đã bỏ Firebase, Facebook SDK, GoogleSignIn, swift-log, Typist và các product test
+Đã bỏ Firebase, Facebook SDK, swift-log, Typist và các product test
 RxBlocking/RxTest không dùng. OSLog, UIRefreshControl, UIKeyboardLayoutGuide thay
 cho các wrapper tương ứng. Màn Thẻ viết lại không còn dùng MMTextView, SwipeCellKit hay CollectionViewPagingLayout nên đã gỡ cả ba.
 
@@ -102,8 +136,8 @@ Hai bundle ID tạo sandbox riêng. Không xóa database để sửa lỗi build
 Bootstrap chép bundle sang file tạm rồi đổi tên khi hoàn tất. Nếu lần chạy trước bị
 dừng, chỉ file ngắn hơn và khớp từng byte với phần đầu bundle mới được chép lại;
 store có bất kỳ thay đổi nào được giữ nguyên. Điều hướng chờ Realm mở thành công.
-Production không có URL mặc định; phase `Validate Environment` chặn build nếu
-chưa cấp API HTTPS hợp lệ. Test action của scheme Production dùng Debug để chạy
+Production dùng `https://kiokoto.com/api` (`ReleaseConfig.xcconfig`); phase `Validate Environment` chặn build nếu
+API không phải HTTPS hợp lệ hoặc cấu hình Google sai định dạng. Test action của scheme Production dùng Debug để chạy
 suite local, không xác nhận binary Release đã sẵn sàng phát hành.
 
 Đổi URL local bằng `FlashcardApp/Environments/local.local.xcconfig` (đã ignore):
@@ -112,7 +146,7 @@ suite local, không xác nhận binary Release đã sẵn sàng phát hành.
 PRODUCT_BASE_URL = http:/$()/localhost:18081/api
 ```
 
-Production dùng file `production.local.xcconfig` với URL HTTPS được cấp thực tế.
+`production.local.xcconfig` chỉ cần khi ghi đè URL production.
 Cú pháp `$()` tránh để `//` bị xcconfig hiểu là comment. ATS chỉ cho HTTP loopback;
 không bật `NSAllowsArbitraryLoads`. `localhost` chỉ dùng với Simulator trên máy
 chạy backend; trên iPhone thật, nó trỏ về chính điện thoại.
@@ -145,3 +179,16 @@ cùng đường vào thẻ offline/cài đặt. Không chạy suite UI khi serve
 Đăng nhập thành công với tài khoản thật, iPhone/iPad thật, migration store cũ và
 phát hành Release cần kiểm tra riêng. Không upload build/push/đổi credential nếu
 chưa được yêu cầu.
+
+### Tìm bằng chữ viết tay (từ điển)
+
+`Modules/DictionaryHandwriting` + `Services/HandwritingRecognitionService.swift`. Bộ nhận dạng tự viết, chạy trên máy, không gửi nét
+đi đâu: so nét người dùng vẽ với hình dạng nét của từng ký tự trong `Resources/HandwritingTemplates.bin` (6.589 kanji/kana, ~1,9 MB,
+dựng từ **KanjiVG** r20260714, © Ulrich Apel, CC BY-SA 3.0; ghi công trong `THIRD_PARTY_NOTICES.md`). Không phụ thuộc thứ tự nét, chịu
+được thiếu/thừa tối đa 2 nét, nhận cả hướng nét. Đây là dữ liệu hình dạng cho bộ nhận dạng, **không phải từ điển**: nghĩa, cách đọc,
+ví dụ vẫn lấy từ API; ký tự nhận dạng xong chỉ được đưa vào ô tìm kiếm.
+
+Dựng lại file: tải `kanjivg-<ngày>-main.zip` từ <https://github.com/KanjiVG/kanjivg/releases>, giải nén vào thư mục riêng, rồi
+`python3 -I scripts/build-handwriting-templates.py <thư-mục>/kanji FlashcardApp/Resources/HandwritingTemplates.bin`.
+Đã thử và loại: ML Kit Digital Ink (chỉ CocoaPods, phải tải model), Zinnia (không có SPM), `PKStrokeRecognizer` của PencilKit
+(iOS 27+, `supportedLanguages` không có tiếng Nhật trên iOS 27.2), Vision OCR trên ảnh nét vẽ (đúng 11/20 chữ sạch, 5/20 khi nét run).

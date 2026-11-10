@@ -113,8 +113,9 @@ giao diện, cỡ chữ ghi trong tên/bảng bên dưới); ảnh P0/P1 để s
 
 1. ~~**Thẻ**~~ — đã làm lại (thư viện, trình soạn, học thẻ): xem `docs/ui-redesign/cards/README.md`. `AppColors` (asset cũ) không còn được màn Thẻ dùng.
 2. ~~**Cài đặt**~~ — đã làm lại, xem §10.
-3. **Từ điển**: hàng kết quả vẫn dùng kiểu mặc định; `StateView` thay `message`.
-4. Kanji: chưa có trang chi tiết (chạm vẫn mở hộp thoại nghĩa); furigana chưa có trong dữ liệu API.
+3. ~~**Từ điển**~~ — đã làm lại cùng các màn chi tiết: xem `docs/ui-redesign/dictionary/README.md`.
+4. ~~Kanji: chưa có trang chi tiết~~ — đã có (kèm thứ tự nét); **furigana từng chữ vẫn chưa có trong dữ liệu API** (chỉ có dòng cách đọc cả câu).
+   Màn nội dung cấp độ (`level_content`) vẫn mở hộp thoại nghĩa khi chạm một dòng.
 5. Fixture backend local (`audit141 lexeme …`) hiển thị ở từ vựng J5; là dữ liệu, không phải lỗi UI.
 6. `UIScreen.main` deprecated ở `ListFlowLayout`/`GridFlowLayout`/`FadingEdgeCollectionView` (ngoài phạm vi).
 7. Chưa kiểm chứng: VoiceOver thật, Increase Contrast, Reduce Motion/Transparency bật, iPad, thiết bị thật, màn hình nhỏ hơn 17e.
@@ -198,9 +199,7 @@ lỗi này; test mức cell mới là bằng chứng.
 
 ## 11. Ngôn ngữ: Tiếng Việt, English, 日本語 (bắt buộc)
 
-**Cơ chế**: ngôn ngữ do iOS chọn (Cài đặt ▸ FlashcardApp ▸ Ngôn ngữ, hoặc ngôn ngữ hệ thống); hàng "Ngôn ngữ" trong Cài đặt hiển thị ngôn ngữ đang
-dùng bằng chính ngôn ngữ đó và mở trang cài đặt của app. Không có bộ chọn trong app: đổi ngôn ngữ lúc chạy phải can thiệp bundle, không phải
-cơ chế được hỗ trợ, và iOS đã khởi động lại app khi đổi ngôn ngữ theo app. Ngôn ngữ không hỗ trợ → English (development language).
+**Cơ chế**: mặc định theo ngôn ngữ hệ thống. Hàng "Ngôn ngữ" trong Cài đặt là bộ chọn kiểu `.choice` (Theo hệ thống / Tiếng Việt / English / 日本語), lưu `LanguageOption` trong `UserDefaults` và ghi (hoặc xoá, khi chọn "Theo hệ thống") khoá `AppleLanguages`. iOS chỉ đọc khoá này lúc khởi động, và `AppLocalization` đổi chuỗi ngay lúc đang chạy (đổi class của `Bundle.main` để đọc chuỗi từ `.lproj` đã chọn), rồi dựng lại tab bar ở đúng tab Cài đặt. Ngôn ngữ không hỗ trợ → English (development language).
 
 **Nguồn chuỗi**: `FlashcardApp/Resources/Localizable.xcstrings` (String Catalog, 118 khoá, đủ vi/en/ja, thay `Localizable.strings` cũ chỉ có khoá không dùng). Khoá
 là chữ tiếng Anh; số ít/số nhiều của "N cards" dùng biến thể plural. Mã dùng `NSLocalizedString`; không viết cứng chuỗi (AGENTS.md).
