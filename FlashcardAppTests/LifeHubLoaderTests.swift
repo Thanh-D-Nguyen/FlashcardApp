@@ -79,7 +79,7 @@ final class TodayLifeHubLoaderTests: XCTestCase {
         XCTAssertEqual(card(.date)?.provenance, .onDevice, "The date is worked out here")
         XCTAssertEqual(card(.weather)?.provenance, .live)
         XCTAssertEqual(cards.filter { $0.provenance == .sample }.count, 7, "Every other topic is an example and says so")
-        XCTAssertTrue(cards.filter { $0.provenance == .sample }.allSatisfy { $0.meta.contains(text("Example content · not live data yet")) })
+        XCTAssertTrue(cards.filter { $0.provenance == .sample }.allSatisfy { !$0.meta.contains(text("Example")) })
         XCTAssertTrue(cards.filter { $0.provenance == .sample }.allSatisfy { $0.status == .ready && $0.lesson != nil })
         XCTAssertEqual(hub.section?.header.dateText, "10月24日（土）")
         XCTAssertEqual(hub.section?.cityName, "Tokyo")

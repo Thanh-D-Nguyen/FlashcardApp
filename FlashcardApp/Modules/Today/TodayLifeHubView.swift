@@ -54,8 +54,10 @@ final class LifeTopicCardView: UIView {
         meta.apply(.metadata)
         meta.numberOfLines = 1
         meta.lineBreakMode = .byTruncatingTail
-        chips.axis = .vertical
-        chips.spacing = Design.Spacing.xs
+        chips.axis = .horizontal
+        chips.distribution = .fillProportionally
+        chips.alignment = .top
+        chips.spacing = Design.Spacing.m
         spinner.hidesWhenStopped = true
         sheen.colors = [UIColor.clear.cgColor, UIColor.white.withAlphaComponent(0.55).cgColor, UIColor.clear.cgColor]
         sheen.startPoint = CGPoint(x: 0, y: 0.5)
@@ -80,7 +82,7 @@ final class LifeTopicCardView: UIView {
         column.translatesAutoresizingMaskIntoConstraints = false
         addSubview(column)
         addSubview(badgeBox)
-        sceneHeightConstraint = scene.heightAnchor.constraint(equalToConstant: 96)
+        sceneHeightConstraint = scene.heightAnchor.constraint(equalToConstant: 120)
         NSLayoutConstraint.activate([
             column.topAnchor.constraint(equalTo: topAnchor),
             column.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
@@ -112,9 +114,6 @@ final class LifeTopicCardView: UIView {
     func configure(_ card: LifeFeedCard) {
         self.card = card
         cardID = card.id
-        let showsScene = card.topic != .date
-        scene.isHidden = !showsScene
-        sceneHeightConstraint.isActive = showsScene
         scene.configure(scene: card.scene, topic: card.topic)
         badge.text = Self.badgeText(card.provenance)
         let tint = card.provenance == .sample ? Design.Color.warning : card.provenance == .live ? Design.Color.success : Design.Color.accent
@@ -166,33 +165,41 @@ final class LifeTopicCardView: UIView {
         configuration.imagePlacement = .trailing
         configuration.imagePadding = Design.Spacing.s
         button.configuration = configuration
-        button.isHidden = busy || card.ctaTitle.isEmpty
         button.accessibilityIdentifier = "life_card_action_\(card.id)"
-        accessibilityIdentifier = "life_card_\(card.topic.rawValue)"
+        updateActions()
+        accessibilityIdentifier = "life_card_\(card.id)"
 
         let facts = card.chips.map(\.text).joined(separator: ", ")
         headline.accessibilityLabel = [card.eyebrow.capitalized, card.headlineJapanese, card.summary, facts, card.meta].filter { !$0.isEmpty }.joined(separator: ". ")
         [eyebrow, reading, summary, meta, chips, badgeBox].forEach { $0.isAccessibilityElement = false }
         headline.isAccessibilityElement = true
         headline.accessibilityTraits = card.status == .ready ? .button : .staticText
+        headline.accessibilityHint = card.status == .ready ? card.ctaTitle : nil
+        updateActions()
+    }
+
+    /// A ready lesson is opened by a tap on the whole card, so it needs no button of its own (VoiceOver: the headline, with the action as
+    /// its hint). A card that waits for its data or a location shows a labelled button, which is hidden while the card is busy.
+    private func updateActions() {
+        guard let card else { return }
+        let busy = card.status == .loading || card.status == .locating
+        button.isHidden = busy || card.status == .ready || card.ctaTitle.isEmpty
         accessibilityElements = [headline] + (button.isHidden ? [] : [button])
     }
 
     /// Keep the default card compact, but never trade away readable content at accessibility text sizes.
     private func updateDensity() {
         let accessibilityText = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        chips.axis = accessibilityText ? .vertical : .horizontal
+        chips.distribution = accessibilityText ? .fill : .fillProportionally
+        chips.spacing = accessibilityText ? Design.Spacing.xs : Design.Spacing.m
+        updateActions()
         summary.numberOfLines = accessibilityText ? 0 : 2
         meta.numberOfLines = accessibilityText ? 0 : 1
         meta.lineBreakMode = accessibilityText ? .byWordWrapping : .byTruncatingTail
 
-        guard card?.topic == .date else {
-            content.layoutMargins.top = Design.Spacing.s
-            return
-        }
-        // The date card has no scene, so reserve exactly enough room for the overlaid provenance badge.
-        // This grows with Dynamic Type instead of relying on a fixed 36-point gap.
-        let badgeHeight = badgeBox.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
-        content.layoutMargins.top = Design.Spacing.m + badgeHeight + Design.Spacing.s
+        // Every card has a scene now, and the provenance badge is laid over it.
+        content.layoutMargins.top = Design.Spacing.s
     }
 
     private func chipRow(_ chip: LifeChip) -> UIView {
@@ -253,8 +260,8 @@ final class TodayDateHeaderView: UIView {
         day.translatesAutoresizingMaskIntoConstraints = false
         [strip, month, day].forEach(tile.addSubview)
         NSLayoutConstraint.activate([
-            tile.widthAnchor.constraint(equalToConstant: 64),
-            tile.heightAnchor.constraint(equalToConstant: 72),
+            tile.widthAnchor.constraint(equalToConstant: 56),
+            tile.heightAnchor.constraint(equalToConstant: 64),
             strip.topAnchor.constraint(equalTo: tile.topAnchor),
             strip.leadingAnchor.constraint(equalTo: tile.leadingAnchor),
             strip.trailingAnchor.constraint(equalTo: tile.trailingAnchor),
@@ -347,7 +354,7 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
     override init(frame: CGRect) {
         super.init(frame: frame)
         titleLabel.apply(.eyebrow)
-        titleLabel.text = NSLocalizedString("LEARN FROM LIFE", comment: "Section label on Today")
+        titleLabel.text = NSLocalizedString("TODAY IN JAPAN", comment: "Section label on Today")
         titleLabel.accessibilityTraits = .header
         var city = UIButton.Configuration.plain()
         city.image = UIImage(systemName: "mappin.and.ellipse")

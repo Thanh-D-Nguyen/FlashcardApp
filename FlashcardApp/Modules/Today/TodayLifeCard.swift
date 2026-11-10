@@ -185,7 +185,7 @@ final class TodayLifeLoader: TodayLifeLoading {
         if lesson.source.licenseStatus == .nonCommercialDevOnly { tags.append(text("Development source")) }
         let minutes = String.localizedStringWithFormat(text("About %lld minutes"), lesson.estimatedMinutes)
         return TodayLifeCard(
-            eyebrow: text("LEARN FROM LIFE"), headline: lesson.titleJapanese, reading: lesson.titleReading,
+            eyebrow: text("TODAY IN JAPAN"), headline: lesson.titleJapanese, reading: lesson.titleReading,
             summary: summary, facts: facts.joined(separator: " · "),
             meta: String(format: text("%1$@ · observed %2$@ (Japan time)"), lesson.source.providerName, time) + " · " + minutes + " · " + lesson.level,
             tags: tags, ctaTitle: text("Learn this lesson"))

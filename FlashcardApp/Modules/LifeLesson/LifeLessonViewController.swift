@@ -256,6 +256,51 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
 
     // MARK: Story
 
+    /// Where the facts come from is a footnote: one tap away, with the attribution the licence asks for and the link to the source.
+    private func showSource(_ story: LifeStoryState, from button: UIView) {
+        let stack = UIStackView(arrangedSubviews: [label(story.sourceLine, role: .metadata)])
+        stack.axis = .vertical
+        stack.spacing = Design.Spacing.s
+        let controller = UIViewController()
+        if !story.attribution.isEmpty {
+            stack.addArrangedSubview(label(story.attribution, role: .meaning))
+            let open = UIButton(type: .system)
+            var link = UIButton.Configuration.plain()
+            link.title = NSLocalizedString("Open source page", comment: "Opens the data source's own page from the source popover")
+            link.image = UIImage(systemName: "arrow.up.right")
+            link.imagePlacement = .trailing
+            link.imagePadding = Design.Spacing.xs
+            link.contentInsets = .zero
+            open.configuration = link
+            open.contentHorizontalAlignment = .leading
+            open.accessibilityTraits = .link
+            open.accessibilityIdentifier = "life_source_link"
+            open.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+            open.addAction(UIAction { [weak self, weak controller] _ in
+                controller?.dismiss(animated: true) { self?.presenter.openSource() }
+            }, for: .primaryActionTriggered)
+            stack.addArrangedSubview(open)
+        }
+        controller.view.backgroundColor = Design.Color.surface
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        controller.view.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: controller.view.topAnchor, constant: Design.Spacing.m),
+            stack.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor, constant: -Design.Spacing.s),
+            stack.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor, constant: Design.Spacing.m),
+            stack.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor, constant: -Design.Spacing.m)
+        ])
+        controller.modalPresentationStyle = .popover
+        controller.preferredContentSize = controller.view.systemLayoutSizeFitting(CGSize(width: 300, height: UIView.layoutFittingCompressedSize.height),
+                                                                                  withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
+        controller.popoverPresentationController?.sourceView = button
+        controller.popoverPresentationController?.permittedArrowDirections = [.up, .down]
+        controller.popoverPresentationController?.delegate = sourcePopoverStyle
+        present(controller, animated: true)
+    }
+
+    private let sourcePopoverStyle = SourcePopoverStyle()
+
     private func storyViews(_ story: LifeStoryState) -> [UIView] {
         let sceneView = LifeSceneView()
         sceneView.layer.cornerRadius = 22
@@ -275,7 +320,22 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
             views.append(wrapped(story.tags.map { tag($0, color: Design.Color.warning) }))
         }
 
-        var factViews: [UIView] = [eyebrow(story.factsHeader)]
+        let sourceButton = UIButton(type: .system)
+        var info = UIButton.Configuration.plain()
+        info.image = UIImage(systemName: "info.circle")
+        info.baseForegroundColor = Design.Color.textSecondary
+        info.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 0)
+        sourceButton.configuration = info
+        sourceButton.accessibilityLabel = NSLocalizedString("Source", comment: "Info button that shows where the facts come from")
+        sourceButton.accessibilityIdentifier = "life_source_info"
+        sourceButton.setContentHuggingPriority(.required, for: .horizontal)
+        sourceButton.addAction(UIAction { [weak self, weak sourceButton] _ in
+            guard let self, let sourceButton else { return }
+            self.showSource(story, from: sourceButton)
+        }, for: .primaryActionTriggered)
+        let header = UIStackView(arrangedSubviews: [eyebrow(story.factsHeader), sourceButton])
+        header.alignment = .center
+        var factViews: [UIView] = [header]
         factViews += story.factChips.map { chip in
             let text = label(chip.text, role: .meaning)
             let image = UIImageView(image: chip.symbol.flatMap { UIImage(systemName: $0) })
@@ -288,21 +348,6 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
             row.spacing = Design.Spacing.s
             row.alignment = .firstBaseline
             return row
-        }
-        factViews.append(label(story.sourceLine, role: .metadata))
-        if !story.attribution.isEmpty {
-            let source = UIButton(type: .system)
-            var link = UIButton.Configuration.plain()
-            link.title = story.attribution
-            link.contentInsets = .zero
-            link.titleAlignment = .leading
-            source.configuration = link
-            source.contentHorizontalAlignment = .leading
-            source.accessibilityTraits = .link
-            source.accessibilityIdentifier = "life_source_link"
-            source.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
-            source.addAction(UIAction { [weak self] _ in self?.presenter.openSource() }, for: .primaryActionTriggered)
-            factViews.append(source)
         }
         let facts = card(factViews, spacing: Design.Spacing.xs)
         facts.accessibilityIdentifier = "life_facts"
@@ -528,4 +573,9 @@ final class LifeWordRow: UIControl {
         accessibilityTraits = row.isSelected ? [.button, .selected] : .button
         alpha = enabled ? 1 : 0.7
     }
+}
+
+/// Keeps the source popover a popover on iPhone instead of a sheet.
+private final class SourcePopoverStyle: NSObject, UIPopoverPresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle { .none }
 }

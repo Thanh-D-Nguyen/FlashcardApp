@@ -238,7 +238,7 @@ final class LifeLessonPresenter {
             eyebrow: eyebrow,
             title: lesson.titleJapanese, titleReading: lesson.titleReading,
             topic: lesson.topic, scene: Self.scene(for: lesson), tags: tags,
-            factsHeader: lesson.provenance == .live ? Self.text("FROM THE DATA SOURCE") : Self.text("FACTS"), factChips: lesson.chips,
+            factsHeader: Self.text("FACTS"), factChips: lesson.chips,
             sourceLine: sourceLine,
             attribution: lesson.source.attributionText ?? "",
             sentencesHeader: Self.text("SENTENCES TO LEARN"),

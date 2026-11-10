@@ -1,26 +1,21 @@
 import UIKit
 
-/// Today: one raised block with where the learner is and the one thing to do next, the deck and session length they can change,
-/// what was saved today, and the way into the levels. Native large title and tab bar; the hero is content, never glass.
+/// Today: the day and what was saved in it, then the life hub as the banner to learn from, then the deck being studied with its session
+/// length (the learner scrolls for it), and the levels at the end. Native large title and tab bar; the hero is content, never glass.
 final class TodayViewController: BaseViewController, TodayViewInterface {
     var presenter: TodayPresenterInterface!
 
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
     private let dateHeader = TodayDateHeaderView()
-    private let subtitleLabel = UILabel()
-    private let heroView = TodayHeroView()
-    private let failureView = TodayFailureView()
-    private let settingsGroup = UIStackView()
-    private let deckRow = TodayRowView()
-    private let timeRow = TodayRowView()
     private let progressGroup = UIStackView()
-    private let progressHeader = UILabel()
     private let progressTitle = UILabel()
     private let progressDetail = UILabel()
-    private let levelsRow = TodayRowView()
+    private let heroView = TodayHeroView()
+    private let failureView = TodayFailureView()
     private let hubView = TodayLifeHubView()
     private let scenarioBanner = TodayScenarioBannerView()
+    private let levelsRow = TodayRowView()
     private var refreshObservers: [NSObjectProtocol] = []
 
     override func viewDidLoad() {
@@ -68,25 +63,13 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         scrollView.addSubview(stack)
         view.addSubview(scrollView)
 
-        subtitleLabel.apply(.reading)
-        subtitleLabel.accessibilityIdentifier = "today_subtitle"
-
-        settingsGroup.axis = .vertical
-        deckRow.accessibilityIdentifier = "today_deck_row"
-        timeRow.accessibilityIdentifier = "today_time_row"
-        [deckRow, timeRow].forEach(settingsGroup.addArrangedSubview)
-
+        // The title says "today" itself ("Hôm nay …"), so the block needs no separate heading.
         progressGroup.axis = .vertical
         progressGroup.spacing = Design.Spacing.xs
-        progressHeader.apply(.metadata)
-        progressHeader.font = Design.TextRole.metadata.font.withWeight(.semibold)
-        progressHeader.text = NSLocalizedString("Today's progress", comment: "")
-        progressHeader.accessibilityTraits = .header
         progressTitle.apply(.meaning)
         progressTitle.accessibilityIdentifier = "today_progress"
         progressDetail.apply(.metadata)
-        [progressHeader, progressTitle, progressDetail].forEach(progressGroup.addArrangedSubview)
-        progressGroup.setCustomSpacing(Design.Spacing.s, after: progressHeader)
+        [progressTitle, progressDetail].forEach(progressGroup.addArrangedSubview)
 
         levelsRow.configure(title: NSLocalizedString("Study by level", comment: "Row that opens the JLPT levels"), value: nil)
         levelsRow.accessibilityIdentifier = "today_levels_row"
@@ -94,11 +77,11 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         dateHeader.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, subtitleLabel, heroView, failureView, settingsGroup, progressGroup, levelsRow, hubView, scenarioBanner].forEach(stack.addArrangedSubview)
-        stack.setCustomSpacing(Design.Spacing.s, after: subtitleLabel)
-        stack.setCustomSpacing(Design.Spacing.m, after: settingsGroup)
-        stack.setCustomSpacing(Design.Spacing.l, after: progressGroup)
-        stack.setCustomSpacing(Design.Spacing.xl, after: levelsRow)
+        [dateHeader, progressGroup, hubView, scenarioBanner, heroView, failureView, levelsRow].forEach(stack.addArrangedSubview)
+        stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
+        stack.setCustomSpacing(Design.Spacing.m, after: hubView)
+        stack.setCustomSpacing(Design.Spacing.l, after: scenarioBanner)
+        stack.setCustomSpacing(Design.Spacing.l, after: heroView)
 
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -112,21 +95,18 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         ])
 
         heroView.onPrimary = { [weak self] in self?.presenter.primaryAction() }
+        heroView.onChangeDeck = { [weak self] in self?.presenter.changeDeck() }
+        heroView.onChangeBudget = { [weak self] in self?.presenter.changeBudget() }
         failureView.onRetry = { [weak self] in self?.presenter.retry() }
         hubView.onCardAction = { [weak self] id in self?.presenter.openLifeCard(id: id) }
         hubView.onChangeCity = { [weak self] in self?.presenter.changeLifeCity() }
         scenarioBanner.addAction(UIAction { [weak self] _ in self?.presenter.openScenarios() }, for: .touchUpInside)
-        // A plain UIControl sends touchUpInside (only a UIButton maps its tap to primaryActionTriggered).
-        deckRow.addAction(UIAction { [weak self] _ in self?.presenter.changeDeck() }, for: .touchUpInside)
-        timeRow.addAction(UIAction { [weak self] _ in self?.presenter.changeBudget() }, for: .touchUpInside)
         levelsRow.addAction(UIAction { [weak self] _ in self?.presenter.openLevels() }, for: .touchUpInside)
     }
 
     // MARK: TodayViewInterface
 
     func render(_ state: TodayViewState) {
-        subtitleLabel.text = state.subtitle
-        subtitleLabel.isHidden = state.subtitle.isEmpty
         switch state.phase {
         case .failed:
             heroView.isHidden = true
@@ -135,12 +115,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         case .loaded:
             failureView.isHidden = true
             heroView.isHidden = state.hero == nil
-            if let hero = state.hero { heroView.configure(hero) }
-        }
-        settingsGroup.isHidden = state.rows == nil
-        if let rows = state.rows {
-            deckRow.configure(title: NSLocalizedString("Study deck", comment: ""), value: rows.deckName)
-            timeRow.configure(title: NSLocalizedString("Session length", comment: ""), value: rows.sessionLength)
+            if let hero = state.hero { heroView.configure(hero, rows: state.rows) }
         }
         progressGroup.isHidden = state.progress == nil
         if let progress = state.progress {
@@ -157,18 +132,28 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     }
 }
 
-/// The raised indigo block of Today.
+/// The raised indigo block of Today: the deck being studied, what is due in it, and its session length. The play icon at the top right
+/// studies the deck; the title opens the deck choice; the session length is changed on its chip. Without a deck there is nothing to play,
+/// so the one action is a text button.
 final class TodayHeroView: UIView {
     var onPrimary: (() -> Void)?
+    var onChangeDeck: (() -> Void)?
+    var onChangeBudget: (() -> Void)?
 
     private let eyebrow = UILabel()
+    private let titleControl = UIControl()
     private let titleLabel = UILabel()
+    private let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
+    private let playButton = UIButton(configuration: Design.Button.heroIcon())
     private let figureLabel = UILabel()
     private let captionLabel = UILabel()
+    private let figureSpacer = UIView()
     private let figureRow = UIStackView()
     private let linesStack = UIStackView()
     private let button = UIButton(configuration: Design.Button.hero(title: ""))
+    private let sessionButton = UIButton(configuration: Design.Button.heroChip(title: ""))
     private var buttonTitle = ""
+    private var sessionTitle = ""
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -182,6 +167,34 @@ final class TodayHeroView: UIView {
         titleLabel.textColor = Design.Color.onHero
         titleLabel.accessibilityTraits = .header
         titleLabel.accessibilityIdentifier = "today_hero_title"
+        chevron.tintColor = Design.Color.onHeroSecondary
+        chevron.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .footnote)
+        chevron.setContentHuggingPriority(.required, for: .horizontal)
+
+        // A plain UIControl sends touchUpInside (only a UIButton maps its tap to primaryActionTriggered).
+        titleControl.accessibilityIdentifier = "today_deck_row"
+        titleControl.addAction(UIAction { [weak self] _ in self?.onChangeDeck?() }, for: .touchUpInside)
+        let titleRow = UIStackView(arrangedSubviews: [titleLabel, chevron])
+        titleRow.alignment = .center
+        titleRow.spacing = Design.Spacing.xs
+        titleRow.isUserInteractionEnabled = false
+        titleRow.translatesAutoresizingMaskIntoConstraints = false
+        titleControl.addSubview(titleRow)
+        NSLayoutConstraint.activate([
+            titleRow.topAnchor.constraint(equalTo: titleControl.topAnchor),
+            titleRow.bottomAnchor.constraint(equalTo: titleControl.bottomAnchor),
+            titleRow.leadingAnchor.constraint(equalTo: titleControl.leadingAnchor),
+            titleRow.trailingAnchor.constraint(equalTo: titleControl.trailingAnchor)
+        ])
+
+        playButton.accessibilityIdentifier = "today_primary"
+        playButton.addAction(UIAction { [weak self] _ in self?.onPrimary?() }, for: .primaryActionTriggered)
+        playButton.setContentHuggingPriority(.required, for: .horizontal)
+        NSLayoutConstraint.activate([
+            playButton.widthAnchor.constraint(equalToConstant: 44),
+            playButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+
         figureLabel.apply(.heroFigure)
         figureLabel.numberOfLines = 1
         figureLabel.adjustsFontSizeToFitWidth = true
@@ -192,18 +205,32 @@ final class TodayHeroView: UIView {
         captionLabel.textColor = Design.Color.onHeroSecondary
         figureRow.alignment = .lastBaseline
         figureRow.spacing = Design.Spacing.m
-        [figureLabel, captionLabel].forEach(figureRow.addArrangedSubview)
+        // The session length sits on the figure's row, at its trailing edge: one line instead of a row of its own.
+        figureSpacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        sessionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        [figureLabel, captionLabel, figureSpacer, sessionButton].forEach(figureRow.addArrangedSubview)
         linesStack.axis = .vertical
         linesStack.spacing = Design.Spacing.xs
+
         button.accessibilityIdentifier = "today_primary"
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
         button.addAction(UIAction { [weak self] _ in self?.onPrimary?() }, for: .primaryActionTriggered)
+        sessionButton.accessibilityIdentifier = "today_time_row"
+        sessionButton.addAction(UIAction { [weak self] _ in self?.onChangeBudget?() }, for: .primaryActionTriggered)
+        sessionButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+        sessionButton.setContentHuggingPriority(.required, for: .horizontal)
 
-        let stack = UIStackView(arrangedSubviews: [eyebrow, titleLabel, figureRow, linesStack, button])
+        let titleBlock = UIStackView(arrangedSubviews: [eyebrow, titleControl])
+        titleBlock.axis = .vertical
+        titleBlock.spacing = Design.Spacing.xs
+        let header = UIStackView(arrangedSubviews: [titleBlock, playButton])
+        header.alignment = .top
+        header.spacing = Design.Spacing.m
+
+        let stack = UIStackView(arrangedSubviews: [header, figureRow, linesStack, button])
         stack.axis = .vertical
-        stack.spacing = Design.Spacing.xs
-        stack.setCustomSpacing(Design.Spacing.s, after: titleLabel)
-        stack.setCustomSpacing(Design.Spacing.s, after: figureRow)
+        stack.spacing = Design.Spacing.s
+        stack.setCustomSpacing(Design.Spacing.xs, after: figureRow)
         stack.setCustomSpacing(Design.Spacing.m, after: linesStack)
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
@@ -216,6 +243,7 @@ final class TodayHeroView: UIView {
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: TodayHeroView, _) in
             view.updateFigureAxis()
             view.updateButton()
+            view.updateSessionButton()
         }
         updateFigureAxis()
     }
@@ -226,6 +254,7 @@ final class TodayHeroView: UIView {
     private func updateFigureAxis() {
         figureRow.axis = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? .vertical : .horizontal
         figureRow.alignment = figureRow.axis == .vertical ? .leading : .lastBaseline
+        figureSpacer.isHidden = figureRow.axis == .vertical
     }
 
     /// A capsule with an arrow turns into a blob that breaks words at accessibility sizes; there the arrow (decoration) goes and
@@ -239,12 +268,27 @@ final class TodayHeroView: UIView {
         button.configuration = configuration
     }
 
-    func configure(_ hero: TodayHero) {
+    private func updateSessionButton() {
+        sessionButton.configuration = Design.Button.heroChip(title: sessionTitle)
+    }
+
+    func configure(_ hero: TodayHero, rows: TodayRows?) {
+        let deckState = rows != nil
         eyebrow.text = hero.eyebrow
         titleLabel.text = hero.title
+        // Only a deck can be changed from its title: without one the title is plain text, read on its own.
+        titleControl.isUserInteractionEnabled = deckState
+        titleControl.isAccessibilityElement = deckState
+        titleControl.accessibilityTraits = deckState ? .button : []
+        titleControl.accessibilityLabel = deckState ? "\(NSLocalizedString("Study deck", comment: "")), \(hero.title)" : nil
+        titleLabel.isAccessibilityElement = !deckState
+        chevron.isHidden = !deckState
         figureLabel.text = hero.figure
         captionLabel.text = hero.caption
-        figureRow.isHidden = hero.figure == nil
+        figureLabel.isHidden = hero.figure == nil
+        captionLabel.isHidden = hero.caption == nil
+        // The row stays for the session length even when there is no count to show (nothing due, done for today).
+        figureRow.isHidden = hero.figure == nil && rows == nil
         linesStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for line in hero.lines {
             let label = UILabel()
@@ -254,12 +298,29 @@ final class TodayHeroView: UIView {
             linesStack.addArrangedSubview(label)
         }
         linesStack.isHidden = hero.lines.isEmpty
+
+        playButton.isHidden = !deckState
+        playButton.accessibilityLabel = hero.ctaTitle
+        button.isHidden = deckState
         buttonTitle = hero.ctaTitle
         updateButton()
-        // VoiceOver reads the number with its caption as one thing, then each line, then the button.
+
+        sessionButton.isHidden = rows == nil
+        if let rows {
+            sessionTitle = rows.sessionLength
+            updateSessionButton()
+            sessionButton.accessibilityLabel = "\(NSLocalizedString("Session length", comment: "")), \(rows.sessionLength)"
+        }
+
+        // VoiceOver reads the number with its caption as one thing, then each line, then the actions.
         figureLabel.accessibilityLabel = [hero.figure, hero.caption].compactMap { $0 }.joined(separator: " ")
         captionLabel.isAccessibilityElement = false
-        accessibilityElements = [eyebrow, titleLabel] + (hero.figure == nil ? [] : [figureLabel]) + linesStack.arrangedSubviews + [button]
+        let figure: [UIView] = hero.figure == nil ? [] : [figureLabel]
+        if deckState {
+            accessibilityElements = [titleControl] + figure + linesStack.arrangedSubviews + [playButton, sessionButton]
+        } else {
+            accessibilityElements = [eyebrow, titleLabel] + figure + linesStack.arrangedSubviews + [button]
+        }
     }
 }
 

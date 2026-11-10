@@ -12,15 +12,7 @@ enum LifeFeedMapper {
     static func card(for lesson: LifeLesson, language: AppLanguage) -> LifeFeedCard {
         let summary = (lesson.sentences.first ?? LifeLesson.Sentence(id: "", isAdvice: false, japanese: "", reading: "", translation: LifeText(vi: "", en: ""), explanation: LifeText(vi: "", en: ""))).translation.resolved(language)
         let minutes = String.localizedStringWithFormat(NSLocalizedString("About %lld minutes", comment: ""), lesson.estimatedMinutes)
-        let meta: String
-        switch lesson.provenance {
-        case .live:
-            meta = [lesson.source.providerName, minutes, lesson.level].joined(separator: " · ")
-        case .onDevice:
-            meta = [NSLocalizedString("Worked out on this device", comment: ""), minutes, lesson.level].joined(separator: " · ")
-        case .sample:
-            meta = [NSLocalizedString("Example content · not live data yet", comment: ""), minutes, lesson.level].joined(separator: " · ")
-        }
+        let meta = [minutes, lesson.level].joined(separator: " · ")
         return LifeFeedCard(id: lesson.id, topic: lesson.topic, status: .ready, provenance: lesson.provenance,
                             eyebrow: lesson.topic.title.uppercased(), headlineJapanese: lesson.titleJapanese, reading: lesson.titleReading,
                             summary: summary, chips: lesson.chips, meta: meta,
