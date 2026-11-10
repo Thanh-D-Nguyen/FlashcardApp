@@ -269,7 +269,7 @@ Commit: `feat(study): schedule reviews from persisted attempts`.
   nhưng nếu ai tách thành hai transaction thì test hiện tại vẫn qua); test múi giờ/DST chỉ khẳng định lịch là thời điểm tuyệt đối vì bộ lập
   lịch không dùng `Calendar`; tham số FSRS mặc định chưa hiệu chỉnh theo người học của app; ý nghĩa rating là giả thuyết sản phẩm.
 
-### L05 — Today từ dữ liệu thật (DONE — L05a logic `6ea9cda`, L05b giao diện `16e7db8`; sau L04)
+### L05 — Today từ dữ liệu thật (DONE — L05a logic `6ea9cda`, L05b giao diện `16e7db8`; kiểm chứng cuối 2026-10-23: `L05_VERIFIED_WITH_LIMITATIONS`)
 
 Phạm vi: `Modules/Home/`, Home/CardStudy wireframes và interactors,
 localization, HomePresenterTests và hành trình XCUITest.
@@ -318,16 +318,49 @@ Commit: `feat(home): show today's review plan`.
   `today_ax_xxxl_en_light.jpg`). Ở cỡ chữ AX XXXL nút hero từng vỡ chữ → bỏ mũi tên và dùng góc `.large` ở cỡ accessibility, đã chụp lại.
 - Lệch so với thiết kế U00: trạng thái "đã xong" không có nút "Xem kết quả"; chọn deck/thời lượng qua action sheet có dấu ✓; định danh
   `tab_levels` nay nằm trên tab Today (hàng "Cấp độ" mở Levels); "đến hạn" tính theo ngày lịch cục bộ; luyện tiếp có thể dùng thẻ chưa học.
-- **Chưa kiểm chứng / rủi ro còn lại**: (1) 3/5/10 phút và 20 giây/mục là giả thuyết, chưa qua usability test (U05); (2) 5 UI test gọi API
-  thật **NOT VERIFIED** vì backend `localhost:18081` không chạy (hạ tầng, không phải lỗi mã nguồn); (3) VoiceOver với hàng `UIControl`,
+- **Chưa kiểm chứng / rủi ro còn lại**: (1) 3/5/10 phút và 20 giây/mục là giả thuyết, chưa qua usability test (U05); (2) ~~5 UI test gọi API thật NOT VERIFIED~~ — đã chạy và PASS ở kiểm chứng cuối bên dưới; (3) VoiceOver với hàng `UIControl`,
   haptics, Reduce Motion, dark mode, iPad và DST chưa kiểm bằng runtime; (4) N5: `ensureSchedules`/băm nội dung chạy trên main thread mỗi lần
   nạp Today — chưa đo với deck lớn; (5) N6: phiên theo danh sách bỏ qua tuỳ chọn xáo trộn; (6) N9: chưa có alias `tab_today`.
 - Tiếp theo: L06 cần hợp đồng API/nội dung/quyền âm thanh đã xác minh (cổng sản phẩm); L07 cần pilot thật.
 
-### L06 — Một chủ đề tình huống (PLANNED; sau L05 và kiểm chứng API/nội dung)
+**Kiểm chứng cuối L05 (2026-10-23) — `L05_VERIFIED_WITH_LIMITATIONS`**
+- Môi trường: một Simulator iPhone 17 / iOS 27.0, cỡ chữ mặc định, scheme `FlashcardApp-Local`, XcodeBuildMCP, không song song. Backend `nihongo-bjt`
+  đã chạy sẵn: `pnpm local:status --stable` PASS ở 0/10/30/60 s (api, learner, admin, proxy, search, mailpit, postgres, redis, listeners đều ok).
+- 5 UI test API thật (báo cáo L05 chỉ nói "5 UI test gọi API thật", không nêu tên; tôi chọn 5 test trong `FlashcardAppUITests` mà việc nạp cấp độ/nội dung/tìm kiếm
+  phụ thuộc trực tiếp vào backend local — **đây là suy luận, không có danh sách gốc để đối chiếu**; các test API khác cũng đã chạy trong lượt toàn suite bên dưới): `testLiveLevelsAndContentCanBeBrowsedWithoutLogin`, `testLiveDictionarySearchDisplaysJapaneseAndVietnamese`,
+  `testFeaturedStartOpensVocabulary`, `testLevelCountOpensItsKindDirectly`, `testInterfaceFollowsTheAppLanguage` — **5/5 PASS** (RUNTIME, không mock).
+- Toàn bộ `FlashcardAppUITests`: 25 PASS / 0 fail / 1 skip (`testLiveLoginSurvivesRelaunchAndLogoutEndsTheSession` cần tài khoản). Test đó chạy riêng với tài khoản
+  dùng một lần tạo trên DB local và **build có ký ad-hoc** (cần Keychain; build `CODE_SIGNING_ALLOWED=NO` không chạy được): **PASS** (đăng nhập → phiên còn sau
+  khởi động lại → đăng xuất xóa phiên). Test hành trình Today (`testTodayStartsASession…`) và lưu lỗi/thử lại cũng PASS.
+- `FlashcardAppTests`: **628 PASS / 0 fail / 5 skip** (Keychain, build không ký) — không có thay đổi mã iOS nào trong phiên này, nên đây là xác nhận hồi quy,
+  gồm fixture nâng schema 5 → 6 giữ deck/card/ví dụ/attempt.
+- Không phát hiện lỗi mới, không sửa mã iOS. Quy tắc lịch (ngày cục bộ, tách `selfRecall`/`recognition`, retry cùng attempt không nhân đôi, ghi lỗi giữ nguyên thẻ)
+  vẫn được các test hiện có khóa; không đọc lại để viết lại.
+- **Hiệu năng (đo, không phải ước đoán)** — `TodayInteractor.plan()` chạy trên main thread; test tạm thời trên Realm file thật (đã hoàn nguyên, không còn trong cây
+  mã), Debug, Simulator, 10 deck × 500 thẻ, tốt nhất trong 3 lần:
+  | Dữ liệu | `plan()` |
+  | --- | --- |
+  | 5.000 thẻ, chưa có lượt học | 215 ms |
+  | 5.000 thẻ, 5.000 lượt + 5.000 lịch | 456 ms |
+  | 5.000 thẻ, 20.000 lượt + 5.000 lịch | 799 ms |
+  `deckChoices()` thêm 51 ms. Ghi 5.000 lượt tuần tự mất ~71 s khi gom lại (mỗi lượt một transaction, chỉ là chi phí seed của phép đo, không phải đường dùng của người học).
+  Kết luận: deck thực tế vài chục thẻ không đáng kể; với ≥ 5.000 thẻ Today có thể khựng ≥ 0,2–0,8 s mỗi lần nạp (suy luận: phần 215 ms còn lại khi chưa có lượt học
+  đến từ ánh xạ toàn bộ deck + băm `contentVersion`, phần còn lại tăng theo lượng lượt/lịch vì `ensureSchedules` và `schedules` vật chất hóa toàn bộ — chưa profile bằng Instruments).
+  Chưa sửa vì ràng buộc "chỉ dùng store trên main thread" cần thiết kế riêng; xem N5 bên dưới. Máy thật/Release chưa đo.
+- **Giới hạn còn lại (lý do không ghi `L05_VERIFIED` đầy đủ):** (1) 3/5/10 phút và 20 giây/mục vẫn là giả thuyết chưa qua usability test; (2) N5 hiệu năng với deck/lịch sử rất lớn
+  (đo trên); (3) VoiceOver với hàng `UIControl`, haptics, Reduce Motion, dark mode, iPad và DST chưa kiểm bằng runtime; (4) N6 phiên theo danh sách bỏ qua xáo trộn; (5) N9 chưa có alias
+  `tab_today`; (6) các lượt UI chỉ trên một Simulator, không phải thiết bị thật.
+
+### L06 — Một chủ đề tình huống (PLANNED; L06a audit xong 2026-10-23: `L06b_CONDITIONALLY_READY`)
 
 Khởi đầu bằng một chủ đề sinh hoạt, khoảng 10 tình huống; học nghe → phản hồi →
 giải thích → ôn lại biến thể. Không xây một engine truyện tổng quát trước khi có bài.
+
+**L06a — kết quả audit (2026-10-23)**: chi tiết, ma trận API/nội dung, kiến trúc, UX năm màn hình, rủi ro và backlog L06b ở
+[personalized-learning-l06a-audit.md](personalized-learning-l06a-audit.md). Tóm tắt: 5 endpoint scenario đã xác minh bằng mã, test và gọi runtime (hợp đồng chuẩn đã
+cập nhật trong `nihongo-bjt/docs/openapi.json`, chưa commit); CSRF/Bearer dùng được với cơ chế Origin sẵn có của `BJTLearnerAPI`; `complete` **không idempotent**; `attempts[].choices`
+là base64. Nội dung: chỉ **1** tình huống chơi được (email công sở, vi/ja, không audio, không rõ tác giả/giấy phép) → lát cắt kỹ thuật chỉ văn bản được phép làm (L06b), nhưng
+**điều kiện vào L06 về nội dung/âm thanh/quyền vẫn chưa đạt**, nên chưa phát hành cho người học.
 
 Điều kiện vào: đọc contract và response đã che thông tin riêng tư; xác nhận ID,
 nghĩa/ngữ cảnh, audio, nguồn/quyền dùng, ngôn ngữ và đáp án được người có chuyên môn duyệt.
