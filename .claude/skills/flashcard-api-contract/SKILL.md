@@ -10,9 +10,11 @@ source and redacted local responses; if an OpenAPI file is available, parse JSON
 and select only the operations and referenced schemas you need.
 
 The website currently uses POST `/api/auth/login` with email/password and an
-opaque session token, GET `/api/auth/me` and POST `/api/auth/logout`. Authentication
-is owned by `AuthSession` and `NativeAuthAPI`; do not restore social SDKs or a
-parallel bearer-header store. Public search and level APIs need no login.
+opaque session token, POST `/api/auth/google` with `{"idToken"}` (a Google ID token whose
+audience is the Web OAuth client; 401 rejected, 409 email already belongs to another account,
+429, 500/503), GET `/api/auth/me` and POST `/api/auth/logout`. Authentication
+is owned by `AuthSession` and `NativeAuthAPI`; GoogleSignIn is the only social SDK and only
+supplies the ID token. Do not add a parallel bearer-header store or store Google tokens. Public search and level APIs need no login.
 
 For each operation check method/path, security, path/query parameters, request
 required fields, nullability, response envelope and error status. Some checked-in

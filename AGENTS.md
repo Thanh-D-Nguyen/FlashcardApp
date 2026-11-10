@@ -12,7 +12,15 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
 - `Networks/BJTClient`: native website session auth, public search and level content.
   Confirm operations against the running backend and selected schemas; older
   Keycloak/Swagger contracts do not describe the current Go login flow.
-- `Services/AuthSession.swift`: Keychain session lifecycle and stale-response protection.
+- `Modules/Dictionary*` (tìm kiếm, `DictionaryEntry` chi tiết từ/kanji/ngữ pháp/câu, `DictionarySaved`, `DictionaryScan`, `DictionaryVoice`, `DictionaryHandwriting`):
+  nội dung từ điển đến từ API công khai (`BJTSearchAPI`, `BJTDictionaryAPI`); "Lưu" là bookmark của **tài khoản** (`BJTBookmarkAPI`, toggle
+  không idempotent, không tự thử lại); lịch sử chỉ ở `UserDefaults` (`DictionaryHistoryStore`). Thứ tự nét chỉ vẽ khi SHA-256 khớp
+  `strokeSvgHash` (`KanjiStrokeDrawing`). Đừng thêm dữ liệu từ điển, tách từ hay furigana tự bịa. Xem `docs/ui-redesign/dictionary/README.md`.
+- `Modules/Discover` (tab 5, "Khám phá") + `Modules/Magazine`: hub theo registry `DiscoverFeature` để thêm dần tính năng của website; Magazine đọc API công khai
+  `/api/magazine` (`BJTMagazineAPI`), lưu từ vào bộ thẻ "Magazine" (idempotent). Bài Loto **không** nằm trong danh sách Magazine mà có màn riêng `Modules/Loto` (thẻ nổi bật đầu Khám phá): bộ số Loto 6/7 kèm đếm ngược, lý do chọn số và câu "mọi tổ hợp có xác suất như nhau" luôn hiện trước các bộ số; không mua vé, không hứa trúng. Cách thêm tính năng mới và giới hạn: `docs/ui-redesign/magazine/README.md`.
+- `Services/AuthSession.swift`: Keychain session lifecycle and stale-response protection. Email and
+  Google sign-in share one path; the Google ID token (`Services/GoogleIDTokenProvider.swift`) is exchanged
+  once at `POST /auth/google` and never stored. Never link a Google account to a password account by email.
   API results keep backend UUIDs; remote deck/progress synchronization is not implemented.
 - `Modules/Card` (tab 3, "Thẻ"): bốn mục như web — **Ôn tập** (`Modules/CardReview`, `GET /reviews/due`, đánh giá `POST /reviews/{id}` **một lần, không tự thử lại**),
   **Của tôi** (bộ trên máy + "Trên tài khoản"), **Công khai**, **Gần đây** (cùng `GET /flashcards/decks`; server xoá `ownerUserId` của bộ không phải của mình) và
@@ -20,7 +28,7 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
 - `Services/RealmService.swift`: Realm stays the local store for the learner's own data (decks and
   cards `RDesk`/`RCard`, and their own changes to example sentences `RCardExample`; schema 3) and is where
   future caches live (add models to `storedTypes`).
-  **The app bundles no database and keeps no dictionary for now**: words, kanji, grammar, example
+  **The app bundles no database and keeps no dictionary for now** (the one bundled data file is `Resources/HandwritingTemplates.bin`, KanjiVG stroke *shapes* for the handwriting recognizer — no meanings, readings or examples): words, kanji, grammar, example
   sentences and suggestions come from the API. The user plans a download mechanism for dictionary
   data later; until they ask for it, do not re-add the bundled `flash_card.realm` or dictionary
   tables. Never delete the learner's decks; the schema-2 migration only empties the retired
@@ -53,9 +61,11 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
    Realm key/schema changes require a migration and upgrade-fixture test, including
    saved decks, card references and favorites. Never invent a DTO from an endpoint
    name; confirm payloads against the contract and a redacted local response.
-8. Local and production use distinct bundle IDs and app sandboxes.
-   Remote URLs are currently unprovisioned. Never substitute localhost or a made-up
-   host for missing remote configuration, and never relax ATS globally.
+8. Local and production use distinct bundle IDs and app sandboxes. Production
+   talks to `https://kiokoto.com/api` (`ReleaseConfig.xcconfig`); local to
+   `http://localhost:18081/api`. Never substitute localhost or a made-up host for missing
+   remote configuration, and never relax ATS globally. Google sign-in needs one iOS OAuth
+   client **per bundle ID** plus the shared Web client (`docs/DEVELOPMENT.md` ▸ Google).
 9. Add a regression test before a behavior fix. Run relevant XCTest, integration
    and UI checks for the affected flow. Aim for ≥80% meaningful coverage of new
    domain logic; report measured scope, never assert whole-app coverage from a
