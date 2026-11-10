@@ -8,6 +8,7 @@
 //
 
 import UIKit
+import AuthenticationServices
 import RxSwift
 
 /// Sign-in screen. Editorial and flat on the paper background: a small brand seal, a serif headline, two labelled
@@ -27,6 +28,11 @@ final class MailLoginViewController: BaseViewController {
     private let errorLabel = UILabel()
     private lazy var errorRow = UIStackView(arrangedSubviews: [errorIcon, errorLabel])
     private let signInButton = UIButton(type: .system)
+    private let googleButton = UIButton(type: .system)
+    private let appleButton = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
+    private let appleButtonDark = ASAuthorizationAppleIDButton(type: .signIn, style: .white)
+    private lazy var appleButtons = UIStackView(arrangedSubviews: [appleButton, appleButtonDark])
+    private lazy var orDivider = Self.makeOrDivider()
     private let continueWithoutLoginButton = UIButton(type: .system)
 
     init() {
@@ -50,6 +56,13 @@ final class MailLoginViewController: BaseViewController {
         view.endEditing(true)
         passwordField.textField.text = nil
         setPasswordRevealed(false)
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            updateAppleButtonAppearance()
+        }
     }
 
     // MARK: - Setup
@@ -126,9 +139,26 @@ final class MailLoginViewController: BaseViewController {
         continueWithoutLoginButton.accessibilityIdentifier = "continueWithoutLoginButton"
         continueWithoutLoginButton.addTarget(self, action: #selector(continueWithoutLoginAction), for: .touchUpInside)
 
-        for button in [signInButton, continueWithoutLoginButton] {
+        googleButton.configuration = Self.googleConfiguration(title: presenter.googleButtonText)
+        googleButton.accessibilityIdentifier = "google_login_button"
+        googleButton.addTarget(self, action: #selector(loginWithGoogleAction), for: .touchUpInside)
+        appleButton.accessibilityIdentifier = "apple_login_button"
+        appleButton.addTarget(self, action: #selector(loginWithAppleAction), for: .touchUpInside)
+        appleButtonDark.accessibilityIdentifier = "apple_login_button"
+        appleButtonDark.addTarget(self, action: #selector(loginWithAppleAction), for: .touchUpInside)
+        appleButtons.axis = .vertical
+        updateAppleButtonAppearance()
+        // Without a valid OAuth client for this build, the option is not offered at all.
+        googleButton.isHidden = !presenter.isGoogleSignInAvailable
+
+        for button in [signInButton, googleButton, appleButtons, continueWithoutLoginButton] {
             button.heightAnchor.constraint(greaterThanOrEqualToConstant: 52).isActive = true
         }
+    }
+
+    private func updateAppleButtonAppearance() {
+        appleButton.isHidden = traitCollection.userInterfaceStyle == .dark
+        appleButtonDark.isHidden = !appleButton.isHidden
     }
 
     /// Both actions use the same headline weight so the pair reads as one set.
@@ -140,6 +170,58 @@ final class MailLoginViewController: BaseViewController {
             return attributes
         }
         return configuration
+    }
+
+    /// Google's light/dark button theme (white or near-black fill, grey outline, standard "G"), in the screen's capsule
+    /// shape and Dynamic Type headline so it sits with the other two actions.
+    private static func googleConfiguration(title: String) -> UIButton.Configuration {
+        func color(light: UInt32, dark: UInt32) -> UIColor {
+            func rgb(_ value: UInt32) -> UIColor {
+                UIColor(red: CGFloat((value >> 16) & 0xFF) / 255, green: CGFloat((value >> 8) & 0xFF) / 255,
+                        blue: CGFloat(value & 0xFF) / 255, alpha: 1)
+            }
+            return UIColor { $0.userInterfaceStyle == .dark ? rgb(dark) : rgb(light) }
+        }
+        var configuration = UIButton.Configuration.plain()
+        configuration.title = title
+        configuration.image = googleLogo()
+        configuration.imagePadding = Design.Spacing.m
+        configuration.cornerStyle = .capsule
+        configuration.buttonSize = .large
+        configuration.baseForegroundColor = color(light: 0x1F1F1F, dark: 0xE3E3E3)
+        configuration.background.backgroundColor = color(light: 0xFFFFFF, dark: 0x131314)
+        configuration.background.strokeColor = color(light: 0x747775, dark: 0x8E918F)
+        configuration.background.strokeWidth = 1
+        return styled(configuration)
+    }
+
+    private static func googleLogo() -> UIImage? {
+        guard let logo = UIImage(named: "Google Logo") else { return nil }
+        let size = CGSize(width: 20, height: 20)
+        return UIGraphicsImageRenderer(size: size).image { _ in logo.draw(in: CGRect(origin: .zero, size: size)) }
+            .withRenderingMode(.alwaysOriginal)
+    }
+
+    private static func makeOrDivider() -> UIView {
+        func line() -> UIView {
+            let line = UIView()
+            line.backgroundColor = Design.Color.separator
+            line.heightAnchor.constraint(equalToConstant: 1).isActive = true
+            return line
+        }
+        let label = UILabel()
+        label.apply(.metadata)
+        label.textColor = Design.Color.textSecondary
+        label.text = NSLocalizedString("or", comment: "Divider between email sign-in and Google sign-in")
+        label.isAccessibilityElement = false
+        let row = UIStackView(arrangedSubviews: [line(), label, line()])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = Design.Spacing.m
+        row.arrangedSubviews[0].widthAnchor.constraint(equalTo: row.arrangedSubviews[2].widthAnchor).isActive = true
+        // Purely visual: VoiceOver users meet the two buttons one after the other.
+        row.isAccessibilityElement = false
+        return row
     }
 
     private func configureErrorRow() {
@@ -193,7 +275,7 @@ final class MailLoginViewController: BaseViewController {
         fields.axis = .vertical
         fields.spacing = Design.Spacing.l + Design.Spacing.xs
 
-        let actions = UIStackView(arrangedSubviews: [signInButton, continueWithoutLoginButton])
+        let actions = UIStackView(arrangedSubviews: [signInButton, orDivider, googleButton, appleButtons, continueWithoutLoginButton])
         actions.axis = .vertical
         actions.spacing = Design.Spacing.m
 
@@ -257,15 +339,25 @@ final class MailLoginViewController: BaseViewController {
     // MARK: - Rendering
 
     private func render(_ state: MailLoginViewState) {
-        let isLoading = state == .loading
+        let isEmailLoading = state == .loading
+        let isGoogleLoading = state == .signingInWithGoogle
+        let isAppleLoading = state == .signingInWithApple
+        let isBusy = isEmailLoading || isGoogleLoading || isAppleLoading
         var configuration = signInButton.configuration
-        configuration?.showsActivityIndicator = isLoading
-        configuration?.title = isLoading ? NSLocalizedString("Signing in…", comment: "") : presenter.loginButtonText
+        configuration?.showsActivityIndicator = isEmailLoading
+        configuration?.title = isEmailLoading ? NSLocalizedString("Signing in…", comment: "") : presenter.loginButtonText
         signInButton.configuration = configuration
-        signInButton.isEnabled = !isLoading
-        emailField.isEnabled = !isLoading
-        passwordField.isEnabled = !isLoading
-        passwordToggle.isEnabled = !isLoading
+        var googleConfiguration = googleButton.configuration
+        googleConfiguration?.showsActivityIndicator = isGoogleLoading
+        googleConfiguration?.title = isGoogleLoading ? NSLocalizedString("Signing in…", comment: "") : presenter.googleButtonText
+        googleButton.configuration = googleConfiguration
+        signInButton.isEnabled = !isBusy
+        googleButton.isEnabled = !isBusy
+        appleButton.isEnabled = !isBusy
+        appleButtonDark.isEnabled = !isBusy
+        emailField.isEnabled = !isBusy
+        passwordField.isEnabled = !isBusy
+        passwordToggle.isEnabled = !isBusy
 
         if case .error(let message) = state {
             setError(message)
@@ -329,6 +421,16 @@ final class MailLoginViewController: BaseViewController {
     @objc private func loginWithEmailAction() {
         view.endEditing(true)
         presenter.loginWithEmail(email: emailField.textField.text ?? "", password: passwordField.textField.text ?? "")
+    }
+
+    @objc private func loginWithGoogleAction() {
+        view.endEditing(true)
+        presenter.loginWithGoogle()
+    }
+
+    @objc private func loginWithAppleAction() {
+        view.endEditing(true)
+        presenter.loginWithApple()
     }
 
     @objc private func continueWithoutLoginAction() {

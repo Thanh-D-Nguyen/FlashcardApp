@@ -10,6 +10,8 @@
 import UIKit
 
 protocol MailLoginWireframeInterface: AnyObject {
+    /// The screen Google's account sheet is presented over.
+    var presentingViewController: UIViewController { get }
     func showMain()
 }
 
@@ -31,6 +33,8 @@ final class MailLoginWireframe: BaseWireframe<MailLoginViewController> {
 
 // MARK: - Extensions -
 extension MailLoginWireframe: MailLoginWireframeInterface {
+    var presentingViewController: UIViewController { viewController }
+
     func showMain() {
         if let onFinish {
             viewController.dismiss(animated: true) { onFinish() }

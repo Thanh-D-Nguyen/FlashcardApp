@@ -1,5 +1,6 @@
 import XCTest
 import RxSwift
+import UIKit
 @testable import FlashcardApp
 
 final class MailLoginPresenterTests: XCTestCase {
@@ -201,6 +202,128 @@ final class MailLoginPresenterTests: XCTestCase {
         XCTAssertEqual(presenter.viewState.value, .idle)
     }
 
+    // MARK: Google
+
+    func testGoogleLoginPresentsOverTheScreenAndWaitsForTheSession() {
+        presenter.loginWithGoogle()
+
+        XCTAssertEqual(interactor.googlePresenters.count, 1)
+        XCTAssertTrue(interactor.googlePresenters.first === wireframe.presentingViewController)
+        XCTAssertEqual(presenter.viewState.value, .signingInWithGoogle)
+        XCTAssertEqual(wireframe.showMainCount, 0)
+
+        interactor.complete(.success(SocialUserEntity(email: "reader@example.com")))
+
+        XCTAssertEqual(presenter.viewState.value, .idle)
+        XCTAssertEqual(wireframe.showMainCount, 1)
+        XCTAssertEqual(interactor.disposedCount, 1)
+    }
+
+    func testClosingGoogleSheetReturnsToIdleWithoutAnError() {
+        presenter.loginWithGoogle()
+        interactor.complete(.failure(GoogleSignInError.cancelled))
+
+        XCTAssertEqual(presenter.viewState.value, .idle)
+        XCTAssertEqual(wireframe.showMainCount, 0)
+
+        presenter.loginWithGoogle()
+        XCTAssertEqual(interactor.googlePresenters.count, 2, "The user can try again")
+    }
+
+    func testGoogleFailuresStayOnTheLoginScreenWithAReadableMessage() {
+        let failures: [Error] = [NativeAuthError.googleCredentialsRejected, NativeAuthError.googleAccountConflict,
+                                 NativeAuthError.rateLimited, NativeAuthError.unavailable, NativeAuthError.offline,
+                                 GoogleSignInError.failed, GoogleSignInError.invalidToken]
+        for failure in failures {
+            presenter.loginWithGoogle()
+            interactor.complete(.failure(failure), at: interactor.completions.count - 1)
+
+            guard case .error(let message) = presenter.viewState.value else {
+                return XCTFail("\(failure) should be shown inline")
+            }
+            XCTAssertEqual(message, failure.localizedDescription)
+            XCTAssertFalse(message.isEmpty)
+            XCTAssertEqual(wireframe.showMainCount, 0)
+        }
+    }
+
+    func testAccountConflictTellsTheUserToUseTheirPasswordInsteadOfLinking() {
+        presenter.loginWithGoogle()
+        interactor.complete(.failure(NativeAuthError.googleAccountConflict))
+
+        XCTAssertEqual(presenter.viewState.value,
+                       .error(NativeAuthError.googleAccountConflict.localizedDescription))
+        XCTAssertEqual(interactor.credentials.count, 0, "Nothing falls back to a password attempt")
+    }
+
+    func testGoogleLoginIsIgnoredWhileAnotherSignInRuns() {
+        presenter.loginWithEmail(email: "reader@example.com", password: "secret")
+        presenter.loginWithGoogle()
+        XCTAssertTrue(interactor.googlePresenters.isEmpty)
+        XCTAssertEqual(presenter.viewState.value, .loading)
+
+        presenter.cancelLogin()
+        presenter.loginWithGoogle()
+        presenter.loginWithEmail(email: "reader@example.com", password: "secret")
+        presenter.loginWithGoogle()
+        XCTAssertEqual(interactor.googlePresenters.count, 1)
+        XCTAssertEqual(interactor.credentials.count, 1)
+        XCTAssertEqual(presenter.viewState.value, .signingInWithGoogle)
+    }
+
+    func testCancelDuringGoogleSignInIgnoresALateSuccess() {
+        presenter.loginWithGoogle()
+        presenter.cancelLogin()
+        interactor.complete(.success(SocialUserEntity()))
+
+        XCTAssertEqual(interactor.disposedCount, 1)
+        XCTAssertEqual(presenter.viewState.value, .idle)
+        XCTAssertEqual(wireframe.showMainCount, 0)
+    }
+
+    func testContinueWithoutLoginCancelsGoogleSignInFirst() {
+        presenter.loginWithGoogle()
+        presenter.continueWithoutLogin()
+        interactor.complete(.success(SocialUserEntity()))
+
+        XCTAssertEqual(interactor.disposedCount, 1)
+        XCTAssertEqual(wireframe.showMainCount, 1, "Only the guest route navigates; the cancelled sign-in does not")
+    }
+
+    func testUnconfiguredBuildHidesGoogleAndNeverStartsTheFlow() {
+        interactor.isGoogleSignInAvailable = false
+        XCTAssertFalse(presenter.isGoogleSignInAvailable)
+
+        presenter.loginWithGoogle()
+
+        XCTAssertTrue(interactor.googlePresenters.isEmpty)
+        XCTAssertEqual(presenter.viewState.value, .error(GoogleSignInError.notConfigured.localizedDescription))
+    }
+
+    func testAppleSignInWaitsForVerifiedAppSessionAndHandlesCancellation() {
+        presenter.loginWithApple()
+        XCTAssertEqual(interactor.applePresenters.count, 1)
+        XCTAssertTrue(interactor.applePresenters[0] === wireframe.presentingViewController)
+        XCTAssertEqual(presenter.viewState.value, .signingInWithApple)
+        XCTAssertEqual(wireframe.showMainCount, 0)
+
+        interactor.complete(.failure(AppleSignInError.cancelled))
+        XCTAssertEqual(presenter.viewState.value, .idle)
+
+        presenter.loginWithApple()
+        interactor.complete(.success(SocialUserEntity()), at: 1)
+        XCTAssertEqual(wireframe.showMainCount, 1)
+        XCTAssertEqual(presenter.viewState.value, .idle)
+    }
+
+    func testAppleSignInIsCancelledWhenLeavingTheScreen() {
+        presenter.loginWithApple()
+        presenter.cancelLogin()
+        interactor.complete(.success(SocialUserEntity()))
+        XCTAssertEqual(wireframe.showMainCount, 0)
+        XCTAssertEqual(interactor.disposedCount, 1)
+    }
+
     func testDeinitDisposesOwnedRequest() {
         presenter.loginWithEmail(email: "reader@example.com", password: "secret")
         weak var releasedPresenter = presenter
@@ -217,6 +340,27 @@ private final class MailLoginInteractorStub: MailLoginInteractorInterface {
     var completions: [(SingleEvent<SocialUserEntity>) -> Void] = []
     var disposedCount = 0
     var immediateResult: SingleEvent<SocialUserEntity>?
+    var isGoogleSignInAvailable = true
+    var googlePresenters: [UIViewController] = []
+    var applePresenters: [UIViewController] = []
+
+    func loginWithApple(presenting viewController: UIViewController) -> Single<SocialUserEntity> {
+        applePresenters.append(viewController)
+        return Single.create { [unowned self] completion in
+            self.completions.append(completion)
+            if let result = self.immediateResult { completion(result) }
+            return Disposables.create { [weak self] in self?.disposedCount += 1 }
+        }
+    }
+
+    func loginWithGoogle(presenting viewController: UIViewController) -> Single<SocialUserEntity> {
+        googlePresenters.append(viewController)
+        return Single.create { [unowned self] completion in
+            self.completions.append(completion)
+            if let result = self.immediateResult { completion(result) }
+            return Disposables.create { [weak self] in self?.disposedCount += 1 }
+        }
+    }
 
     func login(email: String, password: String) -> Single<SocialUserEntity> {
         credentials.append((email, password))
@@ -236,6 +380,7 @@ private final class MailLoginWireframeSpy: MailLoginWireframeInterface {
     var showMainCount = 0
     var navigationWasOnMainThread = false
     var onShowMain: (() -> Void)?
+    let presentingViewController = UIViewController()
 
     func showMain() {
         showMainCount += 1

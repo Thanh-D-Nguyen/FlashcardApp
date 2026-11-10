@@ -15,6 +15,9 @@ import RxSwift
 enum MailLoginViewState: Equatable {
     case idle
     case loading
+    /// Google's account sheet is open, or its ID token is being exchanged for a website session.
+    case signingInWithGoogle
+    case signingInWithApple
     case error(String)
 }
 
@@ -23,9 +26,14 @@ protocol MailLoginPresenterInterface: AnyObject {
     var titleText: String { get }
     var subtitleText: String { get }
     var loginButtonText: String { get }
+    var googleButtonText: String { get }
+    /// False when this build has no Google OAuth configuration; the view then hides the Google button.
+    var isGoogleSignInAvailable: Bool { get }
     var viewState: BehaviorRelay<MailLoginViewState> { get }
 
     func loginWithEmail(email: String, password: String)
+    func loginWithGoogle()
+    func loginWithApple()
     func cancelLogin()
     func continueWithoutLogin()
 }
@@ -54,6 +62,14 @@ final class MailLoginPresenter {
     var loginButtonText: String {
         NSLocalizedString("Sign In", comment: "")
     }
+
+    var googleButtonText: String {
+        NSLocalizedString("Continue with Google", comment: "Login screen Google button")
+    }
+
+    var isGoogleSignInAvailable: Bool {
+        interactor.isGoogleSignInAvailable
+    }
     
     init(
         interactor: MailLoginInteractorInterface,
@@ -67,12 +83,36 @@ final class MailLoginPresenter {
         loginRequest?.dispose()
     }
 
+    /// Runs one sign-in attempt at a time. A second request while one is running is ignored.
+    private func start(_ state: MailLoginViewState,
+                       _ attempt: (MailLoginInteractorInterface) -> Single<SocialUserEntity>) {
+        guard loginRequest == nil else { return }
+        let request = SingleAssignmentDisposable()
+        loginRequest = request
+        viewState.accept(state)
+        guard loginRequest === request else { return }
+        request.setDisposable(attempt(interactor)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self, weak request] _ in
+                guard let request else { return }
+                self?.finishLogin(request, error: nil)
+            }, onFailure: { [weak self, weak request] error in
+                guard let request else { return }
+                self?.finishLogin(request, error: error)
+            }))
+    }
+
     private func finishLogin(_ request: SingleAssignmentDisposable, error: Error?) {
         guard loginRequest === request else { return }
         loginRequest = nil
         request.dispose()
         if let error {
-            viewState.accept(.error(error.localizedDescription))
+            // Closing Google's account sheet is a choice, not a failure.
+            if (error as? GoogleSignInError) == .cancelled || (error as? AppleSignInError) == .cancelled {
+                viewState.accept(.idle)
+            } else {
+                viewState.accept(.error(error.localizedDescription))
+            }
         } else {
             viewState.accept(.idle)
             wireframe.showMain()
@@ -97,19 +137,19 @@ extension MailLoginPresenter: MailLoginPresenterInterface {
             return
         }
 
-        let request = SingleAssignmentDisposable()
-        loginRequest = request
-        viewState.accept(.loading)
-        guard loginRequest === request else { return }
-        request.setDisposable(interactor.login(email: email, password: password)
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self, weak request] _ in
-                guard let request else { return }
-                self?.finishLogin(request, error: nil)
-            }, onFailure: { [weak self, weak request] error in
-                guard let request else { return }
-                self?.finishLogin(request, error: error)
-            }))
+        start(.loading) { $0.login(email: email, password: password) }
+    }
+
+    func loginWithGoogle() {
+        guard isGoogleSignInAvailable else {
+            viewState.accept(.error(GoogleSignInError.notConfigured.localizedDescription))
+            return
+        }
+        start(.signingInWithGoogle) { [wireframe] in $0.loginWithGoogle(presenting: wireframe.presentingViewController) }
+    }
+
+    func loginWithApple() {
+        start(.signingInWithApple) { [wireframe] in $0.loginWithApple(presenting: wireframe.presentingViewController) }
     }
 
     func cancelLogin() {
