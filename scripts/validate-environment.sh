@@ -31,3 +31,18 @@ esac
     if (host ~ /(^|\.)(example\.(com|org|net)|invalid|example|test|localhost)$/) exit 1
     exit 0
 }' || fail 'PRODUCT_BASE_URL must be a valid HTTPS API URL; local allows only localhost or 127.0.0.1. Credentials, query strings and placeholder domains are forbidden.'
+
+# Google sign-in client IDs are public identifiers, but a swapped or malformed one only fails later on a device.
+# Never echo the values.
+client_id='^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$'
+prefix='^[0-9]+-[a-z0-9]+$'
+printf '%s\n' "${GOOGLE_SERVER_CLIENT_ID:-}" | /usr/bin/grep -Eq "$client_id" \
+    || fail 'GOOGLE_SERVER_CLIENT_ID must be the Web OAuth client ID (NNN-xxx.apps.googleusercontent.com).'
+if [ -n "${GOOGLE_IOS_CLIENT_ID_PREFIX:-}" ]; then
+    printf '%s\n' "$GOOGLE_IOS_CLIENT_ID_PREFIX" | /usr/bin/grep -Eq "$prefix" \
+        || fail 'GOOGLE_IOS_CLIENT_ID_PREFIX must be the iOS OAuth client ID without .apps.googleusercontent.com.'
+    [ "$GOOGLE_IOS_CLIENT_ID_PREFIX.apps.googleusercontent.com" != "$GOOGLE_SERVER_CLIENT_ID" ] \
+        || fail 'GOOGLE_IOS_CLIENT_ID_PREFIX is the Web client; use the iOS client created for this bundle ID.'
+elif [ "${CONFIGURATION:-}" = Release ]; then
+    echo 'warning: GOOGLE_IOS_CLIENT_ID_PREFIX is empty; this Release build has no Google sign-in button.'
+fi
