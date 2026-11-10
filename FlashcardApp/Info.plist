@@ -2,6 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>google-sign-in</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(GOOGLE_REVERSED_CLIENT_ID)</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>$(GOOGLE_IOS_CLIENT_ID)</string>
+	<key>GIDServerClientID</key>
+	<string>$(GOOGLE_SERVER_CLIENT_ID)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
@@ -24,6 +41,12 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Flashcard uses the camera only when you tap "Take photo" to scan Japanese text for the dictionary. The text is read on your device and the photo is not uploaded or saved.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Flashcard uses the microphone only while you listen in voice search, to turn your Japanese speech into text for the dictionary. Audio is not saved.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Flashcard uses speech recognition only in voice search, to turn your Japanese speech into text for the dictionary. It runs on the device when your iPhone supports it; otherwise Apple processes the audio.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Flashcard uses your location once, only when you tap "Use my location", to teach you the Japanese for the places around you. It is never stored or sent anywhere.</string>
 	<key>ProductBaseUrl</key>

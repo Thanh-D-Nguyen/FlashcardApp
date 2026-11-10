@@ -3,4 +3,7 @@ APP_ENVIRONMENT = local
 PRODUCT_DISPLAY_NAME = Flashcard Local
 PRODUCT_BUNDLE_IDENTIFIER = com.ds.FlashcardApp.dev
 PRODUCT_BASE_URL = http:/$()/localhost:18081/api
+// iOS OAuth client for bundle ID com.ds.FlashcardApp.dev (a different client from production). Empty hides the Google button.
+// The local backend must verify the same GOOGLE_OAUTH_CLIENT_ID as GOOGLE_SERVER_CLIENT_ID, or override that here.
+GOOGLE_IOS_CLIENT_ID_PREFIX =
 #include? "local.local.xcconfig"

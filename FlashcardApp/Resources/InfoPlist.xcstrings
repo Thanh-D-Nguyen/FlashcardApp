@@ -1,30 +1,126 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "NSLocationWhenInUseUsageDescription": {
-      "comment": "Shown in the system location prompt",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Flashcard uses your location once, only when you tap \"Use my location\", to teach you the Japanese for the places around you. It is never stored or sent anywhere."
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Flashcard"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FlashcardApp"
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Shown in the system location prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard uses your location once, only when you tap \"Use my location\", to teach you the Japanese for the places around you. It is never stored or sent anywhere."
           }
         },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Flashcard chỉ dùng vị trí của bạn một lần, khi bạn bấm “Dùng vị trí của tôi”, để dạy tiếng Nhật về những nơi quanh bạn. Vị trí không bao giờ được lưu hay gửi đi."
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「現在地を使う」をタップしたときに一度だけ現在地を使い、周りの場所を日本語で学べるようにします。現在地は保存も送信もされません。"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "「現在地を使う」をタップしたときに一度だけ現在地を使い、周りの場所を日本語で学べるようにします。現在地は保存も送信もされません。"
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard chỉ dùng vị trí của bạn một lần, khi bạn bấm “Dùng vị trí của tôi”, để dạy tiếng Nhật về những nơi quanh bạn. Vị trí không bao giờ được lưu hay gửi đi."
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Shown in the system camera prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard uses the camera only when you tap \"Take photo\" to scan Japanese text for the dictionary. The text is read on your device and the photo is not uploaded or saved."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "辞書用に日本語のテキストをスキャンするため、「写真を撮る」をタップしたときだけカメラを使います。テキストはデバイス上で読み取られ、写真はアップロードも保存もされません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard chỉ dùng camera khi bạn bấm “Chụp ảnh” để quét chữ Nhật cho từ điển. Chữ được đọc ngay trên máy và ảnh không được tải lên hay lưu lại."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription" : {
+      "comment" : "Shown in the system microphone prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard uses the microphone only while you listen in voice search, to turn your Japanese speech into text for the dictionary. Audio is not saved."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声検索で聞き取っている間だけマイクを使い、日本語の音声を辞書用のテキストに変換します。音声は保存されません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard chỉ dùng micro khi bạn nghe trong tìm kiếm bằng giọng nói, để chuyển lời nói tiếng Nhật thành chữ cho từ điển. Âm thanh không được lưu."
+          }
+        }
+      }
+    },
+    "NSSpeechRecognitionUsageDescription" : {
+      "comment" : "Shown in the system speech recognition prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard uses speech recognition only in voice search, to turn your Japanese speech into text for the dictionary. It runs on the device when your iPhone supports it; otherwise Apple processes the audio."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声検索でのみ音声認識を使い、日本語の音声を辞書用のテキストに変換します。iPhoneが対応している場合はデバイス上で処理され、対応していない場合はAppleが音声を処理します。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flashcard chỉ dùng nhận dạng giọng nói trong tìm kiếm bằng giọng nói, để chuyển lời nói tiếng Nhật thành chữ cho từ điển. Việc này chạy ngay trên máy nếu iPhone hỗ trợ; nếu không, Apple sẽ xử lý âm thanh."
           }
         }
       }
     }
   },
-  "version": "1.1"
+  "version" : "1.1"
 }

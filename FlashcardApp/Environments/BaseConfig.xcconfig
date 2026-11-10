@@ -9,3 +9,17 @@
 // https://help.apple.com/xcode/#/dev745c5c974
 
 PRODUCT_DISPLAY_NAME = Flashcard
+
+// Google sign-in. None of these values is a secret; there is no client secret in a native app.
+//
+// GOOGLE_SERVER_CLIENT_ID is the **Web application** OAuth client the backend verifies ID tokens against
+// (Google sets it as the token's audience). It is the same for every environment that talks to that backend.
+GOOGLE_SERVER_CLIENT_ID = 112477118682-4b6pb2ph8i2lrbao13l90rvn5qitra4g.apps.googleusercontent.com
+//
+// GOOGLE_IOS_CLIENT_ID_PREFIX is the part before ".apps.googleusercontent.com" of the **iOS** OAuth client created
+// for this environment's bundle ID (each bundle ID needs its own client). It is set per environment, in
+// DevelopmentConfig / ReleaseConfig or in the ignored *.local.xcconfig. While it is empty the Google button is hidden.
+GOOGLE_IOS_CLIENT_ID_PREFIX =
+GOOGLE_IOS_CLIENT_ID = $(GOOGLE_IOS_CLIENT_ID_PREFIX).apps.googleusercontent.com
+// The iOS client's redirect URL scheme: Google requires the reversed client ID, so it is derived, never typed twice.
+GOOGLE_REVERSED_CLIENT_ID = com.googleusercontent.apps.$(GOOGLE_IOS_CLIENT_ID_PREFIX)

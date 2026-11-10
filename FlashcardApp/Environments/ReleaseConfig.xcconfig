@@ -2,6 +2,7 @@
 APP_ENVIRONMENT = production
 PRODUCT_DISPLAY_NAME = Flashcard
 PRODUCT_BUNDLE_IDENTIFIER = com.ds.FlashcardApp
-// Configure the provisioned HTTPS API before building for distribution.
-PRODUCT_BASE_URL =
+PRODUCT_BASE_URL = https:/$()/kiokoto.com/api
+// iOS OAuth client for bundle ID com.ds.FlashcardApp (Google Cloud Console ▸ Credentials). Empty hides the Google button.
+GOOGLE_IOS_CLIENT_ID_PREFIX = 112477118682-7ovgctal79v4boh11vlbr08dlhp6dvfi
 #include? "production.local.xcconfig"

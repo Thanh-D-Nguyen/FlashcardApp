@@ -1,3 +1,5 @@
 // Copy to production.local.xcconfig and enter the provisioned production endpoint.
 // Example syntax only: https:/$()/api.your-domain/api
 PRODUCT_BASE_URL =
+// Optional overrides (iOS OAuth client of com.ds.FlashcardApp; the prefix is the text before .apps.googleusercontent.com):
+// GOOGLE_IOS_CLIENT_ID_PREFIX = 123456789012-abcdefghijklmnopqrstuvwxyz012345
