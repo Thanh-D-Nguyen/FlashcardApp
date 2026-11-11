@@ -52,4 +52,13 @@ final class LiveProductionContractTests: XCTestCase {
         calendar.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh")!
         XCTAssertNotNil(AccountStreak.current(from: rows, now: Date(), calendar: calendar), "A day was just recorded")
     }
+
+    /// Reads only: the test account already has one export request (created once by the contract probe; not sent again here).
+    func test_privacyRequestsDecodeAndAnUnpreparedExportIsNotFound() throws {
+        let rows = try value(api.privacyRequests())
+        let export = try XCTUnwrap(rows.first { $0.kind == "export" }, "The probe's export request")
+        XCTAssertTrue(["pending", "processing"].contains(export.status))
+        XCTAssertNotNil(DataExportPresenter.parse(export.createdAt))
+        XCTAssertThrowsError(try value(api.downloadDataExport(requestId: export.id))) { XCTAssertEqual($0 as? LearnerAPIError, .notFound) }
+    }
 }

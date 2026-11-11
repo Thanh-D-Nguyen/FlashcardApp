@@ -400,6 +400,8 @@ extension SettingPresenter {
             wireframe.showContactSupport()
         case "about":
             wireframe.showAbout()
+        case "data_export":
+            wireframe.showDataExport()
         default:
             break
         }
@@ -552,6 +554,16 @@ private extension SettingPresenter {
         )
 
         var sections = [accountSection, preferencesSection, generalSection, aboutSection]
+        if user != nil {
+            sections.insert(SettingSection(
+                title: NSLocalizedString("Your data", comment: "Settings section about the account's data"),
+                items: [.navigation(NavigationConfig(
+                    id: "data_export",
+                    title: NSLocalizedString("Get a copy of your data", comment: "Settings row: request/download a data export"),
+                    iconName: "square.and.arrow.down"
+                ))]
+            ), at: 3)
+        }
 
         if user != nil {
             sections.append(SettingSection(

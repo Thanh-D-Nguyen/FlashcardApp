@@ -83,6 +83,8 @@ final class MockSettingInteractor: SettingInteractorInterface {
 }
 
 final class MockSettingWireframe: SettingWireframeInterface {
+    var dataExportOpened = 0
+    func showDataExport() { dataExportOpened += 1 }
     var logoutConfirmationHandler: (() -> Void)?
     var deleteConfirmationHandler: (() -> Void)?
     func showDeleteAccountConfirmation(onConfirm: @escaping () -> Void) {
@@ -732,5 +734,26 @@ final class SettingPresenterTests: XCTestCase {
             return
         }
         XCTAssertNil(displayedUser)
+    }
+
+    // MARK: - Data export (K-17)
+
+    private func navigationIDs() -> [String] {
+        presenter.sectionsRelay.value.flatMap(\.items).compactMap { item in
+            if case .navigation(let config) = item { return config.id }
+            return nil
+        }
+    }
+
+    func test_aSignedInLearnerCanOpenTheDataExportAndAGuestDoesNotSeeIt() throws {
+        mockInteractor.currentUser = nil
+        presenter.viewDidLoad()
+        XCTAssertFalse(navigationIDs().contains("data_export"), "A guest has no account data on the server")
+
+        mockInteractor.currentUser = SocialUserEntity(id: "7c2218b4-590b-49b2-8be0-076fd9992135")
+        presenter.viewDidLoad()
+        XCTAssertTrue(navigationIDs().contains("data_export"))
+        presenter.handleNavigationTap(config: NavigationConfig(id: "data_export", title: "", iconName: ""))
+        XCTAssertEqual(mockWireframe.dataExportOpened, 1)
     }
 }

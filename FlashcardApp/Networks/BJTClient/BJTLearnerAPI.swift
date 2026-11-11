@@ -133,6 +133,13 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
 
     func perform<Response: Decodable, Body: Encodable>(_ path: [String], method: HTTPMethod, body: Body?,
                                                        query: [String: String] = [:]) -> Single<Response> {
+        performData(path, method: method, body: body, query: query).map { data in
+            do { return try JSONDecoder().decode(Response.self, from: data) } catch { throw LearnerAPIError.invalidResponse }
+        }
+    }
+
+    /// The body of a 2xx answer, unchanged (for a file the learner keeps, such as a data export).
+    func performData<Body: Encodable>(_ path: [String], method: HTTPMethod, body: Body?, query: [String: String] = [:]) -> Single<Data> {
         Single.create { [self] observer in
             guard let bearer = token() else {
                 observer(.failure(LearnerAPIError.signInRequired))
@@ -167,10 +174,20 @@ final class BJTLearnerAPI: BJTLearnerAPIInterface {
             request.responseData { response in
                 // A logout or account switch while the request ran: drop the result instead of acting on it.
                 guard self.token() == bearer else { return observer(.failure(LearnerAPIError.staleSession)) }
-                observer(Self.result(of: response))
+                observer(Self.dataResult(of: response))
             }
             return Disposables.create { request.cancel() }
         }
+    }
+
+    static func dataResult(of response: AFDataResponse<Data>) -> Result<Data, Error> {
+        if let error = response.error, response.response == nil {
+            return .failure(transportError(error))
+        }
+        guard let status = response.response?.statusCode else { return .failure(LearnerAPIError.invalidResponse) }
+        let data = response.data ?? Data()
+        guard (200..<300).contains(status) else { return .failure(statusError(status, data: data)) }
+        return .success(data)
     }
 
     static func result<Response: Decodable>(of response: AFDataResponse<Data>) -> Result<Response, Error> {

@@ -25947,6 +25947,486 @@
           }
         }
       }
+    },
+    "Your data" : {
+      "comment" : "Settings section about the account's data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなたのデータ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dữ liệu của bạn"
+          }
+        }
+      }
+    },
+    "Get a copy of your data" : {
+      "comment" : "Settings row and screen title: request/download a data export",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get a copy of your data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データのコピーを入手"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhận bản sao dữ liệu của bạn"
+          }
+        }
+      }
+    },
+    "Couldn't check your data requests" : {
+      "comment" : "Data export: the list could not be read",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't check your data requests"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データのリクエストを確認できませんでした"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không kiểm tra được yêu cầu dữ liệu của bạn"
+          }
+        }
+      }
+    },
+    "Request sent. An administrator will prepare your copy." : {
+      "comment" : "Data export: request accepted",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request sent. An administrator will prepare your copy."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リクエストを送信しました。管理者がコピーを準備します。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã gửi yêu cầu. Quản trị viên sẽ chuẩn bị bản sao cho bạn."
+          }
+        }
+      }
+    },
+    "We couldn't confirm the request, so we checked your requests again." : {
+      "comment" : "Data export: outcome unknown, the list was read again",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't confirm the request, so we checked your requests again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リクエストを確認できなかったため、リクエスト一覧を確認し直しました。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa xác nhận được yêu cầu, nên ứng dụng đã kiểm tra lại danh sách yêu cầu của bạn."
+          }
+        }
+      }
+    },
+    "The copy could not be saved on this device." : {
+      "comment" : "Data export: writing the downloaded file failed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The copy could not be saved on this device."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーをこの端末に保存できませんでした。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không lưu được bản sao trên thiết bị này."
+          }
+        }
+      }
+    },
+    "This copy is no longer available." : {
+      "comment" : "Data export: 404/410 on download",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This copy is no longer available."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このコピーはもう利用できません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bản sao này không còn tải được nữa."
+          }
+        }
+      }
+    },
+    "You can ask for a copy of the data your Kiokoto account keeps. An administrator prepares it by hand, which can take several days. When it is ready you can download it here." : {
+      "comment" : "Data export: explanation before any request",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can ask for a copy of the data your Kiokoto account keeps. An administrator prepares it by hand, which can take several days. When it is ready you can download it here."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiokotoアカウントが保存しているデータのコピーを依頼できます。管理者が手作業で準備するため、数日かかることがあります。準備ができたらここからダウンロードできます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn có thể yêu cầu bản sao dữ liệu mà tài khoản Kiokoto đang lưu. Quản trị viên chuẩn bị thủ công, có thể mất vài ngày. Khi xong, bạn tải về tại đây."
+          }
+        }
+      }
+    },
+    "Request a copy" : {
+      "comment" : "Data export: button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request a copy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーを依頼"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yêu cầu bản sao"
+          }
+        }
+      }
+    },
+    "Your copy is being prepared" : {
+      "comment" : "Data export: open request",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your copy is being prepared"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーを準備中です"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bản sao đang được chuẩn bị"
+          }
+        }
+      }
+    },
+    "Requested on %@. An administrator prepares the copy; this can take several days. Come back here to download it." : {
+      "comment" : "Data export: open request, with the request date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requested on %@. An administrator prepares the copy; this can take several days. Come back here to download it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@に依頼しました。管理者がコピーを準備しており、数日かかることがあります。ダウンロードはこの画面から行えます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã yêu cầu ngày %@. Quản trị viên đang chuẩn bị bản sao, có thể mất vài ngày. Hãy quay lại đây để tải về."
+          }
+        }
+      }
+    },
+    "Check again" : {
+      "comment" : "Data export: re-read the request status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check again"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう一度確認"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiểm tra lại"
+          }
+        }
+      }
+    },
+    "Your copy is ready" : {
+      "comment" : "Data export: completed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your copy is ready"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーの準備ができました"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bản sao đã sẵn sàng"
+          }
+        }
+      }
+    },
+    "You can download it until %@. The file is in JSON format." : {
+      "comment" : "Data export: completed, with the expiry date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can download it until %@. The file is in JSON format."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@までダウンロードできます。ファイルはJSON形式です。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn có thể tải về đến ngày %@. Tệp ở định dạng JSON."
+          }
+        }
+      }
+    },
+    "Download" : {
+      "comment" : "Data export: download button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tải về"
+          }
+        }
+      }
+    },
+    "Your last copy has expired" : {
+      "comment" : "Data export: completed but expired",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your last copy has expired"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前回のコピーは期限切れです"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bản sao trước đã hết hạn"
+          }
+        }
+      }
+    },
+    "Copies can be downloaded for a limited time. You can ask for a new one." : {
+      "comment" : "Data export: expired explanation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copies can be downloaded for a limited time. You can ask for a new one."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーは期間限定でダウンロードできます。新しいコピーを依頼できます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bản sao chỉ tải được trong thời gian có hạn. Bạn có thể yêu cầu bản mới."
+          }
+        }
+      }
+    },
+    "Request a new copy" : {
+      "comment" : "Data export: button after expiry",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request a new copy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいコピーを依頼"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yêu cầu bản mới"
+          }
+        }
+      }
+    },
+    "Your last request was not completed" : {
+      "comment" : "Data export: failed/rejected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your last request was not completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前回のリクエストは完了しませんでした"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yêu cầu trước chưa được hoàn tất"
+          }
+        }
+      }
+    },
+    "The administrator could not prepare it. You can ask again, or contact support." : {
+      "comment" : "Data export: failed explanation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The administrator could not prepare it. You can ask again, or contact support."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "管理者が準備できませんでした。もう一度依頼するか、サポートにお問い合わせください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quản trị viên chưa chuẩn bị được. Bạn có thể yêu cầu lại hoặc liên hệ hỗ trợ."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

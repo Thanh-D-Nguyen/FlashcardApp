@@ -22,6 +22,8 @@ protocol SettingWireframeInterface: AnyObject {
     func showTermsOfService()
     func showContactSupport()
     func showAbout()
+    /// Asking for and downloading a copy of the account's data (signed in only).
+    func showDataExport()
 }
 
 final class SettingWireframe: BaseWireframe<SettingViewController> {
@@ -141,6 +143,10 @@ extension SettingWireframe: SettingWireframeInterface {
         let url = site.appendingPathComponent(AppLanguage.current.rawValue).appendingPathComponent(page)
         let safari = SFSafariViewController(url: url)
         viewController.present(safari, animated: true)
+    }
+
+    func showDataExport() {
+        navigationController?.pushViewController(DataExportViewController.make(), animated: true)
     }
 
     func showAbout() {
