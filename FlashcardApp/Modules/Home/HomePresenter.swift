@@ -65,6 +65,9 @@ protocol HomePresenterInterface: AnyObject {
     func loadMore()
     func retry()
     func cancelLoading()
+    /// Level screen only: whether the level has structured lessons to open.
+    var canShowLessons: Bool { get }
+    func showLessons()
 }
 
 final class HomePresenter: HomePresenterInterface {
@@ -95,6 +98,15 @@ final class HomePresenter: HomePresenterInterface {
         }
     }
     var onChange: (() -> Void)?
+    var canShowLessons: Bool {
+        guard let level else { return false }
+        return BJTLessonAPI.levelCodes.contains(level.code)
+    }
+
+    func showLessons() {
+        guard canShowLessons, let level else { return }
+        wireframe.showLessons(level: level)
+    }
 
     init(interactor: HomeInteractorInterface, wireframe: HomeWireframeInterface, level: BJTLevelDTO? = nil,
          kind: HomeContentKind = .vocabulary) {

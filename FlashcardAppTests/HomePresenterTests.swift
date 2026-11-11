@@ -211,6 +211,23 @@ final class HomePresenterTests: XCTestCase {
         XCTAssertEqual(wireframe.detail, "Nghĩa đầy đủ")
     }
 
+    func testLessonsAreOfferedOnlyOnALevelScreenWhoseLevelHasLessons() {
+        let wireframe = LevelHomeWireframeSpy()
+        let levelScreen = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: wireframe, level: level)
+        XCTAssertTrue(levelScreen.canShowLessons)
+        levelScreen.showLessons()
+        XCTAssertEqual(wireframe.lessonsLevel?.code, "J5")
+
+        let levelList = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: wireframe)
+        XCTAssertFalse(levelList.canShowLessons, "The level list has no single level to open lessons for")
+        let plus = BJTLevelDTO(code: "J1+", nameVi: "J1+", descriptionVi: "", vocabCount: 5, kanjiCount: 0, grammarCount: 0)
+        let plusWireframe = LevelHomeWireframeSpy()
+        let plusScreen = HomePresenter(interactor: LevelHomeInteractorStub(), wireframe: plusWireframe, level: plus)
+        XCTAssertFalse(plusScreen.canShowLessons, "J1+ has no lessons on the server (404)")
+        plusScreen.showLessons()
+        XCTAssertNil(plusWireframe.lessonsLevel)
+    }
+
     private func makeRows(_ count: Int) -> [HomeRow] {
         (0..<count).map { HomeRow(id: "id-\($0)", title: "語", subtitle: "Nghĩa", detail: "Nghĩa đầy đủ") }
     }
@@ -239,6 +256,8 @@ private final class LevelHomeWireframeSpy: HomeWireframeInterface {
     var openedLevel: BJTLevelDTO?
     var detail: String?
     var openedKind: HomeContentKind?
+    var lessonsLevel: BJTLevelDTO?
     func showLevel(_ level: BJTLevelDTO, kind: HomeContentKind) { openedLevel = level; openedKind = kind }
     func showMeaning(title: String, message: String) { detail = message }
+    func showLessons(level: BJTLevelDTO) { lessonsLevel = level }
 }

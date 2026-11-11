@@ -6,6 +6,7 @@ final class HomeViewController: BaseViewController {
     private let stateView = StateView()
     private let kindControl = UISegmentedControl(items: HomeContentKind.allCases.map(\.title))
     private let totalLabel = UILabel()
+    private let lessonsButton = UIButton(configuration: .tinted())
     private let headerView = UIView()
     private var sections: [Section] = []
 
@@ -95,6 +96,19 @@ final class HomeViewController: BaseViewController {
             self.presenter.selectKind(kind)
         }, for: .valueChanged)
         totalLabel.apply(.metadata)
+        if presenter.canShowLessons {
+            var configuration = UIButton.Configuration.tinted()
+            configuration.title = NSLocalizedString("Lessons", comment: "Opens the structured lessons of the level")
+            configuration.image = UIImage(systemName: "list.bullet.rectangle")
+            configuration.imagePadding = Design.Spacing.s
+            configuration.baseForegroundColor = Design.Color.accent
+            configuration.cornerStyle = .large
+            lessonsButton.configuration = configuration
+            lessonsButton.contentHorizontalAlignment = .leading
+            lessonsButton.accessibilityIdentifier = "level_lessons"
+            lessonsButton.addAction(UIAction { [weak self] _ in self?.presenter.showLessons() }, for: .primaryActionTriggered)
+            stack.addArrangedSubview(lessonsButton)
+        }
         [kindControl, totalLabel].forEach(stack.addArrangedSubview)
         tableView.tableHeaderView = headerView
     }

@@ -154,6 +154,22 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.segmentedControls["level_content_kind"].buttons["Từ vựng"].isSelected)
     }
 
+    /// A level with structured lessons offers them from its screen, grouped by week.
+    func testLevelScreenOpensItsLessonsGroupedByWeek() {
+        let app = makeApp()
+        app.launch()
+        openLevels(app)
+        let start = app.buttons["home_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 40))
+        start.tap()
+        let lessons = app.buttons["level_lessons"]
+        XCTAssertTrue(lessons.waitForExistence(timeout: 10))
+        lessons.tap()
+        XCTAssertTrue(app.tables["lesson_list"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Tuần 1"].waitForExistence(timeout: 20), "The first week header follows the loaded lessons")
+        XCTAssertTrue(app.cells.matching(identifier: "lesson_row_j5-01-greetings-intro").firstMatch.waitForExistence(timeout: 5))
+    }
+
     /// A level's count opens that kind directly, skipping the kind chooser.
     func testLevelCountOpensItsKindDirectly() {
         let app = makeApp()

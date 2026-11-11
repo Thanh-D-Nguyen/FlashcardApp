@@ -25,3 +25,10 @@ test: `BJTLessonAPITests`, fixture `BJTLessonFixtures` (response thật, ẩn da
 - Chất lượng nội dung (content gate trước K-02) chưa được người đánh giá; K-01 chỉ chứng minh decode đúng. Số bài J4–J1 chưa kiểm đếm.
 - Rate limit của `levelReadRateLimit` chưa đo.
 - Progress web/iOS cùng bản ghi (cùng `user_id`) theo source, chưa kiểm bằng tài khoản thật.
+
+## K-02 — danh sách bài trong cấp độ
+
+- Lối vào: nút **Bài học** (`level_lessons`) ở đầu màn nội dung của cấp độ (`HomeViewController`), chỉ khi cấp độ nằm trong `BJTLessonAPI.levelCodes` (J1+ không có). Giữ nguyên 5 tab và các mục Từ vựng/Kanji/Ngữ pháp.
+- `Modules/LessonList` (presenter/VC/wireframe) + `Interactors/LessonListInteractor`. Bảng nhóm theo `weekNumber` tăng dần, trong tuần theo `sortOrder`. Hàng hiển thị tiêu đề/mô tả theo `AppLanguage` (API chỉ có vi/ja: en dùng vi; trường rỗng dùng ngôn ngữ còn lại), loại `review`/`checkpoint`, số phút và số hoạt động **chỉ khi > 0**.
+- Trạng thái: loading, empty, failed + Retry; rời màn thì huỷ request, quay lại thì tải lại; lỗi chỉ tải lại bằng Retry.
+- Chưa có: mở bài (K-03), tiến độ hoàn thành (K-04).
