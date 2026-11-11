@@ -59,6 +59,8 @@ struct BJTRemoteDeckDTO: Decodable, Equatable {
     var descriptionJa: String? = nil
     var visibility: String? = nil
     var ownerUserId: String? = nil
+    /// The owner's share token (the server clears it on decks of others); its presence means the deck is being shared.
+    var shareToken: String? = nil
 }
 
 /// One row of `GET /api/flashcards/decks`: the learner's own decks and every public deck. The server clears

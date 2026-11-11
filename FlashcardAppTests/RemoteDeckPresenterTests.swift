@@ -25,6 +25,12 @@ final class FakeRemoteDeckWireframe: RemoteDeckWireframeInterface {
     func chooseReportReason(onSelect: @escaping (String) -> Void) { reportRequests += 1; reportSelection = onSelect }
     func confirmBlockAuthor(onConfirm: @escaping () -> Void) { blockRequests += 1; blockConfirmation = onConfirm }
     func leave() { leaveCount += 1 }
+    private(set) var sharedLinks: [URL] = []
+    private(set) var stopSharingRequests = 0
+    private var stopSharingConfirmation: (() -> Void)?
+    func shareLink(_ url: URL) { sharedLinks.append(url) }
+    func confirmStopSharing(onConfirm: @escaping () -> Void) { stopSharingRequests += 1; stopSharingConfirmation = onConfirm }
+    func confirmStop() { stopSharingConfirmation?() }
     func confirm() { confirmation?() }
     func selectReportReason(_ reason: String) { reportSelection?(reason) }
     func confirmBlock() { blockConfirmation?() }
@@ -51,8 +57,10 @@ final class RemoteDeckPresenterTests: XCTestCase {
                          cards: (0..<cards).map { ServerDeckCard(id: "aaaaaaaa-0000-4000-8000-00000000000\($0)", front: "語\($0)", back: "a", reading: "") })
     }
 
+    private var sharing = FakeDeckSharing()
+
     private func makePresenter() {
-        presenter = RemoteDeckPresenter(deckId: deckId, interactor: server, wireframe: wireframe)
+        presenter = RemoteDeckPresenter(deckId: deckId, interactor: server, wireframe: wireframe, sharing: sharing)
         presenter.view = view
         presenter.viewDidLoad()
     }
@@ -239,4 +247,62 @@ final class RemoteDeckPresenterTests: XCTestCase {
         XCTAssertNil(view.last.busy)
         XCTAssertNotNil(view.last.notice)
     }
+
+    // MARK: Sharing by link (K-16)
+
+    func test_theOwnerGetsTheLinkOnceAndCanStopSharingAfterConfirming() {
+        var owned = detail(owned: true)
+        owned.isShared = false
+        server.detailResult = .just(owned)
+        makePresenter()
+        XCTAssertFalse(view.last.isShared)
+        presenter.shareLink()
+        XCTAssertEqual(sharing.shareRequests, [deckId])
+        XCTAssertEqual(wireframe.sharedLinks, [sharing.link])
+        XCTAssertTrue(view.last.isShared)
+        XCTAssertNil(view.last.busy)
+
+        presenter.stopSharing()
+        XCTAssertTrue(sharing.stopRequests.isEmpty, "Nothing is revoked before the learner confirms")
+        wireframe.confirmStop()
+        XCTAssertEqual(sharing.stopRequests, [deckId])
+        XCTAssertFalse(view.last.isShared)
+    }
+
+    func test_aDeckOfSomeoneElseCannotBeSharedOrRevoked() {
+        makePresenter()
+        presenter.shareLink()
+        presenter.stopSharing()
+        XCTAssertTrue(sharing.shareRequests.isEmpty)
+        XCTAssertEqual(wireframe.stopSharingRequests, 0)
+    }
+
+    func test_aFailedShareSaysSoAndOffersNothing() {
+        server.detailResult = .just(detail(owned: true))
+        sharing.shareResult = .error(LearnerAPIError.offline)
+        makePresenter()
+        presenter.shareLink()
+        XCTAssertTrue(wireframe.sharedLinks.isEmpty)
+        XCTAssertNotNil(view.last.notice)
+        XCTAssertFalse(view.last.isShared)
+    }
+}
+
+final class FakeDeckSharing: DeckSharingInteractorInterface {
+    var isSignedIn = true
+    let link = URL(string: "https://kiokoto.com/vi/decks/shared/AbCdEfGhIjKlMnOpQrStUvWxYz0123456789_-abcd")!
+    var shareResult: Single<URL>?
+    var stopResult: Single<Void> = .just(())
+    var previewResult: Single<BJTSharedDeckPreviewDTO> = .error(LearnerAPIError.notFound)
+    var copyResult: Single<String> = .just("99999999-2222-4333-8444-555555555555")
+    private(set) var shareRequests: [String] = []
+    private(set) var stopRequests: [String] = []
+    private(set) var previews = 0
+    private(set) var copies = 0
+
+    func shareLink(deckId: String) -> Single<URL> { shareRequests.append(deckId); return shareResult ?? .just(link) }
+    func stopSharing(deckId: String) -> Single<Void> { stopRequests.append(deckId); return stopResult }
+    func link(from text: String) -> DeckShareLink? { DeckShareLink.parse(text, webHost: "kiokoto.com") }
+    func preview(_ link: DeckShareLink) -> Single<BJTSharedDeckPreviewDTO> { previews += 1; return previewResult }
+    func copyToAccount(_ link: DeckShareLink) -> Single<String> { copies += 1; return copyResult }
 }

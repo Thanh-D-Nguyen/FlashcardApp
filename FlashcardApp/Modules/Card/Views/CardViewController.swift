@@ -57,6 +57,13 @@ final class CardViewController: BaseViewController, CardViewInterface {
         return item
     }()
 
+    private lazy var sharedDeckItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(image: UIImage(systemName: "link"), primaryAction: UIAction { [weak self] _ in self?.presenter.addSharedDeck() })
+        item.accessibilityLabel = NSLocalizedString("Add a shared deck", comment: "Cards: open a deck shared by link")
+        item.accessibilityIdentifier = "shared_deck_button"
+        return item
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -72,7 +79,7 @@ final class CardViewController: BaseViewController, CardViewInterface {
     func setupUI() {
         view.backgroundColor = Design.Color.background
         navigationItem.largeTitleDisplayMode = .always
-        navigationItem.rightBarButtonItems = [addItem, sortItem, oftenMissedItem]
+        navigationItem.rightBarButtonItems = [addItem, sortItem, oftenMissedItem, sharedDeckItem]
 
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchResultsUpdater = self
@@ -258,7 +265,7 @@ final class CardViewController: BaseViewController, CardViewInterface {
     private func updateBarItems(for state: CardLibraryState) {
         // Sorting orders the decks on the device only.
         // The often-missed list is made from this device's own history, so it belongs to the device's decks.
-        navigationItem.rightBarButtonItems = state.scope == .mine ? [addItem, sortItem, oftenMissedItem] : [addItem]
+        navigationItem.rightBarButtonItems = state.scope == .mine ? [addItem, sortItem, oftenMissedItem, sharedDeckItem] : [addItem, sharedDeckItem]
         sortItem.menu = makeSortMenu()
         sortItem.isEnabled = state.deckCount > 1
     }

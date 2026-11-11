@@ -8,6 +8,9 @@ protocol RemoteDeckWireframeInterface: AnyObject {
     func chooseReportReason(onSelect: @escaping (String) -> Void)
     func confirmBlockAuthor(onConfirm: @escaping () -> Void)
     func leave()
+    /// The system share sheet with the deck's link.
+    func shareLink(_ url: URL)
+    func confirmStopSharing(onConfirm: @escaping () -> Void)
 }
 
 final class RemoteDeckWireframe: BaseWireframe<RemoteDeckViewController> {
@@ -68,5 +71,48 @@ extension RemoteDeckWireframe: RemoteDeckWireframeInterface {
 
     func leave() {
         navigationController?.popViewController(animated: true)
+    }
+
+    func shareLink(_ url: URL) {
+        let sheet = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        sheet.popoverPresentationController?.sourceView = viewController.view
+        viewController.present(sheet, animated: true)
+    }
+
+    func confirmStopSharing(onConfirm: @escaping () -> Void) {
+        showAlert(with: NSLocalizedString("Stop sharing this deck?", comment: ""),
+                  message: NSLocalizedString("The link stops working for everyone. Copies already saved by others stay theirs.", comment: "Stop sharing confirmation"),
+                  actions: [UIAlertAction(title: NSLocalizedString("Stop sharing", comment: ""), style: .destructive) { _ in onConfirm() },
+                            UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel)])
+    }
+}
+
+/// A deck someone shared by link: its public preview, and a copy into the account.
+final class SharedDeckWireframe: BaseWireframe<SharedDeckViewController> {
+    init(link: DeckShareLink) {
+        let controller = SharedDeckViewController()
+        super.init(viewController: controller)
+        controller.hidesBottomBarWhenPushed = true
+        let presenter = SharedDeckPresenter(link: link, interactor: DeckSharingInteractor(), wireframe: self)
+        presenter.view = controller
+        controller.presenter = presenter
+    }
+}
+
+extension SharedDeckWireframe: SharedDeckWireframeInterface {
+    func showSignIn(onFinish: @escaping () -> Void) {
+        let login = MailLoginWireframe(onFinish: onFinish)
+        let loginController = login.viewController
+        loginController.modalPresentationStyle = .fullScreen
+        viewController.present(loginController, animated: true)
+    }
+
+    func showAccountDeck(id: String) {
+        guard let navigationController else { return }
+        let deck = RemoteDeckWireframe(deckId: id)
+        var stack = navigationController.viewControllers
+        if stack.last === viewController { stack.removeLast() }
+        stack.append(deck.viewController)
+        navigationController.setViewControllers(stack, animated: true)
     }
 }

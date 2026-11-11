@@ -132,6 +132,8 @@ protocol CardPresenterInterface: AnyObject {
     func startReview()
     /// Opens the list of cards the learner keeps getting wrong on this device.
     func showOftenMissed()
+    /// Opens a deck someone shared by link.
+    func addSharedDeck()
     func openAccountDeck(id: String)
     func signIn()
     func updateQuery(_ query: String?)
@@ -188,6 +190,7 @@ class CardPresenter {
     private var dueChanged = false
     private let decksRequest = SerialDisposable()
     private let dueRequest = SerialDisposable()
+    private let sharing: DeckSharingInteractorInterface
     private let uploadRequest = SerialDisposable()
 
     init(interactor: CardInteractorInterface,
@@ -196,7 +199,9 @@ class CardPresenter {
          defaults: UserDefaults = .standard,
          server: CardLibraryServerInteractorInterface = CardLibraryServerInteractor(),
          publisher: DeckPublishInteractorInterface = DeckPublishInteractor(),
-         now: @escaping () -> Date = Date.init) {
+         now: @escaping () -> Date = Date.init,
+         sharing: DeckSharingInteractorInterface = DeckSharingInteractor()) {
+        self.sharing = sharing
         self.interactor = interactor
         self.deskInteractor = deskInteractor
         self.wireframe = wireframe
@@ -437,6 +442,17 @@ extension CardPresenter: CardPresenterInterface {
             if scope != .mine { loadDue(force: dueChanged) }
         }
         reload()
+    }
+
+    func addSharedDeck() {
+        wireframe.askForSharedDeckLink { [weak self] text in
+            guard let self else { return }
+            guard let link = self.sharing.link(from: text) else {
+                return self.wireframe.showAlert(with: NSLocalizedString("This is not a Kiokoto deck link", comment: ""),
+                                                message: NSLocalizedString("Ask for the link again, or open it from the website.", comment: ""))
+            }
+            self.wireframe.showSharedDeck(link)
+        }
     }
 
     func showOftenMissed() {

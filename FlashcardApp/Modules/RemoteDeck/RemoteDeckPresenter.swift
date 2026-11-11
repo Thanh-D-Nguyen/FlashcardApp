@@ -22,6 +22,7 @@ struct RemoteDeckState: Equatable {
         case saving
         case archiving
         case moderating
+        case sharing
     }
 
     var phase: Phase = .loading
@@ -31,6 +32,8 @@ struct RemoteDeckState: Equatable {
     var isOwned = false
     var cards: [ServerDeckCard] = []
     var isOnDevice = false
+    /// The learner's own deck has a share link that works now.
+    var isShared = false
     var busy: Busy?
     /// A save or archive that failed, shown beside the actions.
     var notice: String?
@@ -52,25 +55,38 @@ protocol RemoteDeckPresenterInterface: AnyObject {
     func archive()
     func report()
     func blockAuthor()
+    /// The learner's own deck: get its link and offer it (share sheet).
+    func shareLink()
+    /// The learner's own deck: revoke its link for everyone (after a confirmation).
+    func stopSharing()
 }
 
 final class RemoteDeckPresenter {
-    private let deckId: String
+    fileprivate let deckId: String
     private let interactor: CardLibraryServerInteractorInterface
-    private let wireframe: RemoteDeckWireframeInterface
+    fileprivate let wireframe: RemoteDeckWireframeInterface
     weak var view: RemoteDeckViewInterface?
 
-    private var state = RemoteDeckState()
+    fileprivate var state = RemoteDeckState()
     private var detail: ServerDeckDetail?
     private let request = SerialDisposable()
+    /// Separate from `request`: sharing never cancels a load or a save, and the other way round.
+    fileprivate let shareRequest = SerialDisposable()
 
-    init(deckId: String, interactor: CardLibraryServerInteractorInterface, wireframe: RemoteDeckWireframeInterface) {
+    fileprivate let sharing: DeckSharingInteractorInterface
+
+    init(deckId: String, interactor: CardLibraryServerInteractorInterface, wireframe: RemoteDeckWireframeInterface,
+         sharing: DeckSharingInteractorInterface = DeckSharingInteractor()) {
+        self.sharing = sharing
         self.deckId = deckId
         self.interactor = interactor
         self.wireframe = wireframe
     }
 
-    deinit { request.dispose() }
+    deinit {
+        request.dispose()
+        shareRequest.dispose()
+    }
 
     private func load() {
         guard interactor.isSignedIn else {
@@ -89,6 +105,7 @@ final class RemoteDeckPresenter {
                 self.state.details = detail.deck.details
                 self.state.visibility = detail.deck.visibility
                 self.state.isOwned = detail.deck.isOwned
+                self.state.isShared = detail.deck.isOwned && detail.isShared
                 self.state.cards = detail.cards
                 self.state.isOnDevice = self.interactor.hasDeviceCopy(deckId: detail.deck.id)
                 self.publish()
@@ -101,7 +118,7 @@ final class RemoteDeckPresenter {
             })
     }
 
-    private func publish() { view?.render(state) }
+    fileprivate func publish() { view?.render(state) }
 
     /// Saves the copy on the device when there is none, then (for a new copy) stores its pictures beside it. `done` receives
     /// whether a copy exists. Pictures are best effort: a picture that cannot be fetched never prevents the copy.
@@ -224,6 +241,53 @@ extension RemoteDeckPresenter: RemoteDeckPresenterInterface {
                     guard let self else { return }
                     self.state.busy = nil
                     self.wireframe.leave()
+                }, onFailure: { [weak self] error in
+                    guard let self else { return }
+                    self.state.busy = nil
+                    self.state.notice = CardPresenter.message(for: error)
+                    self.publish()
+                })
+        }
+    }
+}
+
+extension RemoteDeckPresenter {
+    /// Asking for the link is safe to repeat (the server returns the same token), so a tap simply asks again.
+    func shareLink() {
+        guard state.phase == .loaded, state.isOwned, state.busy == nil else { return }
+        state.busy = .sharing
+        state.notice = nil
+        publish()
+        shareRequest.disposable = sharing.shareLink(deckId: deckId)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] url in
+                guard let self else { return }
+                self.state.busy = nil
+                self.state.isShared = true
+                self.publish()
+                self.wireframe.shareLink(url)
+            }, onFailure: { [weak self] error in
+                guard let self else { return }
+                self.state.busy = nil
+                self.state.notice = CardPresenter.message(for: error)
+                self.publish()
+            })
+    }
+
+    func stopSharing() {
+        guard state.phase == .loaded, state.isOwned, state.isShared, state.busy == nil else { return }
+        wireframe.confirmStopSharing { [weak self] in
+            guard let self, self.state.busy == nil else { return }
+            self.state.busy = .sharing
+            self.state.notice = nil
+            self.publish()
+            self.shareRequest.disposable = self.sharing.stopSharing(deckId: self.deckId)
+                .observe(on: MainScheduler.instance)
+                .subscribe(onSuccess: { [weak self] in
+                    guard let self else { return }
+                    self.state.busy = nil
+                    self.state.isShared = false
+                    self.publish()
                 }, onFailure: { [weak self] error in
                     guard let self else { return }
                     self.state.busy = nil

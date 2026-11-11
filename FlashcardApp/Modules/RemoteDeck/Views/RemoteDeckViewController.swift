@@ -158,6 +158,15 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
             })
         }
         if state.isOwned {
+            children.append(UIAction(title: NSLocalizedString("Share link", comment: "Remote deck menu: share the deck by link"),
+                                     image: UIImage(systemName: "square.and.arrow.up")) { [weak self] _ in
+                self?.presenter.shareLink()
+            })
+            if state.isShared {
+                children.append(UIAction(title: NSLocalizedString("Stop sharing", comment: ""), image: UIImage(systemName: "link.badge.plus")) { [weak self] _ in
+                    self?.presenter.stopSharing()
+                })
+            }
             children.append(UIAction(title: NSLocalizedString("Archive", comment: ""), image: UIImage(systemName: "archivebox"), attributes: .destructive) { [weak self] _ in
                 self?.presenter.archive()
             })

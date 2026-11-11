@@ -17,6 +17,10 @@ protocol CardWireframeInterface: AnyObject {
     func showStudy(deckId: String)
     /// The cards the learner keeps getting wrong, from this device's history.
     func showOftenMissed()
+    /// Asks for a pasted share link (or token) of a deck; `onSubmit` receives the text.
+    func askForSharedDeckLink(onSubmit: @escaping (String) -> Void)
+    /// The public preview of a shared deck, where it can be copied into the account.
+    func showSharedDeck(_ link: DeckShareLink)
     /// Starts a review of these due cards.
     func showReview(cards: [DueCard])
     /// Opens a deck of the account (cards, save to device, study).
@@ -88,6 +92,28 @@ extension CardWireframe: CardWireframeInterface {
 
     func showRemoteDeck(deckId: String) {
         navigationController?.pushWireframe(RemoteDeckWireframe(deckId: deckId))
+    }
+
+    func askForSharedDeckLink(onSubmit: @escaping (String) -> Void) {
+        let alert = UIAlertController(title: NSLocalizedString("Add a shared deck", comment: "Cards: open a deck shared by link"),
+                                      message: NSLocalizedString("Paste the link someone shared with you.", comment: ""), preferredStyle: .alert)
+        alert.addTextField { field in
+            field.placeholder = "https://kiokoto.com/…/decks/shared/…"
+            field.keyboardType = .URL
+            field.autocapitalizationType = .none
+            field.autocorrectionType = .no
+            field.accessibilityIdentifier = "shared_deck_link_field"
+            if let pasted = UIPasteboard.general.hasURLs ? UIPasteboard.general.url?.absoluteString : nil { field.text = pasted }
+        }
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel))
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Open", comment: ""), style: .default) { [weak alert] _ in
+            onSubmit(alert?.textFields?.first?.text ?? "")
+        })
+        viewController.present(alert, animated: true)
+    }
+
+    func showSharedDeck(_ link: DeckShareLink) {
+        navigationController?.pushWireframe(SharedDeckWireframe(link: link))
     }
 
     func showSignIn(onFinish: @escaping () -> Void) {

@@ -20,7 +20,8 @@ final class CardPresenterTests: XCTestCase {
     }
 
     private func makePresenter() -> CardPresenter {
-        let result = CardPresenter(interactor: CardInteractor(), deskInteractor: interactor, wireframe: wireframe, defaults: defaults)
+        let result = CardPresenter(interactor: CardInteractor(), deskInteractor: interactor, wireframe: wireframe, defaults: defaults,
+                                   sharing: FakeDeckSharing())
         result.view = view
         return result
     }
@@ -44,6 +45,18 @@ final class CardPresenterTests: XCTestCase {
     private var rows: [DeckRowModel] {
         if case .decks(let rows) = view.states.last?.content { return rows }
         return []
+    }
+
+    func test_aPastedShareLinkOpensItsPreviewAndAnythingElseIsExplained() {
+        let token = "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789_-abcd"
+        let alertsBefore = wireframe.alerts.count
+        wireframe.sharedLinkAnswer = "https://evil.example/vi/decks/shared/\(token)"
+        presenter.addSharedDeck()
+        XCTAssertTrue(wireframe.sharedDecks.isEmpty)
+        XCTAssertEqual(wireframe.alerts.count, alertsBefore + 1)
+        wireframe.sharedLinkAnswer = "https://kiokoto.com/vi/decks/shared/\(token)"
+        presenter.addSharedDeck()
+        XCTAssertEqual(wireframe.sharedDecks, [DeckShareLink(token: token)])
     }
 
     func test_oftenMissedOpensTheLocalListOnce() {
@@ -181,6 +194,10 @@ final class FakeCardWireframe: CardWireframeInterface {
     var studied: [String] = []
     private(set) var oftenMissedOpened = 0
     func showOftenMissed() { oftenMissedOpened += 1 }
+    var sharedLinkAnswer: String?
+    private(set) var sharedDecks: [DeckShareLink] = []
+    func askForSharedDeckLink(onSubmit: @escaping (String) -> Void) { if let sharedLinkAnswer { onSubmit(sharedLinkAnswer) } }
+    func showSharedDeck(_ link: DeckShareLink) { sharedDecks.append(link) }
     var deleteRequests: [String] = []
     var alerts: [String?] = []
     private var editorFinish: (() -> Void)?

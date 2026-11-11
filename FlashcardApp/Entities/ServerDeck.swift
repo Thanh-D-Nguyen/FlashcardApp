@@ -97,6 +97,8 @@ struct ServerDeckCard: Equatable, Identifiable {
 struct ServerDeckDetail: Equatable {
     let deck: ServerDeck
     let cards: [ServerDeckCard]
+    /// The learner's own deck has a share link that works now.
+    var isShared = false
 }
 
 /// A card the schedule says is due.
@@ -136,7 +138,7 @@ enum ServerDeckMapper {
         let deck = make(id: dto.id, owned: dto.ownerUserId != nil, titleVi: dto.titleVi, titleJa: dto.titleJa, descriptionVi: dto.descriptionVi,
                         descriptionJa: dto.descriptionJa, visibility: dto.visibility ?? "private", cardCount: cards.count, updatedAt: nil,
                         language: language)
-        return ServerDeckDetail(deck: deck, cards: cards)
+        return ServerDeckDetail(deck: deck, cards: cards, isShared: dto.ownerUserId != nil && !(dto.shareToken ?? "").isEmpty)
     }
 
     static func dueCard(from dto: BJTDueCardDTO) -> DueCard? {

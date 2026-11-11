@@ -69,4 +69,21 @@ final class LiveProductionContractTests: XCTestCase {
                                       payload: try XCTUnwrap(AnalyticsEvent.sessionStarted.payload(appVersion: "contract-test")))
         XCTAssertNoThrow(try value(api.send([item])))
     }
+
+    /// The test account's own deck: share (same token twice), anonymous preview, one copy, revoke, and the link is gone.
+    func test_aDeckIsSharedPreviewedCopiedAndRevokedOnTheRealServer() throws {
+        let own = try XCTUnwrap(try value(api.libraryDecks(limit: 50)).first { $0.ownerUserId != nil && $0.status != "archived" }, "The account owns a deck")
+        let token = try value(api.shareDeck(id: own.id))
+        XCTAssertTrue(DeckShareLink.isValid(token: token))
+        XCTAssertEqual(try value(api.shareDeck(id: own.id)), token, "Sharing again returns the same link")
+        let preview = try value(BJTPublicDeckAPI(baseURL: { "https://kiokoto.com/api" }).preview(token: token))
+        XCTAssertGreaterThan(preview.cardCount, 0)
+        let copy = try value(api.cloneSharedDeck(token: token))
+        XCTAssertNotEqual(copy.id, own.id)
+        XCTAssertNoThrow(try value(api.unshareDeck(id: own.id)))
+        XCTAssertThrowsError(try value(BJTPublicDeckAPI(baseURL: { "https://kiokoto.com/api" }).preview(token: token))) {
+            XCTAssertEqual($0 as? LearnerAPIError, .notFound)
+        }
+        XCTAssertThrowsError(try value(api.cloneSharedDeck(token: token))) { XCTAssertEqual($0 as? LearnerAPIError, .notFound) }
+    }
 }

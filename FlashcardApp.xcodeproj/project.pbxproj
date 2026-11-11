@@ -59,6 +59,7 @@
 		3809A6AD49199CB7D07DBA0F /* SettingPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9CAB3FBED0EBD7CB069327 /* SettingPresenterTests.swift */; };
 		39A253290C90462492BE266A /* TodayPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */; };
 		39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */; };
+		A49E87933C00D0A12B6D4715 /* DeckSharingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167BEA257D1D3BC5F9A3C10E /* DeckSharingTests.swift */; };
 		85673383A5F90CACD5A52176 /* AnalyticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FDC5A41462B3833297FC57 /* AnalyticsTests.swift */; };
 		09D239C734C09D847B9A8A9C /* DataExportPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843C1BC16BA460BE67B6F458 /* DataExportPresenterTests.swift */; };
 		DCFA46725C2163496587BD8F /* DailyRadarFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BA1A74BC9B10016D164608 /* DailyRadarFixtures.swift */; };
@@ -276,6 +277,7 @@
 		96B48E86B4FB7CB02ADD3396 /* LessonListInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D09051AC9F201CC1DBBCF7 /* LessonListInteractor.swift */; };
 		6DD9B37812B41CF6B571C04B /* OftenMissedInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78B6A5A23EC4F18BD70ACD68 /* OftenMissedInteractor.swift */; };
 		467A662523D29D11742687A3 /* BJTLessonAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251F41EA212A9E3F05616E4F /* BJTLessonAPI.swift */; };
+		D2AF8550672EEF9562E7A1B2 /* BJTDeckShareAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAA7B30616A771212E7616F /* BJTDeckShareAPI.swift */; };
 		BD728430407E29BB27E358FB /* BJTPrivacyAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA98F4F23BA3FBD06D429563 /* BJTPrivacyAPI.swift */; };
 		4169C6CDC6658D215BCB91EE /* BJTDailyRadarAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071189C3887C6F7745C3F338 /* BJTDailyRadarAPI.swift */; };
 		AB7147470FF7180DD50C7875 /* BJTGamificationAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BDEC8C6511732DAD2CDD5E2 /* BJTGamificationAPI.swift */; };
@@ -294,6 +296,7 @@
 		98FF4302C5A8616691CCF827 /* GoogleSignInTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A40DB45DA41C353B9FAA34 /* GoogleSignInTests.swift */; };
 		9AA04D45D0CEE19583D9E08A /* BJTLifeFeedDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 708DFED82E76BA66048FA688 /* BJTLifeFeedDTO.swift */; };
 		9ACAE21E616C9A932152F14F /* CardLibraryServerInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */; };
+		55BB3356CBBBB12243B2D48F /* DeckSharingInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D60201A00B864F44CEF8EA4 /* DeckSharingInteractor.swift */; };
 		D4DAF9589C6D68099CA878A4 /* DailyRadar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE5961417F80BFE9EFE9B2A /* DailyRadar.swift */; };
 		951D28DDF464AD1B60DAAE2F /* AccountStreak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51889EA2321A71B8FA9B8F29 /* AccountStreak.swift */; };
 		9E75DCF301AC94A73072DD65 /* ScenarioWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01779D3F9AAABA9D3B3B287 /* ScenarioWireframe.swift */; };
@@ -340,6 +343,7 @@
 		B54706FD42A98427FF57E0FA /* DictionaryAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB0ABC95B2F0626764F789 /* DictionaryAPITests.swift */; };
 		B68AFF6A9F19EB8159544F27 /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD28E011B55258DB127437C /* SpeechRecognitionService.swift */; };
 		B6D8914AE28F69C26D61146F /* RemoteDeckViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC765A3B4A5F02EC29087FC5 /* RemoteDeckViewController.swift */; };
+		F9A189451DA93FDB20E9B608 /* SharedDeckViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A77BDA9C5E5168393CEDCCB /* SharedDeckViewController.swift */; };
 		B6E1EA5E329D8218A372092F /* NoticeToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A28EC0D989511B7F733297 /* NoticeToastView.swift */; };
 		B6E88469A0B6F11A7D082E25 /* BJTMagazineDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419759F1DD716FA545408C34 /* BJTMagazineDTO.swift */; };
 		B79BF51CC3AAFB7445C57B4C /* DeckDirectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1349716F3450468B69CADAE0 /* DeckDirectionCell.swift */; };
@@ -435,6 +439,7 @@
 		FB56D4B862C02A12C9222471 /* LifeLessonTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */; };
 		FD522D81543FA020FD1D49B5 /* LifeLesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AE4F17F125884E0FFDD865 /* LifeLesson.swift */; };
 		FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */; };
+		2BC56385C3FAF5834CFF437F /* SharedDeckPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F843166153B8343EC63770C /* SharedDeckPresenter.swift */; };
 		FFC05FDC39365669F1D11F02 /* MagazineArticlePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB8A0B721AC99E2ED0A8B14 /* MagazineArticlePresenterTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -604,12 +609,14 @@
 		7E69356F010E94232AF06D15 /* RCardExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCardExample.swift; sourceTree = "<group>"; };
 		7E77F62AA897954B5B91A027 /* BulkDeckImport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BulkDeckImport.swift; sourceTree = "<group>"; };
 		7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckPresenter.swift; sourceTree = "<group>"; };
+		5F843166153B8343EC63770C /* SharedDeckPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDeckPresenter.swift; sourceTree = "<group>"; };
 		7EADC489FA314F64A10F6D80 /* TodayInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInteractorTests.swift; sourceTree = "<group>"; };
 		8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RReviewAttempt.swift; sourceTree = "<group>"; };
 		4F6AA2F3B90E21C12AC80CC5 /* RLessonProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RLessonProgress.swift; sourceTree = "<group>"; };
 		8106BDF8A68673700EEF38DC /* DictionarySavedWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySavedWireframe.swift; sourceTree = "<group>"; };
 		81651ED770FBD884568B4B44 /* HomeCells.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeCells.swift; sourceTree = "<group>"; };
 		816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryServerInteractorTests.swift; sourceTree = "<group>"; };
+		167BEA257D1D3BC5F9A3C10E /* DeckSharingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckSharingTests.swift; sourceTree = "<group>"; };
 		C2FDC5A41462B3833297FC57 /* AnalyticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsTests.swift; sourceTree = "<group>"; };
 		843C1BC16BA460BE67B6F458 /* DataExportPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExportPresenterTests.swift; sourceTree = "<group>"; };
 		95BA1A74BC9B10016D164608 /* DailyRadarFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyRadarFixtures.swift; sourceTree = "<group>"; };
@@ -746,6 +753,7 @@
 		64D09051AC9F201CC1DBBCF7 /* LessonListInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonListInteractor.swift; sourceTree = "<group>"; };
 		78B6A5A23EC4F18BD70ACD68 /* OftenMissedInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OftenMissedInteractor.swift; sourceTree = "<group>"; };
 		251F41EA212A9E3F05616E4F /* BJTLessonAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLessonAPI.swift; sourceTree = "<group>"; };
+		BAAA7B30616A771212E7616F /* BJTDeckShareAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTDeckShareAPI.swift; sourceTree = "<group>"; };
 		BA98F4F23BA3FBD06D429563 /* BJTPrivacyAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTPrivacyAPI.swift; sourceTree = "<group>"; };
 		071189C3887C6F7745C3F338 /* BJTDailyRadarAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTDailyRadarAPI.swift; sourceTree = "<group>"; };
 		1BDEC8C6511732DAD2CDD5E2 /* BJTGamificationAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTGamificationAPI.swift; sourceTree = "<group>"; };
@@ -786,6 +794,7 @@
 		ABB9AB551D561032B238CFDA /* BJTDictionaryDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTDictionaryDTO.swift; sourceTree = "<group>"; };
 		ABCD2026111012000000000001 /* AppleIDTokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIDTokenProvider.swift; sourceTree = "<group>"; };
 		AC765A3B4A5F02EC29087FC5 /* RemoteDeckViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckViewController.swift; sourceTree = "<group>"; };
+		7A77BDA9C5E5168393CEDCCB /* SharedDeckViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDeckViewController.swift; sourceTree = "<group>"; };
 		AD5525CD0304B6DFC98F5804 /* MagazineCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagazineCells.swift; sourceTree = "<group>"; };
 		ADD28E011B55258DB127437C /* SpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionService.swift; sourceTree = "<group>"; };
 		B08C758364F30545E6BB1188 /* MagazineAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagazineAPITests.swift; sourceTree = "<group>"; };
@@ -808,6 +817,7 @@
 		C01779D3F9AAABA9D3B3B287 /* ScenarioWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioWireframe.swift; sourceTree = "<group>"; };
 		C0A32B4DA0B2480CB3FFE81E /* TodayPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlannerTests.swift; sourceTree = "<group>"; };
 		C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryServerInteractor.swift; sourceTree = "<group>"; };
+		8D60201A00B864F44CEF8EA4 /* DeckSharingInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckSharingInteractor.swift; sourceTree = "<group>"; };
 		8EE5961417F80BFE9EFE9B2A /* DailyRadar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyRadar.swift; sourceTree = "<group>"; };
 		51889EA2321A71B8FA9B8F29 /* AccountStreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountStreak.swift; sourceTree = "<group>"; };
 		C1F3F8A76C66C6980B018BEC /* DiscoverUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiscoverUITests.swift; sourceTree = "<group>"; };
@@ -1020,6 +1030,7 @@
 			isa = PBXGroup;
 			children = (
 				AC765A3B4A5F02EC29087FC5 /* RemoteDeckViewController.swift */,
+				7A77BDA9C5E5168393CEDCCB /* SharedDeckViewController.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1206,6 +1217,7 @@
 				599E734D29F737C4F99A6EAB /* ScenarioTests.swift */,
 				8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */,
 				816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */,
+				167BEA257D1D3BC5F9A3C10E /* DeckSharingTests.swift */,
 				C2FDC5A41462B3833297FC57 /* AnalyticsTests.swift */,
 				843C1BC16BA460BE67B6F458 /* DataExportPresenterTests.swift */,
 				95BA1A74BC9B10016D164608 /* DailyRadarFixtures.swift */,
@@ -1329,6 +1341,7 @@
 				EEB95458093C713F94F09498 /* LifeFeedMapper.swift */,
 				BD7647D265FE490193008FCB /* ReviewHistoryStore.swift */,
 				C131D9812C8417D8C0E42B3B /* CardLibraryServerInteractor.swift */,
+				8D60201A00B864F44CEF8EA4 /* DeckSharingInteractor.swift */,
 				8EE5961417F80BFE9EFE9B2A /* DailyRadar.swift */,
 				51889EA2321A71B8FA9B8F29 /* AccountStreak.swift */,
 				A8B2350C2485A25310794A32 /* ScenarioInteractor.swift */,
@@ -1657,6 +1670,7 @@
 				92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */,
 				92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */,
 				251F41EA212A9E3F05616E4F /* BJTLessonAPI.swift */,
+				BAAA7B30616A771212E7616F /* BJTDeckShareAPI.swift */,
 				BA98F4F23BA3FBD06D429563 /* BJTPrivacyAPI.swift */,
 				071189C3887C6F7745C3F338 /* BJTDailyRadarAPI.swift */,
 				1BDEC8C6511732DAD2CDD5E2 /* BJTGamificationAPI.swift */,
@@ -1687,6 +1701,7 @@
 			isa = PBXGroup;
 			children = (
 				7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */,
+				5F843166153B8343EC63770C /* SharedDeckPresenter.swift */,
 				DBE125BAA1B1DA138A039267 /* RemoteDeckWireframe.swift */,
 				665A038350706AAE15A4E12D /* Views */,
 			);
@@ -2164,6 +2179,7 @@
 				96B48E86B4FB7CB02ADD3396 /* LessonListInteractor.swift in Sources */,
 				6DD9B37812B41CF6B571C04B /* OftenMissedInteractor.swift in Sources */,
 				467A662523D29D11742687A3 /* BJTLessonAPI.swift in Sources */,
+				D2AF8550672EEF9562E7A1B2 /* BJTDeckShareAPI.swift in Sources */,
 				BD728430407E29BB27E358FB /* BJTPrivacyAPI.swift in Sources */,
 				4169C6CDC6658D215BCB91EE /* BJTDailyRadarAPI.swift in Sources */,
 				AB7147470FF7180DD50C7875 /* BJTGamificationAPI.swift in Sources */,
@@ -2348,6 +2364,7 @@
 				0735704A1D76E60CB510F581 /* BJTScenarioAPI.swift in Sources */,
 				5B5C334B7DDEDBF60633B0BA /* ServerDeck.swift in Sources */,
 				9ACAE21E616C9A932152F14F /* CardLibraryServerInteractor.swift in Sources */,
+				55BB3356CBBBB12243B2D48F /* DeckSharingInteractor.swift in Sources */,
 				D4DAF9589C6D68099CA878A4 /* DailyRadar.swift in Sources */,
 				951D28DDF464AD1B60DAAE2F /* AccountStreak.swift in Sources */,
 				BCCF41FFDB430E8475100D93 /* ScenarioInteractor.swift in Sources */,
@@ -2360,8 +2377,10 @@
 				D1226665E9F9A69198CC896C /* CardReviewWireframe.swift in Sources */,
 				686E5589694681D1642124E9 /* CardReviewViewController.swift in Sources */,
 				FF499DC7EE9691044DFF58B5 /* RemoteDeckPresenter.swift in Sources */,
+				2BC56385C3FAF5834CFF437F /* SharedDeckPresenter.swift in Sources */,
 				448E5AD33E33A2027A240E58 /* RemoteDeckWireframe.swift in Sources */,
 				B6D8914AE28F69C26D61146F /* RemoteDeckViewController.swift in Sources */,
+				F9A189451DA93FDB20E9B608 /* SharedDeckViewController.swift in Sources */,
 				ECC823B204B5AFFC7BE6CB3B /* CardLibraryViews.swift in Sources */,
 				B3466471B9B71BBE4FB9C529 /* Loto.swift in Sources */,
 				A1B2C3D4E5F60718293A4B04 /* LotoRandomizer.swift in Sources */,
@@ -2473,6 +2492,7 @@
 				07C12B5F488DF621CD3DF025 /* ScenarioTests.swift in Sources */,
 				5B52DA9D92D2D156B5E21480 /* BJTScenarioAPITests.swift in Sources */,
 				39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */,
+				A49E87933C00D0A12B6D4715 /* DeckSharingTests.swift in Sources */,
 				85673383A5F90CACD5A52176 /* AnalyticsTests.swift in Sources */,
 				09D239C734C09D847B9A8A9C /* DataExportPresenterTests.swift in Sources */,
 				DCFA46725C2163496587BD8F /* DailyRadarFixtures.swift in Sources */,

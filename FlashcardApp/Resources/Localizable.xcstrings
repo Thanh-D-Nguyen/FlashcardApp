@@ -26475,6 +26475,366 @@
           }
         }
       }
+    },
+    "Save to my account" : {
+      "comment" : "Shared deck: copy it into the account",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to my account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントに保存"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lưu vào tài khoản của tôi"
+          }
+        }
+      }
+    },
+    "Sign in to save" : {
+      "comment" : "Shared deck: guest",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to save"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインして保存"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng nhập để lưu"
+          }
+        }
+      }
+    },
+    "We couldn't confirm the copy. Check your decks on the account before saving it again." : {
+      "comment" : "Shared deck: clone outcome unknown",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't confirm the copy. Check your decks on the account before saving it again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーを確認できませんでした。もう一度保存する前に、アカウントのデッキを確認してください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa xác nhận được bản sao. Hãy kiểm tra bộ thẻ trên tài khoản trước khi lưu lại."
+          }
+        }
+      }
+    },
+    "Stop sharing this deck?" : {
+      "comment" : "Remote deck: confirm revoking the share link",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop sharing this deck?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデッキの共有を停止しますか？"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ngừng chia sẻ bộ thẻ này?"
+          }
+        }
+      }
+    },
+    "The link stops working for everyone. Copies already saved by others stay theirs." : {
+      "comment" : "Stop sharing confirmation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The link stops working for everyone. Copies already saved by others stay theirs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクは誰も使えなくなります。他の人がすでに保存したコピーはその人のものです。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liên kết sẽ không dùng được với bất kỳ ai. Bản sao người khác đã lưu vẫn là của họ."
+          }
+        }
+      }
+    },
+    "Stop sharing" : {
+      "comment" : "Remote deck menu / confirmation button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop sharing"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有を停止"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ngừng chia sẻ"
+          }
+        }
+      }
+    },
+    "Share link" : {
+      "comment" : "Remote deck menu: share the deck by link",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share link"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクを共有"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chia sẻ liên kết"
+          }
+        }
+      }
+    },
+    "Shared deck" : {
+      "comment" : "Title of the preview of a deck shared by link",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared deck"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有されたデッキ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bộ thẻ được chia sẻ"
+          }
+        }
+      }
+    },
+    "This link no longer works" : {
+      "comment" : "Shared deck: revoked or unknown link",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This link no longer works"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このリンクはもう使えません"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liên kết này không còn dùng được"
+          }
+        }
+      }
+    },
+    "The owner may have stopped sharing the deck." : {
+      "comment" : "Shared deck: revoked explanation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The owner may have stopped sharing the deck."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有者が共有を停止した可能性があります。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Có thể chủ bộ thẻ đã ngừng chia sẻ."
+          }
+        }
+      }
+    },
+    "Add a shared deck" : {
+      "comment" : "Cards: open a deck shared by link",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a shared deck"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有デッキを追加"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thêm bộ thẻ được chia sẻ"
+          }
+        }
+      }
+    },
+    "Paste the link someone shared with you." : {
+      "comment" : "Cards: shared deck link prompt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste the link someone shared with you."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有されたリンクを貼り付けてください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dán liên kết mà người khác đã chia sẻ cho bạn."
+          }
+        }
+      }
+    },
+    "This is not a Kiokoto deck link" : {
+      "comment" : "Cards: pasted text is not a share link",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is not a Kiokoto deck link"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiokotoのデッキのリンクではありません"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đây không phải liên kết bộ thẻ Kiokoto"
+          }
+        }
+      }
+    },
+    "Ask for the link again, or open it from the website." : {
+      "comment" : "Cards: invalid share link help",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask for the link again, or open it from the website."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクをもう一度もらうか、Webサイトから開いてください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hãy xin lại liên kết, hoặc mở nó trên website."
+          }
+        }
+      }
+    },
+    "Open" : {
+      "comment" : "Generic: open",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開く"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
