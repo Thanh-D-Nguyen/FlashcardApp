@@ -204,6 +204,41 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "practice_back").firstMatch.waitForExistence(timeout: 10), "The lesson ends on its summary")
     }
 
+    /// The learner chooses a deck for a lesson's words; saving again is harmless and reports what was already there.
+    func testLessonWordsCanBeSavedToADeckTheLearnerPicks() {
+        let app = makeApp()
+        app.launch()
+        openLevels(app)
+        let start = app.buttons["home_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 40))
+        start.tap()
+        let lessons = app.buttons["level_lessons"]
+        XCTAssertTrue(lessons.waitForExistence(timeout: 10))
+        lessons.tap()
+        let row = app.descendants(matching: .any).matching(identifier: "lesson_row_j5-03-email-writing").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 20))
+        row.tap()
+        let table = app.tables["lesson_reader"]
+        XCTAssertTrue(table.waitForExistence(timeout: 10))
+        let saveAll = app.descendants(matching: .any).matching(identifier: "lesson_save_all_words").firstMatch
+        for _ in 0..<6 where !(saveAll.exists && saveAll.isHittable) { table.swipeUp() }
+        XCTAssertTrue(saveAll.waitForExistence(timeout: 10), "The vocabulary section offers to save every word")
+        for attempt in 0..<2 {
+            saveAll.tap()
+            let sheet = app.sheets.firstMatch
+            XCTAssertTrue(sheet.waitForExistence(timeout: 5), "The learner is asked which deck")
+            let deck = sheet.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Từ các bài học' OR label BEGINSWITH 'Bộ mới'")).firstMatch
+            XCTAssertTrue(deck.waitForExistence(timeout: 5))
+            deck.tap()
+            let alert = app.alerts.firstMatch
+            XCTAssertTrue(alert.waitForExistence(timeout: 10), "The result is reported (attempt \(attempt))")
+            if attempt == 1 {
+                XCTAssertTrue(alert.staticTexts.matching(NSPredicate(format: "label CONTAINS 'đã có sẵn'")).firstMatch.exists, "The repeat reports the words already there")
+            }
+            alert.buttons.firstMatch.tap()
+        }
+    }
+
     /// A level's count opens that kind directly, skipping the kind chooser.
     func testLevelCountOpensItsKindDirectly() {
         let app = makeApp()

@@ -118,8 +118,25 @@ final class LessonReaderViewController: BaseVC {
 extension LessonReaderViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int { presenter.sections.count + (showsPractice ? 1 : 0) }
 
+    private func isVocabulary(_ section: Int) -> Bool {
+        section < presenter.sections.count && presenter.sections[section].kind == .vocabulary
+    }
+
+    /// The vocabulary section ends with one more row that saves every word.
+    private func hasSaveAllRow(_ section: Int) -> Bool { isVocabulary(section) && presenter.canSaveWords }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        section < presenter.sections.count ? presenter.sections[section].entries.count : 1
+        section < presenter.sections.count ? presenter.sections[section].entries.count + (hasSaveAllRow(section) ? 1 : 0) : 1
+    }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard isVocabulary(indexPath.section), indexPath.row < presenter.sections[indexPath.section].entries.count, presenter.canSaveWords else { return nil }
+        let action = UIContextualAction(style: .normal, title: NSLocalizedString("Save", comment: "Save a word to a deck")) { [weak self] _, _, done in
+            self?.presenter.saveWord(at: indexPath.row)
+            done(true)
+        }
+        action.backgroundColor = Design.Color.accent
+        return UISwipeActionsConfiguration(actions: [action])
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -136,13 +153,18 @@ extension LessonReaderViewController: UITableViewDataSource, UITableViewDelegate
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.section >= presenter.sections.count { presenter.showPractice() }
+        if indexPath.section >= presenter.sections.count {
+            presenter.showPractice()
+        } else if hasSaveAllRow(indexPath.section), indexPath.row == presenter.sections[indexPath.section].entries.count {
+            presenter.saveAllWords()
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "entry", for: indexPath)
         cell.accessoryType = .none
         cell.isAccessibilityElement = false
+        cell.accessibilityCustomActions = nil
         var content = cell.defaultContentConfiguration()
         content.textProperties.numberOfLines = 0
         content.secondaryTextProperties.numberOfLines = 0
@@ -166,6 +188,18 @@ extension LessonReaderViewController: UITableViewDataSource, UITableViewDelegate
             return cell
         }
         let section = presenter.sections[indexPath.section]
+        if indexPath.row >= section.entries.count {
+            content.text = NSLocalizedString("Save all words to a deck", comment: "Lesson reader")
+            content.textProperties.apply(.title)
+            content.textProperties.color = Design.Color.accent
+            cell.selectionStyle = .default
+            cell.isAccessibilityElement = true
+            cell.accessibilityLabel = content.text
+            cell.accessibilityTraits = .button
+            cell.accessibilityIdentifier = "lesson_save_all_words"
+            cell.contentConfiguration = content
+            return cell
+        }
         let entry = section.entries[indexPath.row]
         if let headline = entry.headline {
             content.text = headline
@@ -182,6 +216,18 @@ extension LessonReaderViewController: UITableViewDataSource, UITableViewDelegate
             content.textProperties.apply(.explanation)
         }
         cell.accessibilityIdentifier = "lesson_entry_\(indexPath.section)_\(indexPath.row)"
+        if section.kind == .vocabulary, presenter.canSaveWords {
+            // One element per word, with a VoiceOver action in place of the swipe.
+            cell.isAccessibilityElement = true
+            cell.accessibilityLabel = [entry.headline, entry.reading, entry.body].compactMap { $0 }.joined(separator: ". ")
+            let index = indexPath.row
+            cell.accessibilityCustomActions = [UIAccessibilityCustomAction(name: NSLocalizedString("Save to a deck", comment: "Lesson reader")) { [weak self] _ in
+                self?.presenter.saveWord(at: index)
+                return true
+            }]
+        } else {
+            cell.accessibilityCustomActions = nil
+        }
         cell.contentConfiguration = content
         return cell
     }

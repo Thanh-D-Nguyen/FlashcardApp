@@ -137,6 +137,80 @@ final class LessonReaderPresenterTests: XCTestCase {
         XCTAssertEqual(spy.practised.map(\.slug), [slug])
     }
 
+    private func loadedPresenter(saver: LessonWordSaverInterface, wireframe: ReaderWireframeSpy, edit: (inout [String: Any]) -> Void = { _ in }) throws -> LessonReaderPresenter {
+        let presenter = LessonReaderPresenter(slug: slug, title: "T", interactor: interactor, language: { .vietnamese },
+                                              progressStore: FailingProgressStore(), ownerKey: { "" }, wordSaver: saver)
+        presenter.wireframe = wireframe
+        presenter.viewDidLoad()
+        interactor.respond(LessonReadResult(lesson: try lesson(edit), isFromCache: false))
+        return presenter
+    }
+
+    func test_aChosenWordIsSavedToTheDeckTheLearnerPicks() throws {
+        let saver = WordSaverStub()
+        let wireframe = ReaderWireframeSpy()
+        wireframe.pick = .existing(deckID: "deck-1")
+        let presenter = try loadedPresenter(saver: saver, wireframe: wireframe)
+        XCTAssertTrue(presenter.canSaveWords)
+        presenter.saveWord(at: 1)
+        XCTAssertEqual(wireframe.offeredChoices, [saver.decks], "The learner's own decks are offered")
+        XCTAssertEqual(saver.saved.count, 1)
+        XCTAssertEqual(saver.saved.first?.words, [LessonWord(japanese: "新入社員", reading: "しんにゅうしゃいん", meaning: "nhân viên mới")])
+        XCTAssertEqual(saver.saved.first?.slug, slug)
+        XCTAssertEqual(saver.saved.first?.target, .existing(deckID: "deck-1"))
+        XCTAssertEqual(wireframe.messages.count, 1, "The result is reported")
+    }
+
+    func test_cancellingTheDeckChoiceSavesNothing() throws {
+        let saver = WordSaverStub()
+        let wireframe = ReaderWireframeSpy()
+        wireframe.pick = nil
+        let presenter = try loadedPresenter(saver: saver, wireframe: wireframe)
+        presenter.saveWord(at: 0)
+        presenter.saveAllWords()
+        XCTAssertTrue(saver.saved.isEmpty)
+        XCTAssertTrue(wireframe.messages.isEmpty)
+    }
+
+    func test_allWordsAreSavedTogetherInOneWrite() throws {
+        let saver = WordSaverStub()
+        let wireframe = ReaderWireframeSpy()
+        wireframe.pick = .newDictionaryDeck
+        let presenter = try loadedPresenter(saver: saver, wireframe: wireframe)
+        presenter.saveAllWords()
+        XCTAssertEqual(saver.saved.count, 1)
+        XCTAssertEqual(saver.saved.first?.words.count, 6)
+        XCTAssertEqual(saver.saved.first?.target, .newDictionaryDeck)
+    }
+
+    func test_aPositionOutsideTheVocabularyOrALessonWithoutWordsSavesNothing() throws {
+        let saver = WordSaverStub()
+        let wireframe = ReaderWireframeSpy()
+        wireframe.pick = .newDictionaryDeck
+        let presenter = try loadedPresenter(saver: saver, wireframe: wireframe)
+        presenter.saveWord(at: 99)
+        presenter.saveWord(at: -1)
+        XCTAssertTrue(saver.saved.isEmpty)
+        XCTAssertTrue(wireframe.offeredChoices.isEmpty, "No deck question for a word that does not exist")
+
+        let empty = try loadedPresenter(saver: saver, wireframe: wireframe) { object in editContent(&object) { $0["vocabulary"] = [] } }
+        XCTAssertFalse(empty.canSaveWords)
+        empty.saveAllWords()
+        XCTAssertTrue(saver.saved.isEmpty)
+    }
+
+    func test_aFailedSaveIsReportedAndNotShownAsSaved() throws {
+        let saver = WordSaverStub()
+        saver.error = AppError.databaseWriteFailed("disk full")
+        let wireframe = ReaderWireframeSpy()
+        wireframe.pick = .existing(deckID: "deck-1")
+        let presenter = try loadedPresenter(saver: saver, wireframe: wireframe)
+        presenter.saveWord(at: 0)
+        XCTAssertEqual(wireframe.messages.count, 1)
+        XCTAssertFalse(wireframe.messages[0].message.isEmpty)
+        XCTAssertEqual(wireframe.messages[0].title, NSLocalizedString("Couldn't save the words", comment: ""))
+    }
+
     func test_practiceIsNotOfferedForALessonWithoutActivities() throws {
         let presenter = makePresenter()
         let spy = ReaderWireframeSpy()
@@ -207,7 +281,27 @@ final class LessonReaderPresenterTests: XCTestCase {
 
 final class ReaderWireframeSpy: LessonReaderWireframeInterface {
     private(set) var practised: [BJTLessonDetailDTO] = []
+    private(set) var offeredChoices: [[TodayDeckChoice]] = []
+    private(set) var messages: [(title: String, message: String)] = []
+    var pick: DictionaryDeckTarget?
     func showPractice(lesson: BJTLessonDetailDTO) { practised.append(lesson) }
+    func chooseDeck(from choices: [TodayDeckChoice], completion: @escaping (DictionaryDeckTarget?) -> Void) {
+        offeredChoices.append(choices)
+        completion(pick)
+    }
+    func showMessage(title: String, message: String) { messages.append((title, message)) }
+}
+
+final class WordSaverStub: LessonWordSaverInterface {
+    let decks = [TodayDeckChoice(id: "deck-1", name: "My words", cardCount: 2)]
+    var error: Error?
+    private(set) var saved: [(words: [LessonWord], slug: String, target: DictionaryDeckTarget)] = []
+    func choices() -> [TodayDeckChoice] { decks }
+    func save(_ words: [LessonWord], fromLesson slug: String, to target: DictionaryDeckTarget) throws -> LessonWordSaveOutcome {
+        if let error { throw error }
+        saved.append((words, slug, target))
+        return LessonWordSaveOutcome(deckID: "deck-1", deckName: "My words", added: words.count, alreadyThere: 0, skipped: 0)
+    }
 }
 
 final class ReaderInteractorStub: LessonReaderInteractorInterface {

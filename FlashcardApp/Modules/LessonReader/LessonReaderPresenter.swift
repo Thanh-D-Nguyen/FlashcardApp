@@ -41,10 +41,18 @@ protocol LessonReaderPresenterInterface: AnyObject {
     func retry()
     func cancelLoading()
     func showPractice()
+    /// Whether the loaded lesson has words the learner can save to a deck.
+    var canSaveWords: Bool { get }
+    /// Saves the word at this position of the vocabulary section to a deck the learner picks.
+    func saveWord(at index: Int)
+    func saveAllWords()
 }
 
 protocol LessonReaderWireframeInterface: AnyObject {
     func showPractice(lesson: BJTLessonDetailDTO)
+    /// Asks which deck to save to; `completion` gets nil when the learner cancels.
+    func chooseDeck(from choices: [TodayDeckChoice], completion: @escaping (DictionaryDeckTarget?) -> Void)
+    func showMessage(title: String, message: String)
 }
 
 /// Where the learner stands in the lesson's activities on this device.
@@ -61,6 +69,7 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
     private let request = SerialDisposable()
     private let progressStore: LessonProgressStoreInterface
     private let ownerKey: () -> String
+    private let wordSaver: LessonWordSaverInterface
     private var lesson: BJTLessonDetailDTO?
     /// Held strongly: nothing else keeps the wireframe alive once its controller is pushed.
     var wireframe: LessonReaderWireframeInterface?
@@ -78,7 +87,9 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
     /// `title` is the list row's, shown while the lesson loads.
     init(slug: String, title: String, interactor: LessonReaderInteractorInterface, language: @escaping () -> AppLanguage = { .current },
          progressStore: LessonProgressStoreInterface = RealmLessonProgressStore.shared,
-         ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" }) {
+         ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" },
+         wordSaver: LessonWordSaverInterface = LessonWordSaver()) {
+        self.wordSaver = wordSaver
         self.slug = slug
         self.title = title
         self.interactor = interactor
@@ -100,6 +111,43 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
         }
         guard state == .idle else { return }
         load()
+    }
+
+    var canSaveWords: Bool { state == .loaded && !(lesson?.lessonContent.vocabulary.isEmpty ?? true) }
+    func saveWord(at index: Int) {
+        guard let words = lesson?.lessonContent.vocabulary, words.indices.contains(index) else { return }
+        save([LessonWord(words[index])])
+    }
+
+    func saveAllWords() {
+        guard let words = lesson?.lessonContent.vocabulary, !words.isEmpty else { return }
+        save(words.map(LessonWord.init))
+    }
+
+    /// The learner picks the deck first; cancelling writes nothing.
+    private func save(_ words: [LessonWord]) {
+        guard let wireframe else { return }
+        wireframe.chooseDeck(from: wordSaver.choices()) { [weak self] target in
+            guard let self, let target else { return }
+            do {
+                let outcome = try self.wordSaver.save(words, fromLesson: self.slug, to: target)
+                wireframe.showMessage(title: NSLocalizedString("Words saved", comment: "Lesson reader"), message: Self.message(for: outcome))
+            } catch {
+                wireframe.showMessage(title: NSLocalizedString("Couldn't save the words", comment: "Lesson reader"),
+                                      message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription)
+            }
+        }
+    }
+
+    private static func message(for outcome: LessonWordSaveOutcome) -> String {
+        var parts = [String(format: NSLocalizedString("Added %lld to “%@”.", comment: "Lesson reader: words added to a deck"), outcome.added, outcome.deckName)]
+        if outcome.alreadyThere > 0 {
+            parts.append(String(format: NSLocalizedString("%lld were already in the deck.", comment: "Lesson reader"), outcome.alreadyThere))
+        }
+        if outcome.skipped > 0 {
+            parts.append(String(format: NSLocalizedString("%lld had no meaning and were skipped.", comment: "Lesson reader"), outcome.skipped))
+        }
+        return parts.joined(separator: " ")
     }
 
     func showPractice() {

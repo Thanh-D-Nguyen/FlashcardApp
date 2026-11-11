@@ -46,3 +46,9 @@ test: `BJTLessonAPITests`, fixture `BJTLessonFixtures` (response thật, ẩn da
 - `RLessonProgress` (Realm **schema 7**, cộng thêm, không cần migrate; khoá `ownerKey|slug` như lịch sử ôn tập). `completedAt` = xong trên máy; `serverConfirmedAt` = server đã xác nhận cho đúng tài khoản. Tiến độ của guest không bị gộp vào tài khoản khi đăng nhập.
 - Máy chỉ gửi `PUT /levels/lessons/{slug}/progress` khi đã đăng nhập, **một lần** ngay sau khi hoàn thành; không tự gửi lại. Lỗi ⇒ "chưa lưu vào tài khoản" + nút thử lại do người học bấm; mất kết nối giữa chừng ⇒ "chưa rõ"; kết quả đến sau khi đổi/đăng xuất tài khoản bị bỏ. Mở lại bài đã xong chỉ hiện nút "Lưu vào tài khoản", không tự gửi.
 - Chưa kiểm với server thật (không gọi PUT production). Chưa có hiển thị tiến độ tài khoản từ server (GET ẩn danh luôn `isCompleted=false`).
+
+## K-05 — lưu từ trong bài vào bộ thẻ
+
+- Mục Từ vựng của reader: vuốt trái một từ (hoặc hành động VoiceOver "Lưu vào bộ thẻ") để lưu từ đó, hoặc hàng "Lưu tất cả các từ vào bộ thẻ". Luôn hỏi bộ thẻ trước (các bộ của người học, hoặc tạo bộ "Từ các bài học"); huỷ thì không ghi gì.
+- `Interactors/LessonWordSaver` dùng cùng repository (`DeskManagement`/`CardManagement`) như `DictionaryDeckWriter`. Bài **không có ID từ điển** nên không tạo `DictionaryCard`; thẻ có id `lesson:<deck>:<slug>:<từ>` (xác định, không phải UUID giả), mặt trước là từ, reading ở phần phụ, mặt sau là `meaningVi`.
+- Không tạo thẻ thiếu một mặt; bỏ qua từ trùng (cùng id, hoặc cùng chữ với thẻ tự gõ / từ vựng từ điển); lưu cả lô trong một transaction; thông báo số từ đã thêm / đã có / bị bỏ qua.
