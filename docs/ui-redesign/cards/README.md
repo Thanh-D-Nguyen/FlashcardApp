@@ -158,7 +158,7 @@ local (`localhost:18081`) và hai học viên thử (A xem, B sở hữu bộ c�
 
 ### Giới hạn đã biết / chưa kiểm chứng
 
-- **Chưa làm**: chia sẻ/hủy chia sẻ bộ và nhân bản qua `cloneToken` (cần liên kết sâu), các chế độ ôn nhập chữ/ghép cặp và gợi ý đáp án nhiễu của web (`/reviews/{id}/distractors`),
+- **Chưa làm**: chia sẻ/hủy chia sẻ bộ và nhân bản qua `cloneToken` (cần liên kết sâu), các chế độ ôn nhập chữ/ghép cặp của web (đáp án nhiễu `/reviews/{id}/distractors` đã dùng cho câu hỏi trắc nghiệm trước khi lật thẻ, xem K-07: đáp đúng/sai không tự chấm, người học vẫn chọn mức),
   hàng đợi ôn ngoại tuyến của web (không có khoá idempotency phía server nên không dựng hàng đợi gửi lại), `deckId` để ôn riêng một bộ, kiểu thẻ lấy từ server (`/styles/active`; app vẫn dùng kiểu đã chọn trên máy).
 - Ôn tập lấy tối đa **50 thẻ** mỗi lượt (giống web); hiển thị "50+" khi đủ một lượt. Xong lượt, "Ôn tiếp" tải lượt kế.
 - Ảnh của thẻ trên server không tồn tại (xem §3), nên thẻ của tài khoản không có ảnh.

@@ -7252,6 +7252,78 @@
         }
       }
     },
+    "Correct. Now rate how well you remembered it." : {
+      "extractionState" : "manual",
+      "comment" : "Shown after a right multiple-choice pick in review; the learner still chooses the rating",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correct. Now rate how well you remembered it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正解です。どのくらい覚えていたか評価してください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đúng. Giờ hãy chấm mức bạn nhớ thẻ này."
+          }
+        }
+      }
+    },
+    "Not quite. Now rate how well you remembered it." : {
+      "extractionState" : "manual",
+      "comment" : "Shown after a wrong multiple-choice pick in review; the learner still chooses the rating",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not quite. Now rate how well you remembered it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "惜しい。どのくらい覚えていたか評価してください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa đúng. Giờ hãy chấm mức bạn nhớ thẻ này."
+          }
+        }
+      }
+    },
+    "Pick the meaning" : {
+      "extractionState" : "manual",
+      "comment" : "Accessibility label of the group of multiple-choice answers in review",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick the meaning"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "意味を選ぶ"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn nghĩa đúng"
+          }
+        }
+      }
+    },
     "Retry" : {
       "comment" : "Retry button",
       "extractionState" : "manual",

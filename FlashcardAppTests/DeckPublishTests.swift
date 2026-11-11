@@ -216,6 +216,7 @@ private final class FakeLibraryNoop: BJTFlashcardLibraryAPIInterface {
     func deck(id: String) -> Single<BJTRemoteDeckDTO> { .error(LearnerAPIError.notFound) }
     func dueCards(limit: Int) -> Single<[BJTDueCardDTO]> { .just([]) }
     func submitReview(userFlashcardId: String, rating: ReviewRating, elapsedMs: Int?) -> Single<Void> { .just(()) }
+    func distractors(userFlashcardId: String, count: Int) -> Single<[String]> { .just([]) }
     func archiveDeck(id: String) -> Single<Void> { .just(()) }
     func reportDeck(id: String, reason: String) -> Single<Void> { .just(()) }
     func blockDeckAuthor(id: String) -> Single<Void> { .just(()) }

@@ -23,6 +23,8 @@ protocol CardLibraryServerInteractorInterface: AnyObject {
     func dueCards(limit: Int) -> Single<[DueCard]>
     /// Sends one rating. Never call it twice for one learner action.
     func submit(_ rating: ReviewRating, for card: DueCard, elapsed: TimeInterval) -> Single<Void>
+    /// Wrong answers for a multiple-choice question about `card`. Read-only; an empty list means "no question, just flip".
+    func distractors(for card: DueCard, count: Int) -> Single<[String]>
     func archive(deckId: String) -> Single<Void>
     func report(deckId: String, reason: String) -> Single<Void>
     func blockAuthor(deckId: String) -> Single<Void>
@@ -92,6 +94,10 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
         let milliseconds = Int((max(elapsed, 0) * 1000).rounded())
         return api.submitReview(userFlashcardId: card.id, rating: rating, elapsedMs: milliseconds)
             .do(onError: signOutIfRejected)
+    }
+
+    func distractors(for card: DueCard, count: Int) -> Single<[String]> {
+        api.distractors(userFlashcardId: card.id, count: count).do(onError: signOutIfRejected)
     }
 
     func archive(deckId: String) -> Single<Void> {

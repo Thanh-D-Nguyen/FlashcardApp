@@ -93,6 +93,41 @@ final class BJTFlashcardLibraryAPITests: XCTestCase {
         XCTAssertEqual(try result(api.dueCards(limit: 50)).get().count, 0)
     }
 
+    // MARK: Distractors
+
+    func test_distractorsReadsTheWrongAnswersOfTheCardsOwnRoute() throws {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 200, json: #"{"items":["mèo","chim","cá"]}"#) }
+        let items = try result(api.distractors(userFlashcardId: ufId, count: 3)).get()
+        XCTAssertEqual(items, ["mèo", "chim", "cá"])
+        let sent = try XCTUnwrap(LearnerURLProtocol.requests.first)
+        XCTAssertEqual(sent.method, "GET", "Reading wrong answers never changes the schedule")
+        XCTAssertEqual(sent.url.path, "/api/flashcards/reviews/\(ufId)/distractors")
+        XCTAssertEqual(URLComponents(url: sent.url, resolvingAgainstBaseURL: false)?.queryItems, [URLQueryItem(name: "n", value: "3")])
+        XCTAssertEqual(sent.headers["Authorization"], "Bearer opaque-session-token")
+    }
+
+    func test_distractorsTreatsANullListAsNoAnswers() throws {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 200, json: #"{"items":null}"#) }
+        XCTAssertEqual(try result(api.distractors(userFlashcardId: ufId, count: 3)).get(), [])
+    }
+
+    func test_distractorsRefusesAnIdThatIsNotAUUIDAndACountOutsideOneToTen() {
+        for (id, count) in [("../decks", 3), (ufId, 0), (ufId, 11)] {
+            guard case .failure(let error) = result(api.distractors(userFlashcardId: id, count: count)) else { return XCTFail("expected failure") }
+            XCTAssertEqual(error as? LearnerAPIError, .invalidRequest(nil))
+        }
+        XCTAssertTrue(LearnerURLProtocol.requests.isEmpty)
+    }
+
+    func test_distractorsMapsAnUnknownCardAndAnAnonymousCaller() {
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 404, json: #"{"error":"user flashcard not found"}"#) }
+        guard case .failure(let missing) = result(api.distractors(userFlashcardId: ufId, count: 3)) else { return XCTFail("expected failure") }
+        XCTAssertEqual(missing as? LearnerAPIError, .notFound)
+        token = nil
+        guard case .failure(let anonymous) = result(api.distractors(userFlashcardId: ufId, count: 3)) else { return XCTFail("expected failure") }
+        XCTAssertEqual(anonymous as? LearnerAPIError, .signInRequired)
+    }
+
     // MARK: Rating
 
     func test_submitReviewPostsTheRatingAndElapsedTimeToTheCardsOwnRoute() throws {

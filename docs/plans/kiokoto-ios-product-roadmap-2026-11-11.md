@@ -28,7 +28,7 @@
 | Lưu từ vào bộ thẻ | **SOURCE**: `DictionaryDeckWriter` ghi vào Realm local, chống thêm trùng | `FlashcardApp/Interactors/DictionaryDeckWriter.swift`; cần kiểm tra cách map vocab trong lesson |
 | Scenario | **SOURCE**: đã có Scenario list/play, tránh viết lại | `FlashcardApp/Modules/Scenario/` |
 | 420 lesson, J5 84 lesson, cấu trúc `lessonContent` | **FABLE-RUNTIME / UNVERIFIED HERE** | K-01 phải kiểm contract + lấy fixture đã loại thông tin nhạy cảm; đừng coi `contents[]` rỗng là nội dung bài |
-| `GET /flashcards/reviews/{id}/distractors` | **FABLE-RUNTIME / UNVERIFIED HERE** | Kiểm API/backend trước K-07 |
+| `GET /flashcards/reviews/{id}/distractors` | **SOURCE-VERIFIED** (handler + test backend; `{"items":[string]}`, 401/404); chưa gọi server thật | K-07 dùng; cần tài khoản để kiểm runtime |
 | Dòng tin Daily Radar, gamification, analytics | **FABLE-SOURCE/RUNTIME / UNVERIFIED HERE** | Xác minh kích thước, auth và hành vi trong story tương ứng |
 | 1.277 tests PASS | **DOC/FABLE**, không phải kết quả chạy hôm nay | Mỗi story phải có log test/build của chính nó |
 
@@ -70,7 +70,7 @@
 | K-04 | 5 hoạt động hoặc số lượng thật từ API, đáp án/rationale, lưu hoàn thành local, ghi progress server khi hợp lệ | K-03 + contract xác minh | 1.1/P3 | **VERIFIED** (local commit; PUT thật NOT VERIFIED) — [status](kiokoto-ios-orca-status.md) |
 | K-05 | Chọn/lưu từ trong lesson vào bộ thẻ local bằng writer hiện có, chống trùng | K-03; nên sau K-04 để hoàn thiện journey | 1.1/P4 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
 | K-06 | Today: bài kế tiếp/tiếp tục học; giữ nguyên hero review, tách nguồn local/server | K-04/K-05 | 1.1/P5 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
-| K-07 | Choice mode cho **server account review**; xác minh distractors; người học tự xác nhận rating | K-01..06 không phải phụ thuộc code, nhưng đợi cổng MVP | 1.1 sau MVP | PLANNED |
+| K-07 | Choice mode cho **server account review**; xác minh distractors; người học tự xác nhận rating | K-01..06 không phải phụ thuộc code, nhưng đợi cổng MVP | 1.1 sau MVP | VERIFIED local (server thật NOT VERIFIED) |
 | K-08 | Danh sách thẻ thường sai theo dữ liệu lịch sử thật; không suy đoán lapse trên server | K-07 hoặc dữ liệu local đã có | Sau K-07 | PLANNED |
 | K-09 | Gõ đáp án kana có xử lý biến thể và accessibility | K-07 | 1.2 | DEFERRED |
 | K-10 | Study-plan/streak signed-in; fallback local phải có định nghĩa rõ | K-04 + contract | 1.2 | DEFERRED |

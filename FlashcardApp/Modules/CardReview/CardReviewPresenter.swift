@@ -24,6 +24,17 @@ struct ReviewCardState: Equatable {
     var picture: CardPicture? = nil
 }
 
+/// A multiple-choice question about the card in front of the learner. Answering only reveals the card: how well the learner
+/// remembered it is still theirs to rate, so a right pick never counts as "good" by itself.
+struct ReviewChoiceState: Equatable {
+    let options: [String]
+    let correctIndex: Int
+    var selectedIndex: Int?
+
+    /// `nil` until the learner picks.
+    var isCorrect: Bool? { selectedIndex.map { $0 == correctIndex } }
+}
+
 struct ReviewSummary: Equatable {
     var total = 0
     var again = 0
@@ -62,6 +73,8 @@ struct CardReviewState: Equatable {
     var card: ReviewCardState?
     var isSubmitting = false
     var failure: Failure?
+    /// Offered only when the server supplied enough wrong answers; otherwise the card is flipped as before.
+    var choice: ReviewChoiceState?
     var summary = ReviewSummary()
 }
 
@@ -73,6 +86,8 @@ protocol CardReviewPresenterInterface: AnyObject {
     func viewDidLoad()
     func viewWillDisappear()
     func flip()
+    /// Picks an option of the multiple-choice question; reveals the card but does not rate it.
+    func choose(optionAt index: Int)
     func rate(_ rating: ReviewRating)
     /// Sends the rating that failed, again, because the learner asked.
     func retryRating()
@@ -85,11 +100,16 @@ protocol CardReviewPresenterInterface: AnyObject {
 
 final class CardReviewPresenter {
     static let batchSize = 50
+    /// Wrong answers asked for; with the right one that makes a four-way question, as on the website.
+    static let distractorCount = 3
+    /// Fewer than this and the question is too easy to be worth asking: the card is flipped as before.
+    static let minimumDistractors = 2
 
     private let interactor: CardLibraryServerInteractorInterface
     private let wireframe: CardReviewWireframeInterface
     private let speech: SpeechServiceInterface
     private let now: () -> Date
+    private let shuffle: ([String]) -> [String]
     weak var view: CardReviewViewInterface?
 
     private var state = CardReviewState()
@@ -102,13 +122,17 @@ final class CardReviewPresenter {
     private var pendingRating: ReviewRating?
     private var pendingElapsed: TimeInterval = 0
     private let request = SerialDisposable()
+    /// Read-only, so cancelling it when the card changes loses nothing.
+    private let choiceRequest = SerialDisposable()
 
     /// `initialCards` skips the first load when the Cards tab already has them.
     init(initialCards: [DueCard]?,
          interactor: CardLibraryServerInteractorInterface,
          wireframe: CardReviewWireframeInterface,
          speech: SpeechServiceInterface = SystemSpeechService.shared,
-         now: @escaping () -> Date = Date.init) {
+         now: @escaping () -> Date = Date.init,
+         shuffle: @escaping ([String]) -> [String] = { $0.shuffled() }) {
+        self.shuffle = shuffle
         self.interactor = interactor
         self.wireframe = wireframe
         self.speech = speech
@@ -118,7 +142,10 @@ final class CardReviewPresenter {
 
     private var initialCards: [DueCard]?
 
-    deinit { request.dispose() }
+    deinit {
+        request.dispose()
+        choiceRequest.dispose()
+    }
 
     // MARK: Loading
 
@@ -159,11 +186,36 @@ final class CardReviewPresenter {
         state.screen = .card
         state.failure = nil
         state.isSubmitting = false
+        state.choice = nil
         pendingRating = nil
         publish()
+        requestChoice(for: cards[position])
+    }
+
+    /// Asks for wrong answers to turn the card into a question. Any failure just leaves the card as it was: flip and rate.
+    private func requestChoice(for card: DueCard) {
+        // Started from inside the batch/rating callbacks, which already run on `MainScheduler`: that scheduler defers a nested hop, so the
+        // concurrent main scheduler (immediate on the main queue, a hop otherwise) keeps this one in order with the screen state.
+        choiceRequest.disposable = interactor.distractors(for: card, count: Self.distractorCount)
+            .observe(on: ConcurrentMainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] items in
+                guard let self, self.state.screen == .card, self.position < self.cards.count, self.cards[self.position].id == card.id,
+                      !self.isFlipped, !self.state.isSubmitting, self.state.choice == nil else { return }
+                var seen: Set<String> = [card.back]
+                let wrong = items.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty && seen.insert($0).inserted }
+                    .prefix(Self.distractorCount)
+                guard wrong.count >= Self.minimumDistractors else { return }
+                let options = self.shuffle(wrong + [card.back])
+                guard let correct = options.firstIndex(of: card.back) else { return }
+                self.state.choice = ReviewChoiceState(options: options, correctIndex: correct, selectedIndex: nil)
+                self.publish()
+            }, onFailure: { _ in })
     }
 
     private func finish() {
+        choiceRequest.disposable = Disposables.create()
+        state.choice = nil
         speech.stop()
         state.summary.duration = now().timeIntervalSince(sessionStartedAt)
         state.screen = .finished
@@ -273,6 +325,21 @@ extension CardReviewPresenter: CardReviewPresenterInterface {
     func flip() {
         guard state.screen == .card, !state.isSubmitting, state.failure == nil, position < cards.count else { return }
         isFlipped.toggle()
+        // Showing the answer instead of picking one gives the question up; it is neither right nor wrong and counts as nothing.
+        if state.choice?.selectedIndex == nil {
+            state.choice = nil
+            choiceRequest.disposable = Disposables.create()
+        }
+        publish()
+    }
+
+    func choose(optionAt index: Int) {
+        guard state.screen == .card, !state.isSubmitting, state.failure == nil, !isFlipped,
+              var choice = state.choice, choice.selectedIndex == nil, choice.options.indices.contains(index) else { return }
+        choice.selectedIndex = index
+        state.choice = choice
+        // The pick only shows the card. Whether the learner knew it is for them to say with one of the four ratings.
+        isFlipped = true
         publish()
     }
 

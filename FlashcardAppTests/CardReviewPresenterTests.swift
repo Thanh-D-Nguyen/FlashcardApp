@@ -11,6 +11,10 @@ final class FakeServerInteractor: CardLibraryServerInteractorInterface {
     /// Consumed in order, one per `submit`; an exhausted queue succeeds.
     var submitResults: [Single<Void>] = []
     var archiveResult: Single<Void> = .just(())
+    /// Defaults to no distractors: the review falls back to flip-and-rate.
+    var distractorResult: Single<[String]> = .just([])
+    var distractorResultsByCard: [String: Single<[String]>] = [:]
+    private(set) var distractorRequests: [(id: String, count: Int)] = []
     var reportResult: Single<Void> = .just(())
     var blockResult: Single<Void> = .just(())
     var deviceCopies = Set<String>()
@@ -32,6 +36,10 @@ final class FakeServerInteractor: CardLibraryServerInteractorInterface {
     func submit(_ rating: ReviewRating, for card: DueCard, elapsed: TimeInterval) -> Single<Void> {
         submissions.append((rating, card.id, elapsed))
         return submitResults.isEmpty ? .just(()) : submitResults.removeFirst()
+    }
+    func distractors(for card: DueCard, count: Int) -> Single<[String]> {
+        distractorRequests.append((card.id, count))
+        return distractorResultsByCard[card.id] ?? distractorResult
     }
     func archive(deckId: String) -> Single<Void> { archived.append(deckId); return archiveResult }
     func report(deckId: String, reason: String) -> Single<Void> { reported.append((deckId, reason)); return reportResult }
@@ -85,8 +93,9 @@ final class CardReviewPresenterTests: XCTestCase {
         DueCard(id: ids[index], state: state, front: front ?? "語\(index)", back: "nghĩa \(index)", reading: "よみ\(index)", lapses: 0, isLeech: leech)
     }
 
-    private func makePresenter(_ initial: [DueCard]?) {
-        presenter = CardReviewPresenter(initialCards: initial, interactor: interactor, wireframe: wireframe, speech: speech, now: { [unowned self] in clock })
+    private func makePresenter(_ initial: [DueCard]?, shuffle: @escaping ([String]) -> [String] = { $0 }) {
+        presenter = CardReviewPresenter(initialCards: initial, interactor: interactor, wireframe: wireframe, speech: speech, now: { [unowned self] in clock },
+                                        shuffle: shuffle)
         presenter.view = view
         presenter.viewDidLoad()
     }
@@ -325,5 +334,238 @@ final class CardReviewPresenterTests: XCTestCase {
         makePresenter([card(0)])
         presenter.viewWillDisappear()
         XCTAssertGreaterThan(speech.stops, 0)
+    }
+}
+
+/// Multiple-choice questions on server-account review (K-07). A pick only reveals the card: the rating stays the learner's.
+extension CardReviewPresenterTests {
+    /// An empty question when none is offered, so a missing choice fails an assertion instead of crashing the run.
+    private var choiceNow: ReviewChoiceState { view.last.choice ?? ReviewChoiceState(options: [], correctIndex: 0, selectedIndex: nil) }
+
+    private func startWithChoices(_ distractors: [String] = ["sai A", "sai B", "sai C"], shuffle: @escaping ([String]) -> [String] = { $0 }) {
+        interactor.distractorResult = .just(distractors)
+        makePresenter([card(0), card(1)], shuffle: shuffle)
+    }
+
+    func test_choice_requestsThreeWrongAnswersForTheShownCard() {
+        startWithChoices()
+        XCTAssertEqual(interactor.distractorRequests.map(\.id), [ids[0]])
+        XCTAssertEqual(interactor.distractorRequests.map(\.count), [3])
+    }
+
+    func test_choice_isOfferedWithTheCorrectAnswerAmongTheServersWrongOnes() {
+        // Rotated, so the right answer is neither first nor last and `correctIndex` has to follow it.
+        startWithChoices(shuffle: { Array($0.dropFirst()) + [$0[0]] })
+        let choice = view.last.choice
+        XCTAssertEqual(choice?.options, ["sai B", "sai C", "nghĩa 0", "sai A"])
+        XCTAssertEqual(choice?.correctIndex, 2)
+        XCTAssertNil(choice?.selectedIndex)
+        XCTAssertEqual(view.last.card?.isFlipped, false, "The question comes first")
+    }
+
+    func test_choice_dropsEmptyRepeatedAndCorrectLookalikeAnswersAndNeedsTwoOthers() {
+        startWithChoices(["", "  ", "nghĩa 0", "sai A", "sai A"])
+        XCTAssertNil(view.last.choice, "Only one distinct wrong answer is left: not a fair question")
+        startWithChoices(["nghĩa 0", "sai A", "sai B", "sai A"])
+        XCTAssertEqual(view.last.choice?.options.sorted(), ["nghĩa 0", "sai A", "sai B"])
+    }
+
+    func test_choice_isNotOfferedWhenTheServerHasNoAnswersOrFails() {
+        startWithChoices([])
+        XCTAssertNil(view.last.choice)
+        interactor.distractorResult = .error(LearnerAPIError.offline)
+        makePresenter([card(0)])
+        XCTAssertNil(view.last.choice)
+        XCTAssertEqual(view.last.screen, .card)
+        presenter.flip()
+        XCTAssertEqual(view.last.card?.isFlipped, true, "Without a question the card is flipped as before")
+        presenter.rate(.good)
+        XCTAssertEqual(interactor.submissions.count, 1)
+    }
+
+    func test_choice_aRightPickRevealsTheCardButDoesNotRateIt() {
+        startWithChoices()
+        presenter.choose(optionAt: choiceNow.correctIndex)
+        XCTAssertEqual(view.last.choice?.isCorrect, true)
+        XCTAssertEqual(view.last.card?.isFlipped, true)
+        XCTAssertTrue(interactor.submissions.isEmpty, "A right answer is not an automatic Good")
+        XCTAssertEqual(view.last.summary.total, 0)
+        XCTAssertEqual(view.last.card?.front, "語0", "The learner still has to rate this card")
+    }
+
+    func test_choice_aWrongPickRevealsTheCardAndDoesNotRateItEither() {
+        startWithChoices()
+        let wrong = (choiceNow.correctIndex + 1) % 4
+        presenter.choose(optionAt: wrong)
+        XCTAssertEqual(view.last.choice?.isCorrect, false)
+        XCTAssertEqual(view.last.card?.isFlipped, true)
+        XCTAssertTrue(interactor.submissions.isEmpty)
+    }
+
+    func test_choice_theLearnersOwnRatingIsWhatIsSentAfterAPick_exactlyOnce() {
+        startWithChoices()
+        presenter.choose(optionAt: choiceNow.correctIndex)
+        presenter.rate(.hard)
+        presenter.rate(.hard)
+        XCTAssertEqual(interactor.submissions.map(\.rating), [.hard], "One confirmation, one POST, and it is the rating the learner chose")
+        XCTAssertEqual(view.last.card?.front, "語1")
+        XCTAssertNil(view.last.choice?.selectedIndex, "The next card is a fresh question, not the previous answer")
+        XCTAssertTrue(view.last.choice?.options.contains("nghĩa 1") ?? false)
+        XCTAssertEqual(interactor.distractorRequests.map(\.id), [ids[0], ids[1]])
+    }
+
+    func test_choice_aSecondPickIsIgnored() {
+        startWithChoices()
+        let right = choiceNow.correctIndex
+        presenter.choose(optionAt: right)
+        presenter.choose(optionAt: (right + 1) % 4)
+        XCTAssertEqual(view.last.choice?.selectedIndex, right)
+        XCTAssertEqual(view.last.choice?.isCorrect, true)
+    }
+
+    func test_choice_anOutOfRangePickIsIgnored() {
+        startWithChoices()
+        presenter.choose(optionAt: 9)
+        presenter.choose(optionAt: -1)
+        XCTAssertNil(view.last.choice?.selectedIndex)
+        XCTAssertEqual(view.last.card?.isFlipped, false)
+    }
+
+    func test_choice_showingTheAnswerInsteadSkipsTheQuestionAndCountsNothing() {
+        startWithChoices()
+        presenter.flip()
+        XCTAssertNil(view.last.choice, "The question is dropped; it never counts as reviewed")
+        XCTAssertEqual(view.last.card?.isFlipped, true)
+        XCTAssertTrue(interactor.submissions.isEmpty)
+        XCTAssertEqual(view.last.summary.total, 0)
+        presenter.rate(.good)
+        XCTAssertEqual(interactor.submissions.count, 1)
+    }
+
+    func test_choice_anAnswerThatArrivesAfterTheLearnerMovedOnIsDiscarded() {
+        let late = PublishSubject<[String]>()
+        interactor.distractorResultsByCard = [ids[0]: late.asSingle()]
+        interactor.distractorResult = .just([])
+        makePresenter([card(0), card(1)])
+        presenter.flip()
+        presenter.rate(.good)
+        XCTAssertEqual(view.last.card?.front, "語1")
+        late.onNext(["sai A", "sai B", "sai C"])
+        late.onCompleted()
+        XCTAssertNil(view.last.choice, "Options of the previous card must not appear on this one")
+    }
+
+    func test_choice_aLateAnswerForTheShownCardOffersTheQuestionIfNotYetAnswered() {
+        let late = PublishSubject<[String]>()
+        interactor.distractorResultsByCard = [ids[0]: late.asSingle()]
+        makePresenter([card(0)])
+        XCTAssertNil(view.last.choice)
+        late.onNext(["sai A", "sai B"])
+        late.onCompleted()
+        XCTAssertNotNil(view.last.choice)
+        presenter.flip()
+        XCTAssertNil(view.last.choice)
+    }
+
+    func test_choice_noPickIsPossibleOnceTheCardIsRevealedOrWhileSubmitting() {
+        let pending = PublishSubject<Void>()
+        interactor.submitResults = [pending.asSingle()]
+        startWithChoices()
+        presenter.choose(optionAt: choiceNow.correctIndex)
+        presenter.rate(.good)
+        presenter.choose(optionAt: 0)
+        XCTAssertTrue(view.last.isSubmitting)
+        XCTAssertEqual(interactor.submissions.count, 1)
+        XCTAssertEqual(view.last.choice?.selectedIndex, view.last.choice?.correctIndex, "Nothing changes while the rating is on its way")
+    }
+}
+
+private final class StubReviewPresenter: CardReviewPresenterInterface {
+    private(set) var chosen: [Int] = []
+    private(set) var flips = 0
+    private(set) var ratings: [ReviewRating] = []
+    func viewDidLoad() {}
+    func viewWillDisappear() {}
+    func flip() { flips += 1 }
+    func choose(optionAt index: Int) { chosen.append(index) }
+    func rate(_ rating: ReviewRating) { ratings.append(rating) }
+    func retryRating() {}
+    func skipCard() {}
+    func speakCurrent() {}
+    func reloadBatch() {}
+    func close() {}
+}
+
+/// What the learner sees of the multiple-choice question (K-07): options before the answer, the four ratings after, and a tap that only
+/// reaches `choose`.
+final class CardReviewViewChoiceTests: XCTestCase {
+    private var presenter: StubReviewPresenter!
+    private var controller: CardReviewViewController!
+
+    override func setUp() {
+        super.setUp()
+        presenter = StubReviewPresenter()
+        controller = CardReviewViewController()
+        controller.presenter = presenter
+        controller.loadViewIfNeeded()
+        controller.view.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
+    }
+
+    private func state(flipped: Bool, choice: ReviewChoiceState?) -> CardReviewState {
+        var state = CardReviewState()
+        state.screen = .card
+        state.card = ReviewCardState(front: "犬", back: "chó", reading: "いぬ", isFlipped: flipped, stateLabel: "Review", isLeech: false)
+        state.choice = choice
+        return state
+    }
+
+    private func views(_ identifier: String) -> [UIView] {
+        var found: [UIView] = []
+        func walk(_ view: UIView) {
+            if view.accessibilityIdentifier == identifier { found.append(view) }
+            view.subviews.forEach(walk)
+        }
+        walk(controller.view)
+        return found
+    }
+
+    private func isShown(_ identifier: String) -> Bool {
+        views(identifier).contains { sequence(first: $0, next: \.superview).allSatisfy { !$0.isHidden } }
+    }
+
+    private let question = ReviewChoiceState(options: ["mèo", "chó", "chim"], correctIndex: 1, selectedIndex: nil)
+
+    func test_theQuestionShowsItsOptionsAndTheShowAnswerWayOut_withoutRatings() {
+        controller.render(state(flipped: false, choice: question))
+        XCTAssertEqual((0..<3).filter { isShown("review_choice_\($0)") }, [0, 1, 2])
+        XCTAssertTrue(isShown("review_show_answer"), "The learner can still give the question up and just flip the card")
+        XCTAssertFalse(isShown("review_rate_good"))
+    }
+
+    func test_tappingAnOptionOnlyForwardsThePick() throws {
+        controller.render(state(flipped: false, choice: question))
+        let option = try XCTUnwrap(views("review_choice_2").first as? UIButton)
+        option.sendActions(for: .primaryActionTriggered)
+        XCTAssertEqual(presenter.chosen, [2])
+        XCTAssertTrue(presenter.ratings.isEmpty, "Picking never rates")
+        XCTAssertEqual(presenter.flips, 0)
+    }
+
+    func test_afterAPickTheOptionsGiveWayToFeedbackAndTheFourRatings() {
+        var answered = question
+        answered.selectedIndex = 1
+        controller.render(state(flipped: true, choice: answered))
+        XCTAssertFalse(isShown("review_choice_0"))
+        XCTAssertTrue(isShown("review_choice_feedback"))
+        XCTAssertTrue(["again", "hard", "good", "easy"].allSatisfy { isShown("review_rate_\($0)") })
+    }
+
+    func test_withoutAQuestionTheScreenIsTheFlipAndRateOneItWasBefore() {
+        controller.render(state(flipped: false, choice: nil))
+        XCTAssertFalse(isShown("review_choice_0"))
+        XCTAssertTrue(isShown("review_show_answer"))
+        controller.render(state(flipped: true, choice: nil))
+        XCTAssertFalse(isShown("review_choice_feedback"))
+        XCTAssertTrue(isShown("review_rate_easy"))
     }
 }

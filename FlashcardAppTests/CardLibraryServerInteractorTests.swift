@@ -28,6 +28,8 @@ private final class FakeLibraryAPI: BJTFlashcardLibraryAPIInterface {
     var blockResult: Single<Void> = .just(())
     private(set) var submissions: [(id: String, rating: ReviewRating, elapsedMs: Int?)] = []
     private(set) var deckLimits: [Int] = []
+    var distractorResult: Single<[String]> = .just([])
+    private(set) var distractorRequests: [(id: String, count: Int)] = []
 
     func libraryDecks(limit: Int) -> Single<[BJTDeckSummaryDTO]> { deckLimits.append(limit); return decks }
     func deck(id: String) -> Single<BJTRemoteDeckDTO> { deckResult }
@@ -35,6 +37,10 @@ private final class FakeLibraryAPI: BJTFlashcardLibraryAPIInterface {
     func submitReview(userFlashcardId: String, rating: ReviewRating, elapsedMs: Int?) -> Single<Void> {
         submissions.append((userFlashcardId, rating, elapsedMs))
         return submitResult
+    }
+    func distractors(userFlashcardId: String, count: Int) -> Single<[String]> {
+        distractorRequests.append((userFlashcardId, count))
+        return distractorResult
     }
     func archiveDeck(id: String) -> Single<Void> { archiveResult }
     func reportDeck(id: String, reason: String) -> Single<Void> { reportResult }
@@ -109,6 +115,23 @@ final class CardLibraryServerInteractorTests: XCTestCase {
             entry("aaaaaaaa-0000-4000-8000-000000000001", 0, first.0, first.1, first.2),
             entry("aaaaaaaa-0000-4000-8000-000000000003", 2, "  ", "bỏ", nil)
         ], descriptionVi: "Mô tả", visibility: "public")
+    }
+
+    // MARK: Distractors
+
+    func test_distractorsAskTheServerForTheCardAndReturnItsAnswers() throws {
+        api.distractorResult = .just(["mèo", "chim"])
+        let card = DueCard(id: ufId, state: .review, front: "犬", back: "chó", reading: "いぬ", lapses: 0, isLeech: false)
+        XCTAssertEqual(try value(interactor.distractors(for: card, count: 3)), ["mèo", "chim"])
+        XCTAssertEqual(api.distractorRequests.map(\.id), [ufId])
+        XCTAssertEqual(api.distractorRequests.map(\.count), [3])
+    }
+
+    func test_distractorsPassTheServersFailureOnWithoutRetrying() {
+        api.distractorResult = .error(LearnerAPIError.server(500))
+        let card = DueCard(id: ufId, state: .review, front: "犬", back: "chó", reading: "いぬ", lapses: 0, isLeech: false)
+        XCTAssertThrowsError(try value(interactor.distractors(for: card, count: 3))) { XCTAssertEqual($0 as? LearnerAPIError, .server(500)) }
+        XCTAssertEqual(api.distractorRequests.count, 1)
     }
 
     // MARK: Deck list

@@ -15,6 +15,9 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
     private let summaryView = ReviewSummaryView()
     private let showAnswerButton = PressableButton(configuration: Design.Button.primary(title: NSLocalizedString("Show answer", comment: "")))
     private let ratingGrid = UIStackView()
+    /// The multiple-choice answers (K-07); shown only while the server supplied a question and the learner has not answered it.
+    private let choiceStack = UIStackView()
+    private let choiceFeedbackLabel = UILabel()
     private let failureView = ReviewFailureView()
     private let bottomStack = UIStackView()
     private var cardMinHeight: NSLayoutConstraint!
@@ -94,7 +97,16 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
         bottomStack.axis = .vertical
         bottomStack.spacing = Design.Spacing.m
         bottomStack.translatesAutoresizingMaskIntoConstraints = false
-        [failureView, showAnswerButton, ratingGrid].forEach(bottomStack.addArrangedSubview)
+        choiceStack.axis = .vertical
+        choiceStack.spacing = Design.Spacing.s
+        choiceStack.isHidden = true
+        choiceStack.accessibilityLabel = NSLocalizedString("Pick the meaning", comment: "Accessibility label of the group of multiple-choice answers in review")
+        choiceFeedbackLabel.apply(.reading)
+        choiceFeedbackLabel.textAlignment = .center
+        choiceFeedbackLabel.numberOfLines = 0
+        choiceFeedbackLabel.isHidden = true
+        choiceFeedbackLabel.accessibilityIdentifier = "review_choice_feedback"
+        [failureView, choiceStack, showAnswerButton, choiceFeedbackLabel, ratingGrid].forEach(bottomStack.addArrangedSubview)
 
         stateView.translatesAutoresizingMaskIntoConstraints = false
         [header, scrollView, bottomStack, stateView].forEach(view.addSubview)
@@ -188,6 +200,57 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
 
     @objc private func flipTapped() { presenter.flip() }
 
+    /// Options are offered before the answer; once one is picked the card is up and only the feedback line and the four ratings remain.
+    private func renderChoice(_ newState: CardReviewState, previous: CardReviewState) {
+        let isCard = newState.screen == .card
+        let flipped = newState.card?.isFlipped ?? false
+        let choice = newState.choice
+        let asking = isCard && !flipped && newState.failure == nil && choice != nil && choice?.selectedIndex == nil
+        if choice?.options != previous.choice?.options || choiceStack.arrangedSubviews.count != (choice?.options.count ?? 0) {
+            choiceStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            for (index, option) in (choice?.options ?? []).enumerated() {
+                let button = Self.makeChoiceButton(title: option, identifier: "review_choice_\(index)")
+                button.addAction(UIAction { [weak self] _ in self?.presenter.choose(optionAt: index) }, for: .primaryActionTriggered)
+                choiceStack.addArrangedSubview(button)
+            }
+        }
+        choiceStack.isHidden = !asking
+        choiceStack.isUserInteractionEnabled = !newState.isSubmitting
+        if asking, previous.choice == nil || !(previous.card.map { $0.front == newState.card?.front } ?? false) {
+            UIAccessibility.post(notification: .layoutChanged, argument: choiceStack.arrangedSubviews.first)
+        }
+        let feedback: String?
+        switch choice?.isCorrect {
+        case .some(true): feedback = NSLocalizedString("Correct. Now rate how well you remembered it.", comment: "Shown after a right multiple-choice pick in review; the learner still chooses the rating")
+        case .some(false): feedback = NSLocalizedString("Not quite. Now rate how well you remembered it.", comment: "Shown after a wrong multiple-choice pick in review; the learner still chooses the rating")
+        case .none: feedback = nil
+        }
+        choiceFeedbackLabel.text = feedback
+        choiceFeedbackLabel.isHidden = !(isCard && flipped && newState.failure == nil && feedback != nil)
+        if previous.choice?.selectedIndex == nil, let feedback, choice?.selectedIndex != nil {
+            UIAccessibility.post(notification: .announcement, argument: feedback)
+        }
+    }
+
+    private static func makeChoiceButton(title: String, identifier: String) -> UIButton {
+        var configuration = UIButton.Configuration.filled()
+        configuration.cornerStyle = .large
+        configuration.buttonSize = .large
+        configuration.baseBackgroundColor = Design.Color.surface
+        configuration.baseForegroundColor = Design.Color.textPrimary
+        configuration.background.strokeColor = Design.Color.accent.withAlphaComponent(0.38)
+        configuration.background.strokeWidth = 1.5
+        var text = AttributedString(title)
+        text.font = UIFont.preferredFont(forTextStyle: .body)
+        configuration.attributedTitle = text
+        let button = PressableButton(configuration: configuration)
+        button.titleLabel?.numberOfLines = 0
+        button.titleLabel?.lineBreakMode = .byWordWrapping
+        button.accessibilityIdentifier = identifier
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
+        return button
+    }
+
     func render(_ newState: CardReviewState) {
         let previous = state
         state = newState
@@ -225,6 +288,7 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
         ratingGrid.isUserInteractionEnabled = !newState.isSubmitting
         ratingGrid.alpha = newState.isSubmitting ? 0.5 : 1
         if let failure = newState.failure { failureView.configure(failure) }
+        renderChoice(newState, previous: previous)
 
         progressLabel.text = isCard ? newState.progressText : nil
         progressView.isHidden = !isCard

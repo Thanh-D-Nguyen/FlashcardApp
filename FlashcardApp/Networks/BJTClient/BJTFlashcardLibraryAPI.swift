@@ -15,6 +15,8 @@ protocol BJTFlashcardLibraryAPIInterface: AnyObject {
     /// Records one review and reschedules the card. NOT idempotent: the server applies the rating every time it is received,
     /// so a caller never repeats it by itself; only the learner may choose to try again.
     func submitReview(userFlashcardId: String, rating: ReviewRating, elapsedMs: Int?) -> Single<Void>
+    /// Wrong answers the server picked from the learner's other cards, for a multiple-choice question. Read-only; safe to repeat.
+    func distractors(userFlashcardId: String, count: Int) -> Single<[String]>
     /// Hides one of the learner's own decks from every list. Safe to repeat.
     func archiveDeck(id: String) -> Single<Void>
     /// Submits a moderation report once; retries must be initiated by the learner.
@@ -27,6 +29,9 @@ extension BJTLearnerAPI: BJTFlashcardLibraryAPIInterface {
     /// The server clamps a limit above this to its default, which would silently return fewer or different rows.
     private static let maximumLimit = 200
 
+    private static let maximumDistractors = 10
+
+    private struct DistractorsResponse: Decodable { let items: [String]? }
     private struct ReviewBody: Encodable { let rating: String; let elapsedMs: Int? }
     private struct ReportBody: Encodable { let reason: String }
     private struct ModerationAck: Decodable { let success: Bool }
@@ -52,6 +57,16 @@ extension BJTLearnerAPI: BJTFlashcardLibraryAPIInterface {
         return response.map { ack in
             guard ack.success else { throw LearnerAPIError.invalidResponse }
         }
+    }
+
+    func distractors(userFlashcardId: String, count: Int) -> Single<[String]> {
+        // The id becomes a path segment, and the server treats a missing or non-positive `n` as its own default: ask for a sane count.
+        guard UUID(uuidString: userFlashcardId) != nil, (1...Self.maximumDistractors).contains(count) else {
+            return .error(LearnerAPIError.invalidRequest(nil))
+        }
+        let response: Single<DistractorsResponse> = perform(["flashcards", "reviews", userFlashcardId, "distractors"], method: .get,
+                                                           body: Optional<ReviewBody>.none, query: ["n": String(count)])
+        return response.map { $0.items ?? [] }
     }
 
     func archiveDeck(id: String) -> Single<Void> {
