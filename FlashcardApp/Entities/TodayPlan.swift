@@ -20,6 +20,8 @@ struct TodayDeck: Equatable {
     let cards: [TodayCard]
     /// Whether a quiz can be made from this deck (at least two different answers), which decides the kind of answer studied.
     let canQuiz: Bool
+    /// Whether every card has a kana reading to type (the typed kind of answer).
+    var canType = false
 }
 
 /// How long a session may take. The time per item is an assumption, not a measurement (the app records no response times
@@ -106,7 +108,12 @@ enum TodayPlanner {
         let deck = decks.first { $0.id == selectedDeckID } ?? (decks.count == 1 ? decks[0] : nil)
         guard let deck else { return TodayPlan(kind: .chooseDeck, budgetMinutes: budget.minutes) }
 
-        let skill: ReviewSkill = (mode == .quiz && deck.canQuiz) ? .recognition : .selfRecall
+        let skill: ReviewSkill
+        switch mode {
+        case .quiz where deck.canQuiz: skill = .recognition
+        case .type where deck.canType: skill = .typedRecall
+        default: skill = .selfRecall
+        }
         var versions: [String: String] = [:]
         for card in deck.cards where versions[card.id] == nil { versions[card.id] = card.version }
 
@@ -123,8 +130,8 @@ enum TodayPlanner {
         for attempt in attemptsToday where versions[attempt.cardID] != nil {
             progress.saved += 1
             switch attempt.result {
-            case .correct: progress.quizCorrect += 1
-            case .incorrect: progress.quizIncorrect += 1
+            case .correct, .typedCorrect: progress.quizCorrect += 1
+            case .incorrect, .typedIncorrect: progress.quizIncorrect += 1
             case .remembered, .needsReview: progress.selfRated += 1
             }
         }

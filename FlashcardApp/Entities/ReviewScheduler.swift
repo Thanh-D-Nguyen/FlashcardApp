@@ -67,6 +67,8 @@ struct ReviewScheduler {
         switch attempt.result {
         case .incorrect, .needsReview: return .again
         case .correct, .remembered: return attempt.hints.isEmpty ? .good : .hard
+        case .typedIncorrect: return .again
+        case .typedCorrect: return attempt.hints.isEmpty ? .good : .hard
         }
     }
 

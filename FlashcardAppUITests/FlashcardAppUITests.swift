@@ -100,6 +100,38 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertEqual(app.cells.matching(NSPredicate(format: "identifier BEGINSWITH 'often_missed_row_'")).count, 0)
     }
 
+    /// K-09: in the typing mode the learner types the reading in kana; the app marks it, shows the right one when wrong, and the next
+    /// question starts empty.
+    func testTypingTheReadingIsCheckedAndTheNextQuestionStartsEmpty() {
+        let app = makeApp()
+        app.launchArguments += ["-SeedCardsFixture", "-disableAds"]
+        app.launch()
+        openCards(app)
+        let row = deckRow(app, named: "JLPT N5 · Everyday words")
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
+        XCTAssertTrue(app.buttons["study_card"].waitForExistence(timeout: 5))
+        app.buttons["study_options"].tap()
+        app.buttons["Gõ cách đọc"].tap()
+
+        let field = app.textFields["study_type_field"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5), "Every sample card has a kana reading, so typing is on")
+        XCTAssertTrue(field.value as? String == "" || (field.value as? String) == "Gõ cách đọc bằng kana", "A new question starts empty")
+        field.typeText("いぬ")
+        app.buttons["study_primary"].tap()
+        XCTAssertTrue(app.staticTexts["study_feedback"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["study_feedback"].label, "Chính xác")
+        app.buttons["study_primary"].tap()
+
+        // The second card is 猫 (ねこ): a wrong reading shows the right one.
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.typeText("いぬ")
+        app.buttons["study_primary"].tap()
+        XCTAssertTrue(app.staticTexts["study_feedback"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["study_feedback"].label.contains("ねこ"), "A wrong answer names the right reading: \(app.staticTexts["study_feedback"].label)")
+        attachScreenshot(app, name: "typing-wrong")
+    }
+
     func testCardEditorKeepsToolbarAboveKeyboardAndCanDiscard() {
         let app = makeApp()
         app.launch()

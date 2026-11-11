@@ -66,6 +66,14 @@ struct StudyReviewState: Equatable {
     var usedReadingHint = false
 }
 
+/// The typed-reading question of the card on screen (K-09). `typed` is `nil` until the learner submits.
+struct StudyTypingState: Equatable {
+    let typed: String?
+    /// The reading the answer was checked against; only shown once answered.
+    let expected: String
+    let isCorrect: Bool?
+}
+
 struct CardStudyState: Equatable {
     enum Screen: Equatable {
         case card
@@ -96,6 +104,9 @@ struct CardStudyState: Equatable {
     var isPrimaryEnabled: Bool
     var review: StudyReviewState
     var summary: StudySummary
+    /// Every card has a kana reading to type, so the typing mode is available.
+    var canType = false
+    var typing: StudyTypingState?
 }
 
 protocol CardStudyViewInterface: AnyObject {
@@ -110,6 +121,8 @@ protocol CardStudyPresenterInterface: AnyObject {
     func previous()
     func next()
     func select(option: String)
+    /// The reading the learner typed for the question on screen (typing mode); recorded once, a blank answer is ignored.
+    func submit(typed: String)
     /// Self-rating of a flipped card; the attempt is saved at once.
     func rate(_ rating: SelfRating)
     /// Saves the attempt that failed to save, again with the same id.
@@ -282,14 +295,15 @@ final class CardStudyPresenter {
 
     private func makeSummary() -> StudySummary {
         let saved = session.attempts.filter { savedAttemptIds.contains($0.id) }
-        let quiz = saved.filter { $0.skill == .recognition }
+        // Checked answers: a pick among options and a typed reading are both marked right or wrong by the app, never by the learner.
+        let quiz = saved.filter { $0.skill == .recognition || $0.skill == .typedRecall }
         let toReview = saved.compactMap { attempt -> StudyReviewedCard? in
-            guard attempt.result == .incorrect || attempt.result == .needsReview,
+            guard attempt.result == .incorrect || attempt.result == .typedIncorrect || attempt.result == .needsReview,
                   let card = session.cards.first(where: { $0.id == attempt.cardID }) else { return nil }
             return StudyReviewedCard(front: card.front, back: card.back, result: attempt.result)
         }
-        return StudySummary(total: session.count, answered: quiz.count, correct: quiz.filter { $0.result == .correct }.count,
-                            mode: session.mode, saved: saved.count, incorrect: quiz.filter { $0.result == .incorrect }.count,
+        return StudySummary(total: session.count, answered: quiz.count, correct: quiz.filter { $0.result == .correct || $0.result == .typedCorrect }.count,
+                            mode: session.mode, saved: saved.count, incorrect: quiz.filter { $0.result == .incorrect || $0.result == .typedIncorrect }.count,
                             selfRated: saved.filter { $0.skill == .selfRecall }.count, toReview: toReview)
     }
 
@@ -298,7 +312,7 @@ final class CardStudyPresenter {
     private func publish(_ transition: CardStudyTransition) {
         guard let deck else { return }
         // The reading in view before the answer is help; the result is recorded as such.
-        if preferences.isReadingVisible, let card = session.current, !card.reading.isEmpty { session.noteHint(.reading) }
+        if preferences.isReadingVisible, session.mode != .type, let card = session.current, !card.reading.isEmpty { session.noteHint(.reading) }
         syncExamples(deck: deck)
         view?.render(makeState(deck: deck), transition: transition)
         if transition != .none, !session.isFinished, session.current != nil { autoSpeakIfNeeded() }
@@ -324,6 +338,10 @@ final class CardStudyPresenter {
         }
         var quiz: StudyQuizState?
         if session.mode == .quiz, let current { quiz = StudyQuizState(options: session.options, selected: session.selectedOption, correct: current.back) }
+        var typing: StudyTypingState?
+        if session.mode == .type, let current, let expected = current.typedAnswer {
+            typing = StudyTypingState(typed: session.typedAnswer, expected: expected, isCorrect: session.isAnswerCorrect)
+        }
         let (title, enabled) = primary(finished: finished)
         let review = StudyReviewState(
             savedCount: savedAttemptIds.count, total: session.count,
@@ -336,7 +354,8 @@ final class CardStudyPresenter {
             mode: session.mode,
             canQuiz: session.canQuiz,
             isShuffled: session.isShuffled,
-            readingVisible: preferences.isReadingVisible,
+            // The reading is the answer when typing: it is never on the front then.
+            readingVisible: preferences.isReadingVisible && session.mode != .type,
             imagesVisible: preferences.areImagesVisible,
             autoSpeak: preferences.autoSpeak,
             deckHasImages: session.cards.contains { !$0.imageReference.isEmpty },
@@ -351,11 +370,17 @@ final class CardStudyPresenter {
             primaryTitle: title,
             isPrimaryEnabled: enabled,
             review: review,
-            summary: makeSummary())
+            summary: makeSummary(),
+            canType: session.canType,
+            typing: typing)
     }
 
     private func primary(finished: Bool) -> (String, Bool) {
         if finished { return (NSLocalizedString("Study again", comment: ""), true) }
+        if session.mode == .type {
+            guard session.typedAnswer != nil else { return (NSLocalizedString("Check answer", comment: "Typing mode: checks the typed reading"), true) }
+            return (session.isLastCard ? NSLocalizedString("See results", comment: "") : NSLocalizedString("Next question", comment: ""), true)
+        }
         if session.mode == .quiz {
             guard session.selectedOption != nil else { return (NSLocalizedString("Choose an answer", comment: ""), false) }
             return (session.isLastCard ? NSLocalizedString("See results", comment: "") : NSLocalizedString("Next question", comment: ""), true)
@@ -369,7 +394,11 @@ final class CardStudyPresenter {
     /// Whether the learner may see the sentences yet: after the flip, or after answering a quiz question. Showing them
     /// on the front would give the word's use away before the learner has tried to recall it.
     private var answerIsShown: Bool {
-        session.mode == .flip ? session.isFlipped : session.selectedOption != nil
+        switch session.mode {
+        case .flip: return session.isFlipped
+        case .quiz: return session.selectedOption != nil
+        case .type: return session.typedAnswer != nil
+        }
     }
 
     /// The sentences panel: the server's sentences with the learner's changes applied, then the learner's own. The learner's
@@ -455,6 +484,8 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     func primaryAction() {
         if session.isFinished || session.current == nil { return restart() }
         if session.mode == .flip, !session.isFlipped { return flip() }
+        // Typing: the screen sends the text with `submit(typed:)`; this only moves on once the question is answered.
+        if session.mode == .type, session.typedAnswer == nil { return }
         next()
     }
 
@@ -468,6 +499,7 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
         // An unsaved answer is not left behind, and quiz answers are final: the learner must answer before moving on.
         guard canChange else { return }
         if session.mode == .quiz, session.selectedOption == nil { return }
+        if session.mode == .type, session.typedAnswer == nil { return }
         session.advance()
         publish(.forward)
     }
@@ -475,6 +507,13 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     func select(option: String) {
         guard !sessionEnded else { return }
         session.select(option: option)
+        persistCurrentAttempt()
+        publish(.none)
+    }
+
+    func submit(typed: String) {
+        guard !sessionEnded else { return }
+        session.submit(typed: typed)
         persistCurrentAttempt()
         publish(.none)
     }

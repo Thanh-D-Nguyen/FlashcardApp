@@ -27,6 +27,14 @@ struct StudyCard: Equatable {
         imageReference = entity.imageUrl
     }
 
+    /// The kana reading a typed answer is checked against. `nil` unless the front is Japanese and differs from its reading (a kana
+    /// word would only be copied), and the reading is pure kana: the reading of the front is what is asked.
+    var typedAnswer: String? {
+        guard KanaAnswer.isKana(reading), JapaneseText.containsJapanese(front),
+              KanaAnswer.normalized(front) != KanaAnswer.normalized(reading) else { return nil }
+        return reading
+    }
+
     /// Identifies what the learner was asked and shown: front, reading and back. The note and the picture
     /// are not part of it, so renaming a deck or changing an image keeps the learner's history valid.
     /// Persisted with each attempt: do not change how it is computed.
@@ -48,6 +56,8 @@ struct StudyCard: Equatable {
 enum StudyMode: String {
     case flip
     case quiz
+    /// Type the reading in kana.
+    case type
 }
 
 /// Picks an integer in the range; injectable so shuffle and quiz options are testable.
@@ -59,6 +69,8 @@ typealias StudyRandomSource = (Range<Int>) -> Int
 enum ReviewSkill: String, Equatable {
     case recognition
     case selfRecall
+    /// The learner typed the reading: a checked recall of the answer itself, neither a pick among options nor a self-rating.
+    case typedRecall
 }
 
 /// Outcome of one answered question. Only combinations that can really happen exist.
@@ -67,11 +79,14 @@ enum ReviewResult: String, Equatable {
     case incorrect
     case remembered
     case needsReview
+    case typedCorrect
+    case typedIncorrect
 
     var skill: ReviewSkill {
         switch self {
         case .correct, .incorrect: return .recognition
         case .remembered, .needsReview: return .selfRecall
+        case .typedCorrect, .typedIncorrect: return .typedRecall
         }
     }
 }
@@ -127,6 +142,8 @@ struct StudySession {
     private(set) var selectedOption: String?
     private(set) var correctCount = 0
     private(set) var answeredCount = 0
+    /// What the learner typed for the current question, once submitted.
+    private(set) var typedAnswer: String?
 
     /// Answered questions of the current run in the order they were answered. Looking at a card,
     /// flipping it, listening or moving on never adds one; skipped questions have none.
@@ -148,7 +165,7 @@ struct StudySession {
         self.makeRunID = makeRunID
         self.isShuffled = shuffled
         self.order = Array(cards.indices)
-        self.mode = (mode == .quiz && Self.canQuiz(quizPool ?? cards)) ? .quiz : .flip
+        self.mode = Self.resolve(mode, cards: cards, pool: quizPool ?? cards)
         restart()
     }
 
@@ -158,6 +175,20 @@ struct StudySession {
     }
 
     var canQuiz: Bool { Self.canQuiz(pool) }
+
+    /// Typing needs a kana reading to check against on every card asked.
+    static func canType(_ cards: [StudyCard]) -> Bool { !cards.isEmpty && cards.allSatisfy { $0.typedAnswer != nil } }
+
+    /// A mode the cards cannot support is flipping.
+    private static func resolve(_ mode: StudyMode, cards: [StudyCard], pool: [StudyCard]) -> StudyMode {
+        switch mode {
+        case .quiz: return canQuiz(pool) ? .quiz : .flip
+        case .type: return canType(cards) ? .type : .flip
+        case .flip: return .flip
+        }
+    }
+
+    var canType: Bool { Self.canType(cards) }
     var count: Int { cards.count }
     var current: StudyCard? { order.indices.contains(position) ? cards[order[position]] : nil }
     var canGoBack: Bool { mode == .flip && position > 0 && !isFinished }
@@ -165,7 +196,10 @@ struct StudySession {
     var isLastCard: Bool { position == count - 1 }
     /// 0…1; reaches 1 when the last card is shown.
     var progress: Double { count == 0 ? 0 : Double(isFinished ? count : position + 1) / Double(count) }
-    var isAnswerCorrect: Bool? { selectedOption.map { $0 == current?.back } }
+    var isAnswerCorrect: Bool? {
+        if mode == .type { return typedAnswer.flatMap { typed in current?.typedAnswer.map { KanaAnswer.matches(typed: typed, expected: $0) } } }
+        return selectedOption.map { $0 == current?.back }
+    }
 
     // MARK: Transitions
 
@@ -174,6 +208,7 @@ struct StudySession {
         isFlipped = false
         isFinished = false
         selectedOption = nil
+        typedAnswer = nil
         correctCount = 0
         answeredCount = 0
         attempts = []
@@ -190,7 +225,7 @@ struct StudySession {
     }
 
     mutating func setMode(_ newMode: StudyMode) {
-        mode = (newMode == .quiz && canQuiz) ? .quiz : .flip
+        mode = Self.resolve(newMode, cards: cards, pool: pool)
         restart()
     }
 
@@ -206,6 +241,7 @@ struct StudySession {
             position += 1
             isFlipped = false
             selectedOption = nil
+            typedAnswer = nil
             prepareQuestion()
         } else {
             isFinished = true
@@ -225,6 +261,17 @@ struct StudySession {
         answeredCount += 1
         if option == card.back { correctCount += 1 }
         record(option == card.back ? .correct : .incorrect, for: card)
+    }
+
+    /// Records a typed reading once per question; a blank answer is not an answer.
+    mutating func submit(typed: String) {
+        guard mode == .type, typedAnswer == nil, !isFinished, let card = current, let expected = card.typedAnswer,
+              !typed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        typedAnswer = typed
+        answeredCount += 1
+        let isRight = KanaAnswer.matches(typed: typed, expected: expected)
+        if isRight { correctCount += 1 }
+        record(isRight ? .typedCorrect : .typedIncorrect, for: card)
     }
 
     /// Rates the shown answer of a flipped card; once per question.

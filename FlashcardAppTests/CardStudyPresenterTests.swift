@@ -1088,3 +1088,110 @@ private final class FailingExampleStore: CardExampleStoreInterface {
     func restoreOriginal(of item: ExampleItem, cardId: String, ownerKey: String) throws { throw DiskFull() }
     func restoreRemoved(cardId: String, ownerKey: String) throws { throw DiskFull() }
 }
+
+/// K-09: typing the reading of a card in kana.
+extension CardStudyPresenterTests {
+    private func startTyping(readings: [String] = ["いち", "に", "さん"]) {
+        let deck = makeDeck(readings.count)
+        for (index, card) in deck.cards.enumerated() {
+            card.frontText = "漢\(index + 1)"
+            card.frontExtraText = readings[index]
+        }
+        interactor.deck = deck
+        preferences.mode = .type
+        start()
+    }
+
+    func test_typingAsksTheFrontAndNeverShowsItsReadingOnTheFront() {
+        preferences.isReadingVisible = true
+        startTyping()
+        XCTAssertEqual(state.mode, .type)
+        XCTAssertTrue(state.canType)
+        XCTAssertEqual(state.card?.front, "漢1")
+        XCTAssertFalse(state.readingVisible, "The reading is the answer")
+        XCTAssertEqual(state.typing, StudyTypingState(typed: nil, expected: "いち", isCorrect: nil))
+        XCTAssertEqual(state.primaryTitle, NSLocalizedString("Check answer", comment: ""))
+        XCTAssertTrue(state.review.usedReadingHint == false, "Reading visibility is not a hint here")
+    }
+
+    func test_aRightReadingIsSavedAsTypedCorrectForTheLearnerAndShowsFeedback() throws {
+        startTyping()
+        presenter.submit(typed: "イチ")
+        XCTAssertEqual(state.typing?.isCorrect, true)
+        XCTAssertEqual(state.typing?.typed, "イチ")
+        XCTAssertEqual(state.primaryTitle, NSLocalizedString("Next question", comment: ""))
+        let (attempt, savedFor) = try XCTUnwrap(history.saves.first)
+        XCTAssertEqual(savedFor, owner)
+        XCTAssertEqual(attempt.result, .typedCorrect)
+        XCTAssertEqual(attempt.skill, .typedRecall)
+        XCTAssertEqual(state.review.save, .saved)
+        XCTAssertEqual(state.summary.correct, 1)
+    }
+
+    func test_aWrongReadingIsSavedAsTypedIncorrectAndListedForReview() {
+        startTyping()
+        presenter.submit(typed: "にち")
+        XCTAssertEqual(state.typing?.isCorrect, false)
+        XCTAssertEqual(history.saves.first?.0.result, .typedIncorrect)
+        XCTAssertEqual(state.summary.incorrect, 1)
+        XCTAssertEqual(state.summary.toReview.map(\.result), [.typedIncorrect])
+    }
+
+    func test_aBlankAnswerSavesNothingAndTheQuestionCannotBeSkipped() {
+        startTyping()
+        presenter.submit(typed: "  ")
+        XCTAssertTrue(history.attempted.isEmpty)
+        presenter.primaryAction()
+        presenter.next()
+        XCTAssertEqual(state.card?.front, "漢1")
+    }
+
+    func test_anAnsweredQuestionIsFinalAndTheNextOneStartsEmpty() {
+        startTyping()
+        presenter.submit(typed: "いち")
+        presenter.submit(typed: "ちがう")
+        XCTAssertEqual(history.attempted.count, 1)
+        presenter.primaryAction()
+        XCTAssertEqual(state.card?.front, "漢2")
+        XCTAssertEqual(state.typing, StudyTypingState(typed: nil, expected: "に", isCorrect: nil))
+    }
+
+    func test_theSessionFinishesWithTypedAnswersCounted() {
+        startTyping()
+        for typed in ["いち", "ちがう", "さん"] {
+            presenter.submit(typed: typed)
+            presenter.primaryAction()
+        }
+        XCTAssertEqual(state.screen, .finished)
+        XCTAssertEqual(state.summary.answered, 3)
+        XCTAssertEqual(state.summary.correct, 2)
+        XCTAssertEqual(state.summary.incorrect, 1)
+        XCTAssertEqual(state.summary.selfRated, 0)
+    }
+
+    func test_aDeckWithACardThatCannotBeTypedFallsBackToFlipping() {
+        startTyping(readings: ["いち", "", "さん"])
+        XCTAssertEqual(state.mode, .flip)
+        XCTAssertFalse(state.canType)
+        XCTAssertNil(state.typing)
+    }
+
+    func test_anAccountChangeStopsSavingTypedAnswersToo() {
+        startTyping()
+        owner = "22222222-2222-2222-2222-222222222222"
+        presenter.submit(typed: "いち")
+        XCTAssertTrue(history.saves.isEmpty, "A different account never receives this session's results")
+    }
+
+    func test_aFailedSaveKeepsTheTypedQuestionUntilRetried() {
+        history.failuresRemaining = 1
+        startTyping()
+        presenter.submit(typed: "いち")
+        XCTAssertEqual(state.review.save, .failed)
+        presenter.next()
+        XCTAssertEqual(state.card?.front, "漢1", "An unsaved answer is not left behind")
+        presenter.retrySave()
+        XCTAssertEqual(state.review.save, .saved)
+        XCTAssertEqual(history.saves.count, 1)
+    }
+}

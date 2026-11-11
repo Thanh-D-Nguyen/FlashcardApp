@@ -72,6 +72,6 @@ final class TodayInteractor: TodayInteractorInterface {
     private static func todayDeck(from entity: DeskEntity) -> TodayDeck {
         let cards = entity.cards.map(StudyCard.init(entity:))
         return TodayDeck(id: entity.id, name: entity.name, cards: cards.map { TodayCard(id: $0.id, version: $0.contentVersion) },
-                         canQuiz: StudySession.canQuiz(cards))
+                         canQuiz: StudySession.canQuiz(cards), canType: StudySession.canType(cards))
     }
 }

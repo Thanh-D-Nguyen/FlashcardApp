@@ -40,6 +40,10 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
     private let cardView = StudyCardView()
     private let examplesView = StudyExamplesView()
     private let optionsStack = UIStackView()
+    /// Typing mode (K-09): the learner types the reading in kana, then the app checks it.
+    private let typingStack = UIStackView()
+    private let typingField = UITextField()
+    private let typingFeedback = UILabel()
     private let summaryView = StudySummaryView()
     private let controls = UIStackView()
     private let bottomStack = UIStackView()
@@ -127,7 +131,8 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         hintLabel.textColor = Design.Color.warning
         hintLabel.accessibilityIdentifier = "study_hint"
         statusLabel.accessibilityIdentifier = "study_save_status"
-        [cardView, hintLabel, statusLabel, examplesView, optionsStack, summaryView].forEach(contentStack.addArrangedSubview)
+        configureTyping()
+        [cardView, hintLabel, statusLabel, typingStack, examplesView, optionsStack, summaryView].forEach(contentStack.addArrangedSubview)
         scrollView.addSubview(contentStack)
 
         configureControls()
@@ -152,7 +157,8 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
             bottomStack.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
             bottomStack.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
-            bottomStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.s),
+            // Follows the keyboard (and the safe area when there is none), so the Check button is never hidden by it.
+            bottomStack.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -Design.Spacing.s),
             cardMinHeight
         ])
         cardView.speakButton.addAction(UIAction { [weak self] _ in self?.presenter.speakCurrent() }, for: .primaryActionTriggered)
@@ -202,7 +208,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         // With example sentences below it the card leaves their heading in view, so it is clear there is more to scroll to.
         let free = scrollView.bounds.height
         let peek = examplesView.isHidden ? Design.Spacing.xs : 200
-        cardMinHeight.constant = state?.mode == .quiz ? 0 : max(240, free - peek)
+        cardMinHeight.constant = state?.mode != .flip ? 0 : max(240, free - peek)
     }
 
     private func configureControls() {
@@ -227,7 +233,84 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         [previousButton, primaryButton, nextButton].forEach(controls.addArrangedSubview)
         previousButton.addAction(UIAction { [weak self] _ in self?.presenter.previous() }, for: .primaryActionTriggered)
         nextButton.addAction(UIAction { [weak self] _ in self?.presenter.next() }, for: .primaryActionTriggered)
-        primaryButton.addAction(UIAction { [weak self] _ in self?.presenter.primaryAction() }, for: .primaryActionTriggered)
+        primaryButton.addAction(UIAction { [weak self] _ in self?.primaryTapped() }, for: .primaryActionTriggered)
+    }
+
+    // MARK: Typing
+
+    private func configureTyping() {
+        typingField.borderStyle = .roundedRect
+        typingField.font = Design.TextRole.meaning.font
+        typingField.adjustsFontForContentSizeCategory = true
+        typingField.placeholder = NSLocalizedString("Type the reading in kana", comment: "Typing mode placeholder")
+        typingField.autocorrectionType = .no
+        typingField.autocapitalizationType = .none
+        typingField.spellCheckingType = .no
+        typingField.smartDashesType = .no
+        typingField.returnKeyType = .done
+        typingField.clearButtonMode = .whileEditing
+        typingField.accessibilityLabel = NSLocalizedString("Reading in kana", comment: "Typing mode field label")
+        typingField.accessibilityHint = NSLocalizedString("Use the Japanese keyboard", comment: "Typing mode field hint")
+        typingField.accessibilityIdentifier = "study_type_field"
+        typingField.heightAnchor.constraint(greaterThanOrEqualToConstant: 52).isActive = true
+        typingField.addAction(UIAction { [weak self] _ in self?.typingChanged() }, for: .editingChanged)
+        typingField.addAction(UIAction { [weak self] _ in self?.primaryTapped() }, for: .primaryActionTriggered)
+        typingFeedback.apply(.title)
+        typingFeedback.numberOfLines = 0
+        typingFeedback.accessibilityIdentifier = "study_feedback"
+        typingStack.axis = .vertical
+        typingStack.spacing = Design.Spacing.m
+        [typingFeedback, typingField].forEach(typingStack.addArrangedSubview)
+        typingStack.isHidden = true
+    }
+
+    /// The state `apply` drew last, to tell a new question from a redraw of the same one.
+    private var lastApplied: CardStudyState?
+    private var isTypingQuestionOpen: Bool { state?.typing != nil && state?.typing?.typed == nil }
+
+    /// "Check answer" sends the text; once answered the same button moves on.
+    private func primaryTapped() {
+        if isTypingQuestionOpen {
+            presenter.submit(typed: typingField.text ?? "")
+        } else {
+            presenter.primaryAction()
+        }
+    }
+
+    private func typingChanged() {
+        primaryButton.isEnabled = !isTypingQuestionOpen || !(typingField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func renderTyping(_ state: CardStudyState, previous: CardStudyState?) {
+        guard let typing = state.typing, state.screen == .card else {
+            typingStack.isHidden = true
+            typingField.resignFirstResponder()
+            return
+        }
+        typingStack.isHidden = false
+        let newQuestion = previous?.card?.front != state.card?.front || previous?.typing == nil
+        if let typed = typing.typed {
+            typingField.text = typed
+            typingField.isUserInteractionEnabled = false
+            let correct = typing.isCorrect == true
+            typingFeedback.text = correct ? NSLocalizedString("Correct", comment: "")
+                                          : String(format: NSLocalizedString("Not quite. The answer is %@.", comment: ""), typing.expected)
+            typingFeedback.textColor = correct ? Design.Color.success : Design.Color.error
+            typingFeedback.isHidden = false
+            typingField.resignFirstResponder()
+            if previous?.typing?.typed == nil, !newQuestion, state.review.save != .failed {
+                haptics.answered(correct: correct)
+                UIAccessibility.post(notification: .announcement, argument: typingFeedback.text)
+            }
+        } else {
+            typingFeedback.isHidden = true
+            typingField.isUserInteractionEnabled = true
+            if newQuestion || previous?.typing?.typed != nil {
+                typingField.text = ""
+                // Opens the keyboard on the new question; VoiceOver users keep their own focus.
+                if !UIAccessibility.isVoiceOverRunning { typingField.becomeFirstResponder() }
+            }
+        }
     }
 
     // MARK: Gestures
@@ -302,6 +385,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         cardView.isHidden = finished
         examplesView.configure(state: finished ? .hidden : state.examples, expanded: state.examplesExpanded)
         optionsStack.isHidden = finished || state.quiz == nil
+        renderTyping(state, previous: lastApplied)
         summaryView.isHidden = !finished
         let failed = state.review.save == .failed && !finished
         controls.isHidden = finished || state.review.canRate || failed
@@ -318,7 +402,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         if finished {
             summaryView.configure(with: state.summary)
         } else if let card = state.card {
-            let isQuiz = state.mode == .quiz
+            let isQuiz = state.mode != .flip
             cardView.configure(card: card, direction: state.direction, showingBack: !isQuiz && card.isFlipped, isQuiz: isQuiz,
                                readingVisible: state.readingVisible, imagesVisible: state.imagesVisible, style: state.style)
             cardView.accessibilityHint = isQuiz ? nil : NSLocalizedString("Double-tap to flip the card", comment: "")
@@ -331,12 +415,14 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             cardView.gestureRecognizers?.compactMap { $0 as? UITapGestureRecognizer }.forEach { $0.isEnabled = !isQuiz }
             renderOptions(state.quiz)
         }
-        previousButton.isHidden = state.mode == .quiz
-        nextButton.isHidden = state.mode == .quiz
+        previousButton.isHidden = state.mode != .flip
+        nextButton.isHidden = state.mode != .flip
         previousButton.isEnabled = state.canGoBack
         primaryButton.configuration?.title = state.primaryTitle
         primaryButton.isEnabled = state.isPrimaryEnabled
+        typingChanged()
         updateCardHeight()
+        lastApplied = state
     }
 
     /// The hint notice and the save status under the card. Both state facts, in words and an icon, not only in colour.
@@ -439,7 +525,9 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             UIAction(title: NSLocalizedString("Flip cards", comment: ""), image: UIImage(systemName: "rectangle.on.rectangle"),
                      attributes: locked, state: state.mode == .flip ? .on : .off) { [weak self] _ in self?.presenter.setMode(.flip) },
             UIAction(title: NSLocalizedString("Quiz", comment: ""), image: UIImage(systemName: "list.bullet.rectangle"),
-                     attributes: state.canQuiz ? locked : .disabled, state: state.mode == .quiz ? .on : .off) { [weak self] _ in self?.presenter.setMode(.quiz) }
+                     attributes: state.canQuiz ? locked : .disabled, state: state.mode == .quiz ? .on : .off) { [weak self] _ in self?.presenter.setMode(.quiz) },
+            UIAction(title: NSLocalizedString("Type the reading", comment: "Study mode: type the kana reading"), image: UIImage(systemName: "keyboard"),
+                     attributes: state.canType ? locked : .disabled, state: state.mode == .type ? .on : .off) { [weak self] _ in self?.presenter.setMode(.type) }
         ])
         let options = UIMenu(options: .displayInline, children: [
             UIAction(title: NSLocalizedString("Shuffle", comment: ""), image: UIImage(systemName: "shuffle"), attributes: locked,
