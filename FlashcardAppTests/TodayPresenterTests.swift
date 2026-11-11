@@ -313,6 +313,8 @@ private final class FakeTodayWireframe: TodayWireframeInterface {
     }
     func showBudgetChooser(current: Int, onSelect: @escaping (Int) -> Void) { budgetChoosers.append((current, onSelect)) }
     func showLevels() { levelsOpened += 1 }
+    var lessonsOpened: [(slug: String, title: String)] = []
+    func showLesson(slug: String, title: String) { lessonsOpened.append((slug, title)) }
 }
 
 private final class SpyTodayView: TodayViewInterface {
@@ -456,5 +458,108 @@ extension TodayPresenterTests {
         let (presenter, _, _) = startWithHub(duePlan(), hub: hub)
         presenter.retryLife()
         XCTAssertEqual(hub.retries, 1)
+    }
+}
+
+
+/// The lesson slot: separate from the review block, from real progress only.
+private final class FakeLessonSlots: TodayLessonSlotProviding {
+    var slot: TodayLessonSlot = .start
+    var owners: [String] = []
+    func slot(ownerKey: String) -> TodayLessonSlot { owners.append(ownerKey); return slot }
+}
+
+extension TodayPresenterTests {
+    private func startWithLessons(_ slots: FakeLessonSlots, plan: TodayPlan) -> (TodayPresenter, FakeTodayWireframe, SpyTodayView) {
+        let interactor = FakeTodayInteractor()
+        interactor.result = .success(plan)
+        let wireframe = FakeTodayWireframe()
+        let view = SpyTodayView()
+        let presenter = TodayPresenter(interactor: interactor, wireframe: wireframe, ownerKey: { "owner" },
+                                       now: { Date(timeIntervalSince1970: 1_800_000_000) }, lessons: slots)
+        presenter.view = view
+        presenter.viewWillAppear()
+        return (presenter, wireframe, view)
+    }
+
+    func test_theLessonSlotNeverChangesTheReviewBlock() {
+        let slots = FakeLessonSlots()
+        let (_, _, withSlot) = startWithLessons(slots, plan: duePlan())
+        interactor.result = .success(duePlan())
+        start(duePlan())
+        XCTAssertEqual(withSlot.renders.last?.hero, state.hero)
+        XCTAssertEqual(withSlot.renders.last?.rows, state.rows)
+        XCTAssertEqual(withSlot.renders.last?.progress, state.progress)
+        XCTAssertNil(state.lessonCard, "Without a provider Today shows no lesson slot")
+    }
+
+    func test_aFreshLearnerIsOfferedTheLevelsAndNoNumbers() {
+        let slots = FakeLessonSlots()
+        slots.slot = .start
+        let (presenter, wireframe, view) = startWithLessons(slots, plan: TodayPlan(kind: .noDeck))
+        let card = view.renders.last?.lessonCard
+        XCTAssertEqual(card?.eyebrow, text("LESSONS"))
+        XCTAssertEqual(card?.action, .chooseLevel)
+        XCTAssertEqual(card?.ctaTitle, text("Choose a level"))
+        presenter.openLessonSlot()
+        XCTAssertEqual(wireframe.levelsOpened, 1)
+        XCTAssertTrue(wireframe.lessonsOpened.isEmpty)
+    }
+
+    func test_aLessonInProgressIsContinuedWithItsAnsweredCount() {
+        let slots = FakeLessonSlots()
+        slots.slot = .continueLesson(slug: "j5-01", title: "Chào hỏi", levelCode: "J5", answered: 3, total: 5)
+        let (presenter, wireframe, view) = startWithLessons(slots, plan: duePlan())
+        let card = view.renders.last?.lessonCard
+        XCTAssertEqual(card?.eyebrow, text("CONTINUE LESSON"))
+        XCTAssertEqual(card?.title, "Chào hỏi")
+        XCTAssertEqual(card?.detail, String(format: text("%lld of %lld answered"), 3, 5))
+        XCTAssertEqual(view.renders.last?.hero?.action, .study(deckID: "deck", cardIDs: (1...12).map { "c\($0)" }), "The review CTA is untouched")
+        presenter.openLessonSlot()
+        XCTAssertEqual(wireframe.lessonsOpened.map(\.slug), ["j5-01"])
+        XCTAssertEqual(wireframe.lessonsOpened.map(\.title), ["Chào hỏi"])
+    }
+
+    func test_theNextLessonIsOfferedWithItsTitleAndLevel() {
+        let slots = FakeLessonSlots()
+        slots.slot = .next(slug: "j5-02", title: "Hai", levelCode: "J5")
+        let (presenter, wireframe, view) = startWithLessons(slots, plan: duePlan())
+        XCTAssertEqual(view.renders.last?.lessonCard?.eyebrow, text("NEXT LESSON"))
+        XCTAssertEqual(view.renders.last?.lessonCard?.title, "Hai")
+        XCTAssertEqual(view.renders.last?.lessonCard?.detail, "J5")
+        presenter.openLessonSlot()
+        XCTAssertEqual(wireframe.lessonsOpened.map(\.slug), ["j5-02"])
+    }
+
+    func test_aLessonNotSavedOnTheDeviceIsContinuedWithItsLevelInTheTitle() {
+        let slots = FakeLessonSlots()
+        slots.slot = .continueLesson(slug: "j5-01", title: nil, levelCode: "J5", answered: 1, total: 5)
+        let (_, _, view) = startWithLessons(slots, plan: duePlan())
+        XCTAssertEqual(view.renders.last?.lessonCard?.title, String(format: text("%@ lesson"), "J5"))
+    }
+
+    func test_afterFinishingLessonsWithNoKnownNextOneTheLearnerChoosesAgain() {
+        let slots = FakeLessonSlots()
+        slots.slot = .finishedOpened(completed: 4)
+        let (presenter, wireframe, view) = startWithLessons(slots, plan: duePlan())
+        XCTAssertEqual(view.renders.last?.lessonCard?.detail, String(format: text("Lessons finished: %lld"), 4))
+        presenter.openLessonSlot()
+        XCTAssertEqual(wireframe.levelsOpened, 1)
+    }
+
+    func test_theSlotIsReadForTheCurrentAccountEachTimeTodayAppearsAndSurvivesAFailedPlan() {
+        let slots = FakeLessonSlots()
+        let interactor = FakeTodayInteractor()
+        interactor.result = .failure(NSError(domain: "t", code: 1))
+        let view = SpyTodayView()
+        var owner = "a"
+        let presenter = TodayPresenter(interactor: interactor, wireframe: FakeTodayWireframe(), ownerKey: { owner }, lessons: slots)
+        presenter.view = view
+        presenter.viewWillAppear()
+        owner = "b"
+        presenter.viewWillAppear()
+        XCTAssertEqual(slots.owners, ["a", "b"], "Switching account reads that account's progress")
+        XCTAssertEqual(view.renders.last?.phase, .failed)
+        XCTAssertNotNil(view.renders.last?.lessonCard, "Lessons do not depend on the review data")
     }
 }

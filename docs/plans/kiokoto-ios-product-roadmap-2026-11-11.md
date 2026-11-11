@@ -69,7 +69,7 @@
 | K-03 | Lesson reader (scenario, vocab, grammar, examples, pitfalls), cache bài đã mở để đọc offline | K-02 | 1.1/P2 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
 | K-04 | 5 hoạt động hoặc số lượng thật từ API, đáp án/rationale, lưu hoàn thành local, ghi progress server khi hợp lệ | K-03 + contract xác minh | 1.1/P3 | **VERIFIED** (local commit; PUT thật NOT VERIFIED) — [status](kiokoto-ios-orca-status.md) |
 | K-05 | Chọn/lưu từ trong lesson vào bộ thẻ local bằng writer hiện có, chống trùng | K-03; nên sau K-04 để hoàn thiện journey | 1.1/P4 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
-| K-06 | Today: bài kế tiếp/tiếp tục học; giữ nguyên hero review, tách nguồn local/server | K-04/K-05 | 1.1/P5 | **NEXT** |
+| K-06 | Today: bài kế tiếp/tiếp tục học; giữ nguyên hero review, tách nguồn local/server | K-04/K-05 | 1.1/P5 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
 | K-07 | Choice mode cho **server account review**; xác minh distractors; người học tự xác nhận rating | K-01..06 không phải phụ thuộc code, nhưng đợi cổng MVP | 1.1 sau MVP | PLANNED |
 | K-08 | Danh sách thẻ thường sai theo dữ liệu lịch sử thật; không suy đoán lapse trên server | K-07 hoặc dữ liệu local đã có | Sau K-07 | PLANNED |
 | K-09 | Gõ đáp án kana có xử lý biến thể và accessibility | K-07 | 1.2 | DEFERRED |

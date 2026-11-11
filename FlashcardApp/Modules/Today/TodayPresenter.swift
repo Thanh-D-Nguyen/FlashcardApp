@@ -25,6 +25,20 @@ struct TodayRows: Equatable {
     let sessionLength: String
 }
 
+enum TodayLessonAction: Equatable {
+    case chooseLevel
+    case openLesson(slug: String, title: String)
+}
+
+/// The lesson slot under the review block. It never replaces the review CTA and says nothing about due cards.
+struct TodayLessonCard: Equatable {
+    let eyebrow: String
+    let title: String
+    let detail: String?
+    let ctaTitle: String
+    let action: TodayLessonAction
+}
+
 struct TodayProgressText: Equatable {
     let title: String
     let detail: String?
@@ -46,6 +60,8 @@ struct TodayViewState: Equatable {
     var failureMessage: String?
     /// "Learn from Life": independent of the review block above. `nil` hides it.
     var life: TodayHubSection?
+    /// Where the learner is in the structured lessons, from their own progress. `nil` hides it.
+    var lessonCard: TodayLessonCard?
 }
 
 protocol TodayViewInterface: AnyObject {
@@ -62,6 +78,8 @@ protocol TodayPresenterInterface: AnyObject {
     func openLevels()
     /// The everyday-situation lessons, whatever Today is showing: they do not depend on the plan or on the life hub.
     func openScenarios()
+    /// The lesson slot's button: continues or starts a lesson, or opens the levels.
+    func openLessonSlot()
     func retry()
     /// A card of the life hub was tapped (or its button): opens its lesson, asks for the location, or retries, by what the card is.
     func openLifeCard(id: String)
@@ -77,6 +95,7 @@ final class TodayPresenter {
     weak var view: TodayViewInterface?
 
     private let life: TodayLifeHubLoading?
+    private let lessons: TodayLessonSlotProviding?
 
     private var plan: TodayPlan?
     private var state: TodayViewState?
@@ -85,7 +104,9 @@ final class TodayPresenter {
     init(interactor: TodayInteractorInterface, wireframe: TodayWireframeInterface,
          ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" },
          now: @escaping () -> Date = Date.init,
-         life: TodayLifeHubLoading? = nil) {
+         life: TodayLifeHubLoading? = nil,
+         lessons: TodayLessonSlotProviding? = nil) {
+        self.lessons = lessons
         self.interactor = interactor
         self.wireframe = wireframe
         self.ownerKey = ownerKey
@@ -122,6 +143,7 @@ final class TodayPresenter {
     private func publish(_ state: TodayViewState) {
         var state = state
         state.life = life?.section
+        state.lessonCard = lessons.map { Self.lessonCard($0.slot(ownerKey: ownerKey())) }
         self.state = state
         view?.render(state)
     }
@@ -185,6 +207,24 @@ final class TodayPresenter {
         return state
     }
 
+    static func lessonCard(_ slot: TodayLessonSlot) -> TodayLessonCard {
+        switch slot {
+        case .start:
+            return TodayLessonCard(eyebrow: text("LESSONS"), title: text("Learn Japanese for work"), detail: text("Short structured lessons with practice."),
+                                   ctaTitle: text("Choose a level"), action: .chooseLevel)
+        case .continueLesson(let slug, let title, let levelCode, let answered, let total):
+            return TodayLessonCard(eyebrow: text("CONTINUE LESSON"), title: title ?? String(format: text("%@ lesson"), levelCode),
+                                   detail: String(format: text("%lld of %lld answered"), answered, total),
+                                   ctaTitle: text("Continue"), action: .openLesson(slug: slug, title: title ?? slug))
+        case .next(let slug, let title, let levelCode):
+            return TodayLessonCard(eyebrow: text("NEXT LESSON"), title: title, detail: levelCode, ctaTitle: text("Start lesson"),
+                                   action: .openLesson(slug: slug, title: title))
+        case .finishedOpened(let completed):
+            return TodayLessonCard(eyebrow: text("LESSONS"), title: text("Pick your next lesson"),
+                                   detail: String(format: text("Lessons finished: %lld"), completed), ctaTitle: text("Choose a lesson"), action: .chooseLevel)
+        }
+    }
+
     private static func progressText(_ progress: TodayProgress) -> TodayProgressText {
         guard progress.saved > 0 else { return TodayProgressText(title: text("Nothing saved yet today."), detail: nil) }
         var parts: [String] = []
@@ -235,6 +275,14 @@ extension TodayPresenter: TodayPresenterInterface {
     func openLevels() { wireframe.showLevels() }
 
     func openScenarios() { wireframe.showScenarios() }
+
+    func openLessonSlot() {
+        guard let action = state?.lessonCard?.action else { return }
+        switch action {
+        case .chooseLevel: wireframe.showLevels()
+        case .openLesson(let slug, let title): wireframe.showLesson(slug: slug, title: title)
+        }
+    }
 
     func retry() { reload() }
 

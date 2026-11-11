@@ -270,6 +270,7 @@ final class ProgressAPIStub: BJTLessonProgressAPIInterface {
 
 final class FailingProgressStore: LessonProgressStoreInterface {
     func progress(slug: String, ownerKey: String) -> LessonProgress? { nil }
+    func allProgress(ownerKey: String) -> [LessonProgress] { [] }
     func completedSlugs(ownerKey: String) -> Set<String> { [] }
     func recordAnswer(_ answer: LessonAnswer, for lesson: LessonProgressSubject, ownerKey: String, at date: Date) throws -> LessonProgress { throw LessonProgressError.notFound }
     func markCompleted(for lesson: LessonProgressSubject, ownerKey: String, at date: Date) throws -> LessonProgress { throw LessonProgressError.notFound }

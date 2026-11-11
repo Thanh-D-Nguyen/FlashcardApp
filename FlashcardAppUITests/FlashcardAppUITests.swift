@@ -239,6 +239,50 @@ final class FlashcardAppUITests: XCTestCase {
         }
     }
 
+    /// Today → level → lesson → every activity → back on Today: the lesson slot now offers the learner's next step, and opens it.
+    func testTodayOffersTheNextLessonAfterAPracticeAndOpensIt() {
+        let app = makeApp()
+        app.launch()
+        openLevels(app)
+        let start = app.buttons["home_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 40))
+        start.tap()
+        let lessons = app.buttons["level_lessons"]
+        XCTAssertTrue(lessons.waitForExistence(timeout: 10))
+        lessons.tap()
+        let row = app.descendants(matching: .any).matching(identifier: "lesson_row_j5-01-greetings-intro").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 20))
+        row.tap()
+        let practice = app.descendants(matching: .any).matching(identifier: "lesson_practice").firstMatch
+        XCTAssertTrue(practice.waitForExistence(timeout: 20))
+        practice.tap()
+        for _ in 0..<5 {
+            let option = app.descendants(matching: .any).matching(identifier: "practice_option_0").firstMatch
+            guard option.waitForExistence(timeout: 5) else { break }
+            option.tap()
+            let next = app.descendants(matching: .any).matching(identifier: "practice_next").firstMatch
+            XCTAssertTrue(next.waitForExistence(timeout: 5))
+            next.tap()
+        }
+        let back = app.descendants(matching: .any).matching(identifier: "practice_back").firstMatch
+        XCTAssertTrue(back.waitForExistence(timeout: 10))
+        // Back out to Today: summary → lesson → lesson list → level → levels → Today.
+        for _ in 0..<5 {
+            guard app.navigationBars.buttons.firstMatch.waitForExistence(timeout: 5) else { break }
+            if app.buttons["today_levels_row"].exists || app.scrollViews["today_screen"].exists { break }
+            app.navigationBars.buttons.firstMatch.tap()
+        }
+        let slot = app.descendants(matching: .any).matching(identifier: "today_lesson_slot").firstMatch
+        let today = app.scrollViews["today_screen"]
+        XCTAssertTrue(today.waitForExistence(timeout: 20))
+        for _ in 0..<6 where !(slot.exists && slot.isHittable) { today.swipeUp() }
+        XCTAssertTrue(slot.waitForExistence(timeout: 10), "Today shows the lesson slot")
+        XCTAssertFalse(slot.label.contains("BÀI HỌC"), "A learner who finished a lesson is not offered the first-time card: \(slot.label)")
+        XCTAssertTrue(slot.label.contains("HỌC TIẾP") || slot.label.contains("BÀI TIẾP THEO"), "It continues or offers the next lesson: \(slot.label)")
+        slot.tap()
+        XCTAssertTrue(app.tables["lesson_reader"].waitForExistence(timeout: 15), "The slot opens the lesson")
+    }
+
     /// A level's count opens that kind directly, skipping the kind chooser.
     func testLevelCountOpensItsKindDirectly() {
         let app = makeApp()

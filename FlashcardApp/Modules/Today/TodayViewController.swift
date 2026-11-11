@@ -16,6 +16,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let hubView = TodayLifeHubView()
     private let scenarioBanner = TodayScenarioBannerView()
     private let levelsRow = TodayRowView()
+    private let lessonSlot = TodayLessonSlotView()
     private var refreshObservers: [NSObjectProtocol] = []
 
     override func viewDidLoad() {
@@ -77,7 +78,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         dateHeader.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, progressGroup, hubView, scenarioBanner, heroView, failureView, levelsRow].forEach(stack.addArrangedSubview)
+        [dateHeader, progressGroup, hubView, scenarioBanner, heroView, failureView, lessonSlot, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
         stack.setCustomSpacing(Design.Spacing.m, after: hubView)
         stack.setCustomSpacing(Design.Spacing.l, after: scenarioBanner)
@@ -102,6 +103,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         hubView.onChangeCity = { [weak self] in self?.presenter.changeLifeCity() }
         scenarioBanner.addAction(UIAction { [weak self] _ in self?.presenter.openScenarios() }, for: .touchUpInside)
         levelsRow.addAction(UIAction { [weak self] _ in self?.presenter.openLevels() }, for: .touchUpInside)
+        lessonSlot.isHidden = true
+        lessonSlot.addAction(UIAction { [weak self] _ in self?.presenter.openLessonSlot() }, for: .touchUpInside)
     }
 
     // MARK: TodayViewInterface
@@ -117,6 +120,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             heroView.isHidden = state.hero == nil
             if let hero = state.hero { heroView.configure(hero, rows: state.rows) }
         }
+        lessonSlot.isHidden = state.lessonCard == nil
+        if let card = state.lessonCard { lessonSlot.configure(card) }
         progressGroup.isHidden = state.progress == nil
         if let progress = state.progress {
             progressTitle.text = progress.title

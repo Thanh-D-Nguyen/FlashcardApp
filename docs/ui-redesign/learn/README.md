@@ -52,3 +52,10 @@ test: `BJTLessonAPITests`, fixture `BJTLessonFixtures` (response thật, ẩn da
 - Mục Từ vựng của reader: vuốt trái một từ (hoặc hành động VoiceOver "Lưu vào bộ thẻ") để lưu từ đó, hoặc hàng "Lưu tất cả các từ vào bộ thẻ". Luôn hỏi bộ thẻ trước (các bộ của người học, hoặc tạo bộ "Từ các bài học"); huỷ thì không ghi gì.
 - `Interactors/LessonWordSaver` dùng cùng repository (`DeskManagement`/`CardManagement`) như `DictionaryDeckWriter`. Bài **không có ID từ điển** nên không tạo `DictionaryCard`; thẻ có id `lesson:<deck>:<slug>:<từ>` (xác định, không phải UUID giả), mặt trước là từ, reading ở phần phụ, mặt sau là `meaningVi`.
 - Không tạo thẻ thiếu một mặt; bỏ qua từ trùng (cùng id, hoặc cùng chữ với thẻ tự gõ / từ vựng từ điển); lưu cả lô trong một transaction; thông báo số từ đã thêm / đã có / bị bỏ qua.
+
+## K-06 — ô bài học trên Today
+
+- `TodayLessonSlotView` nằm **dưới** khối ôn tập (hero giữ nguyên, nút chính của hero không đổi). Nội dung chỉ lấy từ tiến độ thật của người học trên máy (`RLessonProgress` theo `ownerKey`), không cần mạng: khách và từng tài khoản thấy tiến độ riêng.
+- Thứ tự quyết định (`Interactors/TodayLessonSlot`): (1) bài đang làm dở (có câu trả lời, chưa xong) → "Học tiếp" + `n/m` câu đã trả lời; (2) bài đã xong gần nhất mà bản đã lưu (`LessonCache`) ghi `nextLesson` chưa làm → "Bài tiếp theo" (mở thẳng bài đó); (3) đã xong nhưng không biết bài kế (bài cuối cấp độ, hoặc bài chưa từng lưu trên máy) → "Chọn bài học" (mở danh sách cấp độ); (4) chưa có gì → "Chọn trình độ".
+- Không hiển thị số thẻ ngày mai hay bất kỳ số suy đoán nào; số duy nhất là số câu đã trả lời / số bài đã xong lấy từ lưu trữ. Hai nguồn ôn tập (thẻ local, thẻ tài khoản) không được gộp ở đây.
+- Chưa có: đồng bộ tiến độ từ server về (GET ẩn danh luôn `isCompleted=false`), nên bài hoàn thành trên web hay thiết bị khác không xuất hiện ở ô này.

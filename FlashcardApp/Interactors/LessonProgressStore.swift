@@ -44,6 +44,8 @@ enum LessonProgressError: Error, Equatable {
 
 protocol LessonProgressStoreInterface: AnyObject {
     func progress(slug: String, ownerKey: String) -> LessonProgress?
+    /// Every lesson this learner has started on this device.
+    func allProgress(ownerKey: String) -> [LessonProgress]
     /// Slugs this learner finished on this device.
     func completedSlugs(ownerKey: String) -> Set<String>
     /// Saves a choice. The first choice for an activity is final: a later one changes nothing and the saved progress is returned.
@@ -64,6 +66,10 @@ final class RealmLessonProgressStore: LessonProgressStoreInterface {
 
     func progress(slug: String, ownerKey: String) -> LessonProgress? {
         realm.object(ofType: RLessonProgress.self, forPrimaryKey: Self.recordId(ownerKey, slug)).map(Self.value)
+    }
+
+    func allProgress(ownerKey: String) -> [LessonProgress] {
+        realm.objects(RLessonProgress.self).filter("ownerKey == %@", ownerKey).map(Self.value)
     }
 
     func completedSlugs(ownerKey: String) -> Set<String> {

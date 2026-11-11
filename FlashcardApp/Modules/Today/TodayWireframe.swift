@@ -8,6 +8,8 @@ protocol TodayWireframeInterface: AnyObject {
     func showBudgetChooser(current: Int, onSelect: @escaping (Int) -> Void)
     func showLevels()
     func showScenarios()
+    /// One structured lesson, opened from the lesson slot.
+    func showLesson(slug: String, title: String)
     func showLifeLesson(cityID: String, lesson: LifeLesson)
     func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void)
     /// The system page of this app's settings, where the learner can allow the location again.
@@ -20,7 +22,8 @@ final class TodayWireframe: BaseWireframe<TodayViewController> {
         super.init(viewController: controller)
         controller.title = MainTabbarName.today.title
         controller.tabBarItem = MainTabbarName.today.tabBarItem
-        let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self, life: TodayLifeHubLoader(weather: TodayLifeLoader()))
+        let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self, life: TodayLifeHubLoader(weather: TodayLifeLoader()),
+                                    lessons: TodayLessonSlotProvider())
         presenter.view = controller
         controller.presenter = presenter
     }
@@ -91,6 +94,10 @@ extension TodayWireframe: TodayWireframeInterface {
 
     func showScenarios() {
         navigationController?.pushWireframe(ScenarioListWireframe())
+    }
+
+    func showLesson(slug: String, title: String) {
+        navigationController?.pushWireframe(LessonReaderWireframe(slug: slug, title: title))
     }
 
     func showLifeLesson(cityID: String, lesson: LifeLesson) {
