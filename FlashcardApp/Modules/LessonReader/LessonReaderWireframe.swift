@@ -6,6 +6,14 @@ final class LessonReaderWireframe: BaseWireframe<LessonReaderViewController> {
         let controller = LessonReaderViewController()
         super.init(viewController: controller)
         controller.title = NSLocalizedString("Lesson", comment: "Title of the lesson reader")
-        controller.presenter = LessonReaderPresenter(slug: slug, title: title, interactor: interactor)
+        let presenter = LessonReaderPresenter(slug: slug, title: title, interactor: interactor)
+        presenter.wireframe = self
+        controller.presenter = presenter
+    }
+}
+
+extension LessonReaderWireframe: LessonReaderWireframeInterface {
+    func showPractice(lesson: BJTLessonDetailDTO) {
+        navigationController?.pushWireframe(LessonPracticeWireframe(lesson: lesson))
     }
 }

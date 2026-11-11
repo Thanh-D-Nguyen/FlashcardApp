@@ -246,9 +246,13 @@
 		92F3A0202B4E1C0000BJTS01 /* BJTSearchAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */; };
 		92F3A0232B4E1C0000BJTS04 /* BJTLevelAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */; };
 		E2281C812567E868D5D91858 /* LessonReaderPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E6B233AB925B90BF86B8BBE /* LessonReaderPresenter.swift */; };
+		64C4106356DDDC3CBCF1B93E /* LessonPracticePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC973DA1CA304F8DE093A7A5 /* LessonPracticePresenter.swift */; };
+		E6CDD732F8464ACAEB57DF05 /* LessonPracticeWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC89D87C4E5DE0995CCC378 /* LessonPracticeWireframe.swift */; };
+		74FD13399F98F737E0F8D835 /* LessonPracticeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009D2A62A1C9195C63852526 /* LessonPracticeViewController.swift */; };
 		4EA1DD9BC7D562AE1854568D /* LessonReaderWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE4E97AB18574160132E07A /* LessonReaderWireframe.swift */; };
 		4CACB07C27A52100837AE180 /* LessonReaderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6EB6DBED92E79385B008A5 /* LessonReaderViewController.swift */; };
 		4A2A7B3FCEC00C042E6161A2 /* LessonReaderInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5234C82622ED443973642159 /* LessonReaderInteractor.swift */; };
+		5B72A9B5A62D7FB22E0C212D /* LessonProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D2331E83E4059C2B76EE02 /* LessonProgressStore.swift */; };
 		9528F0A4B1FF2C17FB702205 /* LessonCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7839F06D18504C321F8BD2AB /* LessonCache.swift */; };
 		3FC60768525AA88E16479459 /* LessonListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43ACF725FB6C360C0871194 /* LessonListPresenter.swift */; };
 		1431918EF58A1389D2844C46 /* LessonListWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47530E97170180EAC4411DD4 /* LessonListWireframe.swift */; };
@@ -353,6 +357,7 @@
 		D5A0000100000000000000A1 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A0000200000000000000A1 /* DesignSystem.swift */; };
 		D6334952959ABB4E724B2551 /* KanjiStrokeDrawingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCCD9C9E354A4538C89E0E5 /* KanjiStrokeDrawingTests.swift */; };
 		D6885E40CF6A4FAA95F75984 /* RReviewAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */; };
+		28810BF4CD74391331436F53 /* RLessonProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F6AA2F3B90E21C12AC80CC5 /* RLessonProgress.swift */; };
 		D6F91920EAB6485D88168056 /* ReviewHistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EE52C8BD3D44EDBAAD5DED /* ReviewHistoryStoreTests.swift */; };
 		D728A94F0F56C7CEAA9A252D /* DiscoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEA7A4244BB3A6E082B5E43 /* DiscoverPresenter.swift */; };
 		D7D0B66BCDB114A908A9EE22 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D7D0B66BCDB114A908A9EE23 /* PrivacyInfo.xcprivacy */; };
@@ -365,6 +370,8 @@
 		D9FBDE3E7E81E67EF30E6FB2 /* LessonReaderPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA24437F35240D2636F8619B /* LessonReaderPresenterTests.swift */; };
 		92A6322C541D7418891AE166 /* LessonReaderInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E26F63DFDDD5FBFC12ACB3 /* LessonReaderInteractorTests.swift */; };
 		772F382E0B698A3D000F0375 /* LessonCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED413715D68363DC8B40707D /* LessonCacheTests.swift */; };
+		9AEC7A4B5080ECCD367DE7CF /* LessonPracticePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C3B62AC399F81BF6D0B3A4 /* LessonPracticePresenterTests.swift */; };
+		5C98E7E332004D5F3DD5BAA8 /* LessonProgressStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FD5D02589A1FA4CB3A800C /* LessonProgressStoreTests.swift */; };
 		FC8C2773C35243369EA3D960 /* LessonListPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20990149DBE49A925B6331FB /* LessonListPresenterTests.swift */; };
 		9570C283670D70BBC8C5267B /* BJTLessonFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732383897D0E59BE80A6C004 /* BJTLessonFixtures.swift */; };
 		1C6589FA54AEE245D8ED01FA /* BJTLessonAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEBB9CF47A37E3A8BDC2483 /* BJTLessonAPITests.swift */; };
@@ -501,6 +508,8 @@
 		CA24437F35240D2636F8619B /* LessonReaderPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonReaderPresenterTests.swift; sourceTree = "<group>"; };
 		E7E26F63DFDDD5FBFC12ACB3 /* LessonReaderInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonReaderInteractorTests.swift; sourceTree = "<group>"; };
 		ED413715D68363DC8B40707D /* LessonCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonCacheTests.swift; sourceTree = "<group>"; };
+		80C3B62AC399F81BF6D0B3A4 /* LessonPracticePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonPracticePresenterTests.swift; sourceTree = "<group>"; };
+		B3FD5D02589A1FA4CB3A800C /* LessonProgressStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonProgressStoreTests.swift; sourceTree = "<group>"; };
 		20990149DBE49A925B6331FB /* LessonListPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonListPresenterTests.swift; sourceTree = "<group>"; };
 		732383897D0E59BE80A6C004 /* BJTLessonFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLessonFixtures.swift; sourceTree = "<group>"; };
 		FFEBB9CF47A37E3A8BDC2483 /* BJTLessonAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLessonAPITests.swift; sourceTree = "<group>"; };
@@ -561,6 +570,7 @@
 		7EA6A57959E7E3554DCF6FD4 /* RemoteDeckPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteDeckPresenter.swift; sourceTree = "<group>"; };
 		7EADC489FA314F64A10F6D80 /* TodayInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInteractorTests.swift; sourceTree = "<group>"; };
 		8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RReviewAttempt.swift; sourceTree = "<group>"; };
+		4F6AA2F3B90E21C12AC80CC5 /* RLessonProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RLessonProgress.swift; sourceTree = "<group>"; };
 		8106BDF8A68673700EEF38DC /* DictionarySavedWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySavedWireframe.swift; sourceTree = "<group>"; };
 		81651ED770FBD884568B4B44 /* HomeCells.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeCells.swift; sourceTree = "<group>"; };
 		816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryServerInteractorTests.swift; sourceTree = "<group>"; };
@@ -674,9 +684,13 @@
 		92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTSearchAPI.swift; sourceTree = "<group>"; };
 		92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLevelAPI.swift; sourceTree = "<group>"; };
 		6E6B233AB925B90BF86B8BBE /* LessonReaderPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonReaderPresenter.swift; sourceTree = "<group>"; };
+		BC973DA1CA304F8DE093A7A5 /* LessonPracticePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonPracticePresenter.swift; sourceTree = "<group>"; };
+		8BC89D87C4E5DE0995CCC378 /* LessonPracticeWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonPracticeWireframe.swift; sourceTree = "<group>"; };
+		009D2A62A1C9195C63852526 /* LessonPracticeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonPracticeViewController.swift; sourceTree = "<group>"; };
 		1AE4E97AB18574160132E07A /* LessonReaderWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonReaderWireframe.swift; sourceTree = "<group>"; };
 		5B6EB6DBED92E79385B008A5 /* LessonReaderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonReaderViewController.swift; sourceTree = "<group>"; };
 		5234C82622ED443973642159 /* LessonReaderInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonReaderInteractor.swift; sourceTree = "<group>"; };
+		31D2331E83E4059C2B76EE02 /* LessonProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonProgressStore.swift; sourceTree = "<group>"; };
 		7839F06D18504C321F8BD2AB /* LessonCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonCache.swift; sourceTree = "<group>"; };
 		F43ACF725FB6C360C0871194 /* LessonListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonListPresenter.swift; sourceTree = "<group>"; };
 		47530E97170180EAC4411DD4 /* LessonListWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonListWireframe.swift; sourceTree = "<group>"; };
@@ -1088,6 +1102,8 @@
 				4E2CC9AE5C10D89658EB3A0C /* BJTLearnerAPITests.swift */,
 				20990149DBE49A925B6331FB /* LessonListPresenterTests.swift */,
 				ED413715D68363DC8B40707D /* LessonCacheTests.swift */,
+				80C3B62AC399F81BF6D0B3A4 /* LessonPracticePresenterTests.swift */,
+				B3FD5D02589A1FA4CB3A800C /* LessonProgressStoreTests.swift */,
 				E7E26F63DFDDD5FBFC12ACB3 /* LessonReaderInteractorTests.swift */,
 				CA24437F35240D2636F8619B /* LessonReaderPresenterTests.swift */,
 				732383897D0E59BE80A6C004 /* BJTLessonFixtures.swift */,
@@ -1215,6 +1231,7 @@
 				9251EC0929A1EAA5006C1D1C /* HomeInteractor.swift */,
 				64D09051AC9F201CC1DBBCF7 /* LessonListInteractor.swift */,
 				5234C82622ED443973642159 /* LessonReaderInteractor.swift */,
+				31D2331E83E4059C2B76EE02 /* LessonProgressStore.swift */,
 				9251EC0B29A1EAA5006C1D1C /* MainInteractor.swift */,
 				9251EC1029A1EAA5006C1D1C /* MailLoginInteractor.swift */,
 				929C4DD229A76442007651E9 /* DeskInteractor.swift */,
@@ -1322,6 +1339,7 @@
 				E2A44EF09CC3298ABFE6F0AE /* Scenario */,
 				E8CA815C09AFD708FFA02C67 /* LessonList */,
 				C28417A65FD6C1F5F992CF22 /* LessonReader */,
+				B3BC8C507916587CF2C763E9 /* LessonPractice */,
 				97485579B0977726EA6FDC21 /* RemoteDeck */,
 				BFFF899A29A2AFC752A900E7 /* DictionaryEntry */,
 				5FE96E0D9149231ECAD05CB7 /* DictionaryHandwriting */,
@@ -1524,6 +1542,7 @@
 				A696A35C7485A1FC9D31516F /* RetiredDictionaryTables.swift */,
 				7E69356F010E94232AF06D15 /* RCardExample.swift */,
 				8001B402CE7F4C7C90451D16 /* RReviewAttempt.swift */,
+				4F6AA2F3B90E21C12AC80CC5 /* RLessonProgress.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1706,6 +1725,16 @@
 				5B6EB6DBED92E79385B008A5 /* LessonReaderViewController.swift */,
 			);
 			path = LessonReader;
+			sourceTree = "<group>";
+		};
+		B3BC8C507916587CF2C763E9 /* LessonPractice */ = {
+			isa = PBXGroup;
+			children = (
+				BC973DA1CA304F8DE093A7A5 /* LessonPracticePresenter.swift */,
+				8BC89D87C4E5DE0995CCC378 /* LessonPracticeWireframe.swift */,
+				009D2A62A1C9195C63852526 /* LessonPracticeViewController.swift */,
+			);
+			path = LessonPractice;
 			sourceTree = "<group>";
 		};
 		E6A7C00F47CA5726E3859874 /* Discover */ = {
@@ -2018,9 +2047,13 @@
 				92F3A0202B4E1C0000BJTS01 /* BJTSearchAPI.swift in Sources */,
 				92F3A0232B4E1C0000BJTS04 /* BJTLevelAPI.swift in Sources */,
 				E2281C812567E868D5D91858 /* LessonReaderPresenter.swift in Sources */,
+				64C4106356DDDC3CBCF1B93E /* LessonPracticePresenter.swift in Sources */,
+				E6CDD732F8464ACAEB57DF05 /* LessonPracticeWireframe.swift in Sources */,
+				74FD13399F98F737E0F8D835 /* LessonPracticeViewController.swift in Sources */,
 				4EA1DD9BC7D562AE1854568D /* LessonReaderWireframe.swift in Sources */,
 				4CACB07C27A52100837AE180 /* LessonReaderViewController.swift in Sources */,
 				4A2A7B3FCEC00C042E6161A2 /* LessonReaderInteractor.swift in Sources */,
+				5B72A9B5A62D7FB22E0C212D /* LessonProgressStore.swift in Sources */,
 				9528F0A4B1FF2C17FB702205 /* LessonCache.swift in Sources */,
 				3FC60768525AA88E16479459 /* LessonListPresenter.swift in Sources */,
 				1431918EF58A1389D2844C46 /* LessonListWireframe.swift in Sources */,
@@ -2186,6 +2219,7 @@
 				7D5CC2E9FF8E4168AE3FD0C9 /* StudyReviewViews.swift in Sources */,
 				5709B51817C9AE729BCC6AF1 /* RCardExample.swift in Sources */,
 				D6885E40CF6A4FAA95F75984 /* RReviewAttempt.swift in Sources */,
+				28810BF4CD74391331436F53 /* RLessonProgress.swift in Sources */,
 				3690461B9DC786EBC8303544 /* CardExampleStore.swift in Sources */,
 				592B098B99C14398AA6F6B9E /* TodayInteractor.swift in Sources */,
 				F21B22EB1016302ABF704C86 /* LifeLessonInteractor.swift in Sources */,
@@ -2282,6 +2316,8 @@
 				D9FBDE3E7E81E67EF30E6FB2 /* LessonReaderPresenterTests.swift in Sources */,
 				92A6322C541D7418891AE166 /* LessonReaderInteractorTests.swift in Sources */,
 				772F382E0B698A3D000F0375 /* LessonCacheTests.swift in Sources */,
+				9AEC7A4B5080ECCD367DE7CF /* LessonPracticePresenterTests.swift in Sources */,
+				5C98E7E332004D5F3DD5BAA8 /* LessonProgressStoreTests.swift in Sources */,
 				FC8C2773C35243369EA3D960 /* LessonListPresenterTests.swift in Sources */,
 				1C6589FA54AEE245D8ED01FA /* BJTLessonAPITests.swift in Sources */,
 				9570C283670D70BBC8C5267B /* BJTLessonFixtures.swift in Sources */,

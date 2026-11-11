@@ -6412,6 +6412,342 @@
         }
       }
     },
+    "Question %lld of %lld" : {
+      "comment" : "Lesson practice progress",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Question %lld of %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "問題 %lld/%lld"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Câu %lld/%lld"
+          }
+        }
+      }
+    },
+    "Lesson finished" : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesson finished"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レッスン完了"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã hoàn thành bài"
+          }
+        }
+      }
+    },
+    "%lld of %lld correct" : {
+      "comment" : "Lesson practice score",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld of %lld correct"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/%lld 正解"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đúng %lld/%lld"
+          }
+        }
+      }
+    },
+    "Saved on this device. Sign in to save progress to your account." : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved on this device. Sign in to save progress to your account."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末に保存しました。ログインするとアカウントにも保存できます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã lưu trên thiết bị. Đăng nhập để lưu tiến độ vào tài khoản."
+          }
+        }
+      }
+    },
+    "Saved to your account." : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to your account."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントに保存しました。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã lưu vào tài khoản."
+          }
+        }
+      }
+    },
+    "Finished on this device. Not saved to your account yet." : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished on this device. Not saved to your account yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末で完了しました。まだアカウントには保存されていません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã hoàn thành trên thiết bị. Chưa lưu vào tài khoản."
+          }
+        }
+      }
+    },
+    "Save to your account" : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to your account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントに保存"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lưu vào tài khoản"
+          }
+        }
+      }
+    },
+    "Finished on this device, but not saved to your account." : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished on this device, but not saved to your account."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末では完了しましたが、アカウントには保存できませんでした。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã hoàn thành trên thiết bị nhưng chưa lưu được vào tài khoản."
+          }
+        }
+      }
+    },
+    "We can't tell whether your account was updated." : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We can't tell whether your account was updated."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントが更新されたかどうか確認できません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa rõ tài khoản đã được cập nhật hay chưa."
+          }
+        }
+      }
+    },
+    "Back to lesson" : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to lesson"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レッスンに戻る"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quay lại bài học"
+          }
+        }
+      }
+    },
+    "Couldn't save your answer on this device. Try again." : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save your answer on this device. Try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末に回答を保存できませんでした。もう一度お試しください。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không lưu được câu trả lời trên thiết bị. Hãy thử lại."
+          }
+        }
+      }
+    },
+    "Saved to your account, but not recorded on this device." : {
+      "comment" : "Lesson practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to your account, but not recorded on this device."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントには保存しましたが、この端末には記録できませんでした。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã lưu vào tài khoản nhưng chưa ghi nhận trên thiết bị."
+          }
+        }
+      }
+    },
+    "%lld of %lld answered" : {
+      "comment" : "Lesson practice progress",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld of %lld answered"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld/%lld 回答済み"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã trả lời %lld/%lld"
+          }
+        }
+      }
+    },
+    "Completed" : {
+      "comment" : "Lesson practice status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã hoàn thành"
+          }
+        }
+      }
+    },
     "Retry" : {
       "comment" : "Retry button",
       "extractionState" : "manual",

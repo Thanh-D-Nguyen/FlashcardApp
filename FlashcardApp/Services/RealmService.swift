@@ -11,8 +11,9 @@ final class RealmService {
     /// 5: adds `RReviewState`, when each card is next due (additive, nothing to migrate).
     /// 6: `RReviewState` loses `lastAttemptId`, a column nothing read that the first schema-5 build had written. Realm drops it
     /// during the version bump; every row is kept (a store written by that build would otherwise not open).
-    static let schemaVersion: UInt64 = 6
-    static let storedTypes: [Object.Type] = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self, RReviewState.self]
+    /// 7: adds `RLessonProgress`, the learner's progress through structured lessons (additive, nothing to migrate).
+    static let schemaVersion: UInt64 = 7
+    static let storedTypes: [Object.Type] = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self, RReviewState.self, RLessonProgress.self]
     /// Tables of the retired bundled dictionary. An upgraded install empties them; the decks are untouched.
     static let retiredDictionaryTables: [Object.Type] = [RetiredJaVi.self, RetiredViJa.self, RetiredKanji.self, RetiredGrammar.self, RetiredExample.self]
     /// How those tables are named in the file (the stand-in classes map to them with `_realmObjectName`).

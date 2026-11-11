@@ -126,21 +126,41 @@ extension LessonReaderViewController: UITableViewDataSource, UITableViewDelegate
         section < presenter.sections.count ? presenter.sections[section].title : NSLocalizedString("Practice", comment: "")
     }
 
+    static func statusText(_ status: LessonPracticeStatus) -> String? {
+        switch status {
+        case .notStarted: return nil
+        case .inProgress(let answered, let total): return String(format: NSLocalizedString("%lld of %lld answered", comment: "Lesson practice progress"), answered, total)
+        case .completed: return NSLocalizedString("Completed", comment: "Lesson practice status")
+        }
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.section >= presenter.sections.count { presenter.showPractice() }
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "entry", for: indexPath)
+        cell.accessoryType = .none
+        cell.isAccessibilityElement = false
         var content = cell.defaultContentConfiguration()
         content.textProperties.numberOfLines = 0
         content.secondaryTextProperties.numberOfLines = 0
         cell.selectionStyle = .none
         cell.accessibilityTraits = .staticText
         if indexPath.section >= presenter.sections.count {
-            // Practice: shown with the server's activity count, but off until the activities exist (K-04).
+            // Practice: the server's activities, with where the learner stands on this device.
             content.text = NSLocalizedString("Practice", comment: "")
             content.textProperties.apply(.title)
-            content.textProperties.color = Design.Color.textSecondary
-            content.secondaryText = String(format: NSLocalizedString("%lld activities", comment: ""), presenter.practiceActivityCount)
+            content.textProperties.color = Design.Color.accent
+            let count = String(format: NSLocalizedString("%lld activities", comment: ""), presenter.practiceActivityCount)
+            content.secondaryText = [Self.statusText(presenter.practiceStatus), count].compactMap { $0 }.joined(separator: " · ")
             content.secondaryTextProperties.apply(.metadata)
-            cell.accessibilityTraits = [.button, .notEnabled]
+            cell.selectionStyle = .default
+            cell.accessoryType = .disclosureIndicator
+            cell.isAccessibilityElement = true
+            cell.accessibilityLabel = [content.text, content.secondaryText].compactMap { $0 }.joined(separator: ". ")
+            cell.accessibilityTraits = .button
             cell.accessibilityIdentifier = "lesson_practice"
             cell.contentConfiguration = content
             return cell

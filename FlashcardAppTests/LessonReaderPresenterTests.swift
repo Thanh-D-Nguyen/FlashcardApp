@@ -1,3 +1,4 @@
+import RealmSwift
 import RxSwift
 import XCTest
 @testable import FlashcardApp
@@ -14,7 +15,8 @@ final class LessonReaderPresenterTests: XCTestCase {
     }
 
     private func makePresenter() -> LessonReaderPresenter {
-        LessonReaderPresenter(slug: slug, title: "Tiêu đề danh sách", interactor: interactor, language: { [unowned self] in language })
+        LessonReaderPresenter(slug: slug, title: "Tiêu đề danh sách", interactor: interactor, language: { [unowned self] in language },
+                              progressStore: FailingProgressStore(), ownerKey: { "" })
     }
 
     private func lesson(_ edit: (inout [String: Any]) -> Void = { _ in }) throws -> BJTLessonDetailDTO {
@@ -121,12 +123,51 @@ final class LessonReaderPresenterTests: XCTestCase {
         XCTAssertEqual(presenter.state, .loaded)
     }
 
-    func test_practiceShowsTheServersActivityCountButStaysUnavailableUntilActivitiesExist() throws {
+    func test_practiceIsOfferedWithTheServersActivityCountAndOpensTheLoadedLesson() throws {
         let presenter = makePresenter()
+        let spy = ReaderWireframeSpy()
+        presenter.wireframe = spy
+        presenter.showPractice()
+        XCTAssertTrue(spy.practised.isEmpty, "Nothing to practise before the lesson has loaded")
         presenter.viewDidLoad()
         interactor.respond(LessonReadResult(lesson: try lesson(), isFromCache: false))
         XCTAssertEqual(presenter.practiceActivityCount, 5, "From the payload, not an assumed number")
+        XCTAssertTrue(presenter.isPracticeAvailable)
+        presenter.showPractice()
+        XCTAssertEqual(spy.practised.map(\.slug), [slug])
+    }
+
+    func test_practiceIsNotOfferedForALessonWithoutActivities() throws {
+        let presenter = makePresenter()
+        let spy = ReaderWireframeSpy()
+        presenter.wireframe = spy
+        presenter.viewDidLoad()
+        interactor.respond(LessonReadResult(lesson: try lesson { object in editContent(&object) { $0["activities"] = [] } }, isFromCache: false))
         XCTAssertFalse(presenter.isPracticeAvailable)
+        presenter.showPractice()
+        XCTAssertTrue(spy.practised.isEmpty)
+    }
+
+    func test_theReaderShowsWhereTheLearnerStandsAndRefreshesWhenComingBack() throws {
+        RealmService.shared.realm = try Realm(configuration: Realm.Configuration(inMemoryIdentifier: UUID().uuidString, objectTypes: RealmService.storedTypes))
+        defer { RealmService.shared.realm = nil }
+        let store = RealmLessonProgressStore()
+        let presenter = LessonReaderPresenter(slug: slug, title: "T", interactor: interactor, language: { .vietnamese }, progressStore: store, ownerKey: { "u1" })
+        presenter.viewDidLoad()
+        let loaded = try lesson()
+        interactor.respond(LessonReadResult(lesson: loaded, isFromCache: false))
+        XCTAssertEqual(presenter.practiceStatus, .notStarted)
+        let ids = loaded.lessonContent.activities.map(\.id)
+        let subject = LessonProgressSubject(slug: slug, lessonId: loaded.id, levelCode: "J5", sortOrder: 1, contentVersion: "", activityIds: ids)
+        try store.recordAnswer(LessonAnswer(activityId: ids[0], optionKey: "A"), for: subject, ownerKey: "u1", at: Date())
+        try store.recordAnswer(LessonAnswer(activityId: ids[1], optionKey: "A"), for: subject, ownerKey: "other", at: Date())
+        presenter.viewDidLoad()   // back from practice
+        XCTAssertEqual(presenter.practiceStatus, .inProgress(answered: 1, total: 5), "Only this account's answers count")
+        XCTAssertEqual(interactor.requested.count, 1, "Coming back does not fetch the lesson again")
+        for id in ids.dropFirst() { try store.recordAnswer(LessonAnswer(activityId: id, optionKey: "A"), for: subject, ownerKey: "u1", at: Date()) }
+        try store.markCompleted(for: subject, ownerKey: "u1", at: Date())
+        presenter.viewDidLoad()
+        XCTAssertEqual(presenter.practiceStatus, .completed)
     }
 
     func test_failureShowsAMessageAndOnlyRetryLoadsAgain() throws {
@@ -162,6 +203,11 @@ final class LessonReaderPresenterTests: XCTestCase {
         presenter.retry()
         XCTAssertEqual(interactor.requested.count, 1)
     }
+}
+
+final class ReaderWireframeSpy: LessonReaderWireframeInterface {
+    private(set) var practised: [BJTLessonDetailDTO] = []
+    func showPractice(lesson: BJTLessonDetailDTO) { practised.append(lesson) }
 }
 
 final class ReaderInteractorStub: LessonReaderInteractorInterface {

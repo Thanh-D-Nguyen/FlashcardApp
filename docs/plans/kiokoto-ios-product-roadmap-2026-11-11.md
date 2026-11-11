@@ -67,8 +67,8 @@
 | **K-01** | Client + DTO/fixture/test cho lesson public và contract progress; không thay UI | — | 1.1/P0 | **VERIFIED** (GET + DTO; PUT theo source, chưa gọi thật) — [contract](../ui-redesign/learn/README.md), [status](kiokoto-ios-orca-status.md) |
 | K-02 | Từ màn cấp độ **đang có**, danh sách lesson J5→J1, nhóm theo tuần, loading/retry | K-01 | 1.1/P1 | **VERIFIED** (local commit; chưa có review độc lập riêng cho K-02) — xem [status](kiokoto-ios-orca-status.md) |
 | K-03 | Lesson reader (scenario, vocab, grammar, examples, pitfalls), cache bài đã mở để đọc offline | K-02 | 1.1/P2 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
-| K-04 | 5 hoạt động hoặc số lượng thật từ API, đáp án/rationale, lưu hoàn thành local, ghi progress server khi hợp lệ | K-03 + contract xác minh | 1.1/P3 | **NEXT** |
-| K-05 | Chọn/lưu từ trong lesson vào bộ thẻ local bằng writer hiện có, chống trùng | K-03; nên sau K-04 để hoàn thiện journey | 1.1/P4 | PLANNED |
+| K-04 | 5 hoạt động hoặc số lượng thật từ API, đáp án/rationale, lưu hoàn thành local, ghi progress server khi hợp lệ | K-03 + contract xác minh | 1.1/P3 | **VERIFIED** (local commit; PUT thật NOT VERIFIED) — [status](kiokoto-ios-orca-status.md) |
+| K-05 | Chọn/lưu từ trong lesson vào bộ thẻ local bằng writer hiện có, chống trùng | K-03; nên sau K-04 để hoàn thiện journey | 1.1/P4 | **NEXT** |
 | K-06 | Today: bài kế tiếp/tiếp tục học; giữ nguyên hero review, tách nguồn local/server | K-04/K-05 | 1.1/P5 | PLANNED |
 | K-07 | Choice mode cho **server account review**; xác minh distractors; người học tự xác nhận rating | K-01..06 không phải phụ thuộc code, nhưng đợi cổng MVP | 1.1 sau MVP | PLANNED |
 | K-08 | Danh sách thẻ thường sai theo dữ liệu lịch sử thật; không suy đoán lapse trên server | K-07 hoặc dữ liệu local đã có | Sau K-07 | PLANNED |

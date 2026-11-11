@@ -17,7 +17,7 @@ final class RealmServiceTests: XCTestCase {
     override func tearDownWithError() throws { try FileManager.default.removeItem(at: folder) }
 
     func test_theLocalSchemaHoldsTheLearnersOwnData() {
-        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard", "RCardExample", "RReviewAttempt", "RReviewState"])
+        XCTAssertEqual(Set(RealmService.storedTypes.map { $0.className() }), ["RDesk", "RCard", "RCardExample", "RReviewAttempt", "RReviewState", "RLessonProgress"])
     }
 
     func test_aFreshInstallOpensAnEmptyStoreWithoutAnyBundledFile() throws {
@@ -43,7 +43,7 @@ final class RealmServiceTests: XCTestCase {
         XCTAssertEqual(deckName, "My deck")
         XCTAssertEqual(frontTexts, ["犬"], "The learner's cards survive the upgrade")
         XCTAssertEqual(cardBack, "con chó")
-        XCTAssertEqual(tables, ["RDesk", "RCard", "RCardExample", "RReviewAttempt", "RReviewState"])
+        XCTAssertEqual(tables, ["RDesk", "RCard", "RCardExample", "RReviewAttempt", "RReviewState", "RLessonProgress"])
         XCTAssertEqual(version, RealmService.schemaVersion)
         XCTAssertEqual(try retiredRowCount(), 0, "The dictionary rows were emptied")
     }
@@ -203,6 +203,53 @@ final class RealmServiceTests: XCTestCase {
             XCTAssertEqual(state.stability, 2.3065, accuracy: 1e-12)
             XCTAssertEqual(state.reviews, 1)
         }
+    }
+
+    func test_upgradingFromSchemaSixKeepsDecksAndReviewHistoryAndStartsWithAnEmptyLessonProgressTable() throws {
+        // A real schema-6 file: the five types schema 6 knew, with a deck, a card and a saved attempt in it.
+        try autoreleasepool {
+            var configuration = Realm.Configuration(fileURL: fileURL, schemaVersion: 6)
+            configuration.objectTypes = [RDesk.self, RCard.self, RCardExample.self, RReviewAttempt.self, RReviewState.self]
+            let realm = try Realm(configuration: configuration)
+            try realm.write {
+                let card = RCard()
+                card.id = "card-1"
+                card.frontText = "犬"
+                card.backText = "con chó"
+                let desk = RDesk()
+                desk.id = "deck-6"
+                desk.name = "Kept in schema 6"
+                desk.cards.append(card)
+                realm.add(desk)
+                let attempt = RReviewAttempt()
+                attempt.recordId = "u1|run/0"
+                attempt.attemptId = "run/0"
+                attempt.ownerKey = "u1"
+                attempt.cardId = "card-1"
+                attempt.contentVersion = "v1"
+                attempt.result = "correct"
+                realm.add(attempt)
+            }
+        }
+        XCTAssertEqual(RealmService.schemaVersion, 7)
+
+        try autoreleasepool {
+            let realm = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+            XCTAssertEqual(realm.configuration.schemaVersion, 7)
+            XCTAssertEqual(realm.object(ofType: RDesk.self, forPrimaryKey: "deck-6")?.cards.map(\.frontText), ["犬"], "Decks and cards survive")
+            XCTAssertEqual(realm.objects(RReviewAttempt.self).count, 1, "Saved review attempts survive")
+            XCTAssertEqual(realm.objects(RLessonProgress.self).count, 0, "The new table starts empty")
+            try realm.write {
+                let progress = RLessonProgress()
+                progress.recordId = "|j5-01"
+                progress.slug = "j5-01"
+                realm.add(progress)
+            }
+        }
+        // Reopening needs no further migration and keeps both old and new data.
+        let again = try Realm(configuration: RealmService.makeConfiguration(fileURL: fileURL))
+        XCTAssertEqual(again.objects(RLessonProgress.self).count, 1)
+        XCTAssertEqual(again.objects(RDesk.self).count, 1)
     }
 
     func test_everySupportedOlderSchemaOpensWithTheReviewTableAvailable() throws {

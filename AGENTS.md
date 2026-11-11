@@ -26,7 +26,7 @@ imports it. Keep project rules here; workflows live in `.claude/skills/`.
   **Của tôi** (bộ trên máy + "Trên tài khoản"), **Công khai**, **Gần đây** (cùng `GET /flashcards/decks`; server xoá `ownerUserId` của bộ không phải của mình) và
   `Modules/RemoteDeck` (xem/lưu về máy/học/lưu trữ). Học vẫn chạy trên bộ cục bộ: "Học" lưu bản sao với id của server. Chi tiết, giới hạn: `docs/ui-redesign/cards/README.md` §8.
 - `Services/RealmService.swift`: Realm stays the local store for the learner's own data (decks and
-  cards `RDesk`/`RCard`, and their own changes to example sentences `RCardExample`; schema 3) and is where
+  cards `RDesk`/`RCard`, example-sentence changes `RCardExample`, review history `RReviewAttempt`/`RReviewState`, lesson progress `RLessonProgress`; schema 7) and is where
   future caches live (add models to `storedTypes`).
   **The app bundles no database and keeps no dictionary for now** (the one bundled data file is `Resources/HandwritingTemplates.bin`, KanjiVG stroke *shapes* for the handwriting recognizer — no meanings, readings or examples): words, kanji, grammar, example
   sentences and suggestions come from the API. The user plans a download mechanism for dictionary

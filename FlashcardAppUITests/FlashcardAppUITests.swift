@@ -175,6 +175,35 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Tình huống")).firstMatch.waitForExistence(timeout: 5), "The first section is the situation")
     }
 
+    /// A guest answers every activity of a lesson, sees the reveal for each, and finishes with the lesson saved on the device.
+    func testGuestCanPractiseALessonToTheEnd() {
+        let app = makeApp()
+        app.launch()
+        openLevels(app)
+        let start = app.buttons["home_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 40))
+        start.tap()
+        let lessons = app.buttons["level_lessons"]
+        XCTAssertTrue(lessons.waitForExistence(timeout: 10))
+        lessons.tap()
+        let row = app.descendants(matching: .any).matching(identifier: "lesson_row_j5-01-greetings-intro").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 20))
+        row.tap()
+        let practice = app.descendants(matching: .any).matching(identifier: "lesson_practice").firstMatch
+        XCTAssertTrue(practice.waitForExistence(timeout: 20), "The lesson loaded and offers its activities")
+        practice.tap()
+        // The device keeps progress between runs, so a lesson finished earlier opens straight on its summary.
+        for _ in 0..<5 {
+            let option = app.descendants(matching: .any).matching(identifier: "practice_option_0").firstMatch
+            guard option.waitForExistence(timeout: 5) else { break }
+            option.tap()
+            let next = app.descendants(matching: .any).matching(identifier: "practice_next").firstMatch
+            XCTAssertTrue(next.waitForExistence(timeout: 5), "Answering reveals the result and offers the next step")
+            next.tap()
+        }
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "practice_back").firstMatch.waitForExistence(timeout: 10), "The lesson ends on its summary")
+    }
+
     /// A level's count opens that kind directly, skipping the kind chooser.
     func testLevelCountOpensItsKindDirectly() {
         let app = makeApp()

@@ -38,3 +38,11 @@ test: `BJTLessonAPITests`, fixture `BJTLessonFixtures` (response thật, ẩn da
 - Chọn một hàng ở danh sách bài → `Modules/LessonReader`. Thứ tự: Tình huống (bối cảnh JA/VI, mục tiêu, thách thức, kết quả mong muốn, "bạn sẽ học"), Từ vựng, Ngữ pháp, Ví dụ, Điểm cần nhớ, Lỗi thường gặp, rồi dòng Luyện tập (hiện số hoạt động của server, **tắt** đến K-04). Section rỗng bị ẩn; reading rỗng không hiện; mã máy như `relationship` không hiển thị.
 - Không có link sang `DictionaryEntry`: bài chỉ có `japanese/reading/meaningVi`, **không có ID từ điển**, và ID không được ghép từ text.
 - Offline: `Services/LessonCache` lưu **đúng bytes server gửi** trong envelope có version (`Application Support/Lessons/<slug>.json`, ghi atomic, loại khỏi backup, không chứa token vì GET ẩn danh). `LessonReaderInteractor` ưu tiên server; chỉ khi offline/ngắt kết nối/429/5xx mới dùng bản đã lưu và hiện banner. 404 hoặc dữ liệu hỏng **không** bị che bằng bản cũ. File hỏng/khác phiên bản/sai slug = miss. Chỉ bài đã mở thành công mới đọc được offline; không tải trước 420 bài.
+
+## K-04 — luyện tập và hoàn thành
+
+- Dòng **Luyện tập** của reader mở `Modules/LessonPractice`: một activity một lúc (câu hỏi, ngữ cảnh/đoạn hội thoại, 4 lựa chọn của server). Số câu lấy từ payload (bài J5 hiện có 5), không giả định.
+- Chọn **một lần**: lưu trên máy trước, rồi mới hiện đúng/sai (biểu tượng + chữ, không chỉ màu), lý do (`rationaleVi`) của đáp án đã chọn và đáp án đúng, và phần giải thích. Lưu lỗi ⇒ báo lỗi, không hiện như đã trả lời.
+- `RLessonProgress` (Realm **schema 7**, cộng thêm, không cần migrate; khoá `ownerKey|slug` như lịch sử ôn tập). `completedAt` = xong trên máy; `serverConfirmedAt` = server đã xác nhận cho đúng tài khoản. Tiến độ của guest không bị gộp vào tài khoản khi đăng nhập.
+- Máy chỉ gửi `PUT /levels/lessons/{slug}/progress` khi đã đăng nhập, **một lần** ngay sau khi hoàn thành; không tự gửi lại. Lỗi ⇒ "chưa lưu vào tài khoản" + nút thử lại do người học bấm; mất kết nối giữa chừng ⇒ "chưa rõ"; kết quả đến sau khi đổi/đăng xuất tài khoản bị bỏ. Mở lại bài đã xong chỉ hiện nút "Lưu vào tài khoản", không tự gửi.
+- Chưa kiểm với server thật (không gọi PUT production). Chưa có hiển thị tiến độ tài khoản từ server (GET ẩn danh luôn `isCompleted=false`).

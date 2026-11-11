@@ -35,10 +35,23 @@ protocol LessonReaderPresenterInterface: AnyObject {
     var isFromCache: Bool { get }
     var practiceActivityCount: Int { get }
     var isPracticeAvailable: Bool { get }
+    var practiceStatus: LessonPracticeStatus { get }
     var onChange: (() -> Void)? { get set }
     func viewDidLoad()
     func retry()
     func cancelLoading()
+    func showPractice()
+}
+
+protocol LessonReaderWireframeInterface: AnyObject {
+    func showPractice(lesson: BJTLessonDetailDTO)
+}
+
+/// Where the learner stands in the lesson's activities on this device.
+enum LessonPracticeStatus: Equatable {
+    case notStarted
+    case inProgress(answered: Int, total: Int)
+    case completed
 }
 
 final class LessonReaderPresenter: LessonReaderPresenterInterface {
@@ -46,6 +59,11 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
     private let interactor: LessonReaderInteractorInterface
     private let language: () -> AppLanguage
     private let request = SerialDisposable()
+    private let progressStore: LessonProgressStoreInterface
+    private let ownerKey: () -> String
+    private var lesson: BJTLessonDetailDTO?
+    /// Held strongly: nothing else keeps the wireframe alive once its controller is pushed.
+    var wireframe: LessonReaderWireframeInterface?
 
     private(set) var state: LessonReaderState = .idle
     private(set) var title: String
@@ -53,16 +71,20 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
     private(set) var sections: [LessonReaderSection] = []
     private(set) var isFromCache = false
     private(set) var practiceActivityCount = 0
-    /// Practice opens with the activities story (K-04); until then the count is shown but the action is off.
-    var isPracticeAvailable: Bool { false }
+    private(set) var practiceStatus: LessonPracticeStatus = .notStarted
+    var isPracticeAvailable: Bool { state == .loaded && practiceActivityCount > 0 }
     var onChange: (() -> Void)?
 
     /// `title` is the list row's, shown while the lesson loads.
-    init(slug: String, title: String, interactor: LessonReaderInteractorInterface, language: @escaping () -> AppLanguage = { .current }) {
+    init(slug: String, title: String, interactor: LessonReaderInteractorInterface, language: @escaping () -> AppLanguage = { .current },
+         progressStore: LessonProgressStoreInterface = RealmLessonProgressStore.shared,
+         ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" }) {
         self.slug = slug
         self.title = title
         self.interactor = interactor
         self.language = language
+        self.progressStore = progressStore
+        self.ownerKey = ownerKey
     }
 
     deinit { request.dispose() }
@@ -70,8 +92,32 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
     /// Called every time the screen appears: loads once, and again only after leaving cancelled the request.
     /// A failed load is repeated by `retry()` only.
     func viewDidLoad() {
+        if state == .loaded {
+            // Back from practice: the lesson is not fetched again, only the progress is read.
+            refreshProgress()
+            onChange?()
+            return
+        }
         guard state == .idle else { return }
         load()
+    }
+
+    func showPractice() {
+        guard isPracticeAvailable, let lesson else { return }
+        wireframe?.showPractice(lesson: lesson)
+    }
+
+    private func refreshProgress() {
+        guard let lesson else { practiceStatus = .notStarted; return }
+        let ids = Set(lesson.lessonContent.activities.map(\.id))
+        let progress = progressStore.progress(slug: slug, ownerKey: ownerKey())
+        if progress?.isCompletedLocally == true {
+            practiceStatus = .completed
+        } else if let progress, !progress.answers.isEmpty {
+            practiceStatus = .inProgress(answered: progress.answers.filter { ids.contains($0.activityId) }.count, total: ids.count)
+        } else {
+            practiceStatus = .notStarted
+        }
     }
 
     func retry() {
@@ -98,7 +144,9 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
                 self.sections = Self.sections(for: lesson.lessonContent)
                 self.isFromCache = result.isFromCache
                 self.practiceActivityCount = lesson.lessonContent.activities.count
+                self.lesson = lesson
                 self.state = .loaded
+                self.refreshProgress()
                 self.onChange?()
             }, onFailure: { [weak self] error in
                 guard let self else { return }
