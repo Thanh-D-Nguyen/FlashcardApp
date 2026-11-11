@@ -49,6 +49,14 @@ final class CardViewController: BaseViewController, CardViewInterface {
         return item
     }()
 
+    private lazy var oftenMissedItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(image: UIImage(systemName: "exclamationmark.arrow.trianglehead.counterclockwise.rotate.90"),
+                                   primaryAction: UIAction { [weak self] _ in self?.presenter.showOftenMissed() })
+        item.accessibilityLabel = NSLocalizedString("Often missed", comment: "Screen of the cards the learner keeps getting wrong")
+        item.accessibilityIdentifier = "often_missed_button"
+        return item
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -64,7 +72,7 @@ final class CardViewController: BaseViewController, CardViewInterface {
     func setupUI() {
         view.backgroundColor = Design.Color.background
         navigationItem.largeTitleDisplayMode = .always
-        navigationItem.rightBarButtonItems = [addItem, sortItem]
+        navigationItem.rightBarButtonItems = [addItem, sortItem, oftenMissedItem]
 
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchResultsUpdater = self
@@ -249,7 +257,8 @@ final class CardViewController: BaseViewController, CardViewInterface {
 
     private func updateBarItems(for state: CardLibraryState) {
         // Sorting orders the decks on the device only.
-        navigationItem.rightBarButtonItems = state.scope == .mine ? [addItem, sortItem] : [addItem]
+        // The often-missed list is made from this device's own history, so it belongs to the device's decks.
+        navigationItem.rightBarButtonItems = state.scope == .mine ? [addItem, sortItem, oftenMissedItem] : [addItem]
         sortItem.menu = makeSortMenu()
         sortItem.isEnabled = state.deckCount > 1
     }

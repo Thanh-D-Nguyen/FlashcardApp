@@ -46,6 +46,11 @@ final class CardPresenterTests: XCTestCase {
         return []
     }
 
+    func test_oftenMissedOpensTheLocalListOnce() {
+        presenter.showOftenMissed()
+        XCTAssertEqual(wireframe.oftenMissedOpened, 1)
+    }
+
     func test_noDecksShowsTheEmptyState() {
         presenter.viewWillAppear()
         XCTAssertEqual(view.states.last?.content, .empty)
@@ -174,6 +179,8 @@ final class FakeCardWireframe: CardWireframeInterface {
     func hideUploadProgress(then: @escaping () -> Void) { hidden += 1; then() }
     var editors: [String?] = []
     var studied: [String] = []
+    private(set) var oftenMissedOpened = 0
+    func showOftenMissed() { oftenMissedOpened += 1 }
     var deleteRequests: [String] = []
     var alerts: [String?] = []
     private var editorFinish: (() -> Void)?

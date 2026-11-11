@@ -84,6 +84,22 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(reviewScope.isSelected, "The reminder must select the Review section regardless of language or login state")
     }
 
+    /// K-08: the often-missed list opens from "My decks" and, with no answers recorded, says so instead of showing an empty table.
+    func testOftenMissedOpensFromMyDecksAndExplainsWhenThereIsNothingYet() {
+        let app = makeApp()
+        app.launchArguments += ["-SeedCardsFixture", "-disableAds"]
+        app.launch()
+        let cards = app.tabBars.buttons["tab_cards"]
+        XCTAssertTrue(cards.waitForExistence(timeout: 40))
+        cards.tap()
+        let button = app.buttons["often_missed_button"]
+        XCTAssertTrue(button.waitForExistence(timeout: 10), "The entry is in the Cards tab's bar while My decks is shown")
+        button.tap()
+        XCTAssertTrue(app.tables["often_missed_list"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Chưa có thẻ hay quên"].waitForExistence(timeout: 5), "No answers recorded yet: the empty state says so")
+        XCTAssertEqual(app.cells.matching(NSPredicate(format: "identifier BEGINSWITH 'often_missed_row_'")).count, 0)
+    }
+
     func testCardEditorKeepsToolbarAboveKeyboardAndCanDiscard() {
         let app = makeApp()
         app.launch()

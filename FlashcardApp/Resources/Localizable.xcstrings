@@ -7324,6 +7324,126 @@
         }
       }
     },
+    "Often missed" : {
+      "extractionState" : "manual",
+      "comment" : "Screen of the cards the learner keeps getting wrong",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Often missed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "よく間違えるカード"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thẻ hay quên"
+          }
+        }
+      }
+    },
+    "No often-missed cards yet" : {
+      "extractionState" : "manual",
+      "comment" : "Empty state of the often-missed screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No often-missed cards yet"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "よく間違えるカードはまだありません"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa có thẻ hay quên"
+          }
+        }
+      }
+    },
+    "Cards you get wrong more than once after the first answer will appear here." : {
+      "extractionState" : "manual",
+      "comment" : "Empty state explanation of the often-missed screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cards you get wrong more than once after the first answer will appear here."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最初の回答のあとで2回以上間違えたカードがここに表示されます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thẻ bạn trả lời sai từ hai lần trở lên sau lần trả lời đầu tiên sẽ hiện ở đây."
+          }
+        }
+      }
+    },
+    "Opens the deck “%@” to study" : {
+      "extractionState" : "manual",
+      "comment" : "Accessibility hint of an often-missed card",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the deck “%@” to study"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デッキ「%@」を開いて学習します"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mở bộ thẻ “%@” để học"
+          }
+        }
+      }
+    },
+    "Missed %1$lld times in %2$lld answers" : {
+      "extractionState" : "manual",
+      "comment" : "Often-missed card: wrong answers after the first, and all answers",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Missed %1$lld times in %2$lld answers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld 回の回答のうち %1$lld 回間違い"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sai %1$lld lần trong %2$lld lần trả lời"
+          }
+        }
+      }
+    },
     "Retry" : {
       "comment" : "Retry button",
       "extractionState" : "manual",

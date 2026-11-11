@@ -130,6 +130,8 @@ protocol CardPresenterInterface: AnyObject {
     /// Loads the section again from the server (pull to refresh, or "Try again").
     func refresh()
     func startReview()
+    /// Opens the list of cards the learner keeps getting wrong on this device.
+    func showOftenMissed()
     func openAccountDeck(id: String)
     func signIn()
     func updateQuery(_ query: String?)
@@ -435,6 +437,10 @@ extension CardPresenter: CardPresenterInterface {
             if scope != .mine { loadDue(force: dueChanged) }
         }
         reload()
+    }
+
+    func showOftenMissed() {
+        wireframe.showOftenMissed()
     }
 
     func startReview() {

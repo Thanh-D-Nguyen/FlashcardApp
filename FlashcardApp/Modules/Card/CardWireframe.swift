@@ -15,6 +15,8 @@ protocol CardWireframeInterface: AnyObject {
     /// `onImported` runs with the local deck id after the generator has closed.
     func showDeckGenerator(onImported: @escaping (String) -> Void)
     func showStudy(deckId: String)
+    /// The cards the learner keeps getting wrong, from this device's history.
+    func showOftenMissed()
     /// Starts a review of these due cards.
     func showReview(cards: [DueCard])
     /// Opens a deck of the account (cards, save to device, study).
@@ -74,6 +76,10 @@ extension CardWireframe: CardWireframeInterface {
 
     func showStudy(deckId: String) {
         navigationController?.pushWireframe(CardStudyWireframe(deckId: deckId))
+    }
+
+    func showOftenMissed() {
+        navigationController?.pushWireframe(OftenMissedWireframe())
     }
 
     func showReview(cards: [DueCard]) {

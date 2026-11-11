@@ -71,7 +71,7 @@
 | K-05 | Chọn/lưu từ trong lesson vào bộ thẻ local bằng writer hiện có, chống trùng | K-03; nên sau K-04 để hoàn thiện journey | 1.1/P4 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
 | K-06 | Today: bài kế tiếp/tiếp tục học; giữ nguyên hero review, tách nguồn local/server | K-04/K-05 | 1.1/P5 | **VERIFIED** (local commit) — [status](kiokoto-ios-orca-status.md) |
 | K-07 | Choice mode cho **server account review**; xác minh distractors; người học tự xác nhận rating | K-01..06 không phải phụ thuộc code, nhưng đợi cổng MVP | 1.1 sau MVP | VERIFIED local (server thật NOT VERIFIED) |
-| K-08 | Danh sách thẻ thường sai theo dữ liệu lịch sử thật; không suy đoán lapse trên server | K-07 hoặc dữ liệu local đã có | Sau K-07 | PLANNED |
+| K-08 | Danh sách thẻ thường sai theo dữ liệu lịch sử thật; không suy đoán lapse trên server | K-07 hoặc dữ liệu local đã có | Sau K-07 | VERIFIED local (nguồn: lịch ôn local, toàn thời gian) |
 | K-09 | Gõ đáp án kana có xử lý biến thể và accessibility | K-07 | 1.2 | DEFERRED |
 | K-10 | Study-plan/streak signed-in; fallback local phải có định nghĩa rõ | K-04 + contract | 1.2 | DEFERRED |
 | K-11 | Analytics opt-in + privacy contract + MetricKit, baseline trước mục tiêu | Consent/legal + event schema | 1.2 | DEFERRED |
