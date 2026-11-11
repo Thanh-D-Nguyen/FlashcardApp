@@ -245,8 +245,10 @@
 		92F3A0062B4E1B0000AUTH01 /* AuthTokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0072B4E1B0000AUTH02 /* AuthTokenManager.swift */; };
 		92F3A0202B4E1C0000BJTS01 /* BJTSearchAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */; };
 		92F3A0232B4E1C0000BJTS04 /* BJTLevelAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */; };
+		467A662523D29D11742687A3 /* BJTLessonAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251F41EA212A9E3F05616E4F /* BJTLessonAPI.swift */; };
 		92F3A0252B4E1C0000BJTS06 /* BJTSearchDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0172B4E1C0000BJTD02 /* BJTSearchDTO.swift */; };
 		92F3A0282B4E1C0000BJTS09 /* BJTLevelDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */; };
+		39CD50820AB85021F274F59F /* BJTLessonDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A0C5B280A7F2D1FE2276E0F /* BJTLessonDTO.swift */; };
 		939CF13955A24E35BD258755 /* FSRSReferenceVectors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DDE228DA5994703B5588750 /* FSRSReferenceVectors.swift */; };
 		93C0DE84642C4F1D64527BE3 /* DeckDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E778AECBA59C5BBC11CC8023 /* DeckDraftTests.swift */; };
 		93C63CAB1642EC80FAFBB221 /* AuthSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DC789F28A351A8BE56E8BA /* AuthSessionTests.swift */; };
@@ -351,6 +353,8 @@
 		DDD3A58016DB08C3B210E685 /* JapaneseText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B79E0E162665B3EAD2A1F4 /* JapaneseText.swift */; };
 		DE967724B987DE9F6942A368 /* ScenarioListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CA6AE5C5E9EFDB71029B31 /* ScenarioListViewController.swift */; };
 		DECD2552BEEA8BE80A1A8B3C /* BJTLearnerAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2CC9AE5C10D89658EB3A0C /* BJTLearnerAPITests.swift */; };
+		9570C283670D70BBC8C5267B /* BJTLessonFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732383897D0E59BE80A6C004 /* BJTLessonFixtures.swift */; };
+		1C6589FA54AEE245D8ED01FA /* BJTLessonAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEBB9CF47A37E3A8BDC2483 /* BJTLessonAPITests.swift */; };
 		DF3E329A8C7C6D2E2B6C2114 /* LifeLessonPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC395943CED0A7E262119EA /* LifeLessonPresenter.swift */; };
 		DFAC4390B1E7226E2B410F24 /* BJTScenarioDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7893E2DAAACED80FCD96D3E6 /* BJTScenarioDTO.swift */; };
 		DFB21D948ACA50D907B7D212 /* LifeFeedMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB95458093C713F94F09498 /* LifeFeedMapper.swift */; };
@@ -481,6 +485,8 @@
 		4AEE9DF635D3E7CF9063F1C2 /* LifeLessonTestDoubles.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeLessonTestDoubles.swift; sourceTree = "<group>"; };
 		4B6CEF174FC5DA53BD2A66BA /* TextHighlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextHighlight.swift; sourceTree = "<group>"; };
 		4E2CC9AE5C10D89658EB3A0C /* BJTLearnerAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLearnerAPITests.swift; sourceTree = "<group>"; };
+		732383897D0E59BE80A6C004 /* BJTLessonFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLessonFixtures.swift; sourceTree = "<group>"; };
+		FFEBB9CF47A37E3A8BDC2483 /* BJTLessonAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLessonAPITests.swift; sourceTree = "<group>"; };
 		4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReviewScheduler.swift; sourceTree = "<group>"; };
 		4FDC53D737822B61CF2AB85E /* CardReviewWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardReviewWireframe.swift; sourceTree = "<group>"; };
 		4FFA59B81BB08C36B46B31F5 /* HomePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenterTests.swift; sourceTree = "<group>"; };
@@ -650,8 +656,10 @@
 		92F3A0072B4E1B0000AUTH02 /* AuthTokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTokenManager.swift; sourceTree = "<group>"; };
 		92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTSearchAPI.swift; sourceTree = "<group>"; };
 		92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLevelAPI.swift; sourceTree = "<group>"; };
+		251F41EA212A9E3F05616E4F /* BJTLessonAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLessonAPI.swift; sourceTree = "<group>"; };
 		92F3A0172B4E1C0000BJTD02 /* BJTSearchDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTSearchDTO.swift; sourceTree = "<group>"; };
 		92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLevelDTO.swift; sourceTree = "<group>"; };
+		4A0C5B280A7F2D1FE2276E0F /* BJTLessonDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BJTLessonDTO.swift; sourceTree = "<group>"; };
 		9321F46D68635E10E86F8D4A /* MailLoginPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailLoginPresenterTests.swift; sourceTree = "<group>"; };
 		9369AB68FA2E9EA64090346F /* CardExampleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExampleStore.swift; sourceTree = "<group>"; };
 		93873D79B82BEDCA818D035F /* StudyPreferences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StudyPreferences.swift; sourceTree = "<group>"; };
@@ -1052,6 +1060,8 @@
 				185A12009D8D62C378721912 /* CreateDeskPresenterTests.swift */,
 				37129E6AA0E1A87ECA2E098E /* CardsIntegrationTests.swift */,
 				4E2CC9AE5C10D89658EB3A0C /* BJTLearnerAPITests.swift */,
+				732383897D0E59BE80A6C004 /* BJTLessonFixtures.swift */,
+				FFEBB9CF47A37E3A8BDC2483 /* BJTLessonAPITests.swift */,
 				09F9A0DFD210564B7A9A78D7 /* DictionarySuggestionTests.swift */,
 				8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */,
 				A0C964F9799EFF286A346DC1 /* PictureSearchTests.swift */,
@@ -1507,6 +1517,7 @@
 				4A421E34481835A9483C8B14 /* NativeAuthAPI.swift */,
 				92F3A0112B4E1C0000BJTA01 /* BJTSearchAPI.swift */,
 				92F3A0142B4E1C0000BJTA04 /* BJTLevelAPI.swift */,
+				251F41EA212A9E3F05616E4F /* BJTLessonAPI.swift */,
 				92F3A0152B4E1C0000BJTM00 /* Models */,
 				F614949841D71B2C79621354 /* BJTFlashcardLibraryAPI.swift */,
 				0B2D7FF9C78D2EDB0CADE15B /* BJTScenarioAPI.swift */,
@@ -1522,6 +1533,7 @@
 			children = (
 				92F3A0172B4E1C0000BJTD02 /* BJTSearchDTO.swift */,
 				92F3A01A2B4E1C0000BJTD05 /* BJTLevelDTO.swift */,
+				4A0C5B280A7F2D1FE2276E0F /* BJTLessonDTO.swift */,
 				ABB9AB551D561032B238CFDA /* BJTDictionaryDTO.swift */,
 				419759F1DD716FA545408C34 /* BJTMagazineDTO.swift */,
 				D843D54C343C154C1BC91DF5 /* BJTLotoDTO.swift */,
@@ -1950,8 +1962,10 @@
 				92F3A0062B4E1B0000AUTH01 /* AuthTokenManager.swift in Sources */,
 				92F3A0202B4E1C0000BJTS01 /* BJTSearchAPI.swift in Sources */,
 				92F3A0232B4E1C0000BJTS04 /* BJTLevelAPI.swift in Sources */,
+				467A662523D29D11742687A3 /* BJTLessonAPI.swift in Sources */,
 				92F3A0252B4E1C0000BJTS06 /* BJTSearchDTO.swift in Sources */,
 				92F3A0282B4E1C0000BJTS09 /* BJTLevelDTO.swift in Sources */,
+				39CD50820AB85021F274F59F /* BJTLessonDTO.swift in Sources */,
 				9251ECD129A1EAA5006C1D1C /* MainWireframe.swift in Sources */,
 				929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */,
 				9251ED2129A2074D006C1D1C /* SettingsRowCell.swift in Sources */,
@@ -2201,6 +2215,8 @@
 				750F55677D549B5D3E081418 /* CreateDeskPresenterTests.swift in Sources */,
 				53633E24935BA3E4E8FF5F21 /* CardsIntegrationTests.swift in Sources */,
 				DECD2552BEEA8BE80A1A8B3C /* BJTLearnerAPITests.swift in Sources */,
+				1C6589FA54AEE245D8ED01FA /* BJTLessonAPITests.swift in Sources */,
+				9570C283670D70BBC8C5267B /* BJTLessonFixtures.swift in Sources */,
 				75A9CBF12981CC4B0D5314D4 /* DictionarySuggestionTests.swift in Sources */,
 				2261377E65101B75EA65A77B /* DeckGeneratorTests.swift in Sources */,
 				11F32497EE4A0CC122C6D530 /* PictureSearchTests.swift in Sources */,
