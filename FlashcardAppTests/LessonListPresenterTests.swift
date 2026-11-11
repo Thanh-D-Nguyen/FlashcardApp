@@ -109,6 +109,21 @@ final class LessonListPresenterTests: XCTestCase {
         XCTAssertEqual(presenter.state, .loading)
     }
 
+    func test_selectingARowOpensThatLessonWithItsTitle() {
+        let presenter = makePresenter()
+        let spy = LessonListWireframeSpy()
+        presenter.wireframe = spy
+        presenter.viewDidLoad()
+        interactor.respond(with: [lesson("a1", week: 1, sort: 1, titleVi: "Một"), lesson("a2", week: 2, sort: 8, titleVi: "Hai")])
+        presenter.selectRow(section: 1, row: 0)
+        XCTAssertEqual(spy.opened.map(\.slug), ["a2"])
+        XCTAssertEqual(spy.opened.map(\.title), ["Hai"])
+        presenter.selectRow(section: 5, row: 0)
+        presenter.selectRow(section: 0, row: 9)
+        presenter.selectRow(section: -1, row: 0)
+        XCTAssertEqual(spy.opened.count, 1, "A position outside the list opens nothing")
+    }
+
     func test_retryWhileLoadingDoesNotStartASecondRequest() {
         let presenter = makePresenter()
         presenter.viewDidLoad()
@@ -142,4 +157,9 @@ final class LessonListInteractorStub: LessonListInteractorInterface {
     func respondToFirst(with rows: [BJTLessonSummaryDTO]) { requests.first?.onNext(rows) }
     func fail(_ error: Error) { requests.last?.onError(error) }
     func reset() { requestedLevels = []; requests = [] }
+}
+
+final class LessonListWireframeSpy: LessonListWireframeInterface {
+    private(set) var opened: [(slug: String, title: String)] = []
+    func showLesson(slug: String, title: String) { opened.append((slug, title)) }
 }

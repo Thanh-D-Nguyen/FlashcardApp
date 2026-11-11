@@ -7,6 +7,13 @@ protocol BJTLessonAPIInterface: AnyObject {
     func lessons(levelCode: String) -> Single<[BJTLessonSummaryDTO]>
     /// Read-only and public; safe to repeat.
     func lesson(slug: String) -> Single<BJTLessonDetailDTO>
+    /// The lesson together with the exact bytes the server sent, so an offline copy can keep them unchanged.
+    func lessonPayload(slug: String) -> Single<BJTLessonPayload>
+}
+
+struct BJTLessonPayload {
+    let lesson: BJTLessonDetailDTO
+    let data: Data
 }
 
 /// The structured lessons of a level. Reads are anonymous: no bearer, no cookies, so the answer never depends on who is
@@ -36,8 +43,15 @@ final class BJTLessonAPI: BJTLessonAPIInterface {
     }
 
     func lesson(slug: String) -> Single<BJTLessonDetailDTO> {
+        lessonPayload(slug: slug).map(\.lesson)
+    }
+
+    func lessonPayload(slug: String) -> Single<BJTLessonPayload> {
         guard Self.isValid(slug: slug) else { return .error(LearnerAPIError.invalidRequest(nil)) }
-        return get(["levels", "lessons", slug])
+        return getData(["levels", "lessons", slug]).map { data in
+            guard let lesson = try? JSONDecoder().decode(BJTLessonDetailDTO.self, from: data) else { throw LearnerAPIError.invalidResponse }
+            return BJTLessonPayload(lesson: lesson, data: data)
+        }
     }
 
     /// Lowercase letters, digits and hyphens (`j5-01-greetings-intro`, `j5-w01-review`). Anything else could change the route.
@@ -48,6 +62,14 @@ final class BJTLessonAPI: BJTLessonAPIInterface {
     }
 
     private func get<Response: Decodable>(_ path: [String]) -> Single<Response> {
+        getData(path).map { data in
+            guard let value = try? JSONDecoder().decode(Response.self, from: data) else { throw LearnerAPIError.invalidResponse }
+            return value
+        }
+    }
+
+    /// The body of a 2xx answer. Status and transport failures use the same mapping as the other learner calls.
+    private func getData(_ path: [String]) -> Single<Data> {
         Single.create { [self] observer in
             guard let base = URL(string: baseURL()), let scheme = base.scheme, ["https", "http"].contains(scheme),
                   base.host != nil, base.user == nil, base.password == nil, base.query == nil, base.fragment == nil else {
@@ -58,7 +80,13 @@ final class BJTLessonAPI: BJTLessonAPIInterface {
             let request = session.request(url, method: .get, headers: ["Accept": "application/json"],
                                           requestModifier: { $0.timeoutInterval = 30 })
             request.responseData { response in
-                observer(BJTLearnerAPI.result(of: response).mapError { $0 })
+                if let error = response.error, response.response == nil {
+                    return observer(.failure(BJTLearnerAPI.transportError(error)))
+                }
+                guard let status = response.response?.statusCode else { return observer(.failure(LearnerAPIError.invalidResponse)) }
+                let data = response.data ?? Data()
+                guard (200..<300).contains(status) else { return observer(.failure(BJTLearnerAPI.statusError(status, data: data))) }
+                observer(.success(data))
             }
             return Disposables.create { request.cancel() }
         }

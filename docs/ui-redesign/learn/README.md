@@ -32,3 +32,9 @@ test: `BJTLessonAPITests`, fixture `BJTLessonFixtures` (response thật, ẩn da
 - `Modules/LessonList` (presenter/VC/wireframe) + `Interactors/LessonListInteractor`. Bảng nhóm theo `weekNumber` tăng dần, trong tuần theo `sortOrder`. Hàng hiển thị tiêu đề/mô tả theo `AppLanguage` (API chỉ có vi/ja: en dùng vi; trường rỗng dùng ngôn ngữ còn lại), loại `review`/`checkpoint`, số phút và số hoạt động **chỉ khi > 0**.
 - Trạng thái: loading, empty, failed + Retry; rời màn thì huỷ request, quay lại thì tải lại; lỗi chỉ tải lại bằng Retry.
 - Chưa có: mở bài (K-03), tiến độ hoàn thành (K-04).
+
+## K-03 — lesson reader và bản đọc offline
+
+- Chọn một hàng ở danh sách bài → `Modules/LessonReader`. Thứ tự: Tình huống (bối cảnh JA/VI, mục tiêu, thách thức, kết quả mong muốn, "bạn sẽ học"), Từ vựng, Ngữ pháp, Ví dụ, Điểm cần nhớ, Lỗi thường gặp, rồi dòng Luyện tập (hiện số hoạt động của server, **tắt** đến K-04). Section rỗng bị ẩn; reading rỗng không hiện; mã máy như `relationship` không hiển thị.
+- Không có link sang `DictionaryEntry`: bài chỉ có `japanese/reading/meaningVi`, **không có ID từ điển**, và ID không được ghép từ text.
+- Offline: `Services/LessonCache` lưu **đúng bytes server gửi** trong envelope có version (`Application Support/Lessons/<slug>.json`, ghi atomic, loại khỏi backup, không chứa token vì GET ẩn danh). `LessonReaderInteractor` ưu tiên server; chỉ khi offline/ngắt kết nối/429/5xx mới dùng bản đã lưu và hiện banner. 404 hoặc dữ liệu hỏng **không** bị che bằng bản cũ. File hỏng/khác phiên bản/sai slug = miss. Chỉ bài đã mở thành công mới đọc được offline; không tải trước 420 bài.

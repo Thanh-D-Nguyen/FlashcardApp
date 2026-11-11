@@ -6,6 +6,14 @@ final class LessonListWireframe: BaseWireframe<LessonListViewController> {
         let controller = LessonListViewController()
         super.init(viewController: controller)
         controller.title = String(format: NSLocalizedString("%@ lessons", comment: "Title of the lesson list; the level code, e.g. J5"), level.code)
-        controller.presenter = LessonListPresenter(levelCode: level.code, interactor: interactor)
+        let presenter = LessonListPresenter(levelCode: level.code, interactor: interactor)
+        presenter.wireframe = self
+        controller.presenter = presenter
+    }
+}
+
+extension LessonListWireframe: LessonListWireframeInterface {
+    func showLesson(slug: String, title: String) {
+        navigationController?.pushWireframe(LessonReaderWireframe(slug: slug, title: title))
     }
 }

@@ -4,14 +4,15 @@ Nguồn: [playbook](kiokoto-ios-orca-execution.md), [roadmap](kiokoto-ios-produc
 Branch tích hợp: `Thanh-D-Nguyen/kiokoto-ios-integration` (chưa push). Worktree: `/Users/thanhnguyen/orca/workspaces/FlashcardApp/kiokoto-ios-integration`.
 Model thực tế của phiên này: Sonnet 5.5 (`claude-sonnet-5-5`) — chưa có launch receipt từ Orca để đối chiếu effort.
 
-lastKnownGoodCommit: `d3d991f` (K-02) trên `af05f0e` (K-01), baseline `d66c631`.
-Story đang làm: **K-03**. File đang do integration owner giữ: `project.pbxproj`, `Localizable.xcstrings`.
+lastKnownGoodCommit: xem `git log` (K-03 ở cuối); K-01 `af05f0e` → K-02 `d3d991f` → fix K-01 `31c1504`; baseline `d66c631`.
+Story kế tiếp: **K-04**. File đang do integration owner giữ: `project.pbxproj`, `Localizable.xcstrings`.
 
 | Story | State | Owner | Commit | Test/build/UI evidence | Blocker/Next |
 | --- | --- | --- | --- | --- | --- |
 | K-01 | VERIFIED (local commit) | integration | `af05f0e` | `BJTLessonAPITests` 16/16 PASS (XcodeBuildMCP `test_sim`, scheme FlashcardApp-Local, iPhone 17 Pro iOS 26.4, 2026-11-11); app + test target build qua test. Fixture từ GET production ẩn danh; 516/516 activity thật thoả điều kiện answer. Không có UI → không có kiểm Simulator UI. | PUT progress chỉ xác minh theo source backend, **NOT VERIFIED** với server thật. GET ẩn danh luôn `isCompleted=false`. Reviewer Codex chưa chạy (**review độc lập chưa có**). Chưa chạy toàn bộ test suite. RED hành vi: không có (test và code viết cùng lượt). |
 | K-02 | VERIFIED (local commit) | integration | `d3d991f` | **RED thật:** `LessonListPresenterTests` 8/8 fail trên skeleton rỗng (vd. `idle` ≠ `empty`, sections rỗng) và `HomePresenterTests/testLessonsAreOffered…` fail (`nil` ≠ `J5`) — rồi cài đặt → **GREEN**: 51/51 (LessonList + Home + Localization + BJTLesson). Full `FlashcardAppTests` 1302 pass / 0 fail. XCUITest `testLevelScreenOpensItsLessonsGroupedByWeek` PASS. Simulator iPhone 17 Pro iOS 26.4, cỡ chữ mặc định, ngôn ngữ en: ảnh chụp danh sách Tuần 1 thật và trạng thái offline+Retry. | Backend local không chạy → UI chạy qua proxy **chỉ-GET** localhost:18081→kiokoto.com (PUT bị chặn 405). Hàng bài chưa bấm được (K-03). Chưa kiểm VoiceOver/Dynamic Type lớn. Không hiện `isCompleted` (GET ẩn danh luôn false). Tiêu đề bài là tiếng Việt khi app en (API không có tiếng Anh). |
-| K-03 … K-18 | PLANNED / DEFERRED / BLOCKED theo roadmap | — | — | — | K-03 NEXT (phụ thuộc content gate chưa làm). |
+| K-03 | VERIFIED (local commit) | integration | xem `git log --grep K-03` | **RED thật:** 21 fail / 8 pass trên skeleton rỗng (cache/interactor/presenter/selectRow) → GREEN 46/46 (BJTLesson+Reader+Cache+List, sau cherry-pick fix K-01). Full `FlashcardAppTests` 1323/1324: 1 fail `DictionaryHandwritingPresenterTests/testAnotherStrokeBeforeTheDelayReplacesTheRequest` (timing, không liên quan) — chạy riêng lại 9/9 PASS, lần full trước đó cũng PASS ⇒ flaky có từ trước, không do K-03. XCUITest Today→cấp độ→Bài học→mở bài PASS (qua proxy chỉ-GET). Ảnh chụp thật: reader online (Situation, Vocabulary, Key points…) và **offline** (proxy tắt) hiện banner + bản đã lưu; file `Application Support/Lessons/j5-01-greetings-intro.json` xuất hiện. | Bắt được lỗi runtime: wireframe không được giữ sau push ⇒ `LessonListPresenter.wireframe` phải strong (đã sửa; test đơn vị không bắt được). Hàng danh sách là một phần tử a11y (button). Từ vựng **không** link DictionaryEntry vì lesson không có ID từ điển (không ghép ID từ text). Nút Luyện tập hiện số hoạt động nhưng tắt đến K-04. Chưa kiểm VoiceOver thực, Dynamic Type lớn, ja/en. Nội dung server có token máy ("senior-junior") trong câu — thuộc content gate. |
+| K-04 … K-18 | PLANNED / DEFERRED / BLOCKED theo roadmap | — | — | — | K-04 NEXT. |
 
 ## Content gate (chất lượng nội dung bài học) — **MỞ**
 
@@ -21,8 +22,8 @@ Chưa có người đánh giá độc lập độ chính xác ngữ pháp, mức
 
 | Story | Nguồn | Mức | Finding | Xử lý |
 | --- | --- | --- | --- | --- |
-| K-01 | Codex gpt-6-sol/high (read-only) | HIGH | `BJTLessonDTO.swift:128`: `activities` vắng/null được decode thành `[]` (phải `invalidResponse`), thiếu test | Coordinator sửa + test ở worktree `kiokoto-ios-codex-review`, nhánh `fix/k01-activities`; integrator cherry-pick khi có hash. **Chưa tích hợp.** Integrator không sửa `BJTLessonDTO.swift`/`BJTLessonAPITests.swift` |
-| K-01 | Codex | MEDIUM | status.md thiếu hash + xcresult | Đã bổ sung (mục dưới) |
+| K-01 | Codex gpt-6-sol/high (read-only) | HIGH | `BJTLessonDTO.swift:128`: `activities` vắng/null được decode thành `[]` (phải `invalidResponse`), thiếu test | Coordinator sửa + test ở worktree `kiokoto-ios-codex-review`, nhánh `fix/k01-activities`; **Đã tích hợp: cherry-pick `721a76e` → `31c1504`.** Integrator không sửa `BJTLessonDTO.swift`/`BJTLessonAPITests.swift` |
+| K-01 | Codex | MEDIUM | status.md thiếu hash + xcresult | Đã bổ sung (commit `5ee8189`) |
 
 ## Evidence (xcresult, `~/Library/Developer/XcodeBuildMCP/workspaces/kiokoto-ios-integration-8d8a7a6ddc82/result-bundles/`)
 
@@ -36,3 +37,10 @@ Thiết bị: iPhone 17 Pro iOS 26.4 (`5483C259-8877-4502-B6E2-1AD05ABA9AC5`), s
 | K-02 | GREEN LessonList + Home + Localization + BJTLesson | 51/51 PASS | `test_sim_2026-11-11T03-17-49-991Z_pid40304_ce6c3a1e.xcresult` |
 | K-02 | Full `FlashcardAppTests` | 1302 PASS / 0 FAIL | `test_sim_2026-11-11T03-22-05-643Z_pid40304_79340e85.xcresult` |
 | K-02 | XCUITest `testLevelScreenOpensItsLessonsGroupedByWeek` (qua proxy chỉ-GET) | PASS | `test_sim_2026-11-11T03-24-13-625Z_pid40304_1df582b6.xcresult` |
+| K-01 fix | Coordinator RED→GREEN (`721a76e`, sim iPhone 17e) | RED 16 pass/1 fail → GREEN 17/17 | `/private/tmp/claude-501/k01fix-red.xcresult`, `/private/tmp/claude-501/k01fix-green.xcresult` |
+| K-01 fix | Integrator chạy lại sau cherry-pick `31c1504` (kèm K-03 chưa commit) | 46/46 PASS | `test_sim_2026-11-11T03-47-44-735Z_pid40304_210e7b21.xcresult` |
+| K-03 | RED (skeleton rỗng) | 21 FAIL / 8 pass | `test_sim_2026-11-11T03-43-28-638Z_pid40304_a6c33140.xcresult` |
+| K-03 | GREEN lần đầu (55 test gồm Localization) | 55/55 PASS | `test_sim_2026-11-11T03-46-23-545Z_pid40304_92494727.xcresult` |
+| K-03 | XCUITest `testLevelScreenOpensItsLessonsGroupedByWeek` (đã mở reader) | PASS | `test_sim_2026-11-11T03-57-46-048Z_pid40304_e4093270.xcresult` |
+| K-03 | Full `FlashcardAppTests` | 1323 PASS / 1 FAIL (flaky, không liên quan) | `test_sim_2026-11-11T03-58-58-557Z_pid40304_e64cfb67.xcresult` |
+| K-03 | `DictionaryHandwritingPresenterTests` chạy riêng | 9/9 PASS | `test_sim_2026-11-11T04-00-44-545Z_pid40304_18373265.xcresult` |

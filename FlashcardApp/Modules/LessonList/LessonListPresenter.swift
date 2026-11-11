@@ -28,6 +28,11 @@ protocol LessonListPresenterInterface: AnyObject {
     func viewDidLoad()
     func retry()
     func cancelLoading()
+    func selectRow(section: Int, row: Int)
+}
+
+protocol LessonListWireframeInterface: AnyObject {
+    func showLesson(slug: String, title: String)
 }
 
 /// The lessons of one level, grouped by week. Everything shown comes from `GET /levels/{code}/lessons`; completion is not
@@ -41,6 +46,8 @@ final class LessonListPresenter: LessonListPresenterInterface {
     private(set) var state: LessonListState = .idle
     private(set) var sections: [LessonWeekSection] = []
     var onChange: (() -> Void)?
+    /// Held strongly: nothing else keeps the wireframe alive once its controller is pushed (it only holds the controller unowned).
+    var wireframe: LessonListWireframeInterface?
 
     init(levelCode: String, interactor: LessonListInteractorInterface, language: @escaping () -> AppLanguage = { .current }) {
         self.levelCode = levelCode
@@ -55,6 +62,12 @@ final class LessonListPresenter: LessonListPresenterInterface {
     func viewDidLoad() {
         guard state == .idle else { return }
         load()
+    }
+
+    func selectRow(section: Int, row: Int) {
+        guard sections.indices.contains(section), sections[section].rows.indices.contains(row) else { return }
+        let selected = sections[section].rows[row]
+        wireframe?.showLesson(slug: selected.slug, title: selected.title)
     }
 
     func retry() {

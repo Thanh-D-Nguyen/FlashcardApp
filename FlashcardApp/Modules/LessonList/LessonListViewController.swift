@@ -31,10 +31,10 @@ final class LessonListViewController: BaseVC {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.backgroundColor = .clear
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "lesson")
         tableView.estimatedRowHeight = 88
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.allowsSelection = false
         tableView.accessibilityIdentifier = "lesson_list"
         tableView.backgroundView = stateView
         view.addSubview(tableView)
@@ -100,7 +100,19 @@ extension LessonListViewController: UITableViewDataSource {
         content.secondaryTextProperties.apply(.metadata)
         content.secondaryTextProperties.numberOfLines = 0
         cell.contentConfiguration = content
+        cell.accessoryType = .disclosureIndicator
+        // One element per row: VoiceOver reads title, description and facts together and offers it as a button.
+        cell.isAccessibilityElement = true
+        cell.accessibilityLabel = [row.title, row.summary, Self.metadata(for: row)].filter { !$0.isEmpty }.joined(separator: ". ")
+        cell.accessibilityTraits = .button
         cell.accessibilityIdentifier = "lesson_row_\(row.slug)"
         return cell
+    }
+}
+
+extension LessonListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        presenter.selectRow(section: indexPath.section, row: indexPath.row)
     }
 }

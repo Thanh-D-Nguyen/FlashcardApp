@@ -167,7 +167,12 @@ final class FlashcardAppUITests: XCTestCase {
         lessons.tap()
         XCTAssertTrue(app.tables["lesson_list"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Tuần 1"].waitForExistence(timeout: 20), "The first week header follows the loaded lessons")
-        XCTAssertTrue(app.cells.matching(identifier: "lesson_row_j5-01-greetings-intro").firstMatch.waitForExistence(timeout: 5))
+        let row = app.descendants(matching: .any).matching(identifier: "lesson_row_j5-01-greetings-intro").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+        XCTAssertTrue(app.tables["lesson_reader"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "lesson_reader_title").firstMatch.waitForExistence(timeout: 20), "The lesson loaded and shows its title")
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Tình huống")).firstMatch.waitForExistence(timeout: 5), "The first section is the situation")
     }
 
     /// A level's count opens that kind directly, skipping the kind chooser.
