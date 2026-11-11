@@ -73,15 +73,15 @@
 | K-07 | Choice mode cho **server account review**; xác minh distractors; người học tự xác nhận rating | K-01..06 không phải phụ thuộc code, nhưng đợi cổng MVP | 1.1 sau MVP | VERIFIED local (server thật NOT VERIFIED) |
 | K-08 | Danh sách thẻ thường sai theo dữ liệu lịch sử thật; không suy đoán lapse trên server | K-07 hoặc dữ liệu local đã có | Sau K-07 | VERIFIED local (nguồn: lịch ôn local, toàn thời gian) |
 | K-09 | Gõ đáp án kana có xử lý biến thể và accessibility | K-07 | 1.2 | VERIFIED local (VoiceOver thật NOT VERIFIED) |
-| K-10 | Study-plan/streak signed-in; fallback local phải có định nghĩa rõ | K-04 + contract | 1.2 | DEFERRED |
-| K-11 | Analytics opt-in + privacy contract + MetricKit, baseline trước mục tiêu | Consent/legal + event schema | 1.2 | DEFERRED |
-| K-12 | 1 thẻ Daily Radar trong Today, dùng endpoint cards và cache có giới hạn | K-06 | 1.2 | DEFERRED |
-| K-13 | NHK Reading Lab | Xác minh quyền dùng nội dung bằng văn bản | 1.2+ | BLOCKED |
-| K-14 | Shadowing thử nghiệm một bài, test trên máy thật | Quyết định thử nghiệm riêng | 1.2+ | DEFERRED |
-| K-15 | Luyện viết Kanji | Đánh giá nhu cầu/hardware Pencil | 1.2+ | DEFERRED |
-| K-16 | Chia sẻ/clone deck qua link | Deep-link/token contract và bảo mật | 1.2+ | DEFERRED |
-| K-17 | Privacy export request | API delivery/privacy UX xác minh | 1.2+ | DEFERRED |
-| K-18 | Reconcile local FSRS với lịch server | Backend identity + idempotency + chính sách conflict | Later/backend | BLOCKED |
+| K-10 | Study-plan/streak signed-in; fallback local phải có định nghĩa rõ | K-04 + contract | 1.2 | VERIFIED (iOS `5601588`, UI đăng nhập thật); backend ngày theo múi giờ người học ở nhánh `ios/kiokoto-k10-k18` (chưa deploy) |
+| K-11 | Analytics opt-in + privacy contract + MetricKit, baseline trước mục tiêu | Consent/legal + event schema | 1.2 | VERIFIED kỹ thuật (`6898dba`, mặc định TẮT); pháp lý/App Privacy cần người duyệt |
+| K-12 | 1 thẻ Daily Radar trong Today, dùng endpoint cards và cache có giới hạn | K-06 | 1.2 | VERIFIED (`87846cc`) |
+| K-13 | NHK Reading Lab | Xác minh quyền dùng nội dung bằng văn bản | 1.2+ | BLOCKED (quyền NHK); không dùng nội dung NHK |
+| K-14 | Shadowing thử nghiệm một bài, test trên máy thật | Quyết định thử nghiệm riêng | 1.2+ | VERIFIED trên Simulator (`a3d9bdf`); mic máy thật NOT VERIFIED |
+| K-15 | Luyện viết Kanji | Đánh giá nhu cầu/hardware Pencil | 1.2+ | VERIFIED trên Simulator (`1e2a4fc`); chữ viết tay thật/Pencil NOT VERIFIED |
+| K-16 | Chia sẻ/clone deck qua link | Deep-link/token contract và bảo mật | 1.2+ | VERIFIED (`b6f8524`, contract production); Universal Link chưa làm |
+| K-17 | Privacy export request | API delivery/privacy UX xác minh | 1.2+ | VERIFIED (`21e892f`, contract + UI production) |
+| K-18 | Reconcile local FSRS với lịch server | Backend identity + idempotency + chính sách conflict | Later/backend | Xem [status](kiokoto-ios-orca-status.md) (backend idempotency ở nhánh `ios/kiokoto-k10-k18`) |
 
 ### Cổng chất lượng sản phẩm trước K-02 (content gate)
 
