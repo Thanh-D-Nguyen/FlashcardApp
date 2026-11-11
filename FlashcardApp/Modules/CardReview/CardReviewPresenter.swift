@@ -110,6 +110,7 @@ final class CardReviewPresenter {
     private let speech: SpeechServiceInterface
     private let now: () -> Date
     private let shuffle: ([String]) -> [String]
+    private let analytics: AnalyticsTracking
     weak var view: CardReviewViewInterface?
 
     private var state = CardReviewState()
@@ -131,7 +132,9 @@ final class CardReviewPresenter {
          wireframe: CardReviewWireframeInterface,
          speech: SpeechServiceInterface = SystemSpeechService.shared,
          now: @escaping () -> Date = Date.init,
-         shuffle: @escaping ([String]) -> [String] = { $0.shuffled() }) {
+         shuffle: @escaping ([String]) -> [String] = { $0.shuffled() },
+         analytics: AnalyticsTracking = AnalyticsService.shared) {
+        self.analytics = analytics
         self.shuffle = shuffle
         self.interactor = interactor
         self.wireframe = wireframe
@@ -219,6 +222,7 @@ final class CardReviewPresenter {
         speech.stop()
         state.summary.duration = now().timeIntervalSince(sessionStartedAt)
         state.screen = .finished
+        analytics.track(.reviewSessionFinished(rated: state.summary.total))
         state.card = nil
         state.progress = 1
         state.failure = nil

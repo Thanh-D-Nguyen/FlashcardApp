@@ -138,6 +138,7 @@ final class MockSettingWireframe: SettingWireframeInterface {
 final class SettingPresenterTests: XCTestCase {
 
     private var presenter: SettingPresenter!
+    private var analyticsConsent: SettingsTestConsent!
     private var mockInteractor: MockSettingInteractor!
     private var mockWireframe: MockSettingWireframe!
     private var disposeBag: DisposeBag!
@@ -146,7 +147,9 @@ final class SettingPresenterTests: XCTestCase {
         super.setUp()
         mockInteractor = MockSettingInteractor()
         mockWireframe = MockSettingWireframe()
-        presenter = SettingPresenter(interactor: mockInteractor, wireframe: mockWireframe)
+        analyticsConsent = SettingsTestConsent()
+        presenter = SettingPresenter(interactor: mockInteractor, wireframe: mockWireframe,
+                                     analytics: AnalyticsService(api: BJTAnalyticsAPI(baseURL: { "https://invalid.test/api" }), consent: analyticsConsent))
         disposeBag = DisposeBag()
     }
 
@@ -756,4 +759,29 @@ final class SettingPresenterTests: XCTestCase {
         presenter.handleNavigationTap(config: NavigationConfig(id: "data_export", title: "", iconName: ""))
         XCTAssertEqual(mockWireframe.dataExportOpened, 1)
     }
+
+    // MARK: - Usage data consent (K-11)
+
+    private func analyticsToggle() -> ToggleConfig? {
+        presenter.sectionsRelay.value.flatMap(\.items).compactMap { item -> ToggleConfig? in
+            if case .toggle(let config) = item, config.id == "analytics" { return config }
+            return nil
+        }.first
+    }
+
+    func test_usageDataSharingIsOffByDefaultAndFollowsTheSwitch() throws {
+        presenter.viewDidLoad()
+        let toggle = try XCTUnwrap(analyticsToggle())
+        XCTAssertFalse(toggle.isOn, "Off until the learner turns it on")
+        XCTAssertNotNil(toggle.subtitle, "It says what is and is not shared")
+        presenter.toggleAnalytics(to: true)
+        XCTAssertTrue(analyticsConsent.isSharingAllowed)
+        XCTAssertEqual(analyticsToggle()?.isOn, true)
+        presenter.toggleAnalytics(to: false)
+        XCTAssertFalse(analyticsConsent.isSharingAllowed)
+    }
+}
+
+final class SettingsTestConsent: AnalyticsConsentStoring {
+    var isSharingAllowed = false
 }

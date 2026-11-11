@@ -27,9 +27,12 @@ final class LessonPracticePresenterTests: XCTestCase {
         super.tearDown()
     }
 
+    private var analytics = SpyAnalytics()
+
     private func makePresenter(store customStore: LessonProgressStoreInterface? = nil) -> LessonPracticePresenter {
         let presenter = LessonPracticePresenter(lesson: lesson, store: customStore ?? store, api: api,
-                                                ownerKey: { [unowned self] in owner }, language: { [unowned self] in language }, now: { [day] in day })
+                                                ownerKey: { [unowned self] in owner }, language: { [unowned self] in language }, now: { [day] in day },
+                                                analytics: analytics)
         presenter.viewDidLoad()
         return presenter
     }
@@ -205,6 +208,14 @@ final class LessonPracticePresenterTests: XCTestCase {
         XCTAssertEqual(api.cancelledCount, 1)
         api.succeed()
         XCTAssertFalse(try XCTUnwrap(store.progress(slug: lesson.slug, ownerKey: account)).isServerConfirmed, "A late answer is ignored")
+    }
+
+    func test_finishingCountsOneLessonForUsageDataWithItsLevelOnly() throws {
+        let presenter = makePresenter()
+        for _ in 0..<4 { try answerCorrectly(presenter) }
+        XCTAssertTrue(analytics.events.isEmpty)
+        try answerCorrectly(presenter)
+        XCTAssertEqual(analytics.events, [.lessonCompleted(levelCode: "J5")])
     }
 
     func test_allAnsweredButLeftBeforeFinishingIsFinishedOnTheLastQuestionNotShownAsDone() throws {

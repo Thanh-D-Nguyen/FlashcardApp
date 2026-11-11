@@ -61,4 +61,12 @@ final class LiveProductionContractTests: XCTestCase {
         XCTAssertNotNil(DataExportPresenter.parse(export.createdAt))
         XCTAssertThrowsError(try value(api.downloadDataExport(requestId: export.id))) { XCTAssertEqual($0 as? LearnerAPIError, .notFound) }
     }
+
+    /// One anonymous event, marked as a contract check so it can be told apart from real usage.
+    func test_theAnalyticsEndpointAcceptsTheAppsBatchShape() throws {
+        let api = BJTAnalyticsAPI(baseURL: { "https://kiokoto.com/api" })
+        let item = AnalyticsBatchItem(eventName: "ios_contract_check", source: "ios-contract-test",
+                                      payload: try XCTUnwrap(AnalyticsEvent.sessionStarted.payload(appVersion: "contract-test")))
+        XCTAssertNoThrow(try value(api.send([item])))
+    }
 }

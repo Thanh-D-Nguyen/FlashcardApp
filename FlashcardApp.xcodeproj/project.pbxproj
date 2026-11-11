@@ -59,6 +59,7 @@
 		3809A6AD49199CB7D07DBA0F /* SettingPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9CAB3FBED0EBD7CB069327 /* SettingPresenterTests.swift */; };
 		39A253290C90462492BE266A /* TodayPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAA292E9221403FB3ABE96C /* TodayPreferencesTests.swift */; };
 		39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */; };
+		85673383A5F90CACD5A52176 /* AnalyticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FDC5A41462B3833297FC57 /* AnalyticsTests.swift */; };
 		09D239C734C09D847B9A8A9C /* DataExportPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843C1BC16BA460BE67B6F458 /* DataExportPresenterTests.swift */; };
 		DCFA46725C2163496587BD8F /* DailyRadarFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BA1A74BC9B10016D164608 /* DailyRadarFixtures.swift */; };
 		E86F8065E7F5789CD3184238 /* DailyRadarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2435C62FE776A54F1A4D64 /* DailyRadarTests.swift */; };
@@ -359,6 +360,7 @@
 		CA94AFEB7A931F7FF291CE25 /* LifeFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE7A3D2A56D8B8BEFB81D360 /* LifeFeed.swift */; };
 		CB7F7544CC129D572EC133FC /* DictionaryVoiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D99705818EADADDF9BBE71E /* DictionaryVoiceViewController.swift */; };
 		CCA0D3202D491CA59F5CDB0C /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 203F142FE069DC1205CFFD9B /* SpeechService.swift */; };
+		70211932B64FA357E7A4323D /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CE4802BDB771D0BEBFA4D3 /* AnalyticsService.swift */; };
 		CCE7D3105ADF3E343FB0C0E7 /* LotoAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815AB330A01662F2C77BAC9 /* LotoAppearance.swift */; };
 		CD0B72B8D266984677BB0860 /* MagazineWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418878B0E57AE5839ABD9A7E /* MagazineWireframe.swift */; };
 		CDF48C69E38D5FD9FA5826C8 /* PictureSearchWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95722E5A19A0ADF9ED4FD7D /* PictureSearchWireframe.swift */; };
@@ -499,6 +501,7 @@
 		1D4F91644AECBF723438E569 /* ScenarioListPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioListPresenter.swift; sourceTree = "<group>"; };
 		1F8D815773D6D8675E9575CB /* DictionaryScanPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryScanPresenter.swift; sourceTree = "<group>"; };
 		203F142FE069DC1205CFFD9B /* SpeechService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
+		E0CE4802BDB771D0BEBFA4D3 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		214F589E14F35A3F722823E7 /* DiscoverWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverWireframe.swift; sourceTree = "<group>"; };
 		2528361902ADCEB5F2A90768 /* LotoDebugFixture.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LotoDebugFixture.swift; sourceTree = "<group>"; };
 		255091EB610F9140CED27B8A /* DictionaryVoiceWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryVoiceWireframe.swift; sourceTree = "<group>"; };
@@ -607,6 +610,7 @@
 		8106BDF8A68673700EEF38DC /* DictionarySavedWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySavedWireframe.swift; sourceTree = "<group>"; };
 		81651ED770FBD884568B4B44 /* HomeCells.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeCells.swift; sourceTree = "<group>"; };
 		816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardLibraryServerInteractorTests.swift; sourceTree = "<group>"; };
+		C2FDC5A41462B3833297FC57 /* AnalyticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsTests.swift; sourceTree = "<group>"; };
 		843C1BC16BA460BE67B6F458 /* DataExportPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExportPresenterTests.swift; sourceTree = "<group>"; };
 		95BA1A74BC9B10016D164608 /* DailyRadarFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyRadarFixtures.swift; sourceTree = "<group>"; };
 		7D2435C62FE776A54F1A4D64 /* DailyRadarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyRadarTests.swift; sourceTree = "<group>"; };
@@ -1202,6 +1206,7 @@
 				599E734D29F737C4F99A6EAB /* ScenarioTests.swift */,
 				8180F41C52039AF1EBDA6C5D /* BJTScenarioAPITests.swift */,
 				816F7FA53840188B662BED66 /* CardLibraryServerInteractorTests.swift */,
+				C2FDC5A41462B3833297FC57 /* AnalyticsTests.swift */,
 				843C1BC16BA460BE67B6F458 /* DataExportPresenterTests.swift */,
 				95BA1A74BC9B10016D164608 /* DailyRadarFixtures.swift */,
 				7D2435C62FE776A54F1A4D64 /* DailyRadarTests.swift */,
@@ -1509,6 +1514,7 @@
 				6CFD7F72896D62FD230A33B5 /* DeckDraftStore.swift */,
 				EB64F2E26CCBB8CC53AF84E4 /* CardMediaMaintenance.swift */,
 				203F142FE069DC1205CFFD9B /* SpeechService.swift */,
+				E0CE4802BDB771D0BEBFA4D3 /* AnalyticsService.swift */,
 				93873D79B82BEDCA818D035F /* StudyPreferences.swift */,
 				3C86741EA0524940BAE20852 /* TodayPreferences.swift */,
 				85A199F10AB1A863FAA1DA27 /* LifeLessonPreferences.swift */,
@@ -2282,6 +2288,7 @@
 				40F1DEE5AF06D1D54975B817 /* CardStudyInteractor.swift in Sources */,
 				DC385AF763EE2D83AC71A055 /* CardMediaMaintenance.swift in Sources */,
 				CCA0D3202D491CA59F5CDB0C /* SpeechService.swift in Sources */,
+				70211932B64FA357E7A4323D /* AnalyticsService.swift in Sources */,
 				4EAEC9A459FEB6A80333B17D /* StudyPreferences.swift in Sources */,
 				E17A096404B94CF88665933F /* TodayPreferences.swift in Sources */,
 				6A005BA4510ADC8E49785E5C /* LifeLessonPreferences.swift in Sources */,
@@ -2466,6 +2473,7 @@
 				07C12B5F488DF621CD3DF025 /* ScenarioTests.swift in Sources */,
 				5B52DA9D92D2D156B5E21480 /* BJTScenarioAPITests.swift in Sources */,
 				39E07A0026E15944C778CC04 /* CardLibraryServerInteractorTests.swift in Sources */,
+				85673383A5F90CACD5A52176 /* AnalyticsTests.swift in Sources */,
 				09D239C734C09D847B9A8A9C /* DataExportPresenterTests.swift in Sources */,
 				DCFA46725C2163496587BD8F /* DailyRadarFixtures.swift in Sources */,
 				E86F8065E7F5789CD3184238 /* DailyRadarTests.swift in Sources */,

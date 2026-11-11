@@ -107,6 +107,7 @@ extension SettingViewController: UITableViewDataSource {
                 switch config.id {
                 case "notification": self?.presenter.toggleNotification(to: isOn)
                 case "sound": self?.presenter.toggleSound(to: isOn)
+                case "analytics": self?.presenter.toggleAnalytics(to: isOn)
                 default: break
                 }
             }

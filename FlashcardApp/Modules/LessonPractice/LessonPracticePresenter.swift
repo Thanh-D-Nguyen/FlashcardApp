@@ -83,6 +83,7 @@ final class LessonPracticePresenter: LessonPracticePresenterInterface {
     private let now: () -> Date
     private let request = SerialDisposable()
     private let subject: LessonProgressSubject
+    private let analytics: AnalyticsTracking
 
     private var index = 0
     private var finished = false
@@ -98,7 +99,9 @@ final class LessonPracticePresenter: LessonPracticePresenterInterface {
     private var activities: [BJTLessonActivityDTO] { lesson.lessonContent.activities }
 
     init(lesson: BJTLessonDetailDTO, store: LessonProgressStoreInterface, api: BJTLessonProgressAPIInterface,
-         ownerKey: @escaping () -> String, language: @escaping () -> AppLanguage = { .current }, now: @escaping () -> Date = Date.init) {
+         ownerKey: @escaping () -> String, language: @escaping () -> AppLanguage = { .current }, now: @escaping () -> Date = Date.init,
+         analytics: AnalyticsTracking = AnalyticsService.shared) {
+        self.analytics = analytics
         self.lesson = lesson
         self.store = store
         self.api = api
@@ -187,6 +190,7 @@ final class LessonPracticePresenter: LessonPracticePresenterInterface {
             return
         }
         finished = true
+        analytics.track(.lessonCompleted(levelCode: lesson.levelCode))
         if owner.isEmpty {
             sync = .notApplicable
             render()

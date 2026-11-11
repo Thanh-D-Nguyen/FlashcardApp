@@ -26427,6 +26427,54 @@
           }
         }
       }
+    },
+    "Share anonymous usage data" : {
+      "comment" : "Settings: analytics consent switch",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share anonymous usage data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匿名の利用データを共有"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chia sẻ dữ liệu sử dụng ẩn danh"
+          }
+        }
+      }
+    },
+    "Only counts such as 'a lesson was finished'. Never the words you look up, your cards, your account or a device ID." : {
+      "comment" : "Settings: what the analytics consent covers",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only counts such as 'a lesson was finished'. Never the words you look up, your cards, your account or a device ID."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「レッスンを1つ終えた」などの回数だけです。調べた言葉、カード、アカウント、端末IDは送信しません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chỉ là số đếm như “đã hoàn thành một bài”. Không bao giờ gửi từ bạn tra, thẻ của bạn, tài khoản hay mã thiết bị."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

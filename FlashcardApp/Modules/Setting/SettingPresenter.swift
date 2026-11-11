@@ -124,6 +124,8 @@ protocol SettingPresenterInterface: AnyObject {
     func toggleDarkMode(to value: Bool)
     func toggleNotification(to value: Bool)
     func toggleSound(to value: Bool)
+    /// Anonymous usage counts; off until the learner turns it on.
+    func toggleAnalytics(to value: Bool)
     func selectChoice(id: String, optionID: String)
     func requestLogout()
     func handleNavigationTap(config: NavigationConfig)
@@ -145,10 +147,14 @@ final class SettingPresenter: SettingPresenterInterface {
 
     let sectionsRelay = BehaviorRelay<[SettingSection]>(value: [])
 
+    private let analytics: AnalyticsService
+
     init(interactor: SettingInteractorInterface,
-         wireframe: SettingWireframeInterface) {
+         wireframe: SettingWireframeInterface,
+         analytics: AnalyticsService = .shared) {
         self.interactor = interactor
         self.wireframe = wireframe
+        self.analytics = analytics
     }
 
     deinit {
@@ -247,6 +253,11 @@ extension SettingPresenter {
                 self.reloadSections()
             }
         }
+    }
+
+    func toggleAnalytics(to value: Bool) {
+        analytics.isSharingAllowed = value
+        reloadSections()
     }
 
     func toggleSound(to value: Bool) {
@@ -522,6 +533,13 @@ private extension SettingPresenter {
                     iconName: "globe",
                     options: LanguageOption.allCases.map { ChoiceOption(id: $0.rawValue, title: $0.title) },
                     selectedID: LanguageOption.resolve(interactor.getLanguage()).rawValue
+                )),
+                .toggle(ToggleConfig(
+                    id: "analytics",
+                    title: NSLocalizedString("Share anonymous usage data", comment: "Settings: analytics consent switch"),
+                    iconName: "chart.bar",
+                    isOn: analytics.isSharingAllowed,
+                    subtitle: NSLocalizedString("Only counts such as 'a lesson was finished'. Never the words you look up, your cards, your account or a device ID.", comment: "Settings: what the analytics consent covers")
                 )),
                 .navigation(NavigationConfig(
                     id: "privacy",
