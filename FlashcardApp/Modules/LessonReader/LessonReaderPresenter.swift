@@ -41,6 +41,9 @@ protocol LessonReaderPresenterInterface: AnyObject {
     func retry()
     func cancelLoading()
     func showPractice()
+    /// The lesson has example sentences to shadow (listen and repeat).
+    var canShadow: Bool { get }
+    func showShadowing()
     /// Whether the loaded lesson has words the learner can save to a deck.
     var canSaveWords: Bool { get }
     /// Saves the word at this position of the vocabulary section to a deck the learner picks.
@@ -50,6 +53,7 @@ protocol LessonReaderPresenterInterface: AnyObject {
 
 protocol LessonReaderWireframeInterface: AnyObject {
     func showPractice(lesson: BJTLessonDetailDTO)
+    func showShadowing(sentences: [ShadowingSentence])
     /// Asks which deck to save to; `completion` gets nil when the learner cancels.
     func chooseDeck(from choices: [TodayDeckChoice], completion: @escaping (DictionaryDeckTarget?) -> Void)
     func showMessage(title: String, message: String)
@@ -114,6 +118,22 @@ final class LessonReaderPresenter: LessonReaderPresenterInterface {
     }
 
     var canSaveWords: Bool { state == .loaded && !(lesson?.lessonContent.vocabulary.isEmpty ?? true) }
+
+    private var shadowingSentences: [ShadowingSentence] {
+        (lesson?.lessonContent.examples ?? []).compactMap { example in
+            let japanese = example.japanese.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !japanese.isEmpty else { return nil }
+            let translation = example.vietnamese.trimmingCharacters(in: .whitespacesAndNewlines)
+            return ShadowingSentence(japanese: japanese, translation: translation.isEmpty ? nil : translation)
+        }
+    }
+
+    var canShadow: Bool { state == .loaded && !shadowingSentences.isEmpty }
+
+    func showShadowing() {
+        guard canShadow else { return }
+        wireframe?.showShadowing(sentences: shadowingSentences)
+    }
     func saveWord(at index: Int) {
         guard let words = lesson?.lessonContent.vocabulary, words.indices.contains(index) else { return }
         save([LessonWord(words[index])])

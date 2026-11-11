@@ -108,6 +108,15 @@ final class LessonReaderViewController: BaseVC {
             break
         }
         stateView.isHidden = presenter.state == .loaded
+        if presenter.canShadow, navigationItem.rightBarButtonItem == nil {
+            let item = UIBarButtonItem(image: UIImage(systemName: "waveform.and.mic"),
+                                       primaryAction: UIAction { [weak self] _ in self?.presenter.showShadowing() })
+            item.accessibilityLabel = NSLocalizedString("Shadowing", comment: "Lesson: repeat the example sentences aloud")
+            item.accessibilityIdentifier = "lesson_shadowing"
+            navigationItem.rightBarButtonItem = item
+        } else if !presenter.canShadow {
+            navigationItem.rightBarButtonItem = nil
+        }
         tableView.reloadData()
         view.setNeedsLayout()
     }

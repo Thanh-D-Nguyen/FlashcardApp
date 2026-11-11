@@ -17,6 +17,10 @@ extension LessonReaderWireframe: LessonReaderWireframeInterface {
         navigationController?.pushWireframe(LessonPracticeWireframe(lesson: lesson))
     }
 
+    func showShadowing(sentences: [ShadowingSentence]) {
+        navigationController?.pushViewController(ShadowingViewController.make(sentences: sentences), animated: true)
+    }
+
     func chooseDeck(from choices: [TodayDeckChoice], completion: @escaping (DictionaryDeckTarget?) -> Void) {
         let sheet = UIAlertController(title: NSLocalizedString("Save to which deck?", comment: "Lesson reader"), message: nil, preferredStyle: .actionSheet)
         for choice in choices {

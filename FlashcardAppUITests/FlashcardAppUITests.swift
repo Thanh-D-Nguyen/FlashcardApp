@@ -767,6 +767,33 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertEqual(word.label, "会□")
     }
 
+    /// K-14: a lesson with example sentences offers shadowing; the screen shows the server's sentence, can play it, and moves on.
+    /// Recording needs the microphone (a permission prompt and real audio): NOT VERIFIED here.
+    func testShadowingOpensFromALessonWithItsExampleSentences() {
+        let app = makeApp()
+        app.launch()
+        openLevels(app)
+        let start = app.buttons["home_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 40))
+        start.tap()
+        app.buttons["level_lessons"].tap()
+        let row = app.descendants(matching: .any).matching(identifier: "lesson_row_j5-01-greetings-intro").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 20))
+        row.tap()
+        let shadowing = app.buttons["lesson_shadowing"]
+        XCTAssertTrue(shadowing.waitForExistence(timeout: 20), "A lesson with examples offers shadowing")
+        shadowing.tap()
+        let sentence = app.staticTexts["shadowing_sentence"]
+        XCTAssertTrue(sentence.waitForExistence(timeout: 10))
+        let first = sentence.label
+        XCTAssertFalse(first.isEmpty)
+        app.buttons["shadowing_listen"].tap()
+        XCTAssertFalse(app.buttons["shadowing_play"].exists, "Nothing recorded yet")
+        attachScreenshot(app, name: "shadowing")
+        app.buttons["shadowing_next"].tap()
+        XCTAssertNotEqual(sentence.label, first, "The next example sentence")
+    }
+
     // MARK: Cards: create, study, edit, persist, delete
 
     /// The whole learner journey on real UI and the real Realm store: make a deck, study it (flip, quiz, summary),

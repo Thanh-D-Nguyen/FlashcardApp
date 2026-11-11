@@ -211,6 +211,21 @@ final class LessonReaderPresenterTests: XCTestCase {
         XCTAssertEqual(wireframe.messages[0].title, NSLocalizedString("Couldn't save the words", comment: ""))
     }
 
+    func test_shadowingOffersTheServersExampleSentencesOnceLoaded() throws {
+        let presenter = makePresenter()
+        let spy = ReaderWireframeSpy()
+        presenter.wireframe = spy
+        presenter.showShadowing()
+        XCTAssertTrue(spy.shadowed.isEmpty)
+        presenter.viewDidLoad()
+        let loaded = try lesson()
+        interactor.respond(LessonReadResult(lesson: loaded, isFromCache: false))
+        XCTAssertTrue(presenter.canShadow)
+        presenter.showShadowing()
+        XCTAssertEqual(spy.shadowed.first?.map(\.japanese), loaded.lessonContent.examples.map(\.japanese))
+        XCTAssertEqual(spy.shadowed.first?.first?.translation, loaded.lessonContent.examples.first?.vietnamese)
+    }
+
     func test_practiceIsNotOfferedForALessonWithoutActivities() throws {
         let presenter = makePresenter()
         let spy = ReaderWireframeSpy()
@@ -285,6 +300,8 @@ final class ReaderWireframeSpy: LessonReaderWireframeInterface {
     private(set) var messages: [(title: String, message: String)] = []
     var pick: DictionaryDeckTarget?
     func showPractice(lesson: BJTLessonDetailDTO) { practised.append(lesson) }
+    private(set) var shadowed: [[ShadowingSentence]] = []
+    func showShadowing(sentences: [ShadowingSentence]) { shadowed.append(sentences) }
     func chooseDeck(from choices: [TodayDeckChoice], completion: @escaping (DictionaryDeckTarget?) -> Void) {
         offeredChoices.append(choices)
         completion(pick)
