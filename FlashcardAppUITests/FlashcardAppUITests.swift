@@ -627,6 +627,104 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(deckRows().waitForExistence(timeout: 15))
     }
 
+    /// The signed-in journey against production through the local proxy (Local scheme → localhost:18081 → kiokoto.com), with a
+    /// throw-away account in TEST_RUNNER_FLASHCARD_E2E_EMAIL / _PASSWORD that has account cards due. K-07: a review card is a question
+    /// whose pick does not rate it; the learner's rating is sent. K-10: Today then shows the account streak. K-04: a lesson finished
+    /// while signed in is saved to the account. K-17/K-11: Settings shows the data export screen and the usage switch (off).
+    func testLiveSignedInJourneyOnProduction() throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let email = environment["FLASHCARD_E2E_EMAIL"], let password = environment["FLASHCARD_E2E_PASSWORD"] else {
+            throw XCTSkip("No disposable account supplied")
+        }
+        let app = makeApp()
+        app.launch()
+        let settings = app.tabBars.buttons["tab_settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 40))
+        settings.tap()
+        if app.buttons["setting_sign_in"].waitForExistence(timeout: 10) {
+            app.buttons["setting_sign_in"].tap()
+            XCTAssertTrue(app.buttons["website_login_button"].waitForExistence(timeout: 5))
+            submitLogin(app, email: email, password: password)
+            XCTAssertTrue(app.tabBars.buttons["tab_levels"].waitForExistence(timeout: 20), "Successful login lands on Main")
+        }
+
+        // K-07 + K-10: one account card as a question, then the learner's own rating.
+        openCards(app)
+        app.buttons.matching(identifier: "cards_scope_review").firstMatch.tap()
+        let start = app.buttons["review_start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 20), "The account has cards due")
+        start.tap()
+        let choice = app.buttons["review_choice_0"]
+        // A card with fewer than two wrong answers on the server is flipped as before: show it, rate it, go on.
+        var flipped = 0
+        while !choice.waitForExistence(timeout: 8), flipped < 4 {
+            let show = app.buttons["review_show_answer"]
+            XCTAssertTrue(show.waitForExistence(timeout: 10))
+            if flipped == 0 { attachScreenshot(app, name: "signed-in-review-flip-fallback") }
+            show.tap()
+            XCTAssertTrue(app.buttons["review_rate_good"].waitForExistence(timeout: 10))
+            app.buttons["review_rate_good"].tap()
+            flipped += 1
+        }
+        XCTAssertTrue(choice.exists, "A card with enough wrong answers is asked as a question")
+        attachScreenshot(app, name: "signed-in-review-question")
+        XCTAssertFalse(app.buttons["review_rate_good"].exists, "No rating before the answer is shown")
+        choice.tap()
+        let good = app.buttons["review_rate_good"]
+        XCTAssertTrue(good.waitForExistence(timeout: 10), "A pick reveals the card; the learner still rates")
+        attachScreenshot(app, name: "signed-in-review-answered")
+        good.tap()
+        XCTAssertTrue(app.staticTexts["review_progress"].waitForExistence(timeout: 15) || app.otherElements["review_summary"].waitForExistence(timeout: 5))
+        app.buttons["review_close"].firstMatch.tap()
+
+        // K-10: the server's streak on Today.
+        app.tabBars.buttons["tab_levels"].tap()   // the Today tab keeps its historical identifier
+        let today = app.scrollViews["today_screen"]
+        XCTAssertTrue(today.waitForExistence(timeout: 20))
+        let streak = app.descendants(matching: .any).matching(identifier: "today_account_streak").firstMatch
+        XCTAssertTrue(streak.waitForExistence(timeout: 20), "A confirmed review counts the day on the account")
+        attachScreenshot(app, name: "signed-in-today-streak")
+
+        // K-04: a lesson finished while signed in is saved to the account.
+        openLevels(app)
+        let startLevel = app.buttons["home_start"]
+        XCTAssertTrue(startLevel.waitForExistence(timeout: 40))
+        startLevel.tap()
+        app.buttons["level_lessons"].tap()
+        let row = app.descendants(matching: .any).matching(identifier: "lesson_row_j5-01-greetings-intro").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 20))
+        row.tap()
+        let practice = app.descendants(matching: .any).matching(identifier: "lesson_practice").firstMatch
+        XCTAssertTrue(practice.waitForExistence(timeout: 20))
+        practice.tap()
+        for _ in 0..<5 {
+            let option = app.descendants(matching: .any).matching(identifier: "practice_option_0").firstMatch
+            guard option.waitForExistence(timeout: 5) else { break }
+            option.tap()
+            let next = app.descendants(matching: .any).matching(identifier: "practice_next").firstMatch
+            XCTAssertTrue(next.waitForExistence(timeout: 5))
+            next.tap()
+        }
+        let saved = app.staticTexts["Đã lưu vào tài khoản."]
+        XCTAssertTrue(saved.waitForExistence(timeout: 20), "The server confirmed the lesson on the account")
+        attachScreenshot(app, name: "signed-in-lesson-summary")
+        app.descendants(matching: .any).matching(identifier: "practice_back").firstMatch.tap()
+
+        // K-17 + K-11 in Settings.
+        app.tabBars.buttons["tab_settings"].tap()
+        let list = app.tables["settings_list"]
+        let usage = app.cells["setting_analytics"]
+        for _ in 0..<5 where !(usage.exists && usage.isHittable) { list.swipeUp() }
+        XCTAssertTrue(usage.waitForExistence(timeout: 5))
+        XCTAssertEqual(usage.switches.firstMatch.value as? String, "0", "Usage sharing is off by default")
+        attachScreenshot(app, name: "signed-in-settings-usage-and-data")
+        let export = app.cells["setting_data_export"]
+        for _ in 0..<5 where !(export.exists && export.isHittable) { list.swipeUp() }
+        export.tap()
+        XCTAssertTrue(app.staticTexts["data_export_title"].waitForExistence(timeout: 20))
+        attachScreenshot(app, name: "signed-in-data-export")
+    }
+
     // MARK: Cards: create, study, edit, persist, delete
 
     /// The whole learner journey on real UI and the real Realm store: make a deck, study it (flip, quiz, summary),
