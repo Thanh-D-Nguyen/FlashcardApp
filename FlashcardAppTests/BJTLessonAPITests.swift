@@ -177,6 +177,16 @@ final class BJTLessonAPITests: XCTestCase {
         XCTAssertEqual(failure(lessonAPI.lesson(slug: slug)), .invalidResponse)
     }
 
+    func test_detailWithoutActivitiesIsAnErrorNotALessonWithNothingToPractise() throws {
+        let missing = try detailJSON { object in editContent(&object) { $0["activities"] = nil } }
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 200, json: missing) }
+        XCTAssertEqual(failure(lessonAPI.lesson(slug: slug)), .invalidResponse)
+
+        let null = try detailJSON { object in editContent(&object) { $0["activities"] = NSNull() } }
+        LearnerURLProtocol.handler = { _, proto in proto.respond(status: 200, json: null) }
+        XCTAssertEqual(failure(lessonAPI.lesson(slug: slug)), .invalidResponse)
+    }
+
     func test_detailRejectsAnActivityWhoseAnswerCannotBeTrusted() throws {
         let corruptions: [(String, (inout [String: Any]) -> Void)] = [
             ("answer names no option", { $0["answer"] = "Z" }),

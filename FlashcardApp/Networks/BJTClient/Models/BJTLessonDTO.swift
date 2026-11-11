@@ -125,7 +125,8 @@ struct BJTLessonContentDTO: Decodable, Equatable {
         vietnameseLearnerPitfalls = try c.decodeIfPresent([String].self, forKey: .vietnameseLearnerPitfalls) ?? []
         businessUsageVi = try c.decodeIfPresent(String.self, forKey: .businessUsageVi)
         politenessHierarchyVi = try c.decodeIfPresent(String.self, forKey: .politenessHierarchyVi)
-        activities = try c.decodeIfPresent([BJTLessonActivityDTO].self, forKey: .activities) ?? []
+        // Required: an absent/null list would read as a lesson with nothing to practise. An explicit empty list is legitimate.
+        activities = try c.decode([BJTLessonActivityDTO].self, forKey: .activities)
     }
 }
 
