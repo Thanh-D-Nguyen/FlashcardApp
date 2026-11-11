@@ -17,6 +17,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let scenarioBanner = TodayScenarioBannerView()
     private let levelsRow = TodayRowView()
     private let lessonSlot = TodayLessonSlotView()
+    private let streakView = TodayStreakView()
     private var refreshObservers: [NSObjectProtocol] = []
 
     override func viewDidLoad() {
@@ -78,8 +79,10 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         dateHeader.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, progressGroup, hubView, scenarioBanner, heroView, failureView, lessonSlot, levelsRow].forEach(stack.addArrangedSubview)
+        [dateHeader, progressGroup, streakView, hubView, scenarioBanner, heroView, failureView, lessonSlot, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
+        stack.setCustomSpacing(Design.Spacing.m, after: streakView)
+        streakView.isHidden = true
         stack.setCustomSpacing(Design.Spacing.m, after: hubView)
         stack.setCustomSpacing(Design.Spacing.l, after: scenarioBanner)
         stack.setCustomSpacing(Design.Spacing.l, after: heroView)
@@ -122,6 +125,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         }
         lessonSlot.isHidden = state.lessonCard == nil
         if let card = state.lessonCard { lessonSlot.configure(card) }
+        streakView.isHidden = state.streak == nil
+        if let streak = state.streak { streakView.configure(streak) }
         progressGroup.isHidden = state.progress == nil
         if let progress = state.progress {
             progressTitle.text = progress.title

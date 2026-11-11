@@ -25731,6 +25731,102 @@
           }
         }
       }
+    },
+    "%lld-day study streak" : {
+      "comment" : "Today: the account's study streak from the server",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld-day study streak"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld-day study streak"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld日連続で学習中"
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Chuỗi học %lld ngày"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Today is counted on your account." : {
+      "comment" : "Today: the account streak already includes today",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today is counted on your account."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日の学習はアカウントに記録済みです。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hôm nay đã được tính vào tài khoản."
+          }
+        }
+      }
+    },
+    "Review an account card today to keep it going." : {
+      "comment" : "Today: how to keep the account streak",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review an account card today to keep it going."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日アカウントのカードを復習すると続きます。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ôn một thẻ trên tài khoản hôm nay để giữ chuỗi."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

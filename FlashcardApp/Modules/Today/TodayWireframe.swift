@@ -23,7 +23,7 @@ final class TodayWireframe: BaseWireframe<TodayViewController> {
         controller.title = MainTabbarName.today.title
         controller.tabBarItem = MainTabbarName.today.tabBarItem
         let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self, life: TodayLifeHubLoader(weather: TodayLifeLoader()),
-                                    lessons: TodayLessonSlotProvider())
+                                    lessons: TodayLessonSlotProvider(), streak: TodayStreakLoader())
         presenter.view = controller
         controller.presenter = presenter
     }

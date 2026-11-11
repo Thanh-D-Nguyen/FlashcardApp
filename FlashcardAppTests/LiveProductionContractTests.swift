@@ -43,4 +43,13 @@ final class LiveProductionContractTests: XCTestCase {
             XCTAssertEqual($0 as? LearnerAPIError, .notFound)
         }
     }
+
+    func test_theAccountStreakIsReadAndADayIsRecordedOnTheRealServer() throws {
+        XCTAssertNoThrow(try value(api.recordStreakActivity(.review, timeZone: TimeZone(identifier: "Asia/Ho_Chi_Minh"))))
+        let rows = try value(api.streaks())
+        XCTAssertTrue(rows.contains { $0.activityType == AccountStreak.activityType }, "Production has the streak of any activity")
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Ho_Chi_Minh")!
+        XCTAssertNotNil(AccountStreak.current(from: rows, now: Date(), calendar: calendar), "A day was just recorded")
+    }
 }

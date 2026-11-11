@@ -44,6 +44,12 @@ struct TodayProgressText: Equatable {
     let detail: String?
 }
 
+/// The account streak line, from the server's own count.
+struct TodayStreakText: Equatable {
+    let title: String
+    let detail: String
+}
+
 struct TodayViewState: Equatable {
     enum Phase: Equatable {
         case loaded
@@ -62,6 +68,8 @@ struct TodayViewState: Equatable {
     var life: TodayHubSection?
     /// Where the learner is in the structured lessons, from their own progress. `nil` hides it.
     var lessonCard: TodayLessonCard?
+    /// The signed-in account's current streak. `nil` hides it (guests, no current streak, not loaded, failed).
+    var streak: TodayStreakText?
 }
 
 protocol TodayViewInterface: AnyObject {
@@ -96,6 +104,7 @@ final class TodayPresenter {
 
     private let life: TodayLifeHubLoading?
     private let lessons: TodayLessonSlotProviding?
+    private let streak: TodayStreakLoading?
 
     private var plan: TodayPlan?
     private var state: TodayViewState?
@@ -105,16 +114,20 @@ final class TodayPresenter {
          ownerKey: @escaping () -> String = { AuthSession.shared.currentUser?.id ?? "" },
          now: @escaping () -> Date = Date.init,
          life: TodayLifeHubLoading? = nil,
-         lessons: TodayLessonSlotProviding? = nil) {
+         lessons: TodayLessonSlotProviding? = nil,
+         streak: TodayStreakLoading? = nil) {
         self.lessons = lessons
+        self.streak = streak
         self.interactor = interactor
         self.wireframe = wireframe
         self.ownerKey = ownerKey
         self.now = now
         self.life = life
         life?.onChange = { [weak self] in self?.lifeChanged() }
+        streak?.onChange = { [weak self] in self?.lifeChanged() }
     }
 
+    /// The life hub or the streak changed on their own: everything else on screen stays as it is.
     private func lifeChanged() {
         guard var current = state else { return }
         current.life = life?.section
@@ -130,6 +143,7 @@ final class TodayPresenter {
             self.plan = plan
             publish(Self.makeState(plan))
             life?.refresh()
+            streak?.refresh()
         } catch {
             logger.error("Reading today's plan failed: \(error.localizedDescription)")
             plan = nil
@@ -137,6 +151,7 @@ final class TodayPresenter {
                                    failureTitle: NSLocalizedString("Couldn't read your progress", comment: ""),
                                    failureMessage: NSLocalizedString("The study data on this device couldn't be opened. Your data is not deleted.", comment: "")))
             life?.refresh()
+            streak?.refresh()
         }
     }
 
@@ -144,6 +159,7 @@ final class TodayPresenter {
         var state = state
         state.life = life?.section
         state.lessonCard = lessons.map { Self.lessonCard($0.slot(ownerKey: ownerKey())) }
+        state.streak = streak?.streak.map(Self.streakText)
         self.state = state
         view?.render(state)
     }
@@ -205,6 +221,11 @@ final class TodayPresenter {
         state.rows = TodayRows(deckName: deckName, sessionLength: minutesText(plan.budgetMinutes))
         state.progress = progressText(plan.progress)
         return state
+    }
+
+    static func streakText(_ streak: AccountStreak) -> TodayStreakText {
+        TodayStreakText(title: String.localizedStringWithFormat(text("%lld-day study streak"), streak.days),
+                        detail: streak.countsToday ? text("Today is counted on your account.") : text("Review an account card today to keep it going."))
     }
 
     static func lessonCard(_ slot: TodayLessonSlot) -> TodayLessonCard {

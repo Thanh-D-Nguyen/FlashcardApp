@@ -563,3 +563,41 @@ extension TodayPresenterTests {
         XCTAssertNotNil(view.renders.last?.lessonCard, "Lessons do not depend on the review data")
     }
 }
+
+private final class FakeStreak: TodayStreakLoading {
+    var streak: AccountStreak?
+    var onChange: (() -> Void)?
+    private(set) var refreshes = 0
+    func refresh() { refreshes += 1 }
+}
+
+/// The account streak line: only the server's number, only for an account, never in place of anything else.
+final class TodayPresenterStreakTests: XCTestCase {
+    private func text(_ key: String) -> String { NSLocalizedString(key, comment: "") }
+
+    func test_theServerStreakIsShownWithWhetherTodayAlreadyCounts() {
+        let interactor = FakeTodayInteractor()
+        interactor.result = .failure(NSError(domain: "t", code: 1))
+        let loader = FakeStreak()
+        let view = SpyTodayView()
+        let presenter = TodayPresenter(interactor: interactor, wireframe: FakeTodayWireframe(), ownerKey: { "owner" }, streak: loader)
+        presenter.view = view
+        presenter.viewWillAppear()
+        XCTAssertEqual(loader.refreshes, 1, "Each time Today appears")
+        XCTAssertNil(view.renders.last?.streak, "Nothing until the server answered")
+
+        loader.streak = AccountStreak(days: 3, countsToday: false)
+        loader.onChange?()
+        XCTAssertEqual(view.renders.last?.streak?.title, String.localizedStringWithFormat(text("%lld-day study streak"), 3))
+        XCTAssertEqual(view.renders.last?.streak?.detail, text("Review an account card today to keep it going."))
+        XCTAssertEqual(view.renders.last?.phase, .failed, "The streak does not depend on the review data")
+
+        loader.streak = AccountStreak(days: 4, countsToday: true)
+        loader.onChange?()
+        XCTAssertEqual(view.renders.last?.streak?.detail, text("Today is counted on your account."))
+
+        loader.streak = nil
+        loader.onChange?()
+        XCTAssertNil(view.renders.last?.streak)
+    }
+}

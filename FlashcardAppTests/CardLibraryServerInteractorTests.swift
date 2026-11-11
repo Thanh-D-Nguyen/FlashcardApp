@@ -47,6 +47,11 @@ private final class FakeLibraryAPI: BJTFlashcardLibraryAPIInterface {
     func blockDeckAuthor(id: String) -> Single<Void> { blockResult }
 }
 
+private final class SpyStreakRecorder: AccountStreakRecording {
+    private(set) var reviews = 0
+    func recordReview() { reviews += 1 }
+}
+
 /// Answers every request with a small JPEG, or 404 for the addresses in `missing`.
 private final class PictureURLProtocol: URLProtocol {
     static var missing = Set<String>()
@@ -73,6 +78,7 @@ private final class PictureURLProtocol: URLProtocol {
 /// Mapping of server rows to the values the Cards tab shows, and the use cases that sit between the API and the device's decks.
 final class CardLibraryServerInteractorTests: XCTestCase {
     private var api: FakeLibraryAPI!
+    private var streaks: SpyStreakRecorder!
     private var repository: DeskManagement!
     private var interactor: CardLibraryServerInteractor!
     private var language = AppLanguage.english
@@ -84,9 +90,10 @@ final class CardLibraryServerInteractorTests: XCTestCase {
         RealmService.shared.realm = try Realm(configuration: configuration)
         repository = DeskManagement()
         api = FakeLibraryAPI()
+        streaks = SpyStreakRecorder()
         interactor = CardLibraryServerInteractor(api: api, repository: repository,
                                                  auth: AuthSession(tokens: SignedOutTokens(), api: UnusedNativeAuth()),
-                                                 language: { [unowned self] in language })
+                                                 language: { [unowned self] in language }, streaks: streaks)
     }
 
     override func tearDownWithError() throws {
@@ -219,6 +226,15 @@ final class CardLibraryServerInteractorTests: XCTestCase {
         XCTAssertEqual(api.submissions.map(\.elapsedMs), [4251, 0])
         XCTAssertEqual(api.submissions.map(\.rating), [.good, .again])
         XCTAssertEqual(api.submissions.map(\.id), [ufId, ufId])
+    }
+
+    func test_onlyAReviewTheServerConfirmedCountsForTheAccountStreak() throws {
+        let card = DueCard(id: ufId, state: .review, front: "a", back: "b", reading: "", lapses: 0, isLeech: false)
+        _ = try value(interactor.submit(.good, for: card, elapsed: 1))
+        XCTAssertEqual(streaks.reviews, 1)
+        api.submitResult = .error(LearnerAPIError.interrupted)
+        XCTAssertThrowsError(try value(interactor.submit(.good, for: card, elapsed: 1)))
+        XCTAssertEqual(streaks.reviews, 1, "An unconfirmed rating is not an activity")
     }
 
     func test_archivePassesTheErrorOn() {

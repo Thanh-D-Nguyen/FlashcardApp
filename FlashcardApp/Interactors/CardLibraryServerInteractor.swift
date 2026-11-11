@@ -46,6 +46,7 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
     private let remote: RemoteImageLoader
     private let images: CardImageStore
     private let links: DeckAccountLinks
+    private let streaks: AccountStreakRecording
 
     init(api: BJTFlashcardLibraryAPIInterface = BJTLearnerAPI.shared,
          repository: DeskRepositoryInterface = DeskManagement.shared,
@@ -53,7 +54,9 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
          language: @escaping () -> AppLanguage = { .current },
          remote: RemoteImageLoader = .shared,
          images: CardImageStore = .shared,
-         links: DeckAccountLinks = .shared) {
+         links: DeckAccountLinks = .shared,
+         streaks: AccountStreakRecording = AccountStreakRecorder.shared) {
+        self.streaks = streaks
         self.api = api
         self.repository = repository
         self.auth = auth
@@ -93,7 +96,7 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
     func submit(_ rating: ReviewRating, for card: DueCard, elapsed: TimeInterval) -> Single<Void> {
         let milliseconds = Int((max(elapsed, 0) * 1000).rounded())
         return api.submitReview(userFlashcardId: card.id, rating: rating, elapsedMs: milliseconds)
-            .do(onError: signOutIfRejected)
+            .do(onSuccess: { [streaks] in streaks.recordReview() }, onError: signOutIfRejected)
     }
 
     func distractors(for card: DueCard, count: Int) -> Single<[String]> {
