@@ -26836,6 +26836,78 @@
         }
       }
     },
+    "Send %lld ratings from this device" : {
+      "comment" : "Remote deck menu: sync device self-ratings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Send %lld rating from this device"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Send %lld ratings from this device"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "この端末の評価%lld件を送信"
+                }
+              }
+            }
+          }
+        },
+        "vi" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Gửi %lld đánh giá trên máy này"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Sent to your account: %1$lld added, %2$lld already there, %3$lld kept as on the account (it had a newer review)." : {
+      "comment" : "Remote deck: device ratings sync report",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent to your account: %1$lld added, %2$lld already there, %3$lld kept as on the account (it had a newer review)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントに送信しました：追加%1$lld件、既存%2$lld件、%3$lld件はアカウントの新しい復習を優先しました。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đã gửi lên tài khoản: thêm %1$lld, %2$lld đã có sẵn, %3$lld giữ nguyên theo tài khoản (tài khoản có lượt ôn mới hơn)."
+          }
+        }
+      }
+    },
     "Write the kanji" : {
       "comment" : "Kanji writing practice",
       "extractionState" : "manual",

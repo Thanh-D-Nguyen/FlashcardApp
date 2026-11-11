@@ -23,6 +23,7 @@ struct RemoteDeckState: Equatable {
         case archiving
         case moderating
         case sharing
+        case syncing
     }
 
     var phase: Phase = .loading
@@ -34,6 +35,9 @@ struct RemoteDeckState: Equatable {
     var isOnDevice = false
     /// The learner's own deck has a share link that works now.
     var isShared = false
+    /// Self-ratings made on this device's copy that are not on the account yet. 0 hides the action (also when the server cannot
+    /// take them safely).
+    var deviceRatingsToSend = 0
     var busy: Busy?
     /// A save or archive that failed, shown beside the actions.
     var notice: String?
@@ -59,6 +63,8 @@ protocol RemoteDeckPresenterInterface: AnyObject {
     func shareLink()
     /// The learner's own deck: revoke its link for everyone (after a confirmation).
     func stopSharing()
+    /// Sends this device's self-ratings of the deck to the account (servers with an idempotent batch only).
+    func sendDeviceRatings()
 }
 
 final class RemoteDeckPresenter {
@@ -74,9 +80,13 @@ final class RemoteDeckPresenter {
     fileprivate let shareRequest = SerialDisposable()
 
     fileprivate let sharing: DeckSharingInteractorInterface
+    fileprivate let reviewSync: ReviewSyncInteractorInterface
+    fileprivate let syncRequest = SerialDisposable()
 
     init(deckId: String, interactor: CardLibraryServerInteractorInterface, wireframe: RemoteDeckWireframeInterface,
-         sharing: DeckSharingInteractorInterface = DeckSharingInteractor()) {
+         sharing: DeckSharingInteractorInterface = DeckSharingInteractor(),
+         reviewSync: ReviewSyncInteractorInterface = ReviewSyncInteractor()) {
+        self.reviewSync = reviewSync
         self.sharing = sharing
         self.deckId = deckId
         self.interactor = interactor
@@ -86,6 +96,7 @@ final class RemoteDeckPresenter {
     deinit {
         request.dispose()
         shareRequest.dispose()
+        syncRequest.dispose()
     }
 
     private func load() {
@@ -109,6 +120,7 @@ final class RemoteDeckPresenter {
                 self.state.cards = detail.cards
                 self.state.isOnDevice = self.interactor.hasDeviceCopy(deckId: detail.deck.id)
                 self.publish()
+                self.offerDeviceRatings()
             }, onFailure: { [weak self] error in
                 guard let self else { return }
                 if case LearnerAPIError.signInRequired = error { self.state.phase = .signInRequired } else {
@@ -295,5 +307,41 @@ extension RemoteDeckPresenter {
                     self.publish()
                 })
         }
+    }
+}
+
+extension RemoteDeckPresenter {
+    /// Asks the server once whether it can take device ratings safely; offers them only then.
+    fileprivate func offerDeviceRatings() {
+        guard state.isOnDevice, reviewSync.pendingCount(deckId: deckId) > 0 else { return }
+        syncRequest.disposable = reviewSync.isSupported()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] supported in
+                guard let self, supported else { return }
+                self.state.deviceRatingsToSend = self.reviewSync.pendingCount(deckId: self.deckId)
+                self.publish()
+            }, onFailure: { _ in })
+    }
+
+    func sendDeviceRatings() {
+        guard state.phase == .loaded, state.deviceRatingsToSend > 0, state.busy == nil else { return }
+        state.busy = .syncing
+        state.notice = nil
+        publish()
+        syncRequest.disposable = reviewSync.send(deckId: deckId)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] report in
+                guard let self else { return }
+                self.state.busy = nil
+                self.state.deviceRatingsToSend = self.reviewSync.pendingCount(deckId: self.deckId)
+                self.state.notice = String(format: NSLocalizedString("Sent to your account: %1$lld added, %2$lld already there, %3$lld kept as on the account (it had a newer review).", comment: "Remote deck: device ratings sync report"),
+                                           report.applied, report.alreadyThere, report.superseded)
+                self.publish()
+            }, onFailure: { [weak self] error in
+                guard let self else { return }
+                self.state.busy = nil
+                self.state.notice = CardPresenter.message(for: error)
+                self.publish()
+            })
     }
 }

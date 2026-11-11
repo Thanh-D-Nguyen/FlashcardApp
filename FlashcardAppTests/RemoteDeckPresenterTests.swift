@@ -58,9 +58,11 @@ final class RemoteDeckPresenterTests: XCTestCase {
     }
 
     private var sharing = FakeDeckSharing()
+    private var reviewSync = FakeReviewSync()
 
     private func makePresenter() {
-        presenter = RemoteDeckPresenter(deckId: deckId, interactor: server, wireframe: wireframe, sharing: sharing)
+        presenter = RemoteDeckPresenter(deckId: deckId, interactor: server, wireframe: wireframe, sharing: sharing,
+                                        reviewSync: reviewSync)
         presenter.view = view
         presenter.viewDidLoad()
     }
@@ -305,4 +307,57 @@ final class FakeDeckSharing: DeckSharingInteractorInterface {
     func link(from text: String) -> DeckShareLink? { DeckShareLink.parse(text, webHost: "kiokoto.com") }
     func preview(_ link: DeckShareLink) -> Single<BJTSharedDeckPreviewDTO> { previews += 1; return previewResult }
     func copyToAccount(_ link: DeckShareLink) -> Single<String> { copies += 1; return copyResult }
+}
+
+final class FakeReviewSync: ReviewSyncInteractorInterface {
+    var pending = 0
+    var supported: Single<Bool> = .just(true)
+    var report: Single<ReviewSyncReport> = .just(ReviewSyncReport(applied: 2, alreadyThere: 1, superseded: 1, refused: 0))
+    private(set) var sends = 0
+    func pendingCount(deckId: String) -> Int { pending }
+    func isSupported() -> Single<Bool> { supported }
+    func send(deckId: String) -> Single<ReviewSyncReport> {
+        sends += 1
+        return report.do(onSuccess: { [weak self] _ in self?.pending = 0 })
+    }
+}
+
+final class RemoteDeckReviewSyncTests: XCTestCase {
+    private let deckId = "11111111-2222-4333-8444-555555555555"
+
+    private func start(onDevice: Bool, pending: Int, supported: Bool) -> (RemoteDeckPresenter, SpyRemoteDeckView, FakeReviewSync) {
+        let server = FakeServerInteractor()
+        server.detailResult = .just(ServerDeckDetail(deck: ServerDeck(id: deckId, title: "Deck", isOwned: true, cardCount: 1),
+                                                     cards: [ServerDeckCard(id: "aaaaaaaa-0000-4000-8000-000000000001", front: "犬", back: "chó", reading: "")]))
+        server.deviceCopies = onDevice ? [deckId] : []
+        let sync = FakeReviewSync()
+        sync.pending = pending
+        sync.supported = .just(supported)
+        let view = SpyRemoteDeckView()
+        let presenter = RemoteDeckPresenter(deckId: deckId, interactor: server, wireframe: FakeRemoteDeckWireframe(), sharing: FakeDeckSharing(), reviewSync: sync)
+        presenter.view = view
+        presenter.viewDidLoad()
+        // The capability answer is delivered from inside the load callback, one main-queue turn later.
+        let drained = expectation(description: "main queue")
+        DispatchQueue.main.async { drained.fulfill() }
+        wait(for: [drained], timeout: 2)
+        return (presenter, view, sync)
+    }
+
+    func test_ratingsAreOfferedOnlyForADeviceCopyOnAServerThatTakesThemSafely() {
+        XCTAssertEqual(start(onDevice: true, pending: 3, supported: true).1.last.deviceRatingsToSend, 3)
+        XCTAssertEqual(start(onDevice: true, pending: 3, supported: false).1.last.deviceRatingsToSend, 0, "Production before IOSK-18")
+        XCTAssertEqual(start(onDevice: false, pending: 3, supported: true).1.last.deviceRatingsToSend, 0)
+        XCTAssertEqual(start(onDevice: true, pending: 0, supported: true).1.last.deviceRatingsToSend, 0)
+    }
+
+    func test_sendingReportsWhatTheServerKeptAndOffersNothingMore() {
+        let (presenter, view, sync) = start(onDevice: true, pending: 4, supported: true)
+        presenter.sendDeviceRatings()
+        XCTAssertEqual(sync.sends, 1)
+        XCTAssertEqual(view.last.deviceRatingsToSend, 0)
+        XCTAssertNotNil(view.last.notice)
+        presenter.sendDeviceRatings()
+        XCTAssertEqual(sync.sends, 1)
+    }
 }

@@ -157,6 +157,13 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
                 self?.presenter.saveToDevice()
             })
         }
+        if state.deviceRatingsToSend > 0 {
+            let title = String.localizedStringWithFormat(NSLocalizedString("Send %lld ratings from this device", comment: "Remote deck menu: sync device self-ratings"),
+                                                         state.deviceRatingsToSend)
+            children.append(UIAction(title: title, image: UIImage(systemName: "arrow.up.circle")) { [weak self] _ in
+                self?.presenter.sendDeviceRatings()
+            })
+        }
         if state.isOwned {
             children.append(UIAction(title: NSLocalizedString("Share link", comment: "Remote deck menu: share the deck by link"),
                                      image: UIImage(systemName: "square.and.arrow.up")) { [weak self] _ in
