@@ -28,7 +28,7 @@
 | Lưu từ vào bộ thẻ | **SOURCE**: `DictionaryDeckWriter` ghi vào Realm local, chống thêm trùng | `FlashcardApp/Interactors/DictionaryDeckWriter.swift`; cần kiểm tra cách map vocab trong lesson |
 | Scenario | **SOURCE**: đã có Scenario list/play, tránh viết lại | `FlashcardApp/Modules/Scenario/` |
 | 420 lesson, J5 84 lesson, cấu trúc `lessonContent` | **FABLE-RUNTIME / UNVERIFIED HERE** | K-01 phải kiểm contract + lấy fixture đã loại thông tin nhạy cảm; đừng coi `contents[]` rỗng là nội dung bài |
-| `GET /flashcards/reviews/{id}/distractors` | **SOURCE-VERIFIED** (handler + test backend; `{"items":[string]}`, 401/404); chưa gọi server thật | K-07 dùng; cần tài khoản để kiểm runtime |
+| `GET /flashcards/reviews/{id}/distractors` | **VERIFIED trên production** (200 `{"items":[string]}`, 401, 404; 2026-11-11) | K-07 dùng |
 | Dòng tin Daily Radar, gamification, analytics | **FABLE-SOURCE/RUNTIME / UNVERIFIED HERE** | Xác minh kích thước, auth và hành vi trong story tương ứng |
 | 1.277 tests PASS | **DOC/FABLE**, không phải kết quả chạy hôm nay | Mỗi story phải có log test/build của chính nó |
 
