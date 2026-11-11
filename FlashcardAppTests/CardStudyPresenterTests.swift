@@ -1017,6 +1017,8 @@ private final class FakeStudyInteractor: CardStudyInteractorInterface {
 }
 
 private final class FakeStudyWireframe: CardStudyWireframeInterface {
+    var kanjiWritingCards: [[StudyCard]] = []
+    func showKanjiWriting(cards: [StudyCard]) { kanjiWritingCards.append(cards) }
     var editedDeckId: String?
     var leaveCount = 0
     var styleRequests: [String?] = []

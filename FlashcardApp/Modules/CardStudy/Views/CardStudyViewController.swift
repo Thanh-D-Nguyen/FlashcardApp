@@ -538,9 +538,13 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
                      attributes: state.deckHasImages ? [] : .disabled, state: state.imagesVisible ? .on : .off) { [weak self] _ in self?.presenter.setImagesVisible(!state.imagesVisible) },
             UIAction(title: NSLocalizedString("Read aloud automatically", comment: ""), image: UIImage(systemName: "speaker.wave.2"), state: state.autoSpeak ? .on : .off) { [weak self] _ in self?.presenter.setAutoSpeak(!state.autoSpeak) }
         ])
+        let writing = UIAction(title: NSLocalizedString("Write the kanji", comment: "Kanji writing practice"), image: UIImage(systemName: "pencil.and.scribble")) { [weak self] _ in
+            self?.presenter.writeKanji()
+        }
         let appearance = UIAction(title: NSLocalizedString("Card style…", comment: ""), image: UIImage(systemName: "paintpalette")) { [weak self] _ in self?.presenter.chooseStyle() }
         appearance.accessibilityIdentifier = "study_card_style"
         let restart = UIAction(title: NSLocalizedString("Start over", comment: ""), image: UIImage(systemName: "arrow.counterclockwise"), attributes: locked) { [weak self] _ in self?.presenter.restart() }
-        return UIMenu(children: [edit, modes, options, UIMenu(options: .displayInline, children: [appearance]), restart])
+        writing.accessibilityIdentifier = "study_write_kanji"
+        return UIMenu(children: [edit, modes, options, UIMenu(options: .displayInline, children: [writing, appearance]), restart])
     }
 }

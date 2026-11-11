@@ -146,6 +146,8 @@ protocol CardStudyPresenterInterface: AnyObject {
     func chooseStyle()
     func restart()
     func edit()
+    /// Practice writing the deck's kanji (no effect on the schedule).
+    func writeKanji()
 }
 
 final class CardStudyPresenter {
@@ -678,5 +680,10 @@ extension CardStudyPresenter: CardStudyPresenterInterface {
     func edit() {
         guard canChange else { return }
         wireframe.showEditor(deckId: deckId) { [weak self] in self?.load() }
+    }
+
+    func writeKanji() {
+        guard let deck else { return }
+        wireframe.showKanjiWriting(cards: Array(deck.cards).map(StudyCard.init(entity:)))
     }
 }

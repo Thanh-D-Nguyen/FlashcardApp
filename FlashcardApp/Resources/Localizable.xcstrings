@@ -26835,6 +26835,150 @@
           }
         }
       }
+    },
+    "Write the kanji" : {
+      "comment" : "Kanji writing practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write the kanji"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "漢字を書く"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viết kanji"
+          }
+        }
+      }
+    },
+    "Writing area" : {
+      "comment" : "Kanji writing practice canvas",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing area"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書く場所"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vùng viết"
+          }
+        }
+      }
+    },
+    "This deck has no kanji the app can check yet." : {
+      "comment" : "Kanji writing practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This deck has no kanji the app can check yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデッキには、アプリが判定できる漢字がまだありません。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bộ thẻ này chưa có kanji nào ứng dụng kiểm tra được."
+          }
+        }
+      }
+    },
+    "Right: %@" : {
+      "comment" : "Kanji writing practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正解：%@"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đúng: %@"
+          }
+        }
+      }
+    },
+    "Not recognised as %@. Compare and try the next one." : {
+      "comment" : "Kanji writing practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not recognised as %@. Compare and try the next one."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@として認識されませんでした。見比べて次へ進みましょう。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa nhận ra là %@. Hãy so sánh rồi sang chữ tiếp theo."
+          }
+        }
+      }
+    },
+    "Done: %1$lld of %2$lld recognised." : {
+      "comment" : "Kanji writing practice",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done: %1$lld of %2$lld recognised."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了：%2$lld字中%1$lld字を認識しました。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xong: nhận ra %1$lld/%2$lld chữ."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

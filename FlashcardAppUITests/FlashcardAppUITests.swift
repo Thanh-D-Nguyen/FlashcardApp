@@ -725,6 +725,48 @@ final class FlashcardAppUITests: XCTestCase {
         attachScreenshot(app, name: "signed-in-data-export")
     }
 
+    /// K-15: the study menu opens kanji writing for the deck; a drawn stroke is checked and the next kanji starts on an empty canvas.
+    /// Whether real handwriting is recognised is NOT checked here (a straight drag is not a kanji): that needs a person and a device.
+    func testKanjiWritingPracticeOpensFromStudyAndChecksADrawing() {
+        let app = makeApp()
+        app.launch()
+        let name = "Kanji \(UUID().uuidString.prefix(6))"
+        addTeardownBlock { self.deleteDeckIfPresent(named: name, orNamed: name) }
+        openCards(app)
+        openNewDeckEditor(app)
+        let nameField = app.textViews["deck_name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name)
+        fillCard(app, index: 0, front: "会議", back: "cuoc hop")
+        fillCard(app, index: 1, front: "人", back: "nguoi")
+        app.buttons["save_deck"].tap()
+        let row = deckRow(app, named: name)
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
+        XCTAssertTrue(app.buttons["study_card"].waitForExistence(timeout: 5))
+        app.buttons["study_options"].tap()
+        let write = app.buttons["study_write_kanji"]
+        XCTAssertTrue(write.waitForExistence(timeout: 5))
+        write.tap()
+        let word = app.staticTexts["kanji_writing_word"]
+        XCTAssertTrue(word.waitForExistence(timeout: 10))
+        XCTAssertEqual(word.label, "□議", "The kanji to write is hidden; the rest of the word is the cue")
+        let canvas = app.descendants(matching: .any)["kanji_writing_canvas"]
+        XCTAssertTrue(canvas.exists)
+        let start = canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.5))
+        start.press(forDuration: 0.05, thenDragTo: canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5)))
+        attachScreenshot(app, name: "kanji-writing-drawn")
+        XCTAssertTrue(app.buttons["kanji_writing_primary"].isEnabled, "A stroke was drawn: canvas \(canvas.frame) in \(app.frame)")
+        app.buttons["kanji_writing_primary"].tap()
+        let result = app.staticTexts["kanji_writing_result"]
+        XCTAssertTrue(result.waitForExistence(timeout: 10))
+        XCTAssertTrue(word.label.contains("会"), "After checking, the word is shown whole: \(word.label)")
+        attachScreenshot(app, name: "kanji-writing-checked")
+        app.buttons["kanji_writing_primary"].tap()
+        XCTAssertEqual(word.label, "会□")
+    }
+
     // MARK: Cards: create, study, edit, persist, delete
 
     /// The whole learner journey on real UI and the real Realm store: make a deck, study it (flip, quiz, summary),

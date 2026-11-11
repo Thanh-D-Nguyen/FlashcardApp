@@ -14,6 +14,7 @@ protocol CardStudyWireframeInterface: AnyObject {
     /// Tells the learner the session cannot go on (the account changed), then leaves.
     func endSession(message: String)
     func leave()
+    func showKanjiWriting(cards: [StudyCard])
 }
 
 final class CardStudyWireframe: BaseWireframe<CardStudyViewController> {
@@ -103,5 +104,11 @@ extension CardStudyWireframe: CardStudyWireframeInterface {
         if navigationController?.topViewController === viewController {
             navigationController?.popViewController(animated: true)
         }
+    }
+}
+
+extension CardStudyWireframe {
+    func showKanjiWriting(cards: [StudyCard]) {
+        navigationController?.pushViewController(KanjiWritingWireframe.make(cards: cards), animated: true)
     }
 }

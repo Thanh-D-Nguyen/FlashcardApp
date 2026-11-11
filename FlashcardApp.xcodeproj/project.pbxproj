@@ -34,6 +34,7 @@
 		1DECF8947A3E2234E8E495A5 /* StudyExamplesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4130315D22CF035B32AB524C /* StudyExamplesView.swift */; };
 		1F35A17C9820138795C7C25B /* Scenario.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA52BB82B4B5A5A694B04F /* Scenario.swift */; };
 		2017FC53E1DE8E424F8E7859 /* CardStudyPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D1736D4AAAA549CC94C638F /* CardStudyPresenter.swift */; };
+		B2ED7B33F2ECA48295E79707 /* KanjiWritingPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9379555F2732B8DFE1C040 /* KanjiWritingPresenter.swift */; };
 		215ACAE719D1F681202C150D /* LifeLessonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A2747B21D3110BEA47C8A7 /* LifeLessonViewController.swift */; };
 		21C0BEA00B3B402A3DF37509 /* DictionaryHandwritingWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8FF438CF57807030FEC46F /* DictionaryHandwritingWireframe.swift */; };
 		2261377E65101B75EA65A77B /* DeckGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8565ADC36DD546451FE5754C /* DeckGeneratorTests.swift */; };
@@ -353,6 +354,7 @@
 		BC925BBD0FFDB154EFB35618 /* ScenarioUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78C2F59D586ECC173D18844 /* ScenarioUITests.swift */; };
 		BCCF41FFDB430E8475100D93 /* ScenarioInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B2350C2485A25310794A32 /* ScenarioInteractor.swift */; };
 		BDEE3368EE7E27913B6D8047 /* CardStudyPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E0FF82AAFD26CE867642EB /* CardStudyPresenterTests.swift */; };
+		6B9E25BFC270F9D024690831 /* KanjiWritingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62B49625CF78C8088E564738 /* KanjiWritingTests.swift */; };
 		BF78C68966DD0927EA03CBF2 /* MagazineArticlePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174FB307A53D6E41E425ABEE /* MagazineArticlePresenter.swift */; };
 		C01C99CBADC2B296D9A31ABE /* DictionarySavedInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF91410FCDB320A2A876779C /* DictionarySavedInteractor.swift */; };
 		C17492DFDE713C9FE3C0751C /* RemoteImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E97BC0EB69B9D52A3D4BD5 /* RemoteImageLoader.swift */; };
@@ -427,6 +429,7 @@
 		E8F7EAB9A2B58980DE5101D7 /* NewDeckOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF8566DD19305209FA80298 /* NewDeckOptionsViewController.swift */; };
 		E91121EA250C574B968C58AA /* ExampleEditorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85AC2F81A5410D56B87F087 /* ExampleEditorPresenter.swift */; };
 		E9CE2A4F18C297D0D9817B1E /* CardStudyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */; };
+		DAFC1E082F41FBAC083F8091 /* KanjiWritingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FDB44AC30ADBC3C2D4DF95 /* KanjiWritingViewController.swift */; };
 		ECC823B204B5AFFC7BE6CB3B /* CardLibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12659E8088253FFDCC6F11F4 /* CardLibraryViews.swift */; };
 		F21B22EB1016302ABF704C86 /* LifeLessonInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A4C5B7933FCF0B57F50A1B /* LifeLessonInteractor.swift */; };
 		F28CE22B3153B170E0A747E1 /* DictionaryEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20EB61D79D78E84B44073FC /* DictionaryEntryViewController.swift */; };
@@ -512,7 +515,9 @@
 		255091EB610F9140CED27B8A /* DictionaryVoiceWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryVoiceWireframe.swift; sourceTree = "<group>"; };
 		271E7DC5C29AAB29F9ED7AE8 /* DictionaryResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryResultCell.swift; sourceTree = "<group>"; };
 		2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyViewController.swift; sourceTree = "<group>"; };
+		E9FDB44AC30ADBC3C2D4DF95 /* KanjiWritingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiWritingViewController.swift; sourceTree = "<group>"; };
 		2D1736D4AAAA549CC94C638F /* CardStudyPresenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyPresenter.swift; sourceTree = "<group>"; };
+		8B9379555F2732B8DFE1C040 /* KanjiWritingPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiWritingPresenter.swift; sourceTree = "<group>"; };
 		2D99705818EADADDF9BBE71E /* DictionaryVoiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryVoiceViewController.swift; sourceTree = "<group>"; };
 		3013332AF3A84AF1A334EC97 /* TodayPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPresenterTests.swift; sourceTree = "<group>"; };
 		32C09BA9E71CCCFC64F02177 /* JapaneseCalendar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JapaneseCalendar.swift; sourceTree = "<group>"; };
@@ -566,6 +571,7 @@
 		55AFC78D9266C6D8BE5ABCAE /* StateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StateView.swift; sourceTree = "<group>"; };
 		55BCC8E1F98A297E17A67982 /* DictionaryEntryViewController+Sentence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DictionaryEntryViewController+Sentence.swift"; sourceTree = "<group>"; };
 		56E0FF82AAFD26CE867642EB /* CardStudyPresenterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardStudyPresenterTests.swift; sourceTree = "<group>"; };
+		62B49625CF78C8088E564738 /* KanjiWritingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanjiWritingTests.swift; sourceTree = "<group>"; };
 		5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerTests.swift; sourceTree = "<group>"; };
 		58659C6A6AC4380435009121 /* DictionaryQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryQuery.swift; sourceTree = "<group>"; };
 		58F523D82C0F0EA33D4FC0A0 /* DeskManagementTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeskManagementTests.swift; sourceTree = "<group>"; };
@@ -945,6 +951,7 @@
 			isa = PBXGroup;
 			children = (
 				2A0C8CBDCD542EC9C7C161B8 /* CardStudyViewController.swift */,
+				E9FDB44AC30ADBC3C2D4DF95 /* KanjiWritingViewController.swift */,
 				855C69598B064D18A3F1DB76 /* StudyCardView.swift */,
 				4130315D22CF035B32AB524C /* StudyExamplesView.swift */,
 				A9D960AD3C744128A7CA10F5 /* StudyReviewViews.swift */,
@@ -1172,6 +1179,7 @@
 				B13B665F5C513DEBDD8A6E8C /* CardMediaTests.swift */,
 				72D2E20362C669E30C7FE447 /* CardPresenterTests.swift */,
 				56E0FF82AAFD26CE867642EB /* CardStudyPresenterTests.swift */,
+				62B49625CF78C8088E564738 /* KanjiWritingTests.swift */,
 				185A12009D8D62C378721912 /* CreateDeskPresenterTests.swift */,
 				37129E6AA0E1A87ECA2E098E /* CardsIntegrationTests.swift */,
 				4E2CC9AE5C10D89658EB3A0C /* BJTLearnerAPITests.swift */,
@@ -1722,6 +1730,7 @@
 			isa = PBXGroup;
 			children = (
 				2D1736D4AAAA549CC94C638F /* CardStudyPresenter.swift */,
+				8B9379555F2732B8DFE1C040 /* KanjiWritingPresenter.swift */,
 				E98C18FA70B1D9007802033D /* CardStudyWireframe.swift */,
 				27254BF6F5893DA65161991A /* Views */,
 			);
@@ -2284,6 +2293,7 @@
 				1000F3D97F64CEC0BD65EC8D /* DeckDraftStore.swift in Sources */,
 				8004D0E6A2CCAAF05CD0BAB9 /* DeckLibraryCell.swift in Sources */,
 				2017FC53E1DE8E424F8E7859 /* CardStudyPresenter.swift in Sources */,
+				B2ED7B33F2ECA48295E79707 /* KanjiWritingPresenter.swift in Sources */,
 				66E62599F6024379833D481D /* TodayPresenter.swift in Sources */,
 				A41D43AA1968A7309A41509B /* LifeLessonWireframe.swift in Sources */,
 				215ACAE719D1F681202C150D /* LifeLessonViewController.swift in Sources */,
@@ -2300,6 +2310,7 @@
 				82AB31DD4A9E08CD1177E116 /* CardStudyWireframe.swift in Sources */,
 				F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */,
 				E9CE2A4F18C297D0D9817B1E /* CardStudyViewController.swift in Sources */,
+				DAFC1E082F41FBAC083F8091 /* KanjiWritingViewController.swift in Sources */,
 				68BB88FE0F810C5DA0F0803A /* StudyCardView.swift in Sources */,
 				40F1DEE5AF06D1D54975B817 /* CardStudyInteractor.swift in Sources */,
 				DC385AF763EE2D83AC71A055 /* CardMediaMaintenance.swift in Sources */,
@@ -2447,6 +2458,7 @@
 				CE2879DE66B59A1174DED694 /* CardMediaTests.swift in Sources */,
 				8321A28636278A10213209B9 /* CardPresenterTests.swift in Sources */,
 				BDEE3368EE7E27913B6D8047 /* CardStudyPresenterTests.swift in Sources */,
+				6B9E25BFC270F9D024690831 /* KanjiWritingTests.swift in Sources */,
 				750F55677D549B5D3E081418 /* CreateDeskPresenterTests.swift in Sources */,
 				53633E24935BA3E4E8FF5F21 /* CardsIntegrationTests.swift in Sources */,
 				DECD2552BEEA8BE80A1A8B3C /* BJTLearnerAPITests.swift in Sources */,
