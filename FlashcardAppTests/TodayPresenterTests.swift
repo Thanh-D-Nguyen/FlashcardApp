@@ -315,6 +315,8 @@ private final class FakeTodayWireframe: TodayWireframeInterface {
     func showLevels() { levelsOpened += 1 }
     var lessonsOpened: [(slug: String, title: String)] = []
     func showLesson(slug: String, title: String) { lessonsOpened.append((slug, title)) }
+    var radarOpened: [DailyRadarItem] = []
+    func showRadarCard(_ item: DailyRadarItem) { radarOpened.append(item) }
 }
 
 private final class SpyTodayView: TodayViewInterface {
@@ -599,5 +601,45 @@ final class TodayPresenterStreakTests: XCTestCase {
         loader.streak = nil
         loader.onChange?()
         XCTAssertNil(view.renders.last?.streak)
+    }
+}
+
+private final class FakeRadar: TodayRadarLoading {
+    var item: DailyRadarItem?
+    var onChange: (() -> Void)?
+    private(set) var refreshes = 0
+    func refresh() { refreshes += 1 }
+}
+
+/// The Daily Radar card: one card when the server has a usable one, opened in the app, never in place of anything else.
+final class TodayPresenterRadarTests: XCTestCase {
+    private let item = DailyRadarItem(id: "1", slug: "kentou", moduleTitle: "Honne & tatemae", title: "「検討します」",
+                                      summary: "Nghĩa thật", expressions: [.init(japanese: "検討します", reading: "けんとうします")],
+                                      usageNote: nil, reason: nil, minutes: 3, level: "BJT J3")
+
+    func test_theCardShowsTheServersTextsAndOpensInTheApp() {
+        let interactor = FakeTodayInteractor()
+        interactor.result = .failure(NSError(domain: "t", code: 1))
+        let radar = FakeRadar()
+        let wireframe = FakeTodayWireframe()
+        let view = SpyTodayView()
+        let presenter = TodayPresenter(interactor: interactor, wireframe: wireframe, ownerKey: { "" }, radar: radar)
+        presenter.view = view
+        presenter.viewWillAppear()
+        XCTAssertEqual(radar.refreshes, 1)
+        XCTAssertNil(view.renders.last?.radar)
+        presenter.openRadar()
+        XCTAssertTrue(wireframe.radarOpened.isEmpty, "Nothing to open yet")
+
+        radar.item = item
+        radar.onChange?()
+        let card = view.renders.last?.radar
+        XCTAssertEqual(card?.eyebrow, "Honne & tatemae")
+        XCTAssertEqual(card?.title, "「検討します」")
+        XCTAssertEqual(card?.expression, "検討します")
+        XCTAssertEqual(card?.detail, ["BJT J3", String.localizedStringWithFormat(NSLocalizedString("%lld minutes", comment: ""), 3)].joined(separator: " · "))
+        XCTAssertEqual(view.renders.last?.phase, .failed, "The radar does not depend on the review data")
+        presenter.openRadar()
+        XCTAssertEqual(wireframe.radarOpened, [item])
     }
 }

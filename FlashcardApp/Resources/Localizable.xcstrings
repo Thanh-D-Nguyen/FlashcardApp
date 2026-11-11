@@ -25827,6 +25827,126 @@
           }
         }
       }
+    },
+    "DAILY RADAR" : {
+      "comment" : "Today: eyebrow of the Daily Radar card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DAILY RADAR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デイリーレーダー"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RADAR HÔM NAY"
+          }
+        }
+      }
+    },
+    "Read the card" : {
+      "comment" : "Today: opens the Daily Radar card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read the card"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カードを読む"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đọc thẻ"
+          }
+        }
+      }
+    },
+    "Daily Radar" : {
+      "comment" : "Title of a Daily Radar card screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily Radar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デイリーレーダー"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radar hôm nay"
+          }
+        }
+      }
+    },
+    "JAPANESE TO USE" : {
+      "comment" : "Daily Radar card: heading of its Japanese expressions",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JAPANESE TO USE"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使える日本語"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TIẾNG NHẬT NÊN DÙNG"
+          }
+        }
+      }
+    },
+    "HOW IT IS USED" : {
+      "comment" : "Daily Radar card: heading of its usage note",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HOW IT IS USED"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使い方"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CÁCH DÙNG"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

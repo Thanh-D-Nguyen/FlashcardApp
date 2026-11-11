@@ -331,6 +331,25 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(app.tables["lesson_reader"].waitForExistence(timeout: 15), "The slot opens the lesson")
     }
 
+    /// K-12: one Daily Radar card on Today (from `GET /daily-radar/cards?limit=20`) opens in the app with its Japanese expressions.
+    /// Needs the API (Local scheme: the localhost proxy); without a reachable server Today simply has no card, so the test is skipped.
+    func testTodayShowsADailyRadarCardThatOpensInTheApp() throws {
+        let app = makeApp()
+        app.launch()
+        let today = app.scrollViews["today_screen"]
+        XCTAssertTrue(today.waitForExistence(timeout: 40))
+        let card = app.descendants(matching: .any).matching(identifier: "today_radar_card").firstMatch
+        for _ in 0..<8 where !(card.exists && card.isHittable) { today.swipeUp() }
+        try XCTSkipUnless(card.waitForExistence(timeout: 20), "No Daily Radar card: the API is not reachable from this run")
+        XCTAssertTrue(today.buttons["today_levels_row"].exists || app.buttons["today_levels_row"].exists, "Everything else on Today is still there")
+        attachScreenshot(app, name: "today-radar-card")
+        card.tap()
+        XCTAssertTrue(app.scrollViews["radar_card_screen"].waitForExistence(timeout: 10), "The card opens in the app")
+        XCTAssertTrue(app.staticTexts["radar_card_title"].exists)
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "radar_expression_0").firstMatch.exists, "With its first expression")
+        attachScreenshot(app, name: "radar-card-detail")
+    }
+
     /// A level's count opens that kind directly, skipping the kind chooser.
     func testLevelCountOpensItsKindDirectly() {
         let app = makeApp()

@@ -18,6 +18,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let levelsRow = TodayRowView()
     private let lessonSlot = TodayLessonSlotView()
     private let streakView = TodayStreakView()
+    private let radarCard = TodayLessonSlotView()
     private var refreshObservers: [NSObjectProtocol] = []
 
     override func viewDidLoad() {
@@ -79,7 +80,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         dateHeader.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, progressGroup, streakView, hubView, scenarioBanner, heroView, failureView, lessonSlot, levelsRow].forEach(stack.addArrangedSubview)
+        [dateHeader, progressGroup, streakView, hubView, scenarioBanner, heroView, failureView, lessonSlot, radarCard, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
         stack.setCustomSpacing(Design.Spacing.m, after: streakView)
         streakView.isHidden = true
@@ -108,6 +109,9 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         levelsRow.addAction(UIAction { [weak self] _ in self?.presenter.openLevels() }, for: .touchUpInside)
         lessonSlot.isHidden = true
         lessonSlot.addAction(UIAction { [weak self] _ in self?.presenter.openLessonSlot() }, for: .touchUpInside)
+        radarCard.isHidden = true
+        radarCard.accessibilityIdentifier = "today_radar_card"
+        radarCard.addAction(UIAction { [weak self] _ in self?.presenter.openRadar() }, for: .touchUpInside)
     }
 
     // MARK: TodayViewInterface
@@ -125,6 +129,12 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         }
         lessonSlot.isHidden = state.lessonCard == nil
         if let card = state.lessonCard { lessonSlot.configure(card) }
+        radarCard.isHidden = state.radar == nil
+        if let radar = state.radar {
+            radarCard.configure(eyebrow: radar.eyebrow.isEmpty ? NSLocalizedString("DAILY RADAR", comment: "Today: eyebrow of the Daily Radar card") : radar.eyebrow.uppercased(),
+                                title: radar.expression, detail: [radar.title, radar.detail].compactMap { $0 }.joined(separator: "\n"),
+                                cta: NSLocalizedString("Read the card", comment: "Today: opens the Daily Radar card"))
+        }
         streakView.isHidden = state.streak == nil
         if let streak = state.streak { streakView.configure(streak) }
         progressGroup.isHidden = state.progress == nil

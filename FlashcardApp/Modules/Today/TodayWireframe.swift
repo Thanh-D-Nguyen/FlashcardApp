@@ -10,6 +10,8 @@ protocol TodayWireframeInterface: AnyObject {
     func showScenarios()
     /// One structured lesson, opened from the lesson slot.
     func showLesson(slug: String, title: String)
+    /// One Daily Radar card, read in the app.
+    func showRadarCard(_ item: DailyRadarItem)
     func showLifeLesson(cityID: String, lesson: LifeLesson)
     func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void)
     /// The system page of this app's settings, where the learner can allow the location again.
@@ -23,13 +25,18 @@ final class TodayWireframe: BaseWireframe<TodayViewController> {
         controller.title = MainTabbarName.today.title
         controller.tabBarItem = MainTabbarName.today.tabBarItem
         let presenter = TodayPresenter(interactor: TodayInteractor(), wireframe: self, life: TodayLifeHubLoader(weather: TodayLifeLoader()),
-                                    lessons: TodayLessonSlotProvider(), streak: TodayStreakLoader())
+                                    lessons: TodayLessonSlotProvider(), streak: TodayStreakLoader(),
+                                    radar: TodayRadarLoader())
         presenter.view = controller
         controller.presenter = presenter
     }
 }
 
 extension TodayWireframe: TodayWireframeInterface {
+    func showRadarCard(_ item: DailyRadarItem) {
+        navigationController?.pushViewController(DailyRadarCardViewController(item: item), animated: true)
+    }
+
     func showStudy(deckId: String, cardIDs: [String]?) {
         navigationController?.pushWireframe(CardStudyWireframe(deckId: deckId, cardIDs: cardIDs))
     }

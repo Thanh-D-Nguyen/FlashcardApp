@@ -44,6 +44,15 @@ struct TodayProgressText: Equatable {
     let detail: String?
 }
 
+/// The Daily Radar card of Today: the server's texts only.
+struct TodayRadarCard: Equatable {
+    let eyebrow: String
+    let title: String
+    /// The first Japanese expression of the card, the thing to learn.
+    let expression: String
+    let detail: String?
+}
+
 /// The account streak line, from the server's own count.
 struct TodayStreakText: Equatable {
     let title: String
@@ -70,6 +79,8 @@ struct TodayViewState: Equatable {
     var lessonCard: TodayLessonCard?
     /// The signed-in account's current streak. `nil` hides it (guests, no current streak, not loaded, failed).
     var streak: TodayStreakText?
+    /// One Daily Radar card. `nil` hides it (loading, failed with no recent copy, nothing usable).
+    var radar: TodayRadarCard?
 }
 
 protocol TodayViewInterface: AnyObject {
@@ -88,6 +99,8 @@ protocol TodayPresenterInterface: AnyObject {
     func openScenarios()
     /// The lesson slot's button: continues or starts a lesson, or opens the levels.
     func openLessonSlot()
+    /// The Daily Radar card was tapped.
+    func openRadar()
     func retry()
     /// A card of the life hub was tapped (or its button): opens its lesson, asks for the location, or retries, by what the card is.
     func openLifeCard(id: String)
@@ -105,6 +118,7 @@ final class TodayPresenter {
     private let life: TodayLifeHubLoading?
     private let lessons: TodayLessonSlotProviding?
     private let streak: TodayStreakLoading?
+    private let radar: TodayRadarLoading?
 
     private var plan: TodayPlan?
     private var state: TodayViewState?
@@ -115,9 +129,11 @@ final class TodayPresenter {
          now: @escaping () -> Date = Date.init,
          life: TodayLifeHubLoading? = nil,
          lessons: TodayLessonSlotProviding? = nil,
-         streak: TodayStreakLoading? = nil) {
+         streak: TodayStreakLoading? = nil,
+         radar: TodayRadarLoading? = nil) {
         self.lessons = lessons
         self.streak = streak
+        self.radar = radar
         self.interactor = interactor
         self.wireframe = wireframe
         self.ownerKey = ownerKey
@@ -125,12 +141,12 @@ final class TodayPresenter {
         self.life = life
         life?.onChange = { [weak self] in self?.lifeChanged() }
         streak?.onChange = { [weak self] in self?.lifeChanged() }
+        radar?.onChange = { [weak self] in self?.lifeChanged() }
     }
 
     /// The life hub or the streak changed on their own: everything else on screen stays as it is.
     private func lifeChanged() {
-        guard var current = state else { return }
-        current.life = life?.section
+        guard let current = state else { return }
         publish(current)
     }
 
@@ -144,6 +160,7 @@ final class TodayPresenter {
             publish(Self.makeState(plan))
             life?.refresh()
             streak?.refresh()
+            radar?.refresh()
         } catch {
             logger.error("Reading today's plan failed: \(error.localizedDescription)")
             plan = nil
@@ -152,6 +169,7 @@ final class TodayPresenter {
                                    failureMessage: NSLocalizedString("The study data on this device couldn't be opened. Your data is not deleted.", comment: "")))
             life?.refresh()
             streak?.refresh()
+            radar?.refresh()
         }
     }
 
@@ -160,6 +178,7 @@ final class TodayPresenter {
         state.life = life?.section
         state.lessonCard = lessons.map { Self.lessonCard($0.slot(ownerKey: ownerKey())) }
         state.streak = streak?.streak.map(Self.streakText)
+        state.radar = radar?.item.flatMap(Self.radarCard)
         self.state = state
         view?.render(state)
     }
@@ -221,6 +240,12 @@ final class TodayPresenter {
         state.rows = TodayRows(deckName: deckName, sessionLength: minutesText(plan.budgetMinutes))
         state.progress = progressText(plan.progress)
         return state
+    }
+
+    static func radarCard(_ item: DailyRadarItem) -> TodayRadarCard? {
+        guard let expression = item.expressions.first?.japanese else { return nil }
+        let detail = [item.level, item.minutes.map(minutesText)].compactMap { $0 }.joined(separator: " · ")
+        return TodayRadarCard(eyebrow: item.moduleTitle, title: item.title, expression: expression, detail: detail.isEmpty ? nil : detail)
     }
 
     static func streakText(_ streak: AccountStreak) -> TodayStreakText {
@@ -303,6 +328,11 @@ extension TodayPresenter: TodayPresenterInterface {
         case .chooseLevel: wireframe.showLevels()
         case .openLesson(let slug, let title): wireframe.showLesson(slug: slug, title: title)
         }
+    }
+
+    func openRadar() {
+        guard state?.radar != nil, let item = radar?.item else { return }
+        wireframe.showRadarCard(item)
     }
 
     func retry() { reload() }

@@ -57,12 +57,17 @@ final class TodayLessonSlotView: UIControl {
     }
 
     func configure(_ card: TodayLessonCard) {
-        eyebrow.text = card.eyebrow
-        titleLabel.text = card.title
-        detail.text = card.detail
-        detail.isHidden = card.detail == nil
-        cta.text = card.ctaTitle
-        accessibilityLabel = [card.eyebrow, card.title, card.detail].compactMap { $0 }.joined(separator: ". ")
-        accessibilityHint = card.ctaTitle
+        configure(eyebrow: card.eyebrow, title: card.title, detail: card.detail, cta: card.ctaTitle)
+    }
+
+    /// The same card for another Today item (the Daily Radar).
+    func configure(eyebrow eyebrowText: String, title: String, detail detailText: String?, cta ctaText: String) {
+        eyebrow.text = eyebrowText
+        titleLabel.text = title
+        detail.text = detailText
+        detail.isHidden = detailText == nil
+        cta.text = ctaText
+        accessibilityLabel = [eyebrowText, title, detailText].compactMap { $0 }.joined(separator: ". ")
+        accessibilityHint = ctaText
     }
 }
