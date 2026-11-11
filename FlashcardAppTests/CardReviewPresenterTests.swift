@@ -535,6 +535,13 @@ final class CardReviewViewChoiceTests: XCTestCase {
 
     private let question = ReviewChoiceState(options: ["mèo", "chó", "chim"], correctIndex: 1, selectedIndex: nil)
 
+    func test_theOptionsAreOneGroupThatVoiceOverNamesAsTheQuestion() throws {
+        controller.render(state(flipped: false, choice: question))
+        let option = try XCTUnwrap(views("review_choice_0").first)
+        let group = try XCTUnwrap(sequence(first: option, next: \.superview).first { $0.accessibilityLabel == NSLocalizedString("Pick the meaning", comment: "") })
+        XCTAssertEqual(group.accessibilityContainerType, .semanticGroup, "A plain stack's label is never read")
+    }
+
     func test_theQuestionShowsItsOptionsAndTheShowAnswerWayOut_withoutRatings() {
         controller.render(state(flipped: false, choice: question))
         XCTAssertEqual((0..<3).filter { isShown("review_choice_\($0)") }, [0, 1, 2])

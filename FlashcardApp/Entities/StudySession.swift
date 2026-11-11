@@ -183,12 +183,13 @@ struct StudySession {
     private static func resolve(_ mode: StudyMode, cards: [StudyCard], pool: [StudyCard]) -> StudyMode {
         switch mode {
         case .quiz: return canQuiz(pool) ? .quiz : .flip
-        case .type: return canType(cards) ? .type : .flip
+        // The whole deck, as Today plans it: a typed subset of a deck that is not typed would study another skill than planned.
+        case .type: return canType(pool) ? .type : .flip
         case .flip: return .flip
         }
     }
 
-    var canType: Bool { Self.canType(cards) }
+    var canType: Bool { Self.canType(pool) }
     var count: Int { cards.count }
     var current: StudyCard? { order.indices.contains(position) ? cards[order[position]] : nil }
     var canGoBack: Bool { mode == .flip && position > 0 && !isFinished }

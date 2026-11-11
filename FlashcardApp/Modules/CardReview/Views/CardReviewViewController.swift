@@ -101,6 +101,7 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
         choiceStack.spacing = Design.Spacing.s
         choiceStack.isHidden = true
         choiceStack.accessibilityLabel = NSLocalizedString("Pick the meaning", comment: "Accessibility label of the group of multiple-choice answers in review")
+        choiceStack.accessibilityContainerType = .semanticGroup
         choiceFeedbackLabel.apply(.reading)
         choiceFeedbackLabel.textAlignment = .center
         choiceFeedbackLabel.numberOfLines = 0

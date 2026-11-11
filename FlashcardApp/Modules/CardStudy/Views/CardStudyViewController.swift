@@ -278,7 +278,8 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
     }
 
     private func typingChanged() {
-        primaryButton.isEnabled = !isTypingQuestionOpen || !(typingField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let hasText = !(typingField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        primaryButton.isEnabled = isTypingQuestionOpen ? hasText : (lastApplied?.isPrimaryEnabled ?? true)
     }
 
     private func renderTyping(_ state: CardStudyState, previous: CardStudyState?) {
@@ -420,9 +421,9 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         previousButton.isEnabled = state.canGoBack
         primaryButton.configuration?.title = state.primaryTitle
         primaryButton.isEnabled = state.isPrimaryEnabled
+        lastApplied = state
         typingChanged()
         updateCardHeight()
-        lastApplied = state
     }
 
     /// The hint notice and the save status under the card. Both state facts, in words and an icon, not only in colour.

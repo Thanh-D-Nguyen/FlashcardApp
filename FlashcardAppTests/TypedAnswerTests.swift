@@ -17,6 +17,12 @@ final class KanaAnswerTests: XCTestCase {
         XCTAssertTrue(KanaAnswer.matches(typed: "か\u{3099}くせい", expected: "がくせい"))
     }
 
+    func test_aSpacingDakutenMarkIsTheSameAsTheCombiningOne() {
+        // NFKC turns ゛ (U+309B) into a space plus the combining mark, which must be composed again.
+        XCTAssertTrue(KanaAnswer.matches(typed: "か\u{309B}くせい", expected: "がくせい"))
+        XCTAssertTrue(KanaAnswer.matches(typed: "は\u{309C}ん", expected: "ぱん"))
+    }
+
     func test_spacesAndMiddleDotsBetweenPartsAreIgnored() {
         XCTAssertTrue(KanaAnswer.matches(typed: " ほん を\u{3000}よむ ", expected: "ほんをよむ"))
         XCTAssertTrue(KanaAnswer.matches(typed: "ほんをよむ", expected: "ほん・を・よむ"))
@@ -196,5 +202,15 @@ final class TypedAnswerSchedulingTests: XCTestCase {
         XCTAssertEqual(plan.progress.quizCorrect, 1)
         XCTAssertEqual(plan.progress.quizIncorrect, 1)
         XCTAssertEqual(plan.progress.saved, 2)
+    }
+}
+
+final class TypedModeSchedulingTests: XCTestCase {
+    func test_typingIsChosenForTheWholeDeckNotOnlyForTheCardsOfThisSession() {
+        let typed = StudyCard(id: "a", front: "食べる", back: "ăn", reading: "たべる")
+        let kanaOnly = StudyCard(id: "b", front: "すし", back: "sushi", reading: "すし")
+        XCTAssertEqual(StudySession(cards: [typed], quizPool: [typed, kanaOnly], mode: .type).mode, .flip,
+                       "Today plans the deck by the deck's own mode; a subset that could be typed must not study another skill")
+        XCTAssertEqual(StudySession(cards: [typed], quizPool: [typed], mode: .type).mode, .type)
     }
 }

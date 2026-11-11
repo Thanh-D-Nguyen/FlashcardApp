@@ -87,6 +87,8 @@ final class LessonPracticePresenter: LessonPracticePresenterInterface {
     private var index = 0
     private var finished = false
     private var sync: LessonServerSync = .notApplicable
+    /// The account `sync` describes.
+    private var syncOwner: String?
 
     private(set) var title: String
     private(set) var screen: LessonPracticeScreen = .summary(PracticeSummary(total: 0, correct: 0, server: .notApplicable))
@@ -115,13 +117,21 @@ final class LessonPracticePresenter: LessonPracticePresenterInterface {
         title = language() == .japanese && !lesson.titleJa.isEmpty ? lesson.titleJa : lesson.titleVi
         let progress = store.progress(slug: lesson.slug, ownerKey: ownerKey())
         let answered = Set(progress?.answers.map(\.activityId) ?? [])
+        let owner = ownerKey()
         if let first = activities.firstIndex(where: { !answered.contains($0.id) }) {
             index = first
             finished = false
+        } else if progress?.completedAt == nil, !activities.isEmpty {
+            // Every answer is saved but the learner left before Finish: reopen on the last question so finishing marks it done.
+            index = activities.count - 1
+            finished = false
         } else {
+            // Appearing again keeps what is known about the account write (unknown, failed) unless the store says it is confirmed.
+            let stored = initialSync(for: progress)
+            if !finished || syncOwner != owner || stored == .confirmed { sync = stored }
             finished = true
-            sync = initialSync(for: progress)
         }
+        syncOwner = owner
         render()
     }
 
@@ -159,7 +169,8 @@ final class LessonPracticePresenter: LessonPracticePresenterInterface {
     func cancelLoading() {
         guard sync == .sending else { return }
         request.disposable = Disposables.create()
-        sync = .notSent
+        // The write may already have reached the server.
+        sync = .unknown(NSLocalizedString("The connection was interrupted.", comment: ""))
         render()
     }
 

@@ -207,6 +207,33 @@ final class LessonPracticePresenterTests: XCTestCase {
         XCTAssertFalse(try XCTUnwrap(store.progress(slug: lesson.slug, ownerKey: account)).isServerConfirmed, "A late answer is ignored")
     }
 
+    func test_allAnsweredButLeftBeforeFinishingIsFinishedOnTheLastQuestionNotShownAsDone() throws {
+        let presenter = makePresenter()
+        for _ in 0..<4 { try answerCorrectly(presenter) }
+        try chooseWrongOption(presenter)   // the last answer is saved, but the learner left before tapping Finish
+        XCTAssertFalse(store.completedSlugs(ownerKey: owner).contains(lesson.slug))
+
+        let resumed = makePresenter()
+        let state = try question(resumed)
+        XCTAssertEqual(state.index, activities.count - 1, "It reopens on the answered last question, not on a summary")
+        XCTAssertTrue(state.isAnswered)
+        resumed.next()
+        _ = try summary(resumed)
+        XCTAssertTrue(store.completedSlugs(ownerKey: owner).contains(lesson.slug), "Finishing now marks it done on this device")
+    }
+
+    func test_leavingWhileTheAccountWriteIsInFlightLeavesItsOutcomeUnknownAndComingBackKeepsThat() throws {
+        owner = account
+        let presenter = makePresenter()
+        for _ in 0..<5 { try answerCorrectly(presenter) }
+        presenter.cancelLoading()
+        guard case .unknown = try summary(presenter).server else {
+            return XCTFail("The write may have reached the server: its outcome is unknown, not 'not sent' (\(try summary(presenter).server))")
+        }
+        presenter.viewDidLoad()   // the screen appears again
+        guard case .unknown = try summary(presenter).server else { return XCTFail("Appearing again does not forget it") }
+    }
+
     func test_comingBackResumesAtTheFirstUnansweredQuestion() throws {
         let presenter = makePresenter()
         try answerCorrectly(presenter)

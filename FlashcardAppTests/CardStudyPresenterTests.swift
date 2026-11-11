@@ -99,6 +99,24 @@ final class CardStudyPresenterTests: XCTestCase {
         XCTAssertEqual(view.renders.last?.transition, .backward)
     }
 
+    func test_theQuizButtonStaysDisabledOnScreenUntilAnAnswerIsChosen() throws {
+        preferences.mode = .quiz
+        start()
+        let controller = CardStudyViewController()
+        controller.presenter = presenter
+        controller.loadViewIfNeeded()
+        controller.render(state, transition: .none)
+        func find(_ view: UIView) -> UIButton? {
+            if let button = view as? UIButton, button.accessibilityIdentifier == "study_primary" { return button }
+            return view.subviews.lazy.compactMap(find).first
+        }
+        let button = try XCTUnwrap(find(controller.view))
+        XCTAssertFalse(button.isEnabled, "'Choose an answer' does nothing, so it must not look or read as enabled")
+        presenter.select(option: "B1")
+        controller.render(state, transition: .none)
+        XCTAssertTrue(button.isEnabled)
+    }
+
     func test_quizNeedsAnAnswerBeforeMovingOn() {
         preferences.mode = .quiz
         start()
