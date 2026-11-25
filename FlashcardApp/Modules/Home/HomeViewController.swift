@@ -6,7 +6,7 @@ final class HomeViewController: BaseViewController {
     private let stateView = StateView()
     private let kindControl = UISegmentedControl(items: HomeContentKind.allCases.map(\.title))
     private let totalLabel = UILabel()
-    private let lessonsButton = UIButton(configuration: .tinted())
+    private let lessonsButton = LevelLessonsRowControl()
     private let headerView = UIView()
     private var sections: [Section] = []
     private var tableBottomConstraint: NSLayoutConstraint!
@@ -128,16 +128,8 @@ final class HomeViewController: BaseViewController {
         }, for: .valueChanged)
         totalLabel.apply(.metadata)
         if presenter.canShowLessons {
-            var configuration = UIButton.Configuration.tinted()
-            configuration.title = NSLocalizedString("Lessons", comment: "Opens the structured lessons of the level")
-            configuration.image = UIImage(systemName: "list.bullet.rectangle")
-            configuration.imagePadding = Design.Spacing.s
-            configuration.baseForegroundColor = Design.Color.accent
-            configuration.cornerStyle = .large
-            lessonsButton.configuration = configuration
-            lessonsButton.contentHorizontalAlignment = .leading
             lessonsButton.accessibilityIdentifier = "level_lessons"
-            lessonsButton.addAction(UIAction { [weak self] _ in self?.presenter.showLessons() }, for: .primaryActionTriggered)
+            lessonsButton.addAction(UIAction { [weak self] _ in self?.presenter.showLessons() }, for: .touchUpInside)
             stack.addArrangedSubview(lessonsButton)
         }
         [kindControl, totalLabel].forEach(stack.addArrangedSubview)
@@ -148,9 +140,12 @@ final class HomeViewController: BaseViewController {
         guard presenter.isContent else { return }
         let width = tableView.bounds.width
         guard width > 0 else { return }
+        headerView.frame.size.width = width
+        headerView.layoutIfNeeded()
         let height = headerView.systemLayoutSizeFitting(
             CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
             withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
+        stateView.topContentInset = height
         guard headerView.frame.size != CGSize(width: width, height: height) else { return }
         headerView.frame.size = CGSize(width: width, height: height)
         tableView.tableHeaderView = headerView
@@ -166,6 +161,7 @@ final class HomeViewController: BaseViewController {
         stateView.accessibilityIdentifier = "home_status"
         tableView.reloadData()
         // The header's content (kind chooser, total) can change without a view layout pass.
+        sizeHeaderToFit()
         view.setNeedsLayout()
     }
 
@@ -357,5 +353,57 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             presenter.loadMore()
         }
+    }
+}
+
+/// Raised surface button opening the structured lessons of a level. Uses Auto Layout labels so
+/// Dynamic Type up to AX-XXL wraps cleanly without vertical clipping and guarantees ≥ 44 pt height.
+private final class LevelLessonsRowControl: UIControl {
+    private let iconView = UIImageView(image: UIImage(systemName: "list.bullet.rectangle"))
+    private let titleLabel = UILabel()
+    private let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        applyCardSurface(radius: Design.Radius.control)
+
+        iconView.tintColor = Design.Color.accent
+        iconView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .headline)
+        iconView.setContentHuggingPriority(.required, for: .horizontal)
+        iconView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        titleLabel.apply(.title)
+        titleLabel.textColor = Design.Color.accent
+        titleLabel.text = NSLocalizedString("Lessons", comment: "Opens the structured lessons of the level")
+
+        chevron.tintColor = Design.Color.textSecondary
+        chevron.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .footnote, scale: .small)
+        chevron.setContentHuggingPriority(.required, for: .horizontal)
+        chevron.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        let row = UIStackView(arrangedSubviews: [iconView, titleLabel, chevron])
+        row.alignment = .center
+        row.spacing = Design.Spacing.m
+        row.isUserInteractionEnabled = false
+        row.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(row)
+
+        NSLayoutConstraint.activate([
+            heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum),
+            row.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
+            row.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.Spacing.m),
+            row.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.l),
+            row.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.l)
+        ])
+
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        accessibilityLabel = titleLabel.text
+    }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    override var isHighlighted: Bool {
+        didSet { backgroundColor = isHighlighted ? Design.Color.highlight : Design.Color.surface }
     }
 }

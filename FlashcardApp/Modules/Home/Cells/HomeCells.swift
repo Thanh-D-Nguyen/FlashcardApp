@@ -44,6 +44,7 @@ final class LevelKindStrip: UIStackView {
         distribution = .fillEqually
         for kind in HomeContentKind.allCases {
             let button = UIButton(configuration: .plain())
+            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             button.addAction(UIAction { [weak self] _ in self?.onSelect?(kind) }, for: .primaryActionTriggered)
             button.configurationUpdateHandler = { button in
                 var configuration = button.configuration
@@ -272,11 +273,12 @@ final class FeaturedLevelCell: UITableViewCell {
         codeLabel.apply(.eyebrow)
         codeLabel.textColor = Design.Color.onHeroSecondary
         nameLabel.apply(.title)
-        nameLabel.font = UIFontMetrics(forTextStyle: .title2).scaledFont(for: .systemFont(ofSize: 22, weight: .semibold))
+        nameLabel.font = Design.TextRole.weighted(.title2, weight: .semibold)
         nameLabel.textColor = Design.Color.onHero
         summaryLabel.apply(.reading)
         summaryLabel.textColor = Design.Color.onHeroSecondary
         countsLabel.numberOfLines = 0
+        startButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         startButton.addAction(UIAction { [weak self] _ in self?.onStart?() }, for: .primaryActionTriggered)
         startButton.accessibilityIdentifier = "home_start"
 
@@ -351,10 +353,8 @@ final class FeaturedLevelCell: UITableViewCell {
         headerStack.axis = large ? .vertical : .horizontal
         headerStack.alignment = large ? .leading : .lastBaseline
         // Rebuilt so the title font follows a Dynamic Type change made while the app is open.
-        // A capsule becomes a circle once the title wraps onto several lines.
-        var configuration = Design.Button.hero(title: Self.startTitle)
-        configuration.cornerStyle = large ? .large : .capsule
-        startButton.configuration = configuration
+        // At AX sizes `Design.Button.hero` drops the trailing arrow and uses rounded-rect corners.
+        startButton.configuration = Design.Button.hero(title: Self.startTitle, traits: traitCollection)
         needsCountsUpdate()
     }
 
