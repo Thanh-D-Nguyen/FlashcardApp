@@ -55,7 +55,8 @@ final class LessonReaderViewController: BaseVC {
         ])
         stateView.accessibilityIdentifier = "lesson_reader_status"
 
-        titleLabel.apply(.title)
+        titleLabel.apply(.headword)
+        titleLabel.font = Design.TextRole.weighted(.title2, weight: .semibold)
         titleLabel.numberOfLines = 0
         titleLabel.accessibilityTraits = .header
         titleLabel.accessibilityIdentifier = "lesson_reader_title"
@@ -83,10 +84,13 @@ final class LessonReaderViewController: BaseVC {
     private func sizeHeaderToFit() {
         let width = tableView.bounds.width
         guard width > 0 else { return }
+        headerView.frame.size.width = width
+        headerView.layoutIfNeeded()
         let height = headerView.systemLayoutSizeFitting(
             CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
             withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
-        guard headerView.frame.size != CGSize(width: width, height: height) else { return }
+        stateView.topContentInset = height + Design.Spacing.s
+        guard abs(headerView.frame.size.height - height) > 0.5 || abs(headerView.frame.size.width - width) > 0.5 else { return }
         headerView.frame.size = CGSize(width: width, height: height)
         tableView.tableHeaderView = headerView
     }
@@ -177,10 +181,17 @@ extension LessonReaderViewController: UITableViewDataSource, UITableViewDelegate
         var content = cell.defaultContentConfiguration()
         content.textProperties.numberOfLines = 0
         content.secondaryTextProperties.numberOfLines = 0
+        content.textToSecondaryTextVerticalPadding = Design.Spacing.xs
+        cell.backgroundColor = Design.Color.surface
+        let highlight = UIView()
+        highlight.backgroundColor = Design.Color.highlight
+        cell.selectedBackgroundView = highlight
         cell.selectionStyle = .none
         cell.accessibilityTraits = .staticText
         if indexPath.section >= presenter.sections.count {
             // Practice: the server's activities, with where the learner stands on this device.
+            content.image = UIImage(systemName: "checklist")
+            content.imageProperties.tintColor = Design.Color.accent
             content.text = NSLocalizedString("Practice", comment: "")
             content.textProperties.apply(.title)
             content.textProperties.color = Design.Color.accent
@@ -198,6 +209,8 @@ extension LessonReaderViewController: UITableViewDataSource, UITableViewDelegate
         }
         let section = presenter.sections[indexPath.section]
         if indexPath.row >= section.entries.count {
+            content.image = UIImage(systemName: "plus.rectangle.on.rectangle")
+            content.imageProperties.tintColor = Design.Color.accent
             content.text = NSLocalizedString("Save all words to a deck", comment: "Lesson reader")
             content.textProperties.apply(.title)
             content.textProperties.color = Design.Color.accent

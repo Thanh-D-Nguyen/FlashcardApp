@@ -54,7 +54,10 @@ final class DailyRadarCardViewController: BaseViewController {
             stack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter)
         ])
 
-        stack.addArrangedSubview(label(item.title, style: .headword, identifier: "radar_card_title"))
+        let heading = label(item.title, style: .headword, identifier: "radar_card_title")
+        heading.font = Design.TextRole.weighted(.title2, weight: .semibold)
+        heading.accessibilityTraits = .header
+        stack.addArrangedSubview(heading)
         let meta = [item.level, item.minutes.map { String.localizedStringWithFormat(NSLocalizedString("%lld minutes", comment: ""), $0) }]
             .compactMap { $0 }.joined(separator: " · ")
         if !meta.isEmpty { stack.addArrangedSubview(label(meta, style: .metadata)) }
@@ -73,16 +76,31 @@ final class DailyRadarCardViewController: BaseViewController {
                 column.addArrangedSubview(label(example, style: .meaning))
                 if let exampleMeaning = expression.exampleMeaning { column.addArrangedSubview(label(exampleMeaning, style: .metadata)) }
             }
-            column.isAccessibilityElement = true
-            column.accessibilityLabel = [expression.japanese, expression.reading, expression.meaning, expression.example, expression.exampleMeaning]
+            let card = wrapCard(column)
+            card.isAccessibilityElement = true
+            card.accessibilityLabel = [expression.japanese, expression.reading, expression.meaning, expression.example, expression.exampleMeaning]
                 .compactMap { $0 }.joined(separator: ". ")
-            stack.addArrangedSubview(column)
+            stack.addArrangedSubview(card)
         }
         if let note = item.usageNote {
             stack.addArrangedSubview(label(NSLocalizedString("HOW IT IS USED", comment: "Daily Radar card: heading of its usage note"),
                                            style: .eyebrow, color: Design.Color.accent))
-            stack.addArrangedSubview(label(note, style: .meaning))
+            stack.addArrangedSubview(wrapCard(label(note, style: .meaning)))
         }
         if let reason = item.reason { stack.addArrangedSubview(label(reason, style: .metadata)) }
+    }
+
+    private func wrapCard(_ content: UIView) -> UIView {
+        let container = UIView()
+        container.applyCardSurface(radius: Design.Radius.card)
+        content.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(content)
+        NSLayoutConstraint.activate([
+            content.topAnchor.constraint(equalTo: container.topAnchor, constant: Design.Spacing.l),
+            content.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -Design.Spacing.l),
+            content.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: Design.Spacing.l),
+            content.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -Design.Spacing.l)
+        ])
+        return container
     }
 }

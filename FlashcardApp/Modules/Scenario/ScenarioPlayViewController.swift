@@ -116,9 +116,13 @@ final class ScenarioPlayViewController: BaseVC, ScenarioPlayViewInterface {
 
     private func card(_ views: [UIView], spacing: CGFloat = Design.Spacing.xs, tint: UIColor? = nil) -> UIView {
         let container = UIView()
-        container.backgroundColor = tint?.withAlphaComponent(0.12) ?? Design.Color.surface
-        container.layer.cornerRadius = 20
-        container.layer.cornerCurve = .continuous
+        if let tint {
+            container.applyCardSurface(radius: Design.Radius.card,
+                                       background: Design.Color.statusFill(tint),
+                                       borderColor: tint.withAlphaComponent(0.35))
+        } else {
+            container.applyCardSurface(radius: Design.Radius.card)
+        }
         let inner = UIStackView(arrangedSubviews: views)
         inner.axis = .vertical
         inner.spacing = spacing
@@ -134,21 +138,13 @@ final class ScenarioPlayViewController: BaseVC, ScenarioPlayViewInterface {
     }
 
     private func button(_ title: String, id: String, prominent: Bool, symbol: String? = nil, action: @escaping () -> Void) -> UIButton {
-        var configuration = prominent ? Design.Button.primary(title: title) : UIButton.Configuration.tinted()
-        if !prominent {
-            configuration.title = title
-            configuration.cornerStyle = .capsule
-            configuration.buttonSize = .large
-            configuration.baseForegroundColor = Design.Color.accent
-            configuration.baseBackgroundColor = Design.Color.accent
-        }
-        if let symbol {
-            configuration.image = UIImage(systemName: symbol)
-            configuration.imagePadding = Design.Spacing.s
-        }
+        let configuration = prominent
+            ? Design.Button.primary(title: title, systemImage: symbol, traits: traitCollection)
+            : Design.Button.secondary(title: title, systemImage: symbol, traits: traitCollection)
         let button = UIButton(configuration: configuration)
         button.accessibilityIdentifier = id
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 54).isActive = true
+        button.enableAdaptiveCornerStyle()
         button.addAction(UIAction { _ in action() }, for: .primaryActionTriggered)
         return button
     }
@@ -230,7 +226,7 @@ final class ScenarioPlayViewController: BaseVC, ScenarioPlayViewInterface {
         guard let summary = state.summary else { return [] }
         var views: [UIView] = []
         let headline = label(summary.headline, role: .headword)
-        headline.font = Design.TextRole.headword.font.withWeight(.semibold)
+        headline.font = Design.TextRole.weighted(.title3, weight: .semibold)
         headline.accessibilityTraits = .header
         headline.accessibilityIdentifier = "scenario_summary_headline"
         views.append(card([label(NSLocalizedString("Result", comment: "Heading of the summary of a situation"), role: .eyebrow), headline], spacing: Design.Spacing.xs))
@@ -301,14 +297,15 @@ final class ScenarioChoiceControl: UIControl {
     private let phrase = UILabel()
     private let meaning = UILabel()
     private let mark = UIImageView()
+    private var currentBorderColor: UIColor = Design.Color.border
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = Design.Color.surface
-        layer.cornerRadius = 18
+        layer.cornerRadius = Design.Radius.control
         layer.cornerCurve = .continuous
         layer.borderWidth = 1.5
-        layer.borderColor = Design.Color.separator.cgColor
+        observeAdaptiveBorder { [weak self] in self?.currentBorderColor ?? Design.Color.border }
         phrase.apply(.headword)
         meaning.apply(.reading)
         mark.setContentHuggingPriority(.required, for: .horizontal)
@@ -350,22 +347,26 @@ final class ScenarioChoiceControl: UIControl {
         switch choice.mark {
         case .none:
             mark.isHidden = true
-            layer.borderColor = Design.Color.separator.cgColor
+            backgroundColor = Design.Color.surface
+            currentBorderColor = Design.Color.border
             alpha = choice.isEnabled ? 1 : 0.55
         case .natural:
             mark.image = UIImage(systemName: "checkmark.circle.fill")
             mark.tintColor = Design.Color.success
             mark.isHidden = false
-            layer.borderColor = Design.Color.success.cgColor
+            backgroundColor = Design.Color.statusFill(Design.Color.success)
+            currentBorderColor = Design.Color.success
             accessibilityValue = NSLocalizedString("Natural", comment: "")
             accessibilityTraits.insert(.selected)
         case .other:
             mark.image = UIImage(systemName: "lightbulb.fill")
             mark.tintColor = Design.Color.warning
             mark.isHidden = false
-            layer.borderColor = Design.Color.warning.cgColor
+            backgroundColor = Design.Color.statusFill(Design.Color.warning)
+            currentBorderColor = Design.Color.warning
             accessibilityValue = NSLocalizedString("Another phrase fits better", comment: "")
             accessibilityTraits.insert(.selected)
         }
+        layer.borderColor = currentBorderColor.resolvedColor(with: traitCollection).cgColor
     }
 }

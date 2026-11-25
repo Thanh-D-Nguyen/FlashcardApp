@@ -11,7 +11,9 @@ final class ScenarioListViewController: BaseVC, ScenarioListViewInterface, UITab
     private let stateView = StateView()
     private let searchController = UISearchController(searchResultsController: nil)
     private var sections: [ScenarioSectionState] = []
-    private var chipHeight: NSLayoutConstraint!
+    private var lastChips: [ScenarioChipState] = []
+    private var chipHiddenHeight: NSLayoutConstraint!
+    private var chipVisibleHeight: NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,17 +63,17 @@ final class ScenarioListViewController: BaseVC, ScenarioListViewInterface, UITab
         stateView.isHidden = true
 
         [chipScroll, tableView, stateView].forEach(view.addSubview)
-        chipHeight = chipScroll.heightAnchor.constraint(equalToConstant: 52)
+        chipHiddenHeight = chipScroll.heightAnchor.constraint(equalToConstant: 0)
+        chipVisibleHeight = chipScroll.heightAnchor.constraint(equalTo: chipStack.heightAnchor, constant: Design.Spacing.s)
+        chipVisibleHeight.isActive = true
         NSLayoutConstraint.activate([
             chipScroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             chipScroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             chipScroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            chipHeight,
             chipStack.topAnchor.constraint(equalTo: chipScroll.contentLayoutGuide.topAnchor, constant: Design.Spacing.xs),
             chipStack.bottomAnchor.constraint(equalTo: chipScroll.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.xs),
             chipStack.leadingAnchor.constraint(equalTo: chipScroll.contentLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
             chipStack.trailingAnchor.constraint(equalTo: chipScroll.contentLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
-            chipStack.heightAnchor.constraint(equalTo: chipScroll.frameLayoutGuide.heightAnchor, constant: -Design.Spacing.s),
             tableView.topAnchor.constraint(equalTo: chipScroll.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -81,6 +83,9 @@ final class ScenarioListViewController: BaseVC, ScenarioListViewInterface, UITab
             stateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             stateView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self, UITraitUserInterfaceStyle.self]) { (controller: ScenarioListViewController, _) in
+            controller.renderChips(controller.lastChips)
+        }
     }
 
     // MARK: ScenarioListViewInterface
@@ -118,10 +123,12 @@ final class ScenarioListViewController: BaseVC, ScenarioListViewInterface, UITab
         }
         let hasCatalogue = !state.chips.isEmpty
         chipScroll.isHidden = !hasCatalogue
-        chipHeight.constant = hasCatalogue ? 52 : 0
+        chipHiddenHeight.isActive = !hasCatalogue
+        chipVisibleHeight.isActive = hasCatalogue
         tableView.isHidden = !showsList
         // The chips stay above "no matches", so the learner can clear a group.
         stateView.isHidden = showsList
+        lastChips = state.chips
         renderChips(state.chips)
         tableView.reloadData()
         if showsList, !state.totalText.isEmpty { tableView.accessibilityLabel = state.totalText }
@@ -129,20 +136,23 @@ final class ScenarioListViewController: BaseVC, ScenarioListViewInterface, UITab
 
     private func renderChips(_ chips: [ScenarioChipState]) {
         chipStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        let cornerStyle = Design.Button.cornerStyle(for: traitCollection)
         for chip in chips {
             var configuration = UIButton.Configuration.filled()
-            configuration.cornerStyle = .capsule
+            configuration.cornerStyle = cornerStyle
             configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 14, bottom: 8, trailing: 14)
             configuration.imagePadding = Design.Spacing.xs
             configuration.image = UIImage(systemName: chip.symbol)
             configuration.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(textStyle: .footnote, scale: .small)
             configuration.baseBackgroundColor = chip.isSelected ? Design.Color.accent : Design.Color.surface
             configuration.baseForegroundColor = chip.isSelected ? Design.Color.onAccent : Design.Color.textPrimary
+            configuration.background.strokeColor = chip.isSelected ? .clear : Design.Color.border
+            configuration.background.strokeWidth = chip.isSelected ? 0 : 1
             var title = AttributedString(chip.title)
-            title.font = UIFont.preferredFont(forTextStyle: .subheadline).withWeight(chip.isSelected ? .semibold : .regular)
+            title.font = Design.TextRole.weighted(.subheadline, weight: chip.isSelected ? .semibold : .regular)
             configuration.attributedTitle = title
             let button = UIButton(configuration: configuration)
-            button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             button.setContentHuggingPriority(.required, for: .horizontal)
             button.setContentCompressionResistancePriority(.required, for: .horizontal)
             button.accessibilityLabel = chip.title
@@ -187,6 +197,9 @@ final class ScenarioListViewController: BaseVC, ScenarioListViewInterface, UITab
         content.textToSecondaryTextVerticalPadding = Design.Spacing.xs
         cell.contentConfiguration = content
         cell.backgroundColor = Design.Color.surface
+        let highlight = UIView()
+        highlight.backgroundColor = Design.Color.highlight
+        cell.selectedBackgroundView = highlight
         cell.accessoryType = .disclosureIndicator
         cell.accessibilityIdentifier = "scenario_row_\(row.id)"
         cell.accessibilityLabel = [row.title, row.subtitle, row.meta].compactMap { $0 }.joined(separator: ", ")

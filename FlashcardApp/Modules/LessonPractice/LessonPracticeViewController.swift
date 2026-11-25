@@ -125,6 +125,11 @@ extension LessonPracticeViewController: UITableViewDataSource, UITableViewDelega
         var content = cell.defaultContentConfiguration()
         content.textProperties.numberOfLines = 0
         content.secondaryTextProperties.numberOfLines = 0
+        content.textToSecondaryTextVerticalPadding = Design.Spacing.xs
+        cell.backgroundColor = Design.Color.surface
+        let highlight = UIView()
+        highlight.backgroundColor = Design.Color.highlight
+        cell.selectedBackgroundView = highlight
         cell.accessoryView = nil
         cell.isAccessibilityElement = false
         cell.accessibilityIdentifier = nil
@@ -165,9 +170,9 @@ extension LessonPracticeViewController: UITableViewDataSource, UITableViewDelega
             content.secondaryTextProperties.apply(.explanation)
             let outcomeLabel: String?
             switch option.outcome {
-            case .correct: (cell.accessoryView, outcomeLabel) = (Self.badge("checkmark.circle.fill", Design.Color.accent), NSLocalizedString("Correct", comment: "Lesson practice outcome"))
+            case .correct: (cell.accessoryView, outcomeLabel) = (Self.badge("checkmark.circle.fill", Design.Color.success), NSLocalizedString("Correct", comment: "Lesson practice outcome"))
             case .incorrect: (cell.accessoryView, outcomeLabel) = (Self.badge("xmark.circle.fill", Design.Color.error), NSLocalizedString("Incorrect", comment: "Lesson practice outcome"))
-            case .correctAnswer: (cell.accessoryView, outcomeLabel) = (Self.badge("checkmark.circle", Design.Color.accent), NSLocalizedString("Correct answer", comment: "Lesson practice outcome"))
+            case .correctAnswer: (cell.accessoryView, outcomeLabel) = (Self.badge("checkmark.circle", Design.Color.success), NSLocalizedString("Correct answer", comment: "Lesson practice outcome"))
             case .none: outcomeLabel = nil
             }
             let answered = presenterIsAnswered

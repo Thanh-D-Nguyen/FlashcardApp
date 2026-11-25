@@ -99,7 +99,12 @@ extension LessonListViewController: UITableViewDataSource {
         content.secondaryText = [row.summary, Self.metadata(for: row)].filter { !$0.isEmpty }.joined(separator: "\n")
         content.secondaryTextProperties.apply(.metadata)
         content.secondaryTextProperties.numberOfLines = 0
+        content.textToSecondaryTextVerticalPadding = Design.Spacing.xs
         cell.contentConfiguration = content
+        cell.backgroundColor = Design.Color.surface
+        let highlight = UIView()
+        highlight.backgroundColor = Design.Color.highlight
+        cell.selectedBackgroundView = highlight
         cell.accessoryType = .disclosureIndicator
         // One element per row: VoiceOver reads title, description and facts together and offers it as a button.
         cell.isAccessibilityElement = true

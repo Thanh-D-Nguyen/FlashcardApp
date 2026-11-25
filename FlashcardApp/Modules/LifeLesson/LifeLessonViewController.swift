@@ -42,9 +42,7 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
         view.addSubview(stateView)
 
         answerField.borderStyle = .none
-        answerField.backgroundColor = Design.Color.surface
-        answerField.layer.cornerRadius = 12
-        answerField.layer.cornerCurve = .continuous
+        answerField.applyCardSurface(radius: Design.Radius.control)
         answerField.font = .preferredFont(forTextStyle: .title3)
         answerField.adjustsFontForContentSizeCategory = true
         answerField.autocorrectionType = .no
@@ -167,9 +165,7 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
 
     private func card(_ views: [UIView], spacing: CGFloat = Design.Spacing.xs) -> UIView {
         let container = UIView()
-        container.backgroundColor = Design.Color.surface
-        container.layer.cornerRadius = 20
-        container.layer.cornerCurve = .continuous
+        container.applyCardSurface(radius: Design.Radius.card)
         let inner = UIStackView(arrangedSubviews: views)
         inner.axis = .vertical
         inner.spacing = spacing
@@ -186,11 +182,12 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
 
     private func tag(_ text: String, color: UIColor = Design.Color.textSecondary) -> UIView {
         let label = label(text, role: .metadata, color: color)
-        label.font = Design.TextRole.metadata.font.withWeight(.semibold)
+        label.font = Design.TextRole.weighted(.footnote, weight: .semibold)
         let box = UIView()
-        box.layer.cornerRadius = 6
+        box.layer.cornerRadius = Design.Radius.badge
+        box.layer.cornerCurve = .continuous
         box.layer.borderWidth = 1
-        box.layer.borderColor = color.cgColor
+        box.observeAdaptiveBorder { color }
         label.translatesAutoresizingMaskIntoConstraints = false
         box.addSubview(label)
         NSLayoutConstraint.activate([
@@ -214,24 +211,20 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
     }
 
     private func primaryButton(_ title: String, id: String, enabled: Bool = true, action: @escaping () -> Void) -> UIButton {
-        let button = UIButton(configuration: Design.Button.primary(title: title))
+        let button = UIButton(configuration: Design.Button.primary(title: title, traits: traitCollection))
         button.isEnabled = enabled
         button.accessibilityIdentifier = id
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 54).isActive = true
+        button.enableAdaptiveCornerStyle()
         button.addAction(UIAction { [weak self] _ in self?.focusIdentifier = id; action() }, for: .primaryActionTriggered)
         return button
     }
 
     private func secondaryButton(_ title: String, id: String, action: @escaping () -> Void) -> UIButton {
-        var configuration = UIButton.Configuration.tinted()
-        configuration.title = title
-        configuration.cornerStyle = .capsule
-        configuration.buttonSize = .large
-        configuration.baseForegroundColor = Design.Color.accent
-        configuration.baseBackgroundColor = Design.Color.accent
-        let button = UIButton(configuration: configuration)
+        let button = UIButton(configuration: Design.Button.secondary(title: title, traits: traitCollection))
         button.accessibilityIdentifier = id
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 54).isActive = true
+        button.enableAdaptiveCornerStyle()
         button.addAction(UIAction { [weak self] _ in self?.focusIdentifier = id; action() }, for: .primaryActionTriggered)
         return button
     }
@@ -303,13 +296,13 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
 
     private func storyViews(_ story: LifeStoryState) -> [UIView] {
         let sceneView = LifeSceneView()
-        sceneView.layer.cornerRadius = 22
+        sceneView.layer.cornerRadius = Design.Radius.card
         sceneView.layer.cornerCurve = .continuous
         sceneView.heightAnchor.constraint(equalToConstant: 148).isActive = true
         sceneView.configure(scene: story.scene, topic: story.topic)
         var views: [UIView] = [sceneView, eyebrow(story.eyebrow)]
         let title = label(story.title, role: .headword, traits: .header)
-        title.font = Design.TextRole.headword.font.withWeight(.semibold)
+        title.font = Design.TextRole.weighted(.title3, weight: .semibold)
         title.accessibilityIdentifier = "life_story_title"
         let reading = label(story.titleReading, role: .reading)
         let titleBlock = UIStackView(arrangedSubviews: [title, reading])
@@ -324,8 +317,10 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
         var info = UIButton.Configuration.plain()
         info.image = UIImage(systemName: "info.circle")
         info.baseForegroundColor = Design.Color.textSecondary
-        info.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 0)
+        info.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         sourceButton.configuration = info
+        sourceButton.widthAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        sourceButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         sourceButton.accessibilityLabel = NSLocalizedString("Source", comment: "Info button that shows where the facts come from")
         sourceButton.accessibilityIdentifier = "life_source_info"
         sourceButton.setContentHuggingPriority(.required, for: .horizontal)
@@ -377,7 +372,7 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
         }
         var views: [UIView] = [eyebrow(practice.progress), wrapped([tag(practice.skill)])]
         let prompt = label(practice.promptJapanese, role: .headword)
-        prompt.font = Design.TextRole.headword.font.withWeight(.semibold)
+        prompt.font = Design.TextRole.weighted(.title3, weight: .semibold)
         prompt.accessibilityIdentifier = "life_prompt"
         views.append(card([prompt, label(practice.prompt, role: .meaning)]))
 
@@ -418,10 +413,10 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
             return attributes
         }
         var color = Design.Color.surface
-        var border: UIColor = Design.Color.separator
+        var border: UIColor = Design.Color.border
         if let feedback {
-            if index == feedback.correctChoice { border = Design.Color.success; color = Design.Color.success.withAlphaComponent(0.12) }
-            else if index == feedback.selectedChoice { border = Design.Color.error; color = Design.Color.error.withAlphaComponent(0.12) }
+            if index == feedback.correctChoice { border = Design.Color.success; color = Design.Color.statusFill(Design.Color.success) }
+            else if index == feedback.selectedChoice { border = Design.Color.error; color = Design.Color.statusFill(Design.Color.error) }
         } else if selected {
             border = Design.Color.accent
             color = Design.Color.highlight
@@ -429,10 +424,10 @@ final class LifeLessonViewController: BaseViewController, LifeLessonViewInterfac
         let button = UIButton(configuration: configuration)
         button.contentHorizontalAlignment = .leading
         button.backgroundColor = color
-        button.layer.cornerRadius = 14
+        button.layer.cornerRadius = Design.Radius.control
         button.layer.cornerCurve = .continuous
         button.layer.borderWidth = selected || feedback != nil ? 2 : 1
-        button.layer.borderColor = border.cgColor
+        button.observeAdaptiveBorder { border }
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 52).isActive = true
         // Stays enabled after the answer so its text keeps full contrast; the presenter ignores a pick once checked.
         button.accessibilityIdentifier = "life_choice_\(index)"
