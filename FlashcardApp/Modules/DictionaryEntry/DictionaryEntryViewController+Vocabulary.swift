@@ -106,11 +106,16 @@ extension DictionaryEntryViewController {
     /// One kanji (or component) as a tappable chip: the character large, its Sino-Vietnamese reading under it.
     func chip(glyph: String, caption: String?, identifier: String, action: @escaping () -> Void) -> UIButton {
         let button = UIButton(type: .system)
-        var configuration = UIButton.Configuration.gray()
+        var configuration = UIButton.Configuration.filled()
         configuration.cornerStyle = .large
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 14, bottom: 8, trailing: 14)
+        configuration.background.cornerRadius = Design.Radius.chip
+        configuration.background.strokeColor = Design.Color.border
+        configuration.background.strokeWidth = 1
+        configuration.baseBackgroundColor = Design.Color.surface
+        configuration.baseForegroundColor = Design.Color.textPrimary
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: Design.Spacing.m + 2, bottom: Design.Spacing.s, trailing: Design.Spacing.m + 2)
         var title = AttributedString(glyph)
-        title.font = Design.TextRole.numeral.font.withSize(30)
+        title.font = Design.TextRole.mincho(size: 30, style: .title1, maximum: 44)
         title.foregroundColor = Design.Color.textPrimary
         configuration.attributedTitle = title
         if let caption {
@@ -121,6 +126,7 @@ extension DictionaryEntryViewController {
             configuration.titlePadding = 2
         }
         button.configuration = configuration
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         button.accessibilityLabel = [glyph, caption].compactMap { $0 }.joined(separator: ", ")
         button.accessibilityTraits = .button
         button.accessibilityIdentifier = identifier

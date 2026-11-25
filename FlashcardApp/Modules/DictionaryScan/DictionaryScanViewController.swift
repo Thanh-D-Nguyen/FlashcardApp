@@ -8,6 +8,7 @@ final class DictionaryScanViewController: BaseVC, UIImagePickerControllerDelegat
                                           PHPickerViewControllerDelegate, UITextViewDelegate {
     var presenter: DictionaryScanPresenterInterface!
 
+    private let scrollView = UIScrollView()
     private let content = UIStackView()
     private let stateView = StateView()
     private let textView = UITextView()
@@ -28,17 +29,25 @@ final class DictionaryScanViewController: BaseVC, UIImagePickerControllerDelegat
         anotherItem.accessibilityLabel = NSLocalizedString("Scan another photo", comment: "")
         anotherItem.accessibilityIdentifier = "scan_another"
 
+        scrollView.alwaysBounceVertical = true
+        scrollView.keyboardDismissMode = .interactive
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
         content.axis = .vertical
         content.spacing = Design.Spacing.m
         content.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(content)
+        scrollView.addSubview(content)
+        view.addSubview(scrollView)
         stateView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stateView)
         NSLayoutConstraint.activate([
-            content.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Design.Spacing.l),
-            content.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            content.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            content.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -Design.Spacing.m),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor),
+            content.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Design.Spacing.l),
+            content.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.xl),
+            content.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
+            content.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
             stateView.topAnchor.constraint(equalTo: view.topAnchor),
             stateView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             stateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -47,10 +56,8 @@ final class DictionaryScanViewController: BaseVC, UIImagePickerControllerDelegat
 
         textView.font = Design.TextRole.sentence.font
         textView.adjustsFontForContentSizeCategory = true
-        textView.backgroundColor = Design.Color.surface
-        textView.layer.cornerRadius = 12
-        textView.layer.cornerCurve = .continuous
-        textView.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        textView.applyCardSurface(radius: Design.Radius.control)
+        textView.textContainerInset = UIEdgeInsets(top: Design.Spacing.m, left: Design.Spacing.m, bottom: Design.Spacing.m, right: Design.Spacing.m)
         textView.autocorrectionType = .no
         textView.delegate = self
         textViewHeight.isActive = true
@@ -60,9 +67,11 @@ final class DictionaryScanViewController: BaseVC, UIImagePickerControllerDelegat
         hint.apply(.metadata)
         hint.text = NSLocalizedString("Check the text, select a word or phrase, then look it up. You can edit what was read.", comment: "")
 
-        var configuration = Design.Button.primary(title: NSLocalizedString("Look up", comment: ""))
+        var configuration = Design.Button.primary(title: NSLocalizedString("Look up", comment: ""), traits: traitCollection)
         configuration.titleLineBreakMode = .byWordWrapping
         lookUpButton.configuration = configuration
+        lookUpButton.enableAdaptiveCornerStyle()
+        lookUpButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         lookUpButton.addAction(UIAction { [weak self] _ in self?.lookUp() }, for: .touchUpInside)
         lookUpButton.accessibilityIdentifier = "scan_lookup"
 
@@ -179,12 +188,12 @@ final class DictionaryScanViewController: BaseVC, UIImagePickerControllerDelegat
 
     private func sourceButton(_ title: String, symbol: String, prominent: Bool, identifier: String, action: @escaping () -> Void) -> UIButton {
         let button = UIButton(type: .system)
-        var configuration = prominent ? Design.Button.primary(title: title) : UIButton.Configuration.gray()
-        configuration.title = title
-        configuration.image = UIImage(systemName: symbol)
-        configuration.imagePadding = Design.Spacing.s
-        if !prominent { configuration.cornerStyle = .capsule; configuration.buttonSize = .large; configuration.baseForegroundColor = Design.Color.accent }
+        let configuration = prominent
+            ? Design.Button.primary(title: title, systemImage: symbol, traits: traitCollection)
+            : Design.Button.secondary(title: title, systemImage: symbol, traits: traitCollection)
         button.configuration = configuration
+        button.enableAdaptiveCornerStyle()
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         button.accessibilityIdentifier = identifier
         button.addAction(UIAction { _ in action() }, for: .touchUpInside)
         return button

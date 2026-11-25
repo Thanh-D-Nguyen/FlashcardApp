@@ -383,21 +383,42 @@ final class DictionaryViewController: BaseVC, UITableViewDataSource, UITableView
     // MARK: Footer
 
     private func footerView() -> UIView? {
+        let width = max(tableView.bounds.width, view.bounds.width)
+        func sized(_ content: UIView) -> UIView {
+            let holder = UIView()
+            content.translatesAutoresizingMaskIntoConstraints = false
+            holder.addSubview(content)
+            NSLayoutConstraint.activate([
+                content.topAnchor.constraint(equalTo: holder.topAnchor, constant: Design.Spacing.m),
+                content.bottomAnchor.constraint(equalTo: holder.bottomAnchor, constant: -Design.Spacing.m),
+                content.leadingAnchor.constraint(equalTo: holder.leadingAnchor, constant: Design.Spacing.gutter),
+                content.trailingAnchor.constraint(equalTo: holder.trailingAnchor, constant: -Design.Spacing.gutter)
+            ])
+            let height = holder.systemLayoutSizeFitting(
+                CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
+                withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
+            holder.frame = CGRect(x: 0, y: 0, width: width, height: max(height, Design.HitTarget.minimum + Design.Spacing.l))
+            return holder
+        }
         switch footer {
         case .none:
             return nil
         case .loading:
             let spinner = UIActivityIndicatorView(style: .medium)
             spinner.startAnimating()
-            spinner.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 56)
+            spinner.frame = CGRect(x: 0, y: 0, width: width, height: 56)
             return spinner
         case .failed:
             let button = UIButton(type: .system)
             var configuration = UIButton.Configuration.plain()
             configuration.title = NSLocalizedString("Couldn’t load more. Tap to retry.", comment: "")
+            configuration.titleAlignment = .center
+            configuration.titleLineBreakMode = .byWordWrapping
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: Design.Spacing.gutter, bottom: Design.Spacing.m, trailing: Design.Spacing.gutter)
             configuration.baseForegroundColor = Design.Color.accent
             button.configuration = configuration
-            button.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 56)
+            let fitHeight = button.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude)).height
+            button.frame = CGRect(x: 0, y: 0, width: width, height: max(fitHeight, Design.HitTarget.minimum + Design.Spacing.m))
             button.addAction(UIAction { [weak self] _ in self?.presenter.loadMore() }, for: .touchUpInside)
             button.accessibilityIdentifier = "dictionary_load_more_retry"
             return button
@@ -406,10 +427,7 @@ final class DictionaryViewController: BaseVC, UITableViewDataSource, UITableView
             note.apply(.metadata)
             note.textAlignment = .center
             note.text = String(format: NSLocalizedString("Showing the first %lld results. Refine your search to narrow them.", comment: ""), DictionaryPresenter.maximumResults)
-            note.frame = CGRect(x: Design.Spacing.gutter, y: 0, width: tableView.bounds.width - 2 * Design.Spacing.gutter, height: 64)
-            let holder = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 64))
-            holder.addSubview(note)
-            return holder
+            return sized(note)
         }
     }
 

@@ -34,6 +34,8 @@ final class DictionaryHandwritingViewController: BaseVC {
         backspace.image = UIImage(systemName: "delete.left")
         backspace.baseForegroundColor = Design.Color.accent
         backspaceButton.configuration = backspace
+        backspaceButton.widthAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        backspaceButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         backspaceButton.accessibilityLabel = NSLocalizedString("Delete last character", comment: "")
         backspaceButton.accessibilityIdentifier = "handwriting_backspace"
         backspaceButton.addAction(UIAction { [weak self] _ in self?.presenter.deleteLastCharacter() }, for: .touchUpInside)
@@ -61,7 +63,9 @@ final class DictionaryHandwritingViewController: BaseVC {
                   identifier: "handwriting_undo") { [weak self] in self?.canvas.undoLastStroke() }
         configure(clearButton, title: NSLocalizedString("Clear", comment: "Handwriting: wipe the pad"), symbol: "xmark.circle",
                   identifier: "handwriting_clear") { [weak self] in self?.canvas.clear() }
-        lookUpButton.configuration = Design.Button.primary(title: NSLocalizedString("Look up", comment: ""))
+        lookUpButton.configuration = Design.Button.primary(title: NSLocalizedString("Look up", comment: ""), traits: traitCollection)
+        lookUpButton.enableAdaptiveCornerStyle()
+        lookUpButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         lookUpButton.accessibilityIdentifier = "handwriting_lookup"
         lookUpButton.addAction(UIAction { [weak self] _ in self?.presenter.lookUp() }, for: .touchUpInside)
 
@@ -102,7 +106,7 @@ final class DictionaryHandwritingViewController: BaseVC {
             stack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             stack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.m),
-            candidateScroll.heightAnchor.constraint(equalToConstant: 60),
+            candidateScroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 56),
             candidateStack.topAnchor.constraint(equalTo: candidateScroll.contentLayoutGuide.topAnchor),
             candidateStack.bottomAnchor.constraint(equalTo: candidateScroll.contentLayoutGuide.bottomAnchor),
             candidateStack.leadingAnchor.constraint(equalTo: candidateScroll.contentLayoutGuide.leadingAnchor),
@@ -116,12 +120,17 @@ final class DictionaryHandwritingViewController: BaseVC {
     }
 
     private func configure(_ button: UIButton, title: String, symbol: String, identifier: String, action: @escaping () -> Void) {
-        var configuration = UIButton.Configuration.gray()
+        var configuration = UIButton.Configuration.filled()
         configuration.image = UIImage(systemName: symbol)
         configuration.cornerStyle = .capsule
         configuration.buttonSize = .large
+        configuration.baseBackgroundColor = Design.Color.surface
         configuration.baseForegroundColor = Design.Color.accent
+        configuration.background.strokeColor = Design.Color.border
+        configuration.background.strokeWidth = 1
         button.configuration = configuration
+        button.widthAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         button.accessibilityLabel = title
         button.accessibilityIdentifier = identifier
         button.addAction(UIAction { _ in action() }, for: .touchUpInside)
@@ -142,11 +151,14 @@ final class DictionaryHandwritingViewController: BaseVC {
 
         candidateStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for candidate in state.candidates {
-            var configuration = UIButton.Configuration.gray()
+            var configuration = UIButton.Configuration.filled()
             configuration.title = candidate
             configuration.cornerStyle = .capsule
+            configuration.baseBackgroundColor = Design.Color.surface
             configuration.baseForegroundColor = Design.Color.textPrimary
-            configuration.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 14, bottom: 6, trailing: 14)
+            configuration.background.strokeColor = Design.Color.border
+            configuration.background.strokeWidth = 1
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: Design.Spacing.m + 2, bottom: Design.Spacing.s, trailing: Design.Spacing.m + 2)
             configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
                 var attributes = attributes
                 attributes.font = Design.TextRole.headword.font
@@ -155,6 +167,7 @@ final class DictionaryHandwritingViewController: BaseVC {
             let button = UIButton(configuration: configuration)
             button.accessibilityIdentifier = "handwriting_candidate_\(candidate)"
             button.widthAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
+            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             button.addAction(UIAction { [weak self] _ in
                 UISelectionFeedbackGenerator().selectionChanged()
                 self?.presenter.choose(candidate)

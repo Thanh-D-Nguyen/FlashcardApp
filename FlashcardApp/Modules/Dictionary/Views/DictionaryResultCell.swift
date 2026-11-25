@@ -32,7 +32,7 @@ final class DictionaryResultCell: UITableViewCell {
         glyph.widthAnchor.constraint(greaterThanOrEqualToConstant: 52).isActive = true
 
         level.apply(.metadata)
-        level.font = UIFont.preferredFont(forTextStyle: .caption1).withWeight(.semibold)
+        level.font = Design.TextRole.weighted(.caption1, weight: .semibold)
         level.textColor = Design.Color.accent
         level.numberOfLines = 1
         level.setContentHuggingPriority(.required, for: .horizontal)
@@ -41,7 +41,6 @@ final class DictionaryResultCell: UITableViewCell {
         lead.numberOfLines = 0
         lead.adjustsFontForContentSizeCategory = true
         second.numberOfLines = 0
-        third.numberOfLines = 3
         [second, third].forEach { $0.adjustsFontForContentSizeCategory = true }
 
         headRow.axis = .horizontal
@@ -69,6 +68,17 @@ final class DictionaryResultCell: UITableViewCell {
         ])
         isAccessibilityElement = true
         accessibilityTraits = .button
+        updateDensity()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: DictionaryResultCell, _) in
+            cell.updateDensity()
+        }
+    }
+
+    private func updateDensity() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        rowStack.axis = isAX ? .vertical : .horizontal
+        rowStack.alignment = isAX ? .leading : .center
+        third.numberOfLines = isAX ? 0 : 3
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -98,7 +108,7 @@ final class DictionaryResultCell: UITableViewCell {
                 TextHighlight.attributed($0, terms: terms, font: Design.TextRole.meaning.font, color: Design.Color.textSecondary)
             }
         case .vocabulary, .grammar:
-            lead.attributedText = TextHighlight.attributed(item.title, terms: terms, font: Design.TextRole.headword.font.withWeight(.semibold), color: Design.Color.textPrimary)
+            lead.attributedText = TextHighlight.attributed(item.title, terms: terms, font: Design.TextRole.weighted(.title2, weight: .semibold), color: Design.Color.textPrimary)
             second.text = item.reading
             second.font = Design.TextRole.reading.font
             second.textColor = Design.Color.textSecondary
@@ -112,9 +122,7 @@ final class DictionaryResultCell: UITableViewCell {
         }
         second.isHidden = (second.text ?? "").isEmpty && second.attributedText == nil
         third.isHidden = third.attributedText == nil && (third.text ?? "").isEmpty
-        let axis: NSLayoutConstraint.Axis = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? .vertical : .horizontal
-        rowStack.axis = axis
-        rowStack.alignment = axis == .vertical ? .leading : .center
+        updateDensity()
         accessibilityLabel = [item.title, item.reading, item.meaning, item.level.map { String(format: NSLocalizedString("JLPT level %@", comment: ""), $0) }]
             .compactMap { $0 }.joined(separator: ", ")
     }
@@ -127,6 +135,9 @@ final class DictionaryQueryCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         backgroundColor = .clear
+        let selected = UIView()
+        selected.backgroundColor = Design.Color.highlight
+        selectedBackgroundView = selected
         isAccessibilityElement = true
         accessibilityTraits = .button
     }

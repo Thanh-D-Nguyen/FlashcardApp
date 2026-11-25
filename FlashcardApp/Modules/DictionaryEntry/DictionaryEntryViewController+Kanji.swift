@@ -63,7 +63,7 @@ extension DictionaryEntryViewController {
             let flow = ChipFlowView()
             flow.setChips(readings.map { reading in readingChip(reading, identifier: "\(identifier)_\(reading)") })
             let heading = label(.metadata, title)
-            heading.font = UIFont.preferredFont(forTextStyle: .footnote).withWeight(.semibold)
+            heading.font = Design.TextRole.weighted(.footnote, weight: .semibold)
             let box = UIStackView(arrangedSubviews: [heading, flow])
             box.axis = .vertical
             box.spacing = Design.Spacing.s
@@ -78,19 +78,25 @@ extension DictionaryEntryViewController {
     /// A reading in kana; tapping it speaks it. The dots and the leading dash of dictionary notation are not spoken.
     private func readingChip(_ reading: String, identifier: String) -> UIButton {
         let button = UIButton(type: .system)
-        var configuration = UIButton.Configuration.gray()
+        var configuration = UIButton.Configuration.filled()
         configuration.cornerStyle = .large
+        configuration.background.cornerRadius = Design.Radius.chip
+        configuration.background.strokeColor = Design.Color.border
+        configuration.background.strokeWidth = 1
+        configuration.baseBackgroundColor = Design.Color.surface
+        configuration.baseForegroundColor = Design.Color.textPrimary
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: Design.Spacing.m, bottom: Design.Spacing.s, trailing: Design.Spacing.m)
         configuration.title = reading
         configuration.image = UIImage(systemName: "speaker.wave.1")
         configuration.imagePlacement = .trailing
-        configuration.imagePadding = Design.Spacing.xs
-        configuration.baseForegroundColor = Design.Color.textPrimary
+        configuration.imagePadding = Design.Spacing.xs + 2
         configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
             var attributes = attributes
             attributes.font = UIFont.preferredFont(forTextStyle: .title3)
             return attributes
         }
         button.configuration = configuration
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         let spoken = reading.filter { $0 != "." && $0 != "-" && $0 != "・" }
         button.accessibilityLabel = String(format: NSLocalizedString("Listen to %@", comment: "VoiceOver; %@ is a kana reading"), spoken)
         button.accessibilityIdentifier = identifier
@@ -249,9 +255,10 @@ extension DictionaryEntryViewController {
         var configuration = UIButton.Configuration.plain()
         configuration.title = title
         configuration.baseForegroundColor = Design.Color.accent
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 8)
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: 0, bottom: Design.Spacing.m, trailing: Design.Spacing.s)
         button.configuration = configuration
         button.contentHorizontalAlignment = .leading
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         button.accessibilityIdentifier = identifier
         button.addAction(UIAction { _ in action() }, for: .touchUpInside)
         return button

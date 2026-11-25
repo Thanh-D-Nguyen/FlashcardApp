@@ -39,9 +39,7 @@ final class StrokeOrderView: UIView {
             return label
         }
         super.init(frame: .zero)
-        backgroundColor = Design.Color.surface
-        layer.cornerRadius = 16
-        layer.cornerCurve = .continuous
+        applyCardSurface(radius: Design.Radius.card)
         layer.masksToBounds = true
         layer.addSublayer(guides)
         for (index, stroke) in drawing.strokes.enumerated() {

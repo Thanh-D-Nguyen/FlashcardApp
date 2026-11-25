@@ -136,6 +136,9 @@ private final class RowAccessibilityElement: UIAccessibilityElement {
 
 /// The title of a section of an entry, optionally with one trailing action ("Hide readings").
 final class SectionTitleView: UIView {
+    private let row = UIStackView()
+    private var spacer: UIView?
+
     init(title: String, actionTitle: String? = nil, action: (() -> Void)? = nil, actionIdentifier: String? = nil) {
         super.init(frame: .zero)
         let label = UILabel()
@@ -143,7 +146,7 @@ final class SectionTitleView: UIView {
         label.text = title
         label.accessibilityTraits = .header
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
-        let row = UIStackView(arrangedSubviews: [label])
+        row.addArrangedSubview(label)
         row.alignment = .center
         row.spacing = Design.Spacing.s
         if let actionTitle, let action {
@@ -151,18 +154,20 @@ final class SectionTitleView: UIView {
             var configuration = UIButton.Configuration.plain()
             configuration.title = actionTitle
             configuration.baseForegroundColor = Design.Color.accent
-            configuration.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 0)
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: Design.Spacing.s, bottom: Design.Spacing.m, trailing: 0)
             configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
                 var attributes = attributes
                 attributes.font = UIFont.preferredFont(forTextStyle: .subheadline)
                 return attributes
             }
             button.configuration = configuration
+            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             button.addAction(UIAction { _ in action() }, for: .touchUpInside)
             button.accessibilityIdentifier = actionIdentifier
-            let spacer = UIView()
-            spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
-            row.addArrangedSubview(spacer)
+            let gap = UIView()
+            gap.setContentHuggingPriority(.defaultLow, for: .horizontal)
+            spacer = gap
+            row.addArrangedSubview(gap)
             row.addArrangedSubview(button)
         }
         row.translatesAutoresizingMaskIntoConstraints = false
@@ -173,6 +178,17 @@ final class SectionTitleView: UIView {
             row.leadingAnchor.constraint(equalTo: leadingAnchor),
             row.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
+        updateAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: SectionTitleView, _) in
+            view.updateAxis()
+        }
+    }
+
+    private func updateAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        row.axis = isAX ? .vertical : .horizontal
+        row.alignment = isAX ? .leading : .center
+        spacer?.isHidden = isAX
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }

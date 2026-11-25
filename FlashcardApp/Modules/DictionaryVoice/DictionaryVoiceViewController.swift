@@ -5,6 +5,7 @@ import UIKit
 final class DictionaryVoiceViewController: BaseVC, UITextViewDelegate {
     var presenter: DictionaryVoicePresenterInterface!
 
+    private let scrollView = UIScrollView()
     private let stack = UIStackView()
     private let micButton = UIButton(type: .system)
     private let status = UILabel()
@@ -27,10 +28,8 @@ final class DictionaryVoiceViewController: BaseVC, UITextViewDelegate {
         detail.textAlignment = .center
         transcript.font = Design.TextRole.sentence.font
         transcript.adjustsFontForContentSizeCategory = true
-        transcript.backgroundColor = Design.Color.surface
-        transcript.layer.cornerRadius = 12
-        transcript.layer.cornerCurve = .continuous
-        transcript.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        transcript.applyCardSurface(radius: Design.Radius.control)
+        transcript.textContainerInset = UIEdgeInsets(top: Design.Spacing.m, left: Design.Spacing.m, bottom: Design.Spacing.m, right: Design.Spacing.m)
         transcript.autocorrectionType = .no
         transcript.delegate = self
         transcript.accessibilityIdentifier = "voice_text"
@@ -48,7 +47,9 @@ final class DictionaryVoiceViewController: BaseVC, UITextViewDelegate {
         micButton.heightAnchor.constraint(equalToConstant: 88).isActive = true
         micButton.widthAnchor.constraint(equalToConstant: 88).isActive = true
 
-        lookUpButton.configuration = Design.Button.primary(title: NSLocalizedString("Look up", comment: ""))
+        lookUpButton.configuration = Design.Button.primary(title: NSLocalizedString("Look up", comment: ""), traits: traitCollection)
+        lookUpButton.enableAdaptiveCornerStyle()
+        lookUpButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         lookUpButton.accessibilityIdentifier = "voice_lookup"
         lookUpButton.addAction(UIAction { [weak self] _ in
             guard let self else { return }
@@ -56,23 +57,30 @@ final class DictionaryVoiceViewController: BaseVC, UITextViewDelegate {
             self.presenter.lookUp(self.transcript.text)
         }, for: .touchUpInside)
 
-        var settings = UIButton.Configuration.gray()
-        settings.title = NSLocalizedString("Open Settings", comment: "")
-        settings.cornerStyle = .capsule
-        settings.baseForegroundColor = Design.Color.accent
-        settingsButton.configuration = settings
+        settingsButton.configuration = Design.Button.secondary(title: NSLocalizedString("Open Settings", comment: ""), traits: traitCollection)
+        settingsButton.enableAdaptiveCornerStyle()
+        settingsButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         settingsButton.accessibilityIdentifier = "voice_settings"
         settingsButton.addAction(UIAction { [weak self] _ in self?.presenter.openSettings() }, for: .touchUpInside)
 
+        scrollView.alwaysBounceVertical = true
+        scrollView.keyboardDismissMode = .interactive
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.alignment = .fill
         stack.spacing = Design.Spacing.l
         stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
+        scrollView.addSubview(stack)
+        view.addSubview(scrollView)
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Design.Spacing.xl),
-            stack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor)
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor),
+            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Design.Spacing.xl),
+            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.xl),
+            stack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
+            stack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter)
         ])
         presenter.state.observe(on: MainScheduler.instance).subscribe(onNext: { [weak self] in self?.render($0) }).disposed(by: disposeBag)
     }

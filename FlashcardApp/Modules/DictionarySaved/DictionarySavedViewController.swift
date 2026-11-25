@@ -24,8 +24,12 @@ final class DictionarySavedViewController: BaseVC, UITableViewDataSource, UITabl
         kinds.addAction(UIAction { [weak self] _ in
             guard let self else { return }
             self.presenter.selectKind(self.kinds.selectedSegmentIndex)
+            self.updateKindChooser()
         }, for: .valueChanged)
-        navigationItem.titleView = kinds
+        updateKindChooser()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: DictionarySavedViewController, _) in
+            controller.updateKindChooser()
+        }
 
         tableView.backgroundColor = .clear
         tableView.dataSource = self
@@ -96,31 +100,70 @@ final class DictionarySavedViewController: BaseVC, UITableViewDataSource, UITabl
         }
     }
 
+    private func updateKindChooser() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        if isAX {
+            navigationItem.titleView = nil
+            let selected = max(0, min(kinds.selectedSegmentIndex, DictionarySavedPresenter.kinds.count - 1))
+            let actions = DictionarySavedPresenter.kinds.enumerated().map { index, kind in
+                UIAction(title: kind.searchType.title, state: index == selected ? .on : .off) { [weak self] _ in
+                    guard let self else { return }
+                    self.kinds.selectedSegmentIndex = index
+                    self.presenter.selectKind(index)
+                    self.updateKindChooser()
+                }
+            }
+            let currentTitle = DictionarySavedPresenter.kinds[selected].searchType.title
+            let item = UIBarButtonItem(title: currentTitle, menu: UIMenu(children: actions))
+            item.accessibilityIdentifier = "saved_kinds"
+            navigationItem.rightBarButtonItem = item
+        } else {
+            navigationItem.titleView = kinds
+            navigationItem.rightBarButtonItem = nil
+        }
+    }
+
     private func footer(for list: SavedList) -> UIView? {
+        let width = max(tableView.bounds.width, view.bounds.width)
+        func sized(_ content: UIView) -> UIView {
+            let holder = UIView()
+            content.translatesAutoresizingMaskIntoConstraints = false
+            holder.addSubview(content)
+            NSLayoutConstraint.activate([
+                content.topAnchor.constraint(equalTo: holder.topAnchor, constant: Design.Spacing.m),
+                content.bottomAnchor.constraint(equalTo: holder.bottomAnchor, constant: -Design.Spacing.m),
+                content.leadingAnchor.constraint(equalTo: holder.leadingAnchor, constant: Design.Spacing.gutter),
+                content.trailingAnchor.constraint(equalTo: holder.trailingAnchor, constant: -Design.Spacing.gutter)
+            ])
+            let height = holder.systemLayoutSizeFitting(
+                CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
+                withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
+            holder.frame = CGRect(x: 0, y: 0, width: width, height: max(height, Design.HitTarget.minimum + Design.Spacing.l))
+            return holder
+        }
         if list.isLoadingMore {
             let spinner = UIActivityIndicatorView(style: .medium)
             spinner.startAnimating()
-            spinner.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 56)
-            return spinner
+            return sized(spinner)
         }
         if list.loadMoreFailed {
             let button = UIButton(type: .system)
             var configuration = UIButton.Configuration.plain()
             configuration.title = NSLocalizedString("Couldn’t load more. Tap to retry.", comment: "")
+            configuration.titleAlignment = .center
+            configuration.titleLineBreakMode = .byWordWrapping
+            configuration.baseForegroundColor = Design.Color.accent
             button.configuration = configuration
-            button.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 56)
+            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             button.addAction(UIAction { [weak self] _ in self?.presenter.loadMore() }, for: .touchUpInside)
-            return button
+            return sized(button)
         }
         guard list.missing > 0 else { return nil }
         let note = UILabel()
         note.apply(.metadata)
         note.textAlignment = .center
         note.text = String.localizedStringWithFormat(NSLocalizedString("%lld saved entries are no longer in the dictionary.", comment: ""), list.missing)
-        note.frame = CGRect(x: Design.Spacing.gutter, y: 0, width: tableView.bounds.width - 2 * Design.Spacing.gutter, height: 64)
-        let holder = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 64))
-        holder.addSubview(note)
-        return holder
+        return sized(note)
     }
 
     // MARK: Table

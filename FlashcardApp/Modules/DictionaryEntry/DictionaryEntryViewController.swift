@@ -175,10 +175,9 @@ final class DictionaryEntryViewController: BaseVC, UITextViewDelegate {
     func errorBlock(message: String, retry: @escaping () -> Void, identifier: String = "entry_retry") -> UIView {
         let text = label(.reading, message, color: Design.Color.error)
         let button = UIButton(type: .system)
-        var configuration = UIButton.Configuration.bordered()
-        configuration.title = NSLocalizedString("Try again", comment: "")
-        configuration.baseForegroundColor = Design.Color.accent
-        button.configuration = configuration
+        button.configuration = Design.Button.secondary(title: NSLocalizedString("Try again", comment: ""), traits: traitCollection)
+        button.enableAdaptiveCornerStyle()
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         button.addAction(UIAction { _ in retry() }, for: .touchUpInside)
         button.accessibilityIdentifier = identifier
         let box = UIStackView(arrangedSubviews: [text, button])
@@ -227,23 +226,29 @@ final class DictionaryEntryViewController: BaseVC, UITextViewDelegate {
 
     private func actionButton(title: String, symbol: String, identifier: String, action: @escaping () -> Void) -> UIButton {
         let button = UIButton(type: .system)
-        var configuration = UIButton.Configuration.gray()
+        var configuration = UIButton.Configuration.filled()
         configuration.title = title
         configuration.image = UIImage(systemName: symbol)
         configuration.imagePlacement = useVerticalActions ? .leading : .top
-        configuration.imagePadding = Design.Spacing.xs
+        configuration.imagePadding = Design.Spacing.xs + 2
         configuration.cornerStyle = .large
+        configuration.background.cornerRadius = Design.Radius.control
+        configuration.background.strokeColor = Design.Color.border
+        configuration.background.strokeWidth = 1
+        configuration.baseBackgroundColor = Design.Color.surface
         configuration.baseForegroundColor = Design.Color.accent
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: Design.Spacing.s, bottom: Design.Spacing.m, trailing: Design.Spacing.s)
+        configuration.titleAlignment = .center
         configuration.titleLineBreakMode = .byWordWrapping
         configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
             var attributes = attributes
-            attributes.font = UIFont.preferredFont(forTextStyle: .footnote).withWeight(.semibold)
+            attributes.font = Design.TextRole.weighted(.footnote, weight: .semibold)
             return attributes
         }
         button.configuration = configuration
         button.addAction(UIAction { _ in action() }, for: .touchUpInside)
         button.accessibilityIdentifier = identifier
-        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         return button
     }
 
