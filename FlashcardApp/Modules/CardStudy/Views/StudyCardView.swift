@@ -16,6 +16,9 @@ final class StudyCardView: UIView {
     private let headerRow = UIStackView()
     private let stack = UIStackView()
     private var imageHeight: NSLayoutConstraint!
+    private var stackBottom: NSLayoutConstraint!
+    private var lastIsQuiz = false
+    private var lastShowingBack = false
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -84,15 +87,18 @@ final class StudyCardView: UIView {
         addSubview(stack)
         addSubview(creditButton)
         imageHeight = imageView.heightAnchor.constraint(equalToConstant: 200)
+        stackBottom = stack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -Design.Spacing.xl)
+        let stackCenterY = stack.centerYAnchor.constraint(equalTo: centerYAnchor)
+        stackCenterY.priority = .defaultHigh
         NSLayoutConstraint.activate([
             headerRow.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
             headerRow.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.xl),
             headerRow.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.m),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.xl),
             stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.xl),
-            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
-            stack.topAnchor.constraint(greaterThanOrEqualTo: headerRow.bottomAnchor, constant: Design.Spacing.m),
-            stack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -Design.Spacing.xl),
+            stackCenterY,
+            stack.topAnchor.constraint(greaterThanOrEqualTo: headerRow.bottomAnchor, constant: Design.Spacing.s),
+            stackBottom,
             speakButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 44),
             speakButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
             creditButton.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -6),
@@ -101,6 +107,23 @@ final class StudyCardView: UIView {
         ])
         isAccessibilityElement = true
         accessibilityTraits = .button
+        updateCardDensity()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: StudyCardView, _) in
+            view.updateCardDensity()
+        }
+    }
+
+    private func updateCardDensity() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        if lastIsQuiz {
+            imageHeight.constant = isAX ? 88 : 110
+        } else if lastShowingBack {
+            imageHeight.constant = isAX ? 96 : 140
+        } else {
+            imageHeight.constant = isAX ? 96 : 200
+        }
+        stack.spacing = isAX ? Design.Spacing.s : Design.Spacing.l
+        stackBottom.constant = isAX ? -Design.Spacing.m : -Design.Spacing.xl
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -174,8 +197,9 @@ final class StudyCardView: UIView {
         noteLabel.isHidden = note.isEmpty
         let hasImage = imagesVisible && !card.imageReference.isEmpty
         imageView.isHidden = !hasImage
-        // A quiz leaves room for the options below; a flip card gives the picture more room on the front.
-        imageHeight.constant = isQuiz ? 110 : (showingBack ? 140 : 200)
+        lastIsQuiz = isQuiz
+        lastShowingBack = showingBack
+        updateCardDensity()
         credit = card.imageCredit
         creditButton.isHidden = !hasImage || credit.isEmpty
         if hasImage {

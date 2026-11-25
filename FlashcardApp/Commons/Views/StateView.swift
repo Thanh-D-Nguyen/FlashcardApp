@@ -12,10 +12,18 @@ final class StateView: UIView {
         case error(message: String, retryTitle: String)
     }
 
-    /// Extra top inset when displayed as a table/collection `backgroundView` beneath a section header or search bar.
+    /// Extra top inset beneath a pinned section header, filter bar or table header.
     var topContentInset: CGFloat = 0 {
         didSet {
-            scrollTopConstraint?.constant = topContentInset
+            guard oldValue != topContentInset else { return }
+            setNeedsLayout()
+        }
+    }
+
+    /// Extra bottom inset above custom chrome when needed.
+    var bottomContentInset: CGFloat = 0 {
+        didSet {
+            guard oldValue != bottomContentInset else { return }
             setNeedsLayout()
         }
     }
@@ -31,6 +39,8 @@ final class StateView: UIView {
     private var onRetry: (() -> Void)?
     private var shownState: State?
     private var scrollTopConstraint: NSLayoutConstraint?
+    private var scrollBottomConstraint: NSLayoutConstraint?
+    private var centerYConstraint: NSLayoutConstraint?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -46,7 +56,6 @@ final class StateView: UIView {
         stack.spacing = Design.Spacing.m
         stack.translatesAutoresizingMaskIntoConstraints = false
 
-        iconView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .largeTitle)
         iconView.contentMode = .scaleAspectFit
         iconView.setContentHuggingPriority(.required, for: .vertical)
 
@@ -59,17 +68,19 @@ final class StateView: UIView {
         retryButton.enableAdaptiveCornerStyle()
 
         [spinner, iconView, titleLabel, messageLabel, retryButton].forEach(stack.addArrangedSubview)
-        stack.setCustomSpacing(Design.Spacing.xl, after: messageLabel)
 
         addSubview(scrollView)
         scrollView.addSubview(contentGuideView)
         contentGuideView.addSubview(stack)
 
-        let top = scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
+        let top = scrollView.topAnchor.constraint(equalTo: topAnchor)
+        let bottom = scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         scrollTopConstraint = top
+        scrollBottomConstraint = bottom
 
         let centerY = stack.centerYAnchor.constraint(equalTo: contentGuideView.centerYAnchor, constant: -Design.Spacing.l)
         centerY.priority = .defaultHigh
+        centerYConstraint = centerY
 
         let minHeight = contentGuideView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.frameLayoutGuide.heightAnchor)
         minHeight.priority = .defaultHigh
@@ -78,7 +89,7 @@ final class StateView: UIView {
             top,
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            bottom,
 
             contentGuideView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentGuideView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
@@ -90,13 +101,71 @@ final class StateView: UIView {
             centerY,
             stack.leadingAnchor.constraint(equalTo: contentGuideView.leadingAnchor, constant: Design.Spacing.xl),
             stack.trailingAnchor.constraint(equalTo: contentGuideView.trailingAnchor, constant: -Design.Spacing.xl),
-            stack.topAnchor.constraint(greaterThanOrEqualTo: contentGuideView.topAnchor, constant: Design.Spacing.l),
+            stack.topAnchor.constraint(greaterThanOrEqualTo: contentGuideView.topAnchor, constant: Design.Spacing.m),
             stack.bottomAnchor.constraint(lessThanOrEqualTo: contentGuideView.bottomAnchor, constant: -Design.Spacing.l)
         ])
         isAccessibilityElement = false
+        updateMetrics()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: StateView, _) in
+            view.updateMetrics()
+        }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    private var enclosingScrollView: UIScrollView? {
+        var current = superview
+        while let candidate = current {
+            if let scroll = candidate as? UIScrollView { return scroll }
+            current = candidate.superview
+        }
+        return nil
+    }
+
+    private func updateMetrics() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        iconView.preferredSymbolConfiguration = isAX
+            ? UIImage.SymbolConfiguration(pointSize: 38, weight: .regular)
+            : UIImage.SymbolConfiguration(textStyle: .largeTitle)
+        stack.spacing = isAX ? Design.Spacing.s : Design.Spacing.m
+        stack.setCustomSpacing(isAX ? Design.Spacing.m : Design.Spacing.xl, after: messageLabel)
+        centerYConstraint?.constant = isAX ? 0 : -Design.Spacing.l
+        setNeedsLayout()
+    }
+
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        setNeedsLayout()
+    }
+
+    override func layoutSubviews() {
+        // When hosted as `UITableView.backgroundView`, UIKit absorbs safe area insets into the table's
+        // `adjustedContentInset` and passes `.zero` to `backgroundView.safeAreaInsets`. Reading the
+        // enclosing scroll view's adjusted insets keeps content clear of both nav/search bars and tab bars.
+        let parentTop = enclosingScrollView?.adjustedContentInset.top ?? 0
+        let parentBottom = enclosingScrollView?.adjustedContentInset.bottom ?? 0
+        let effectiveTop = max(safeAreaInsets.top, parentTop) + topContentInset
+        let effectiveBottom = max(safeAreaInsets.bottom, parentBottom) + bottomContentInset
+        if scrollTopConstraint?.constant != effectiveTop {
+            scrollTopConstraint?.constant = effectiveTop
+        }
+        if scrollBottomConstraint?.constant != -effectiveBottom {
+            scrollBottomConstraint?.constant = -effectiveBottom
+        }
+        super.layoutSubviews()
+    }
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard !isHidden, isUserInteractionEnabled, alpha > 0.01 else { return nil }
+        // Never intercept touches in the inset bands reserved for filter bars, search/scope bars or tab bars.
+        guard scrollView.frame.contains(point) else { return nil }
+        let hit = super.hitTest(point, with: event)
+        if let hit, hit.isDescendant(of: retryButton), !retryButton.isHidden {
+            return hit
+        }
+        let canScroll = scrollView.contentSize.height > scrollView.bounds.height + 1
+        return canScroll ? hit : nil
+    }
 
     func configure(_ state: State, onRetry: (() -> Void)? = nil) {
         self.onRetry = onRetry

@@ -28,17 +28,17 @@
 
 Tất cả ảnh đối chiếu nằm trong:
 - Trước đại tu: `docs/ui-redesign/overhaul-2026-11-25/before/` (49 ảnh)
-- Sau đại tu: `docs/ui-redesign/overhaul-2026-11-25/after/` (54 ảnh, bổ sung `magazine_{light,dark,ax}.png` sau khi sửa crash, cùng `life_lesson_{light,dark}.png` và `daily_radar_light.png`)
+- Sau đại tu: `docs/ui-redesign/overhaul-2026-11-25/after/` (55 ảnh, đầy đủ đối ứng `dictionary_empty_light.png`, bổ sung `magazine_{light,dark,ax}.png` sau khi sửa crash, cùng `life_lesson_{light,dark}.png` và `daily_radar_light.png`)
 
 ### 2.1. Hệ thống Thiết kế (Design System)
-- **`FlashcardApp/Commons/Utils/DesignSystem.swift`**: Bổ sung `Design.HitTarget.minimum = 44`, thang bo góc chuẩn (`panel=28`, `card=20`, `control=14`, `chip=12`, `badge=8`), token màu mới (`surfaceElevated`, `surfaceTint`, `placeholder`, `border`, `heroChipFill`, `statusFill(_:)`), font scale theo Dynamic Type (`weighted`, `mincho`), cấu hình nút nhất quán (`Design.Button.primary`, `secondary`, `surfaceChip`, `hero`, `heroChip`, `cornerStyle(for:)`), cùng helper `applyCardSurface`, `observeAdaptiveBorder`, `enableAdaptiveCornerStyle`.
+- **`FlashcardApp/Commons/Utils/DesignSystem.swift`**: Bổ sung `Design.HitTarget.minimum = 44`, thang bo góc chuẩn (`panel=28`, `card=20`, `control=14`, `chip=12`, `badge=8`), token màu mới (`surfaceElevated`, `surfaceTint`, `placeholder`, `border`, `heroChipFill`, `statusFill(_:)`), font scale theo Dynamic Type (`weighted`, `mincho`), cấu hình nút nhất quán (`Design.Button.primary`, `secondary`, `surfaceChip`, `hero`, `heroChip`, `cornerStyle(for:)`), cùng helper idempotent `applyCardSurface`, `observeAdaptiveBorder`, `enableAdaptiveCornerStyle`.
 - **`FlashcardApp/Commons/Utils/AppColor.swift`**: Loại bỏ toàn bộ force-unwrap `UIColor(named:)!`, chuyển thành lớp tương thích an toàn trỏ sang `Design.Color`.
-- **`FlashcardApp/Commons/Views/StateView.swift`** & **`PlaceholderView.swift`**: Bọc `StateView` trong `UIScrollView` có `topContentInset` động (chống che lấp header/search bar ở AX); chuẩn hoá `PlaceholderView` sang `Design.Color` + Auto Layout.
+- **`FlashcardApp/Commons/Views/StateView.swift`** & **`PlaceholderView.swift`**: Bọc `StateView` trong `UIScrollView` có `topContentInset` / `bottomContentInset` và tự động bù `enclosingScrollView?.adjustedContentInset` khi gắn làm `UITableView.backgroundView` (chống che lấp header/search bar lẫn Tab Bar ở AX), đồng thời cho phép thao tác xuyên qua vùng inset (`hitTest` pass-through) để không khoá thanh lọc ghim đầu trang; chuẩn hoá `PlaceholderView` sang `Design.Color` + Auto Layout.
 
 ### 2.2. Slice (a) — Main & Today
 - **Thay đổi:**
-  - `LifeSceneView.swift`: sửa tương phản Dark Mode cho chữ số ngày lớn (`Design.Color.textPrimary`), nền thời tiết/chủ đề thích ứng, font Mincho/rounded hỗ trợ Dynamic Type.
-  - `TodayLifeHubView.swift`: áp dụng `applyCardSurface(radius: .card)`, badge `LIVE`/`Đang dùng` nội tuyến không đè chữ ở AX, bỏ khoảng trắng thừa ~45pt dưới mỗi thẻ Life, chuyển thanh tiêu đề `TodayLifeHubView` và `TodayDateHeaderView` sang xếp dọc ở AX (hết vỡ `"Toky\no"`), đảm bảo nút đổi thành phố `>= 44pt`.
+  - `LifeSceneView.swift`: sửa tương phản Dark Mode cho chữ số ngày lớn (`Design.Color.textPrimary`), cân chỉnh khung lịch và chữ số ngày không tràn viền ngang, nền thời tiết/chủ đề thích ứng, font Mincho/rounded hỗ trợ Dynamic Type.
+  - `TodayLifeHubView.swift`: áp dụng `applyCardSurface(radius: .card)`, badge `LIVE`/`Đang dùng` nội tuyến không đè chữ ở AX, căn đáy đồng đều giữa các thẻ Life cùng hàng qua `bottomSpacer`, chuyển thanh tiêu đề `TodayLifeHubView` và `TodayDateHeaderView` sang xếp dọc ở AX (hết vỡ `"Toky\no"`), đảm bảo nút đổi thành phố `>= 44pt`.
   - `TodayScenarioBanner.swift` & `TodayViewController.swift`: hạ mức độ nhấn của banner tình huống xuống card phẳng + nút `secondary` để không tranh điểm nhấn với `TodayHeroView`; tăng target chạm `>= 44pt` cho `titleControl` và `TodayRowView`; xếp dọc `TodayRowView` ở AX.
 - **Ảnh đối chiếu:**
   - Light: `before/today_light.png` → `after/today_light.png` (`before/today_scroll_light.png` → `after/today_scroll_light.png`)
@@ -60,14 +60,15 @@ Tất cả ảnh đối chiếu nằm trong:
   - `DictionaryEntryViewController.swift` (+ `+Vocabulary`, `+Kanji`, `EntryRows`, `StrokeOrderView`): nâng cấp nút hành động và chip từ/kanji từ `.gray()` mờ sang `Design.Color.surface` + viền mảnh `Design.Color.border`, scale glyph kanji bằng `Design.TextRole.mincho`, target `>= 44pt` cho `moreButton` và action header, bọc `StrokeOrderView` bằng `applyCardSurface`.
   - `DictionaryHandwritingViewController.swift`, `DictionaryScanViewController.swift`, `DictionaryVoiceViewController.swift`: bọc nội dung Scan/Voice trong `UIScrollView`, nâng kích thước nút xoá/lùi/làm mới Handwriting lên `>= 44pt`, chiều cao thanh ứng viên động theo Dynamic Type.
 - **Ảnh đối chiếu:**
+  - Màn trống: `before/dictionary_empty_light.png` → `after/dictionary_empty_light.png`
   - Kết quả tìm kiếm: `before/dictionary_results_{light,dark,ax}.png` → `after/dictionary_results_{light,dark,ax}.png`
   - Chi tiết từ vựng: `before/dictionary_entry_vocab_{light,dark,ax}.png` → `after/dictionary_entry_vocab_{light,dark,ax}.png`
   - Chi tiết Kanji: `before/dictionary_entry_kanji_{light,dark,ax}.png` → `after/dictionary_entry_kanji_{light,dark,ax}.png`
 
 ### 2.5. Slice (d) — Cards + CardStudy / CardReview / RemoteDeck / CreateDesk
 - **Thay đổi:**
-  - `CardViewController.swift` & `CardLibraryViews.swift`: sửa lỗi P0 `StateView` chồng lên thanh tìm kiếm và thanh scope ở AX bằng cách tính `topContentInset` theo toạ độ thực của `CardScopeHeaderView`; chuyển `CardScopeBar` sang chiều cao tự co giãn theo Dynamic Type; dùng `UITableView.automaticDimension` cho section header; giữ nguyên `often_missed_button` và `create_deck_button`.
-  - `CardStudyViewController.swift`, `StudyReviewViews.swift`, `CardReviewViewController.swift`: ở AX chuyển điều khiển học sang bố cục 2 hàng (`Hiện đáp án` full-width phía trên `[Trước, Tiếp]`), nút trắc nghiệm dạng card surface `>= 44pt`, góc bo nút thích ứng (`.capsule` / `.large`), tổng kết dùng `applyCardSurface`.
+  - `CardViewController.swift` & `CardLibraryViews.swift`: sửa lỗi P0 `StateView` chồng lên thanh tìm kiếm, thanh scope và bị che khuất dưới Tab Bar ở AX bằng cách tính `topContentInset` theo toạ độ thực của `CardScopeHeaderView` kết hợp `adjustedContentInset` của `StateView`; chuyển `CardScopeBar` sang chiều cao tự co giãn theo Dynamic Type; dùng `UITableView.automaticDimension` cho section header; giữ nguyên `often_missed_button` và `create_deck_button`.
+  - `CardStudyViewController.swift`, `StudyCardView.swift`, `StudyReviewViews.swift`, `CardReviewViewController.swift`: ở AX chuyển điều khiển học sang bố cục 2 hàng (`Hiện đáp án` full-width phía trên `[Trước, Tiếp]`), thu gọn mật độ ảnh/đệm trong `StudyCardView` + hạ ưu tiên `centerYAnchor` xuống `.defaultHigh` để giữ nguyên 4 góc bo `28pt` không bị cắt phẳng ở đáy khung cuộn, cố định cỡ biểu tượng chevron `18pt semibold` trên nút tròn `56×56`, nút trắc nghiệm dạng card surface `>= 44pt`, góc bo nút thích ứng (`.capsule` / `.large`), tổng kết dùng `applyCardSurface`.
   - `KanjiWritingViewController.swift`, `SharedDeckViewController.swift`, `RemoteDeckViewController.swift`, `NewDeckOptionsViewController.swift`, `DeckGeneratorViewController.swift`, `OftenMissedViewController.swift`, `ExampleEditorViewController.swift`: bổ sung `UIScrollView` + `StateView` thống nhất, xếp dọc ở AX, `applyCardSurface` và `Design.Color.highlight`.
 - **Ảnh đối chiếu:**
   - Thư viện trống: `before/cards_library_{light,dark,ax}.png` → `after/cards_library_{light,dark,ax}.png`
@@ -77,8 +78,8 @@ Tất cả ảnh đối chiếu nằm trong:
 
 ### 2.6. Slice (e) — Discover / Magazine / Loto
 - **Thay đổi:**
-  - **Sửa P0 Crash `MagazineViewController.swift`:** `willDisplay` gọi `presenter.loadMore()` đồng bộ ngay trong lúc `dataSource.apply(snapshot)` đang chạy gây crash re-entrant diffable data source. Đã sửa bằng cờ `isApplyingSnapshot` + hàng đợi trì hoãn sang `DispatchQueue.main.async` (`drainQueuedWillDisplay`), kèm regression unit test `test_willDisplayNearEndDefersLoadMoreSoDiffableSnapshotApplyNeverReenters` trong `MagazinePresenterTests.swift`. Đồng thời tính `stateView.topContentInset` bên dưới `MagazineFilterBar`.
-  - `MagazineCells.swift`, `MagazineArticleViews.swift`, `MagazineArticleSections.swift`: viền mảnh thích ứng trên filter chip và card bài viết, xếp dọc `MagazineRowCell` ở AX, adaptive border cho tag JLPT và `QuizOptionControl`, `Design.Button.secondary` cho nút thử lại/làm lại.
+  - **Sửa P0 Crash `MagazineViewController.swift`:** `willDisplay` gọi `presenter.loadMore()` đồng bộ ngay trong lúc `dataSource.apply(snapshot)` đang chạy gây crash re-entrant diffable data source. Đã sửa bằng cờ `isApplyingSnapshot` + hàng đợi trì hoãn sang `DispatchQueue.main.async` (`drainQueuedWillDisplay`), kèm regression unit test `test_willDisplayNearEndDefersLoadMoreSoDiffableSnapshotApplyNeverReenters` trong `MagazinePresenterTests.swift`. Đồng thời giữ section rỗng khi lọc trống/lỗi và tính `stateView.topContentInset` + pass-through `hitTest` bên dưới `MagazineFilterBar` để thanh lọc luôn chạm được.
+  - `MagazineCells.swift`, `MagazineArticleViews.swift`, `MagazineArticleSections.swift`: viền mảnh thích ứng trên filter chip và card bài viết, xếp dọc `MagazineLeadCell.head` và `MagazineRowCell` ở AX, cập nhật `DiscoverTagFlow` trả đúng `intrinsicContentSize` ngay ở lượt đo đầu để không nén/cắt nhãn `eyebrow`, adaptive border cho tag JLPT và `QuizOptionControl`, `Design.Button.secondary` cho nút thử lại/làm lại.
   - `DiscoverViewController.swift` & `DiscoverHeroViews.swift`: sửa P0 cắt chữ `"Phát hiện hôm nay"` ở AX bằng cách chuyển mặt niêm phong `DiscoverFindCard` sang xếp dọc ở AX; sửa tag `Loto 6`/`Loto 7` trên nền chàm bị đen đặc ở Dark Mode bằng `Design.Color.heroChipFill` + `Design.Color.onHero`; xếp dọc thẻ gọn ở AX.
   - `LotoViewController.swift`, `LotoViews.swift`, `LotoLabView.swift`, `LotoChaosViews.swift`: sửa P0 cắt chữ bộ đếm ngược (`ng.../ph.../gi...`) ở AX bằng cách chuyển sang lưới 2×2 ở AX; cập nhật gradient hero/lab khi đổi Dark Mode; thay `PaddedToastLabel` bằng `NoticeToastView` dùng chung; xếp dọc `LotoWeightBar` và tiêu đề slider lab ở AX; `applyCardSurface` cho `LotoPanel`.
 - **Ảnh đối chiếu:**
@@ -92,7 +93,7 @@ Tất cả ảnh đối chiếu nằm trong:
   - `ShadowingViewController.swift`: bọc `UIScrollView`, thêm `StateView` cho trạng thái rỗng, đặt câu mẫu trong card `applyCardSurface`, nâng cấp nút Nghe/Thu âm/Nghe lại lên `Design.Button.primary`/`secondary` + target `>= 44pt`.
   - `LifeLessonViewController.swift`: áp dụng `applyCardSurface` cho card và `answerField`, sửa viền `CGColor` đứng hình khi đổi Dark Mode bằng `observeAdaptiveBorder`, tăng nút nguồn thông tin lên `>= 44×44pt`, đồng bộ `primaryButton`/`secondaryButton` với góc bo thích ứng.
   - `ScenarioListViewController.swift`, `ScenarioPlayViewController.swift`: thay chiều cao chip cố định `52pt` bằng Auto Layout động theo `chipStack`, theo dõi Dynamic Type/Dark Mode, sửa adaptive border trên `ScenarioChoiceControl`, chuẩn hoá `card` và `button`.
-  - `DailyRadarCardViewController.swift`: bọc từng biểu đạt và ghi chú cách dùng trong `applyCardSurface(radius: .card)`, nâng cấp tiêu đề có trait `.header`.
+  - `DailyRadarCardViewController.swift`: bọc từng biểu đạt (`expressions`) và ghi chú cách dùng (`usageNote`, khi có) trong `applyCardSurface(radius: .card)`, giữ dòng lý do (`reason`) ở kiểu `.metadata` bên dưới, nâng cấp tiêu đề có trait `.header`.
 - **Ảnh đối chiếu:**
   - LessonList: `before/lesson_list_{light,dark,ax}.png` → `after/lesson_list_{light,dark,ax}.png`
   - LessonReader: `before/lesson_reader_{light,dark,ax}.png` → `after/lesson_reader_{light,dark,ax}.png`
@@ -129,16 +130,22 @@ xcodebuild test -project FlashcardApp.xcodeproj \
   -only-testing:FlashcardAppTests
 ```
 
-Kết quả thực tế:
-- **Tổng số test thực thi:** `1546`
-- **Pass:** `1533`
+Kết quả thực tế (sau khi bổ sung các bản sửa và kiểm thử hồi quy từ đợt review độc lập):
+- **Tổng số test thực thi:** `1551`
+- **Pass:** `1538`
 - **Fail:** `0` (`0 unexpected`)
 - **Skipped:** `13` (giống hệt baseline, đều do điều kiện môi trường opt-in/signing):
   - `5` test `KeychainAuthTokenManagerTests` (`AuthSessionTests.swift:768`): skip vì chạy không ký (`CODE_SIGNING_ALLOWED=NO`, Keychain trả `-34018`).
   - `7` test `LiveProductionContractTests` (`LiveProductionContractTests.swift:15`): opt-in, không có file token live để không chạm dữ liệu production.
   - `1` test `LocalBackendReviewSyncTests` (`ReviewSyncTests.swift:155`): opt-in, không bật local backend IOSK-18.
 - **`LocalizationTests`:** `10/10` pass (0 lỗi key thiếu hoặc sai 3 ngôn ngữ vi/en/ja).
-- **Regression test mới thêm:** `MagazinePresenterTests.test_willDisplayNearEndDefersLoadMoreSoDiffableSnapshotApplyNeverReenters` — **PASSED**.
+- **Regression tests mới thêm (6 tests — PASSED):**
+  - `MagazinePresenterTests.test_willDisplayNearEndDefersLoadMoreSoDiffableSnapshotApplyNeverReenters`
+  - `MagazinePresenterTests.test_emptyAndFailedStatesKeepPinnedFilterBarTappableWhileRetryButtonWorks`
+  - `MagazinePresenterTests.test_leadCellSizesEyebrowAndWordChipsWithoutCompressionAtAccessibilitySize`
+  - `DictionarySavedPresenterTests.testSavedViewControllerFooterPreservesSpinnerAndRetryButtonTypes`
+  - `DictionaryViewControllerTests.testStateViewInTableBackgroundRespectsTopAndBottomAdjustedContentInsetsAtAccessibilitySize`
+  - `CardStudyPresenterTests.test_flipCardWithPictureFitsInsideScrollViewportWithoutBottomClippingAtAccessibilitySize`
 - **Production Simulator Build (`FlashcardApp-Production`):** `** BUILD SUCCEEDED **`.
 
 ---

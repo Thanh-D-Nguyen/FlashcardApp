@@ -239,6 +239,9 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         navSpacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         previousButton.configuration?.image = UIImage(systemName: "chevron.left")
         nextButton.configuration?.image = UIImage(systemName: "chevron.right")
+        let chevronSymbol = UIImage.SymbolConfiguration(pointSize: 18, weight: .semibold)
+        previousButton.configuration?.preferredSymbolConfigurationForImage = chevronSymbol
+        nextButton.configuration?.preferredSymbolConfigurationForImage = chevronSymbol
         previousButton.accessibilityLabel = NSLocalizedString("Previous card", comment: "")
         nextButton.accessibilityLabel = NSLocalizedString("Next card", comment: "")
         previousButton.accessibilityIdentifier = "study_previous"

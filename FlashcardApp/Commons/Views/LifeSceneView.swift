@@ -133,13 +133,13 @@ final class LifeSceneView: UIView {
             numeral.isHidden = false
             caption.isHidden = false
             numeral.format = { "\($0)" }
-            numeral.font = Design.TextRole.mincho(size: 52, style: .largeTitle, maximum: 60)
+            numeral.font = Design.TextRole.mincho(size: 40, style: .largeTitle, maximum: 46)
             numeral.textColor = Design.Color.textPrimary
             numeral.text = "\(day)"
             caption.text = weekday
-            caption.font = Design.TextRole.mincho(size: 18, style: .headline, maximum: 22)
-            caption.textColor = Design.Color.textPrimary.withAlphaComponent(0.75)
-            icon.image = symbol("calendar", size: 80)
+            caption.font = Design.TextRole.mincho(size: 16, style: .headline, maximum: 20)
+            caption.textColor = Design.Color.textPrimary.withAlphaComponent(0.78)
+            icon.image = symbol("calendar", size: 84)
             icon.tintColor = Design.Color.textPrimary.withAlphaComponent(0.12)
         case .place:
             icon.image = symbol("mappin.circle.fill", size: 58)
@@ -207,11 +207,12 @@ final class LifeSceneView: UIView {
             numeral.bounds = CGRect(x: 0, y: 0, width: 110, height: 60)
             numeral.center = CGPoint(x: bounds.midX + 52, y: center.y)
         case .date:
-            icon.center = center
-            numeral.bounds = CGRect(x: 0, y: 0, width: 120, height: 64)
-            numeral.center = CGPoint(x: center.x, y: center.y - 8)
+            icon.bounds = CGRect(x: 0, y: 0, width: 96, height: 96)
+            icon.center = CGPoint(x: center.x, y: center.y - 6)
+            numeral.bounds = CGRect(x: 0, y: 0, width: 96, height: 52)
+            numeral.center = CGPoint(x: center.x, y: center.y - 2)
             caption.bounds = CGRect(x: 0, y: 0, width: 120, height: 24)
-            caption.center = CGPoint(x: center.x, y: center.y + 34)
+            caption.center = CGPoint(x: center.x, y: center.y + 38)
         case .shopping:
             icon.center = center
             secondary.center = CGPoint(x: center.x + 58, y: center.y - 22)

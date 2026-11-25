@@ -355,6 +355,8 @@ final class DiscoverTagFlow: UIView {
         self.tags = tags
         super.init(frame: .zero)
         isUserInteractionEnabled = false
+        setContentHuggingPriority(.required, for: .vertical)
+        setContentCompressionResistancePriority(.required, for: .vertical)
         labels = tags.map { Self.chip($0, isOnHero: isOnHero) }
         labels.forEach(addSubview)
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: DiscoverTagFlow, _) in
@@ -421,7 +423,13 @@ final class DiscoverTagFlow: UIView {
 
     override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
                                           verticalFittingPriority: UILayoutPriority) -> CGSize {
-        CGSize(width: targetSize.width, height: arrange(width: targetSize.width, apply: false).height)
+        let width = targetSize.width > 0 ? targetSize.width : (bounds.width > 0 ? bounds.width : 320)
+        let height = arrange(width: width, apply: false).height
+        if abs(height - fittedHeight) > 0.5 {
+            fittedHeight = height
+            invalidateIntrinsicContentSize()
+        }
+        return CGSize(width: targetSize.width, height: height)
     }
 }
 

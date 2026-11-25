@@ -209,8 +209,9 @@ final class MagazineViewController: BaseVC, MagazineViewInterface, UICollectionV
     }
 
     private func show(_ state: StateView.State, retry: (() -> Void)? = nil) {
+        // Keep an empty section so the compositional layout's pinned `MagazineFilterBar` stays mounted and tappable.
         var empty = NSDiffableDataSourceSnapshot<SectionID, Item>()
-        empty.appendSections([])
+        empty.appendSections([.rows("")])
         applySnapshot(empty, animatingDifferences: false)
         collectionView.isHidden = false
         stateView.isHidden = false

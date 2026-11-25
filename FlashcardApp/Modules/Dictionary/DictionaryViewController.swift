@@ -383,7 +383,7 @@ final class DictionaryViewController: BaseVC, UITableViewDataSource, UITableView
     // MARK: Footer
 
     private func footerView() -> UIView? {
-        let width = max(tableView.bounds.width, view.bounds.width)
+        let width = max(max(tableView.bounds.width, view.bounds.width), 320)
         func sized(_ content: UIView) -> UIView {
             let holder = UIView()
             content.translatesAutoresizingMaskIntoConstraints = false

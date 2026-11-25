@@ -7,6 +7,7 @@
 //  here. See docs/UI_REDESIGN_BLUEPRINT.md and docs/ui-redesign/overhaul-2026-11-25/DESIGN_SYSTEM.md.
 //
 
+import ObjectiveC
 import UIKit
 
 enum Design {
@@ -329,7 +330,7 @@ enum Design {
             configuration.baseBackgroundColor = Color.onHero
             configuration.baseForegroundColor = Color.heroDeep
             var text = AttributedString(title)
-            text.font = UIFont.preferredFont(forTextStyle: .headline)
+            text.font = UIFont.preferredFont(forTextStyle: .headline, compatibleWith: traits)
             configuration.attributedTitle = text
             configuration.image = isAX ? nil : UIImage(systemName: "arrow.right")
             configuration.imagePlacement = .trailing
@@ -359,11 +360,16 @@ enum Design {
             configuration.baseBackgroundColor = Color.heroChipFill
             configuration.baseForegroundColor = Color.onHero
             var text = AttributedString(title)
-            text.font = UIFont.preferredFont(forTextStyle: .subheadline)
+            text.font = UIFont.preferredFont(forTextStyle: .subheadline, compatibleWith: traits)
             configuration.attributedTitle = text
             return configuration
         }
     }
+}
+
+private enum TraitObservationKeys {
+    static var adaptiveBorder: UInt8 = 0
+    static var adaptiveCorner: UInt8 = 0
 }
 
 extension UIListContentConfiguration.TextProperties {
@@ -401,6 +407,10 @@ extension UIView {
             layer.borderColor = borderColor.resolvedColor(with: traitCollection).cgColor
             observeAdaptiveBorder { borderColor }
         } else {
+            if let existing = objc_getAssociatedObject(self, &TraitObservationKeys.adaptiveBorder) as? UITraitChangeRegistration {
+                unregisterForTraitChanges(existing)
+                objc_setAssociatedObject(self, &TraitObservationKeys.adaptiveBorder, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            }
             layer.borderWidth = 0
             layer.borderColor = nil
         }
@@ -408,25 +418,33 @@ extension UIView {
 
     /// Re-resolves `layer.borderColor` whenever the user switches Light/Dark mode so `CGColor` never goes stale.
     func observeAdaptiveBorder(_ colorProvider: @escaping () -> UIColor) {
+        if let existing = objc_getAssociatedObject(self, &TraitObservationKeys.adaptiveBorder) as? UITraitChangeRegistration {
+            unregisterForTraitChanges(existing)
+        }
         layer.borderColor = colorProvider().resolvedColor(with: traitCollection).cgColor
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: UIView, _) in
+        let token = registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: UIView, _) in
             view.layer.borderColor = colorProvider().resolvedColor(with: view.traitCollection).cgColor
         }
+        objc_setAssociatedObject(self, &TraitObservationKeys.adaptiveBorder, token, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 }
 
 extension UIButton {
     /// Keeps a configured button's corner style adapted between `.capsule` (standard) and `.large` (AX sizes).
     func enableAdaptiveCornerStyle() {
+        if let existing = objc_getAssociatedObject(self, &TraitObservationKeys.adaptiveCorner) as? UITraitChangeRegistration {
+            unregisterForTraitChanges(existing)
+        }
         func sync(_ button: UIButton) {
             guard var config = button.configuration else { return }
             config.cornerStyle = Design.Button.cornerStyle(for: button.traitCollection)
             button.configuration = config
         }
         sync(self)
-        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (button: UIButton, _) in
+        let token = registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (button: UIButton, _) in
             sync(button)
         }
+        objc_setAssociatedObject(self, &TraitObservationKeys.adaptiveCorner, token, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 }
 

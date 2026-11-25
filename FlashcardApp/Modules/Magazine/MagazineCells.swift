@@ -124,6 +124,7 @@ final class MagazineLeadCell: UICollectionViewCell {
     private let card = UIView()
     private let tile = MagazineSymbolTile(side: 40)
     private let eyebrow = UILabel()
+    private let head = UIStackView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
     private let summaryLabel = UILabel()
@@ -139,11 +140,17 @@ final class MagazineLeadCell: UICollectionViewCell {
         contentView.addSubview(card)
 
         eyebrow.apply(.eyebrow)
+        eyebrow.setContentCompressionResistancePriority(.required, for: .vertical)
         titleLabel.apply(.articleTitle)
         titleLabel.markJapanese()
+        titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         subtitleLabel.apply(.meaning)
         subtitleLabel.textColor = Design.Color.textSecondary
+        subtitleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         summaryLabel.apply(.reading)
+        wordsHolder.setContentCompressionResistancePriority(.required, for: .vertical)
+        tile.setContentHuggingPriority(.required, for: .horizontal)
+        [tile, eyebrow].forEach(head.addArrangedSubview)
         updateSummaryLines()
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: MagazineLeadCell, _) in
             cell.updateSummaryLines()
@@ -154,9 +161,6 @@ final class MagazineLeadCell: UICollectionViewCell {
         arrow.tintColor = Design.Color.accent
         arrow.setContentHuggingPriority(.required, for: .horizontal)
 
-        let head = UIStackView(arrangedSubviews: [tile, eyebrow])
-        head.alignment = .center
-        head.spacing = Design.Spacing.m
         let footer = UIStackView(arrangedSubviews: [cta, arrow, UIView()])
         footer.alignment = .center
         footer.spacing = Design.Spacing.xs
@@ -190,7 +194,11 @@ final class MagazineLeadCell: UICollectionViewCell {
     }
 
     private func updateSummaryLines() {
-        summaryLabel.numberOfLines = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? 0 : 3
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        summaryLabel.numberOfLines = isAX ? 0 : 3
+        head.axis = isAX ? .vertical : .horizontal
+        head.alignment = isAX ? .leading : .center
+        head.spacing = isAX ? Design.Spacing.xs : Design.Spacing.m
     }
 
     func configure(_ row: MagazineRow) {

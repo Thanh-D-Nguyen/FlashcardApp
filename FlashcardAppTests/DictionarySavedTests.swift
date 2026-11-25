@@ -195,6 +195,48 @@ final class DictionarySavedPresenterTests: XCTestCase {
         presenter.select(item(7))
         XCTAssertEqual(wireframe.shown.map(\.id), ["id7"])
     }
+
+    func testSavedViewControllerFooterPreservesSpinnerAndRetryButtonTypes() throws {
+        let vc = DictionarySavedViewController()
+        vc.presenter = presenter
+        vc.loadViewIfNeeded()
+        vc.view.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
+        vc.view.layoutIfNeeded()
+
+        let table = try XCTUnwrap(vc.view.subviews.compactMap { $0 as? UITableView }.first)
+
+        interactor.ids = (0..<45).map { "id\($0)" }
+        interactor.resolveGate = PublishSubject<SavedPage>().asSingle()
+        presenter.viewWillAppear()
+        pump()
+        XCTAssertNil(table.tableFooterView)
+
+        presenter.loadMore()
+        pump()
+        XCTAssertTrue(table.tableFooterView is UIActivityIndicatorView,
+                      "Loading next saved page must expose UIActivityIndicatorView as tableFooterView")
+
+        let failSubject = PublishSubject<SavedPage>()
+        interactor.resolveGate = failSubject.asSingle()
+        // Trigger a fresh failed loadMore
+        let vc2 = DictionarySavedViewController()
+        let interactor2 = FakeSavedInteractor()
+        interactor2.ids = (0..<45).map { "id\($0)" }
+        let presenter2 = DictionarySavedPresenter(interactor: interactor2, wireframe: wireframe)
+        vc2.presenter = presenter2
+        vc2.loadViewIfNeeded()
+        vc2.view.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
+        vc2.view.layoutIfNeeded()
+        let table2 = try XCTUnwrap(vc2.view.subviews.compactMap { $0 as? UITableView }.first)
+
+        presenter2.viewWillAppear()
+        pump()
+        interactor2.resolveGate = .error(LearnerAPIError.offline)
+        presenter2.loadMore()
+        pump()
+        XCTAssertEqual((table2.tableFooterView as? UIButton)?.accessibilityIdentifier, "saved_load_more_retry",
+                       "Failed saved page must expose UIButton(saved_load_more_retry) as tableFooterView")
+    }
 }
 
 // MARK: Doubles

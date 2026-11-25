@@ -1214,4 +1214,53 @@ extension CardStudyPresenterTests {
         XCTAssertEqual(state.review.save, .saved)
         XCTAssertEqual(history.saves.count, 1)
     }
+
+    func test_flipCardWithPictureFitsInsideScrollViewportWithoutBottomClippingAtAccessibilitySize() throws {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 200, height: 140))
+        let img = renderer.image { ctx in
+            UIColor.systemIndigo.setFill()
+            ctx.fill(CGRect(x: 0, y: 0, width: 200, height: 140))
+        }
+        let ref = try CardImageStore.shared.save(image: img)
+        defer {
+            if let url = CardImageStore.shared.fileURL(for: CardImageReference(ref)) {
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
+
+        let deck = makeDeck(2)
+        deck.cards[0].frontText = "犬"
+        deck.cards[0].frontExtraText = "いぬ"
+        deck.cards[0].backText = "con chó"
+        deck.cards[0].imageUrl = ref
+        interactor.deck = deck
+
+        let controller = CardStudyViewController()
+        let nav = UINavigationController(rootViewController: controller)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 402, height: 874))
+        window.traitOverrides.preferredContentSizeCategory = .accessibilityExtraExtraLarge
+        window.rootViewController = nav
+        window.makeKeyAndVisible()
+
+        presenter = CardStudyPresenter(deckId: "deck", interactor: interactor, wireframe: wireframe, preferences: preferences,
+                                       speech: speech, random: { $0.lowerBound }, examples: examples,
+                                       exampleStore: exampleStore ?? RealmCardExampleStore(), reviewHistory: history, ownerKey: { [unowned self] in owner })
+        controller.presenter = presenter
+        presenter.view = controller
+        controller.loadViewIfNeeded()
+        presenter.viewWillAppear()
+        window.layoutIfNeeded()
+        nav.view.layoutIfNeeded()
+        controller.view.layoutIfNeeded()
+
+        func findView<T: UIView>(_ type: T.Type, in root: UIView) -> T? {
+            if let match = root as? T { return match }
+            return root.subviews.lazy.compactMap { findView(type, in: $0) }.first
+        }
+        let scroll = try XCTUnwrap(findView(UIScrollView.self, in: controller.view))
+        let card = try XCTUnwrap(findView(StudyCardView.self, in: scroll))
+        let cardFrameInScroll = card.convert(card.bounds, to: scroll)
+        XCTAssertLessThanOrEqual(cardFrameInScroll.maxY, scroll.bounds.height + 1,
+                                 "StudyCardView must fit within scrollView viewport at AX-XXL so its 28pt bottom corners are not clipped flat")
+    }
 }

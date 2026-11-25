@@ -124,7 +124,7 @@ final class DictionarySavedViewController: BaseVC, UITableViewDataSource, UITabl
     }
 
     private func footer(for list: SavedList) -> UIView? {
-        let width = max(tableView.bounds.width, view.bounds.width)
+        let width = max(max(tableView.bounds.width, view.bounds.width), 320)
         func sized(_ content: UIView) -> UIView {
             let holder = UIView()
             content.translatesAutoresizingMaskIntoConstraints = false
@@ -144,7 +144,8 @@ final class DictionarySavedViewController: BaseVC, UITableViewDataSource, UITabl
         if list.isLoadingMore {
             let spinner = UIActivityIndicatorView(style: .medium)
             spinner.startAnimating()
-            return sized(spinner)
+            spinner.frame = CGRect(x: 0, y: 0, width: width, height: 56)
+            return spinner
         }
         if list.loadMoreFailed {
             let button = UIButton(type: .system)
@@ -152,11 +153,14 @@ final class DictionarySavedViewController: BaseVC, UITableViewDataSource, UITabl
             configuration.title = NSLocalizedString("Couldn’t load more. Tap to retry.", comment: "")
             configuration.titleAlignment = .center
             configuration.titleLineBreakMode = .byWordWrapping
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: Design.Spacing.gutter, bottom: Design.Spacing.m, trailing: Design.Spacing.gutter)
             configuration.baseForegroundColor = Design.Color.accent
             button.configuration = configuration
-            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+            let fitHeight = button.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude)).height
+            button.frame = CGRect(x: 0, y: 0, width: width, height: max(fitHeight, Design.HitTarget.minimum + Design.Spacing.m))
             button.addAction(UIAction { [weak self] _ in self?.presenter.loadMore() }, for: .touchUpInside)
-            return sized(button)
+            button.accessibilityIdentifier = "saved_load_more_retry"
+            return button
         }
         guard list.missing > 0 else { return nil }
         let note = UILabel()

@@ -239,15 +239,28 @@ final class MailLoginViewController: BaseViewController {
         seal.text = "単"
         seal.textAlignment = .center
         seal.textColor = Design.Color.onHero
-        seal.backgroundColor = Design.Color.hero
-        seal.font = Design.TextRole.mincho(size: 22, style: .title3, maximum: 30)
+        seal.font = Design.TextRole.mincho(size: 22, style: .title3, maximum: 38)
         seal.adjustsFontForContentSizeCategory = true
-        seal.layer.cornerRadius = Design.Radius.chip
-        seal.layer.cornerCurve = .continuous
-        seal.clipsToBounds = true
-        seal.isAccessibilityElement = false
-        seal.widthAnchor.constraint(greaterThanOrEqualToConstant: 40).isActive = true
-        seal.heightAnchor.constraint(greaterThanOrEqualToConstant: 40).isActive = true
+        seal.setContentHuggingPriority(.required, for: .horizontal)
+        seal.setContentCompressionResistancePriority(.required, for: .horizontal)
+        seal.translatesAutoresizingMaskIntoConstraints = false
+
+        let sealBox = BrandSealView()
+        sealBox.backgroundColor = Design.Color.hero
+        sealBox.layer.cornerCurve = .continuous
+        sealBox.clipsToBounds = true
+        sealBox.isAccessibilityElement = false
+        sealBox.addSubview(seal)
+        NSLayoutConstraint.activate([
+            sealBox.widthAnchor.constraint(greaterThanOrEqualToConstant: 40),
+            sealBox.heightAnchor.constraint(equalTo: sealBox.widthAnchor),
+            seal.centerXAnchor.constraint(equalTo: sealBox.centerXAnchor),
+            seal.centerYAnchor.constraint(equalTo: sealBox.centerYAnchor),
+            seal.topAnchor.constraint(greaterThanOrEqualTo: sealBox.topAnchor, constant: Design.Spacing.s),
+            seal.bottomAnchor.constraint(lessThanOrEqualTo: sealBox.bottomAnchor, constant: -Design.Spacing.s),
+            seal.leadingAnchor.constraint(greaterThanOrEqualTo: sealBox.leadingAnchor, constant: Design.Spacing.s),
+            seal.trailingAnchor.constraint(lessThanOrEqualTo: sealBox.trailingAnchor, constant: -Design.Spacing.s)
+        ])
 
         let wordmark = UILabel()
         wordmark.text = "Flashcard"
@@ -257,7 +270,7 @@ final class MailLoginViewController: BaseViewController {
         wordmark.font = UIFontMetrics(forTextStyle: .title3).scaledFont(
             for: UIFont(descriptor: serif.fontDescriptor.withDesign(.serif) ?? serif.fontDescriptor, size: 20))
 
-        let brand = UIStackView(arrangedSubviews: [seal, wordmark, UIView()])
+        let brand = UIStackView(arrangedSubviews: [sealBox, wordmark, UIView()])
         brand.axis = .horizontal
         brand.alignment = .center
         brand.spacing = Design.Spacing.m
@@ -552,5 +565,12 @@ private final class LoginFieldView: UIView {
         let color = focused ? Design.Color.accent : Design.Color.border
         container.layer.borderColor = color.resolvedColor(with: traitCollection).cgColor
         container.layer.borderWidth = focused ? 2 : 1
+    }
+}
+
+private final class BrandSealView: UIView {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = min(max(bounds.height * 0.28, Design.Radius.chip), 18)
     }
 }

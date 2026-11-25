@@ -52,6 +52,30 @@ final class DictionaryViewControllerTests: XCTestCase {
         presenter.state.accept(.error("x"))
         XCTAssertNil(table.tableFooterView)
     }
+
+    func testStateViewInTableBackgroundRespectsTopAndBottomAdjustedContentInsetsAtAccessibilitySize() throws {
+        let nav = UINavigationController(rootViewController: controller)
+        let tabs = UITabBarController()
+        tabs.viewControllers = [nav]
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        window.traitOverrides.preferredContentSizeCategory = .accessibilityExtraExtraLarge
+        window.rootViewController = tabs
+        window.makeKeyAndVisible()
+
+        presenter.state.accept(.error("Không thể kết nối máy chủ. Vui lòng kiểm tra mạng và thử lại."))
+        tabs.view.layoutIfNeeded()
+        nav.view.layoutIfNeeded()
+        controller.view.layoutIfNeeded()
+        table.layoutIfNeeded()
+        let stateView = try XCTUnwrap(table.backgroundView as? StateView)
+        stateView.layoutIfNeeded()
+
+        let scroll = try XCTUnwrap(stateView.subviews.compactMap { $0 as? UIScrollView }.first)
+        XCTAssertGreaterThanOrEqual(scroll.frame.minY, table.adjustedContentInset.top - 0.5,
+                                    "StateView scroll viewport must start below navigation/search bar adjusted inset")
+        XCTAssertLessThanOrEqual(scroll.frame.maxY, stateView.bounds.height - table.adjustedContentInset.bottom + 0.5,
+                                 "StateView scroll viewport must stay above tab bar adjusted inset so CTA is never occluded")
+    }
 }
 
 private final class FakeSearchPresenter: DictionaryPresenterInterface {

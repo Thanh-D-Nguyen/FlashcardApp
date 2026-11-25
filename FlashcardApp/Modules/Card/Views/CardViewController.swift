@@ -120,13 +120,15 @@ final class CardViewController: BaseViewController, CardViewInterface {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        let baseTop = max(stateView.safeAreaInsets.top, tableView.adjustedContentInset.top)
         let headerBottom: CGFloat
         if let header = tableView.headerView(forSection: 0) {
             headerBottom = header.convert(header.bounds, to: stateView).maxY
         } else {
-            headerBottom = tableView.adjustedContentInset.top + tableView.rectForHeader(inSection: 0).height
+            headerBottom = baseTop + tableView.rectForHeader(inSection: 0).height
         }
-        stateView.topContentInset = max(0, headerBottom - stateView.safeAreaInsets.top) + Design.Spacing.s
+        stateView.topContentInset = max(0, headerBottom - baseTop) + Design.Spacing.s
+        stateView.setNeedsLayout()
     }
 
     func subscribe() {}

@@ -284,4 +284,111 @@ final class MagazinePresenterTests: XCTestCase {
         wait(for: [exp], timeout: 2.0)
         XCTAssertEqual(stubPresenter.loadMoreCount, 1)
     }
+
+    func test_emptyAndFailedStatesKeepPinnedFilterBarTappableWhileRetryButtonWorks() throws {
+        final class PassivePresenter: MagazinePresenterInterface {
+            weak var view: MagazineViewInterface?
+            var selectedFilters: [MagazineFilter] = []
+            var retries = 0
+            func viewDidLoad() {}
+            func refresh() {}
+            func select(_ filter: MagazineFilter) { selectedFilters.append(filter) }
+            func loadMore() {}
+            func retry() { retries += 1 }
+            func retryLoadMore() {}
+            func open(slug: String) {}
+        }
+
+        func findControl(in root: UIView, identifier: String) -> UIControl? {
+            if let control = root as? UIControl, control.accessibilityIdentifier == identifier { return control }
+            for child in root.subviews {
+                if let match = findControl(in: child, identifier: identifier) { return match }
+            }
+            return nil
+        }
+
+        func findRetryButton(in root: UIView) -> UIButton? {
+            if let stateView = root as? StateView {
+                func button(in v: UIView) -> UIButton? {
+                    if let b = v as? UIButton, !b.isHidden { return b }
+                    return v.subviews.lazy.compactMap(button).first
+                }
+                return button(in: stateView)
+            }
+            return root.subviews.lazy.compactMap(findRetryButton).first
+        }
+
+        let vc = MagazineViewController()
+        let stub = PassivePresenter()
+        vc.presenter = stub
+        stub.view = vc
+
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        window.rootViewController = UINavigationController(rootViewController: vc)
+        window.makeKeyAndVisible()
+        vc.loadViewIfNeeded()
+
+        vc.render(MagazineViewState(filter: .kind(.weather), content: .empty(title: "No articles yet", message: "Try another filter")))
+        window.layoutIfNeeded()
+        vc.view.layoutIfNeeded()
+
+        let allFilterButton = try XCTUnwrap(findControl(in: vc.view, identifier: "magazine_filter_all"),
+                                            "Filter bar must remain mounted when a filter is empty")
+        let filterPointInRoot = allFilterButton.convert(CGPoint(x: allFilterButton.bounds.midX, y: allFilterButton.bounds.midY), to: vc.view)
+        let hitInEmpty = try XCTUnwrap(vc.view.hitTest(filterPointInRoot, with: nil))
+        XCTAssertTrue(hitInEmpty === allFilterButton || hitInEmpty.isDescendant(of: allFilterButton),
+                      "StateView must not intercept touches over MagazineFilterBar in empty state")
+
+        vc.render(MagazineViewState(filter: .kind(.weather), content: .failed(message: "Offline")))
+        window.layoutIfNeeded()
+        vc.view.layoutIfNeeded()
+
+        let allFilterInError = try XCTUnwrap(findControl(in: vc.view, identifier: "magazine_filter_all"))
+        let errorFilterPoint = allFilterInError.convert(CGPoint(x: allFilterInError.bounds.midX, y: allFilterInError.bounds.midY), to: vc.view)
+        let hitFilterInError = try XCTUnwrap(vc.view.hitTest(errorFilterPoint, with: nil))
+        XCTAssertTrue(hitFilterInError === allFilterInError || hitFilterInError.isDescendant(of: allFilterInError),
+                      "Filter bar must remain tappable in failed state")
+
+        let retryButton = try XCTUnwrap(findRetryButton(in: vc.view))
+        let retryPoint = retryButton.convert(CGPoint(x: retryButton.bounds.midX, y: retryButton.bounds.midY), to: vc.view)
+        let hitRetry = try XCTUnwrap(vc.view.hitTest(retryPoint, with: nil))
+        XCTAssertTrue(hitRetry === retryButton || hitRetry.isDescendant(of: retryButton),
+                      "StateView retry button must still receive touches in failed state")
+    }
+
+    func test_leadCellSizesEyebrowAndWordChipsWithoutCompressionAtAccessibilitySize() throws {
+        let cell = MagazineLeadCell(frame: CGRect(x: 0, y: 0, width: 350, height: 400))
+        cell.traitOverrides.preferredContentSizeCategory = .accessibilityExtraExtraLarge
+        let row = MagazineRow(
+            slug: "bjt-1",
+            kind: .weather,
+            titleJapanese: "お忙しいところ恐れ入りますがご確認いただけますでしょうか",
+            titleVietnamese: "Xin lỗi làm phiền lúc bận rộn, nhờ anh/chị xác nhận giúp",
+            summary: "Cách mở lời lịch sự trong email công sở Nhật Bản.",
+            meta: "Tiếng Nhật công sở · N3 · 25 thg 11",
+            words: ["恐れ入りますが", "ご確認", "お忙しいところ", "いただけますでしょうか"],
+            isToday: true
+        )
+        cell.configure(row)
+
+        let fitted = cell.contentView.systemLayoutSizeFitting(
+            CGSize(width: 350, height: UIView.layoutFittingCompressedSize.height),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        )
+        cell.frame = CGRect(x: 0, y: 0, width: 350, height: fitted.height)
+        cell.contentView.frame = cell.bounds
+        cell.setNeedsLayout()
+        cell.layoutIfNeeded()
+
+        func allLabels(in view: UIView) -> [UILabel] {
+            var result = (view as? UILabel).map { [$0] } ?? []
+            for sub in view.subviews { result.append(contentsOf: allLabels(in: sub)) }
+            return result
+        }
+        let eyebrow = try XCTUnwrap(allLabels(in: cell.contentView).first { ($0.text ?? "").contains("N3") })
+        let neededEyebrowHeight = eyebrow.sizeThatFits(CGSize(width: eyebrow.bounds.width, height: .greatestFiniteMagnitude)).height
+        XCTAssertGreaterThanOrEqual(eyebrow.bounds.height + 1, neededEyebrowHeight,
+                                    "Lead eyebrow must get its full wrapped height on first pass without vertical truncation")
+    }
 }
