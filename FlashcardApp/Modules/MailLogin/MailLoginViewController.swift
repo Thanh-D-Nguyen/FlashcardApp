@@ -47,7 +47,7 @@ final class MailLoginViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (controller: MailLoginViewController, _) in
+        registerForTraitChanges([UITraitUserInterfaceStyle.self, UITraitPreferredContentSizeCategory.self]) { (controller: MailLoginViewController, _) in
             controller.updateAppleButtonAppearance()
         }
         subscribe()
@@ -121,21 +121,18 @@ final class MailLoginViewController: BaseViewController {
     }
 
     private func configureButtons() {
-        signInButton.configuration = Self.styled(Design.Button.primary(title: presenter.loginButtonText))
+        signInButton.configuration = Self.styled(Design.Button.primary(title: presenter.loginButtonText, traits: traitCollection))
+        signInButton.enableAdaptiveCornerStyle()
         signInButton.accessibilityIdentifier = "website_login_button"
         signInButton.addTarget(self, action: #selector(loginWithEmailAction), for: .touchUpInside)
 
-        var secondary = UIButton.Configuration.tinted()
-        secondary.title = NSLocalizedString("Continue without login", comment: "")
-        secondary.cornerStyle = .capsule
-        secondary.buttonSize = .large
-        secondary.baseForegroundColor = Design.Color.accent
-        secondary.baseBackgroundColor = Design.Color.accent
-        continueWithoutLoginButton.configuration = Self.styled(secondary)
+        continueWithoutLoginButton.configuration = Self.styled(Design.Button.secondary(title: NSLocalizedString("Continue without login", comment: ""), traits: traitCollection))
+        continueWithoutLoginButton.enableAdaptiveCornerStyle()
         continueWithoutLoginButton.accessibilityIdentifier = "continueWithoutLoginButton"
         continueWithoutLoginButton.addTarget(self, action: #selector(continueWithoutLoginAction), for: .touchUpInside)
 
-        googleButton.configuration = Self.googleConfiguration(title: presenter.googleButtonText)
+        googleButton.configuration = Self.googleConfiguration(title: presenter.googleButtonText, traits: traitCollection)
+        googleButton.enableAdaptiveCornerStyle()
         googleButton.accessibilityIdentifier = "google_login_button"
         googleButton.addTarget(self, action: #selector(loginWithGoogleAction), for: .touchUpInside)
         appleButton.accessibilityIdentifier = "apple_login_button"
@@ -153,6 +150,9 @@ final class MailLoginViewController: BaseViewController {
     }
 
     private func updateAppleButtonAppearance() {
+        let radius: CGFloat = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? Design.Radius.control : 26
+        appleButton.cornerRadius = radius
+        appleButtonDark.cornerRadius = radius
         appleButton.isHidden = traitCollection.userInterfaceStyle == .dark
         appleButtonDark.isHidden = !appleButton.isHidden
     }
@@ -170,7 +170,7 @@ final class MailLoginViewController: BaseViewController {
 
     /// Google's light/dark button theme (white or near-black fill, grey outline, standard "G"), in the screen's capsule
     /// shape and Dynamic Type headline so it sits with the other two actions.
-    private static func googleConfiguration(title: String) -> UIButton.Configuration {
+    private static func googleConfiguration(title: String, traits: UITraitCollection) -> UIButton.Configuration {
         func color(light: UInt32, dark: UInt32) -> UIColor {
             func rgb(_ value: UInt32) -> UIColor {
                 UIColor(red: CGFloat((value >> 16) & 0xFF) / 255, green: CGFloat((value >> 8) & 0xFF) / 255,
@@ -182,7 +182,7 @@ final class MailLoginViewController: BaseViewController {
         configuration.title = title
         configuration.image = googleLogo()
         configuration.imagePadding = Design.Spacing.m
-        configuration.cornerStyle = .capsule
+        configuration.cornerStyle = Design.Button.cornerStyle(for: traits)
         configuration.buttonSize = .large
         configuration.baseForegroundColor = color(light: 0x1F1F1F, dark: 0xE3E3E3)
         configuration.background.backgroundColor = color(light: 0xFFFFFF, dark: 0x131314)
@@ -240,13 +240,14 @@ final class MailLoginViewController: BaseViewController {
         seal.textAlignment = .center
         seal.textColor = Design.Color.onHero
         seal.backgroundColor = Design.Color.hero
-        seal.font = UIFont(name: "HiraMinProN-W6", size: 22) ?? .systemFont(ofSize: 22, weight: .semibold)
-        seal.layer.cornerRadius = 10
+        seal.font = Design.TextRole.mincho(size: 22, style: .title3, maximum: 30)
+        seal.adjustsFontForContentSizeCategory = true
+        seal.layer.cornerRadius = Design.Radius.chip
         seal.layer.cornerCurve = .continuous
         seal.clipsToBounds = true
         seal.isAccessibilityElement = false
-        seal.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        seal.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        seal.widthAnchor.constraint(greaterThanOrEqualToConstant: 40).isActive = true
+        seal.heightAnchor.constraint(greaterThanOrEqualToConstant: 40).isActive = true
 
         let wordmark = UILabel()
         wordmark.text = "Flashcard"
@@ -472,12 +473,12 @@ private final class LoginFieldView: UIView {
         super.init(frame: .zero)
 
         titleLabel.apply(.metadata)
-        titleLabel.font = Design.TextRole.metadata.font.withWeight(.semibold)
+        titleLabel.font = Design.TextRole.weighted(.footnote, weight: .semibold)
         titleLabel.text = title
         titleLabel.isAccessibilityElement = false
 
         container.backgroundColor = Design.Color.surface
-        container.layer.cornerRadius = 14
+        container.layer.cornerRadius = Design.Radius.control
         container.layer.cornerCurve = .continuous
 
         textField.font = .preferredFont(forTextStyle: .body)
@@ -548,7 +549,7 @@ private final class LoginFieldView: UIView {
     }
 
     private func applyBorder(focused: Bool) {
-        let color = focused ? Design.Color.accent : UIColor.systemGray2
+        let color = focused ? Design.Color.accent : Design.Color.border
         container.layer.borderColor = color.resolvedColor(with: traitCollection).cgColor
         container.layer.borderWidth = focused ? 2 : 1
     }

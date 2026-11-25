@@ -16,11 +16,14 @@ final class DataExportWireframe: DataExportWireframeInterface {
 final class DataExportViewController: BaseViewController, DataExportViewInterface {
     var presenter: DataExportPresenterInterface!
 
+    private let scrollView = UIScrollView()
+    private let stateView = StateView()
+    private let cardView = UIView()
     private let stack = UIStackView()
     private let titleLabel = UILabel()
     private let messageLabel = UILabel()
     private let noticeLabel = UILabel()
-    private let button = UIButton(configuration: .borderedProminent())
+    private let button = UIButton(type: .system)
     private let spinner = UIActivityIndicatorView(style: .medium)
 
     static func make() -> DataExportViewController {
@@ -52,7 +55,9 @@ final class DataExportViewController: BaseViewController, DataExportViewInterfac
         title = NSLocalizedString("Your data", comment: "Settings section about the account's data")
 
         titleLabel.apply(.headword)
+        titleLabel.font = Design.TextRole.weighted(.title3, weight: .semibold)
         titleLabel.numberOfLines = 0
+        titleLabel.accessibilityTraits = .header
         titleLabel.accessibilityIdentifier = "data_export_title"
         messageLabel.apply(.meaning)
         messageLabel.numberOfLines = 0
@@ -60,6 +65,23 @@ final class DataExportViewController: BaseViewController, DataExportViewInterfac
         noticeLabel.apply(.metadata)
         noticeLabel.numberOfLines = 0
         noticeLabel.accessibilityIdentifier = "data_export_notice"
+
+        cardView.applyCardSurface(radius: Design.Radius.card)
+        let cardStack = UIStackView(arrangedSubviews: [titleLabel, messageLabel, noticeLabel])
+        cardStack.axis = .vertical
+        cardStack.spacing = Design.Spacing.s
+        cardStack.translatesAutoresizingMaskIntoConstraints = false
+        cardView.addSubview(cardStack)
+        NSLayoutConstraint.activate([
+            cardStack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: Design.Spacing.l),
+            cardStack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -Design.Spacing.l),
+            cardStack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: Design.Spacing.l),
+            cardStack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -Design.Spacing.l)
+        ])
+
+        button.configuration = Design.Button.primary(title: "", traits: traitCollection)
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 52).isActive = true
+        button.enableAdaptiveCornerStyle()
         button.accessibilityIdentifier = "data_export_action"
         // In the failed state the button reads the list again instead of performing an action.
         button.addAction(UIAction { [weak self] _ in
@@ -68,35 +90,54 @@ final class DataExportViewController: BaseViewController, DataExportViewInterfac
         }, for: .touchUpInside)
         spinner.hidesWhenStopped = true
 
-        [titleLabel, messageLabel, noticeLabel, button, spinner].forEach(stack.addArrangedSubview)
+        [cardView, button, spinner].forEach(stack.addArrangedSubview)
         stack.axis = .vertical
-        stack.spacing = Design.Spacing.m
+        stack.spacing = Design.Spacing.l
         stack.alignment = .fill
         stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
+
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.addSubview(stack)
+        stateView.translatesAutoresizingMaskIntoConstraints = false
+        stateView.isHidden = true
+        view.addSubview(scrollView)
+        view.addSubview(stateView)
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Design.Spacing.l),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Design.Spacing.gutter),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Design.Spacing.gutter)
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Design.Spacing.l),
+            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.xl),
+            stack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
+            stack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
+            stateView.topAnchor.constraint(equalTo: view.topAnchor),
+            stateView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            stateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            stateView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
 
     func render(_ state: DataExportState) {
-        switch state.phase {
-        case .loading:
-            titleLabel.text = nil
-            messageLabel.text = nil
-        case .loaded, .failed:
-            titleLabel.text = state.title
-            messageLabel.text = state.message
+        failed = state.phase == .failed
+        if state.phase == .loading {
+            scrollView.isHidden = true
+            stateView.isHidden = false
+            stateView.configure(.loading(NSLocalizedString("Loading…", comment: "")))
+            spinner.stopAnimating()
+            return
         }
+        stateView.isHidden = true
+        scrollView.isHidden = false
+        titleLabel.text = state.title
+        messageLabel.text = state.message
         noticeLabel.text = state.notice
         noticeLabel.isHidden = state.notice == nil
         let title = state.phase == .failed ? NSLocalizedString("Try again", comment: "") : state.actionTitle
         button.configuration?.title = title
         button.isHidden = title == nil
         button.isEnabled = !state.isWorking
-        failed = state.phase == .failed
         state.isWorking ? spinner.startAnimating() : spinner.stopAnimating()
     }
 

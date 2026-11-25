@@ -139,7 +139,9 @@ final class SettingsRowCell: UITableViewCell {
         let natural = menuButton.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude,
                                                      height: CGFloat.greatestFiniteMagnitude))
         let limit = bounds.width > 0 ? bounds.width * 0.6 : natural.width
-        menuButton.bounds = CGRect(x: 0, y: 0, width: ceil(min(natural.width, limit)), height: ceil(natural.height))
+        let width = max(ceil(min(natural.width, limit)), Design.HitTarget.minimum)
+        let height = max(ceil(natural.height), Design.HitTarget.minimum)
+        menuButton.bounds = CGRect(x: 0, y: 0, width: width, height: height)
     }
 
     override func layoutSubviews() {

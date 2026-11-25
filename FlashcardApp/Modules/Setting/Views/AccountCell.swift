@@ -38,7 +38,7 @@ final class AccountCell: UITableViewCell {
 
         avatarView.layer.cornerRadius = Self.avatarSize / 2
         avatarView.layer.borderWidth = 1
-        avatarView.layer.borderColor = Design.Color.accent.resolvedColor(with: traitCollection).cgColor
+        avatarView.observeAdaptiveBorder { Design.Color.accent }
         avatarView.clipsToBounds = true
         avatarView.translatesAutoresizingMaskIntoConstraints = false
         avatarView.isAccessibilityElement = false
@@ -69,7 +69,7 @@ final class AccountCell: UITableViewCell {
         ])
 
         nameLabel.apply(.title)
-        nameLabel.font = UIFontMetrics(forTextStyle: .title3).scaledFont(for: .systemFont(ofSize: 20, weight: .semibold))
+        nameLabel.font = Design.TextRole.weighted(.title3, weight: .semibold)
         detailLabel.apply(.reading)
         let textStack = UIStackView(arrangedSubviews: [nameLabel, detailLabel])
         textStack.axis = .vertical
@@ -88,6 +88,8 @@ final class AccountCell: UITableViewCell {
         headerStack.alignment = .center
         [avatarView, infoView].forEach(headerStack.addArrangedSubview)
 
+        signInButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        signInButton.enableAdaptiveCornerStyle()
         signInButton.accessibilityIdentifier = "setting_sign_in"
         signInButton.addAction(UIAction { [weak self] _ in self?.onSignIn?() }, for: .primaryActionTriggered)
 
@@ -105,10 +107,6 @@ final class AccountCell: UITableViewCell {
         updateAxis()
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: AccountCell, _) in
             cell.updateAxis()
-        }
-        // CGColor does not follow appearance by itself; resolve it again when light/dark changes.
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (cell: AccountCell, _) in
-            cell.avatarView.layer.borderColor = Design.Color.accent.resolvedColor(with: cell.traitCollection).cgColor
         }
     }
 
