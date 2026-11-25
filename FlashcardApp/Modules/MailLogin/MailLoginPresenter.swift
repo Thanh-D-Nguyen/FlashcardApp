@@ -48,7 +48,7 @@ final class MailLoginPresenter {
     var mailPlaceHolderAttributedText: NSAttributedString {
         NSAttributedString(
             string: NSLocalizedString("email@domain.com", comment: ""),
-            attributes: [.foregroundColor: AppColors.placeholderText])
+            attributes: [.foregroundColor: Design.Color.placeholder])
     }
     
     var titleText: String {

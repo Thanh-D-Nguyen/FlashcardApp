@@ -2,103 +2,30 @@
 //  AppColor.swift
 //  FlashcardApp
 //
-//  Created by タイン・グエン on 2023/02/23.
+//  Legacy color namespace retained as a thin compatibility shim over `Design.Color`.
+//  New code should reference `Design.Color` directly.
 //
 
 import UIKit
 
-class AppColors {
-    
-    // Màu chính (Primary Color)
-    static var primary: UIColor {
-        return UIColor(named: "AppPrimary")!
-    }
-    
-    // Màu phụ (Secondary Color)
-    static var secondary: UIColor {
-        return UIColor(named: "AppSecondary")!
-    }
-    
-    // Màu xanh điểm nhấn (Accent Green)
-    static var accentGreen: UIColor {
-        return UIColor(named: "AccentGreen")!
-    }
-    
-    // Màu đỏ điểm nhấn (Accent Red)
-    static var accentRed: UIColor {
-        return UIColor(named: "AccentRed")!
-    }
-    
-    // Màu nền chính (Background Color)
-    static var background: UIColor {
-        return UIColor(named: "Background")!
-    }
-    
-    // Màu nền của các thẻ (Card Background Color)
-    static var cardBackground: UIColor {
-        return UIColor(named: "CardBackground")!
-    }
-    
-    // Màu văn bản chính (Primary Text Color)
-    static var textPrimary: UIColor {
-        return UIColor(named: "TextPrimary")!
-    }
-    
-    // Màu văn bản phụ (Secondary Text Color)
-    static var textSecondary: UIColor {
-        return UIColor(named: "TextSecondary")!
-    }
-    
-    // Màu vàng nổi bật (Highlight Yellow)
-    static var highlightYellow: UIColor {
-        return UIColor(named: "HighlightYellow")!
-    }
-    
-    // Màu xám nhạt (Light Gray)
-    static var lightGray: UIColor {
-        return UIColor(named: "AppLightGray")!
-    }
-    
-    // Màu xám đậm (Dark Gray)
-    static var darkGray: UIColor {
-        return UIColor(named: "AppDarkGray")!
-    }
-    
-    // Màu tím tương tác (Interactive Purple)
-    static var interactivePurple: UIColor {
-        return UIColor(named: "InteractivePurple")!
-    }
-    
-    // Màu cam thông báo (Notification Orange)
-    static var notificationOrange: UIColor {
-        return UIColor(named: "NotificationOrange")!
-    }
-    
-    // Màu nền của ảnh (Image Background Color)
-    static var imageBackground: UIColor {
-        return UIColor(named: "ImageBackground")!
-    }
-    
-    // Màu cho đáp án đúng trong quiz (Quiz Correct)
-    static var quizCorrect: UIColor {
-        return UIColor(named: "QuizCorrect")!
-    }
-    
-    // Màu cho đáp án sai trong quiz (Quiz Incorrect)
-    static var quizIncorrect: UIColor {
-        return UIColor(named: "QuizIncorrect")!
-    }
-    
-    // Màu nền của các mục từ điển (Dictionary Background Color)
-    static var dictionaryBackground: UIColor {
-        return UIColor(named: "DictionaryBackground")!
-    }
-    
-    static var placeholderText: UIColor {
-        return UIColor(named: "AppPlaceholderText")!
-    }
-    
-    static var separatorLine: UIColor {
-        return UIColor(named: "SeparatorLine")!
-    }
+enum AppColors {
+    static var primary: UIColor { Design.Color.accent }
+    static var secondary: UIColor { Design.Color.hero }
+    static var accentGreen: UIColor { Design.Color.success }
+    static var accentRed: UIColor { Design.Color.error }
+    static var background: UIColor { Design.Color.background }
+    static var cardBackground: UIColor { Design.Color.surface }
+    static var textPrimary: UIColor { Design.Color.textPrimary }
+    static var textSecondary: UIColor { Design.Color.textSecondary }
+    static var highlightYellow: UIColor { Design.Color.warning }
+    static var lightGray: UIColor { Design.Color.surfaceTint }
+    static var darkGray: UIColor { Design.Color.textSecondary }
+    static var interactivePurple: UIColor { Design.Color.accent }
+    static var notificationOrange: UIColor { Design.Color.warning }
+    static var imageBackground: UIColor { Design.Color.surfaceTint }
+    static var quizCorrect: UIColor { Design.Color.success }
+    static var quizIncorrect: UIColor { Design.Color.error }
+    static var dictionaryBackground: UIColor { Design.Color.background }
+    static var placeholderText: UIColor { Design.Color.placeholder }
+    static var separatorLine: UIColor { Design.Color.separator }
 }

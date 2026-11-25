@@ -2,46 +2,27 @@
 //  PlaceholderView.swift
 //  FlashcardApp
 //
-//  Created by タイン・グエン on 2023/03/26.
+//  Legacy placeholder helper migrated onto `Design` tokens and Auto Layout.
+//  Prefer `StateView` for all new list/screen empty & error states.
 //
 
 import UIKit
 
 final class PlaceholderView: UIView {
-    
-    // MARK: - Properties
+
     private(set) var text: String
     private(set) var imageTintColor: UIColor
     private(set) var placeholderImage: UIImage?
-    
+
     enum PlaceholderImage: String {
         case empty = "photo.on.rectangle"
         case warning = "exclamationmark.triangle"
     }
-    
-    // MARK: - Constants
-    private enum Constants {
-        static let labelTopOffest = CGFloat(10)
-        static let placeholderImageSize = CGSize(width: 50, height: 50)
-    }
-    
-    // MARK: - Views
-    private lazy var placeholerImageView: UIImageView = {
-        let imageView = UIImageView(image: tintedPlaceholderImage)
-        imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .white
-        imageView.preferredSymbolConfiguration = .init(scale: .large)
-        return imageView
-    }()
-    private lazy var placeholderLabel: UILabel = {
-        let label = UILabel()
-        label.text = text
-        label.textColor = .systemGray
-        label.backgroundColor = .white
-        return label
-    }()
-    
-    // MARK: - Init
+
+    private let stack = UIStackView()
+    private let imageView = UIImageView()
+    private let label = UILabel()
+
     init(text: String, image: PlaceholderImage, imageTintColor: UIColor) {
         self.text = text
         self.imageTintColor = imageTintColor
@@ -49,68 +30,44 @@ final class PlaceholderView: UIView {
         super.init(frame: .zero)
         setupViews()
     }
-    
+
     @available(*, unavailable) required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) is not supported")
     }
-    
-    // MARK: - Life cycle
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setupFrames()
-    }
-}
 
-// MARK: - Methods
-extension PlaceholderView {
     func update(text: String, image: PlaceholderImage, imageTintColor: UIColor) {
-        placeholderLabel.text = text
+        self.text = text
         self.imageTintColor = imageTintColor
-        placeholderImage = UIImage(systemName: image.rawValue)
-        placeholerImageView.image = tintedPlaceholderImage
+        self.placeholderImage = UIImage(systemName: image.rawValue)
+        label.text = text
+        imageView.image = placeholderImage
+        imageView.tintColor = imageTintColor
     }
-}
 
-// MARK: - Computed properties
-private extension PlaceholderView {
-    var tintedPlaceholderImage: UIImage? {
-        placeholderImage?.withTintColor(
-            imageTintColor,
-            renderingMode: .alwaysOriginal
-        )
-    }
-    
-    var labelSize: CGSize {
-        placeholderLabel.intrinsicContentSize
-    }
-    
-    var imageHeight: CGFloat {
-        placeholerImageView.frame.size.height
-    }
-    
-    var imageYPosition: CGFloat {
-        placeholerImageView.frame.origin.y
-    }
-}
+    private func setupViews() {
+        backgroundColor = Design.Color.background
 
-// MARK: - Setup views
-private extension PlaceholderView {
-    func setupViews() {
-        addSubviews()
-        backgroundColor = .white
-    }
-    
-    func addSubviews() {
-        addSubview(placeholerImageView)
-        addSubview(placeholderLabel)
-    }
-    
-    func setupFrames() {
-        placeholerImageView.frame.size = Constants.placeholderImageSize
-        placeholerImageView.center = CGPoint(x: frame.width / 2, y: frame.height / 2)
-        
-        placeholderLabel.frame.origin.x = (frame.width - labelSize.width) / 2
-        placeholderLabel.frame.origin.y = imageYPosition + imageHeight + Constants.labelTopOffest
-        placeholderLabel.frame.size = labelSize
+        imageView.image = placeholderImage
+        imageView.tintColor = imageTintColor
+        imageView.contentMode = .scaleAspectFit
+        imageView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .largeTitle)
+
+        label.apply(.reading)
+        label.textAlignment = .center
+        label.text = text
+
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = Design.Spacing.m
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.addArrangedSubview(imageView)
+        stack.addArrangedSubview(label)
+        addSubview(stack)
+
+        NSLayoutConstraint.activate([
+            stack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
+            stack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor, constant: Design.Spacing.l),
+            stack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor, constant: -Design.Spacing.l)
+        ])
     }
 }

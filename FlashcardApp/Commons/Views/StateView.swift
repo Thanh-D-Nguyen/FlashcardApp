@@ -2,6 +2,7 @@ import UIKit
 
 /// Full-area loading / empty / error presentation shared by list screens.
 /// Color is never the only signal: every state has an icon (or spinner) and words.
+/// Scrollable so accessibility text sizes never clip or collide with navigation chrome.
 final class StateView: UIView {
     enum State: Equatable {
         case loading(String)
@@ -11,6 +12,16 @@ final class StateView: UIView {
         case error(message: String, retryTitle: String)
     }
 
+    /// Extra top inset when displayed as a table/collection `backgroundView` beneath a section header or search bar.
+    var topContentInset: CGFloat = 0 {
+        didSet {
+            scrollTopConstraint?.constant = topContentInset
+            setNeedsLayout()
+        }
+    }
+
+    private let scrollView = UIScrollView()
+    private let contentGuideView = UIView()
     private let stack = UIStackView()
     private let iconView = UIImageView()
     private let spinner = UIActivityIndicatorView(style: .large)
@@ -19,30 +30,68 @@ final class StateView: UIView {
     private let retryButton = UIButton(type: .system)
     private var onRetry: (() -> Void)?
     private var shownState: State?
+    private var scrollTopConstraint: NSLayoutConstraint?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        scrollView.alwaysBounceVertical = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+
+        contentGuideView.translatesAutoresizingMaskIntoConstraints = false
+
         stack.axis = .vertical
         stack.alignment = .center
         stack.spacing = Design.Spacing.m
         stack.translatesAutoresizingMaskIntoConstraints = false
+
         iconView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .largeTitle)
         iconView.contentMode = .scaleAspectFit
         iconView.setContentHuggingPriority(.required, for: .vertical)
+
         titleLabel.apply(.title)
         titleLabel.textAlignment = .center
         messageLabel.apply(.reading)
         messageLabel.textAlignment = .center
+
         retryButton.addAction(UIAction { [weak self] _ in self?.onRetry?() }, for: .touchUpInside)
+        retryButton.enableAdaptiveCornerStyle()
+
         [spinner, iconView, titleLabel, messageLabel, retryButton].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.xl, after: messageLabel)
-        addSubview(stack)
+
+        addSubview(scrollView)
+        scrollView.addSubview(contentGuideView)
+        contentGuideView.addSubview(stack)
+
+        let top = scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
+        scrollTopConstraint = top
+
+        let centerY = stack.centerYAnchor.constraint(equalTo: contentGuideView.centerYAnchor, constant: -Design.Spacing.l)
+        centerY.priority = .defaultHigh
+
+        let minHeight = contentGuideView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.frameLayoutGuide.heightAnchor)
+        minHeight.priority = .defaultHigh
+
         NSLayoutConstraint.activate([
-            stack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor, constant: -Design.Spacing.xxl),
-            stack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor, constant: Design.Spacing.l),
-            stack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor, constant: -Design.Spacing.l),
-            stack.topAnchor.constraint(greaterThanOrEqualTo: safeAreaLayoutGuide.topAnchor, constant: Design.Spacing.l),
-            stack.bottomAnchor.constraint(lessThanOrEqualTo: safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.l)
+            top,
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+
+            contentGuideView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentGuideView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentGuideView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentGuideView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            contentGuideView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            minHeight,
+
+            centerY,
+            stack.leadingAnchor.constraint(equalTo: contentGuideView.leadingAnchor, constant: Design.Spacing.xl),
+            stack.trailingAnchor.constraint(equalTo: contentGuideView.trailingAnchor, constant: -Design.Spacing.xl),
+            stack.topAnchor.constraint(greaterThanOrEqualTo: contentGuideView.topAnchor, constant: Design.Spacing.l),
+            stack.bottomAnchor.constraint(lessThanOrEqualTo: contentGuideView.bottomAnchor, constant: -Design.Spacing.l)
         ])
         isAccessibilityElement = false
     }
@@ -72,13 +121,13 @@ final class StateView: UIView {
             titleLabel.textColor = Design.Color.textPrimary
             messageLabel.text = message
             messageLabel.isHidden = message == nil
-            retryButton.configuration = Design.Button.primary(title: actionTitle)
+            retryButton.configuration = Design.Button.primary(title: actionTitle, traits: traitCollection)
             retryButton.isHidden = false
         case .error(let message, let retryTitle):
             show(symbol: "exclamationmark.triangle", tint: Design.Color.error)
             titleLabel.text = message
             titleLabel.textColor = Design.Color.error
-            retryButton.configuration = Design.Button.primary(title: retryTitle)
+            retryButton.configuration = Design.Button.primary(title: retryTitle, traits: traitCollection)
             retryButton.isHidden = false
         }
         spinner.isHidden = !spinner.isAnimating
