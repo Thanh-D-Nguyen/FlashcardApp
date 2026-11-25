@@ -150,22 +150,25 @@ final class CardScopeBar: UIView {
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stack.centerYAnchor.constraint(equalTo: scrollView.frameLayoutGuide.centerYAnchor),
             stack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
             stack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
-            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
+            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Design.Spacing.s),
+            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.s),
+            scrollView.heightAnchor.constraint(equalTo: stack.heightAnchor, constant: Design.Spacing.s * 2)
         ])
         for scope in CardLibraryScope.allCases {
             let chip = PressableButton(configuration: .filled())
             chip.accessibilityIdentifier = "cards_scope_\(scope.rawValue)"
-            chip.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+            chip.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             chip.setContentCompressionResistancePriority(.required, for: .horizontal)
             chip.addAction(UIAction { [weak self] _ in self?.onSelect?(scope) }, for: .primaryActionTriggered)
             chips[scope] = chip
             stack.addArrangedSubview(chip)
         }
         refreshChips()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (bar: CardScopeBar, _) in
+            bar.refreshChips()
+        }
         // Everything inside is one list of choices for VoiceOver, with the badge read as part of the name.
         isAccessibilityElement = false
     }
@@ -321,6 +324,10 @@ final class ReviewHeroCell: UITableViewCell {
         startButton.accessibilityIdentifier = "review_start"
         startButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         startButton.addAction(UIAction { [weak self] _ in self?.onStart?() }, for: .primaryActionTriggered)
+        updateStartButton()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: ReviewHeroCell, _) in
+            cell.updateStartButton()
+        }
 
         let stack = UIStackView(arrangedSubviews: [figureLabel, captionLabel, explanationLabel, startButton])
         stack.axis = .vertical
@@ -344,6 +351,10 @@ final class ReviewHeroCell: UITableViewCell {
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    private func updateStartButton() {
+        startButton.configuration = Design.Button.hero(title: NSLocalizedString("Start review", comment: ""), traits: traitCollection)
+    }
 
     func configure(due: Int, capped: Bool, onStart: @escaping () -> Void) {
         let number = due.formatted(.number.locale(AppLanguage.current.locale))

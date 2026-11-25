@@ -54,11 +54,13 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
         tableView.tableHeaderView = header
 
         studyButton.accessibilityIdentifier = "remote_deck_study"
+        studyButton.enableAdaptiveCornerStyle()
         studyButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         studyButton.addAction(UIAction { [weak self] _ in self?.presenter.study() }, for: .primaryActionTriggered)
         saveButton.configuration?.title = NSLocalizedString("Save to this device", comment: "")
         saveButton.configuration?.image = UIImage(systemName: "arrow.down.circle")
         saveButton.configuration?.imagePadding = Design.Spacing.s
+        saveButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         saveButton.accessibilityIdentifier = "remote_deck_save"
         saveButton.addAction(UIAction { [weak self] _ in self?.presenter.saveToDevice() }, for: .primaryActionTriggered)
         for label in [noticeLabel, footnoteLabel] {
@@ -207,11 +209,12 @@ final class RemoteDeckHeaderView: UIView {
     private let titleLabel = UILabel()
     private let factsLabel = UILabel()
     private let detailsLabel = UILabel()
+    private let topRow = UIStackView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         monogramBox.backgroundColor = Design.Color.highlight
-        monogramBox.layer.cornerRadius = Design.Spacing.m
+        monogramBox.layer.cornerRadius = Design.Radius.chip
         monogramBox.layer.cornerCurve = .continuous
         monogramBox.isAccessibilityElement = false
         monogramBox.translatesAutoresizingMaskIntoConstraints = false
@@ -236,10 +239,10 @@ final class RemoteDeckHeaderView: UIView {
         let text = UIStackView(arrangedSubviews: [titleLabel, factsLabel])
         text.axis = .vertical
         text.spacing = Design.Spacing.xs
-        let top = UIStackView(arrangedSubviews: [monogramBox, text])
-        top.spacing = Design.Spacing.m
-        top.alignment = .center
-        let stack = UIStackView(arrangedSubviews: [top, detailsLabel])
+        [monogramBox, text].forEach(topRow.addArrangedSubview)
+        topRow.spacing = Design.Spacing.m
+        updateAxis()
+        let stack = UIStackView(arrangedSubviews: [topRow, detailsLabel])
         stack.axis = .vertical
         stack.spacing = Design.Spacing.m
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -250,6 +253,15 @@ final class RemoteDeckHeaderView: UIView {
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.gutter),
             stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.gutter)
         ])
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: RemoteDeckHeaderView, _) in
+            view.updateAxis()
+        }
+    }
+
+    private func updateAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        topRow.axis = isAX ? .vertical : .horizontal
+        topRow.alignment = isAX ? .leading : .center
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -277,6 +289,7 @@ final class RemoteDeckCardCell: UITableViewCell {
     private let backLabel = UILabel()
     private let creditLabel = UILabel()
     private let pictureView = CardImageView()
+    private let row = UIStackView()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -299,10 +312,8 @@ final class RemoteDeckCardCell: UITableViewCell {
         let text = UIStackView(arrangedSubviews: [frontLabel, readingLabel, backLabel, creditLabel])
         text.axis = .vertical
         text.spacing = Design.Spacing.xs
-        // The picture sits beside the words, top-aligned, and is absent for cards without one.
-        let row = UIStackView(arrangedSubviews: [text, pictureView])
-        row.axis = .horizontal
-        row.alignment = .top
+        // The picture sits beside the words, top-aligned, and stacks above/below at accessibility sizes.
+        [text, pictureView].forEach(row.addArrangedSubview)
         row.spacing = Design.Spacing.m
         row.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(row)
@@ -313,6 +324,16 @@ final class RemoteDeckCardCell: UITableViewCell {
             row.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Design.Spacing.gutter)
         ])
         isAccessibilityElement = true
+        updateAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: RemoteDeckCardCell, _) in
+            cell.updateAxis()
+        }
+    }
+
+    private func updateAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        row.axis = isAX ? .vertical : .horizontal
+        row.alignment = isAX ? .leading : .top
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }

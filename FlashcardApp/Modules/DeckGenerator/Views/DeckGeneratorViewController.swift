@@ -115,9 +115,7 @@ final class DeckGeneratorViewController: BaseViewController, DeckGeneratorViewIn
 
         nameField.placeholder = NSLocalizedString("Deck name", comment: "")
         nameField.borderStyle = .none
-        nameField.backgroundColor = Design.Color.surface
-        nameField.layer.cornerRadius = Design.Spacing.m
-        nameField.layer.cornerCurve = .continuous
+        nameField.applyCardSurface(radius: Design.Radius.control)
         nameField.font = Design.TextRole.meaning.font
         nameField.adjustsFontForContentSizeCategory = true
         nameField.clearButtonMode = .whileEditing
@@ -146,6 +144,8 @@ final class DeckGeneratorViewController: BaseViewController, DeckGeneratorViewIn
         footnote.textColor = Design.Color.textSecondary
         footnote.text = NSLocalizedString("The deck is also created in your account on the website. It is saved on this device; changes you make here are not synced back.", comment: "")
         generateButton.accessibilityIdentifier = "generate_deck"
+        generateButton.enableAdaptiveCornerStyle()
+        generateButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         generateButton.addAction(UIAction { [weak self] _ in
             self?.view.endEditing(true)
             self?.presenter.generate()
@@ -218,9 +218,7 @@ final class DeckGeneratorViewController: BaseViewController, DeckGeneratorViewIn
         summary.spacing = Design.Spacing.m
         summary.isLayoutMarginsRelativeArrangement = true
         summary.directionalLayoutMargins = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: Design.Spacing.l, bottom: Design.Spacing.m, trailing: Design.Spacing.l)
-        summary.backgroundColor = Design.Color.surface
-        summary.layer.cornerRadius = Design.Spacing.l
-        summary.layer.cornerCurve = .continuous
+        summary.applyCardSurface(radius: Design.Radius.card)
         [leading, text].forEach(summary.addArrangedSubview)
         summary.accessibilityIdentifier = "generator_summary"
         summaryAction.accessibilityIdentifier = "generator_summary_action"

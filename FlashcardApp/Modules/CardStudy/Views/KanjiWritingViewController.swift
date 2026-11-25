@@ -18,13 +18,16 @@ enum KanjiWritingWireframe {
 final class KanjiWritingViewController: BaseViewController, KanjiWritingViewInterface {
     var presenter: KanjiWritingPresenterInterface!
 
+    private let scrollView = UIScrollView()
+    private let stateView = StateView()
     private let progressLabel = UILabel()
     private let wordLabel = UILabel()
     private let cueLabel = UILabel()
     private let canvas = HandwritingCanvasView()
     private let resultLabel = UILabel()
-    private let primaryButton = UIButton(configuration: .borderedProminent())
-    private let clearButton = UIButton(configuration: .bordered())
+    private let primaryButton = UIButton(type: .system)
+    private let clearButton = UIButton(type: .system)
+    private let buttons = UIStackView()
     private var phase: KanjiWritingState.Phase = .writing
 
     override func viewDidLoad() {
@@ -51,6 +54,7 @@ final class KanjiWritingViewController: BaseViewController, KanjiWritingViewInte
         view.backgroundColor = Design.Color.background
         navigationItem.largeTitleDisplayMode = .never
         title = NSLocalizedString("Write the kanji", comment: "Kanji writing practice")
+
         progressLabel.apply(.metadata)
         wordLabel.apply(.headword)
         wordLabel.textAlignment = .center
@@ -62,32 +66,66 @@ final class KanjiWritingViewController: BaseViewController, KanjiWritingViewInte
         resultLabel.textAlignment = .center
         resultLabel.numberOfLines = 0
         resultLabel.accessibilityIdentifier = "kanji_writing_result"
+
         canvas.accessibilityIdentifier = "kanji_writing_canvas"
         canvas.isAccessibilityElement = true
         canvas.accessibilityLabel = NSLocalizedString("Writing area", comment: "Kanji writing practice canvas")
         canvas.onInkChange = { [weak self] ink in self?.presenter.inkChanged(ink) }
+
+        primaryButton.configuration = Design.Button.primary(title: NSLocalizedString("Check", comment: "Kanji writing practice"), traits: traitCollection)
+        primaryButton.enableAdaptiveCornerStyle()
+        primaryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         primaryButton.accessibilityIdentifier = "kanji_writing_primary"
         primaryButton.addAction(UIAction { [weak self] _ in
             guard let self else { return }
             if case .answered = self.phase { self.presenter.next() } else { self.presenter.check() }
         }, for: .touchUpInside)
-        clearButton.configuration?.title = NSLocalizedString("Clear", comment: "")
+
+        clearButton.configuration = Design.Button.secondary(title: NSLocalizedString("Clear", comment: ""), traits: traitCollection)
+        clearButton.enableAdaptiveCornerStyle()
+        clearButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         clearButton.addAction(UIAction { [weak self] _ in self?.presenter.clear() }, for: .touchUpInside)
 
-        let buttons = UIStackView(arrangedSubviews: [clearButton, primaryButton])
+        [clearButton, primaryButton].forEach(buttons.addArrangedSubview)
         buttons.spacing = Design.Spacing.m
         buttons.distribution = .fillEqually
+        updateButtonsAxis()
+
+        scrollView.alwaysBounceVertical = true
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
         let stack = UIStackView(arrangedSubviews: [progressLabel, wordLabel, cueLabel, canvas, resultLabel, buttons])
         stack.axis = .vertical
         stack.spacing = Design.Spacing.m
         stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
+        scrollView.addSubview(stack)
+        stateView.translatesAutoresizingMaskIntoConstraints = false
+        stateView.isHidden = true
+        view.addSubview(scrollView)
+        view.addSubview(stateView)
+
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Design.Spacing.m),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Design.Spacing.gutter),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Design.Spacing.gutter),
-            canvas.heightAnchor.constraint(equalTo: canvas.widthAnchor)
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Design.Spacing.m),
+            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.xl),
+            stack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
+            stack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
+            canvas.heightAnchor.constraint(equalTo: canvas.widthAnchor),
+            stateView.topAnchor.constraint(equalTo: view.topAnchor),
+            stateView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            stateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            stateView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: KanjiWritingViewController, _) in
+            controller.updateButtonsAxis()
+        }
+    }
+
+    private func updateButtonsAxis() {
+        buttons.axis = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? .vertical : .horizontal
     }
 
     func clearCanvas() { canvas.clear() }
@@ -100,30 +138,34 @@ final class KanjiWritingViewController: BaseViewController, KanjiWritingViewInte
         cueLabel.text = state.question.map { [$0.reading, $0.meaning].filter { !$0.isEmpty }.joined(separator: " · ") }
         canvas.isUserInteractionEnabled = state.phase == .writing
         clearButton.isEnabled = state.phase == .writing && state.hasInk
+        stateView.isHidden = true
+        scrollView.isHidden = false
         switch state.phase {
         case .empty:
-            resultLabel.text = NSLocalizedString("This deck has no kanji the app can check yet.", comment: "Kanji writing practice")
-            canvas.isHidden = true
-            primaryButton.isHidden = true
-            clearButton.isHidden = true
+            let message = NSLocalizedString("This deck has no kanji the app can check yet.", comment: "Kanji writing practice")
+            resultLabel.text = message
+            stateView.configure(.empty(title: message, message: nil))
+            stateView.isHidden = false
+            scrollView.isHidden = true
         case .writing, .checking:
+            resultLabel.textColor = Design.Color.textSecondary
             resultLabel.text = state.notice
-            primaryButton.configuration?.title = NSLocalizedString("Check", comment: "Kanji writing practice")
+            primaryButton.configuration = Design.Button.primary(title: NSLocalizedString("Check", comment: "Kanji writing practice"), traits: traitCollection)
             primaryButton.isEnabled = state.phase == .writing && state.hasInk
         case .answered(let correct):
             let target = state.question?.target ?? ""
+            resultLabel.textColor = correct ? Design.Color.success : Design.Color.error
             resultLabel.text = correct ? String(format: NSLocalizedString("Right: %@", comment: "Kanji writing practice"), target)
                                        : String(format: NSLocalizedString("Not recognised as %@. Compare and try the next one.", comment: "Kanji writing practice"), target)
             wordLabel.text = state.question.map { $0.maskedWord.replacingOccurrences(of: "□", with: $0.target) }
-            primaryButton.configuration?.title = NSLocalizedString("Next", comment: "")
+            primaryButton.configuration = Design.Button.primary(title: NSLocalizedString("Next", comment: ""), traits: traitCollection)
             primaryButton.isEnabled = true
         case .finished:
-            resultLabel.text = String(format: NSLocalizedString("Done: %1$lld of %2$lld recognised.", comment: "Kanji writing practice"), state.correct, state.total)
-            canvas.isHidden = true
-            primaryButton.isHidden = true
-            clearButton.isHidden = true
-            wordLabel.text = nil
-            cueLabel.text = nil
+            let message = String(format: NSLocalizedString("Done: %1$lld of %2$lld recognised.", comment: "Kanji writing practice"), state.correct, state.total)
+            resultLabel.text = message
+            stateView.configure(.empty(title: message, message: nil))
+            stateView.isHidden = false
+            scrollView.isHidden = true
         }
     }
 }

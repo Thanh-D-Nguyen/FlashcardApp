@@ -118,6 +118,17 @@ final class CardViewController: BaseViewController, CardViewInterface {
         stateView.accessibilityIdentifier = "deck_library_state"
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let headerBottom: CGFloat
+        if let header = tableView.headerView(forSection: 0) {
+            headerBottom = header.convert(header.bounds, to: stateView).maxY
+        } else {
+            headerBottom = tableView.adjustedContentInset.top + tableView.rectForHeader(inSection: 0).height
+        }
+        stateView.topContentInset = max(0, headerBottom - stateView.safeAreaInsets.top) + Design.Spacing.s
+    }
+
     func subscribe() {}
 
     // MARK: CardViewInterface
@@ -322,7 +333,7 @@ extension CardViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        section == 0 ? CardScopeBar.height : UITableView.automaticDimension
+        UITableView.automaticDimension
     }
 
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {

@@ -74,6 +74,9 @@ extension OftenMissedViewController: UITableViewDataSource, UITableViewDelegate 
         content.secondaryTextProperties.apply(.metadata)
         content.secondaryTextProperties.numberOfLines = 0
         cell.contentConfiguration = content
+        let selected = UIView()
+        selected.backgroundColor = Design.Color.highlight
+        cell.selectedBackgroundView = selected
         cell.accessoryType = .disclosureIndicator
         cell.isAccessibilityElement = true
         cell.accessibilityLabel = [content.text, row.back, row.detail, row.deckName].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ". ")

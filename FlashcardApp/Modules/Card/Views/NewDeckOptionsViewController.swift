@@ -68,18 +68,19 @@ final class NewDeckOptionsViewController: UIViewController {
 }
 
 private final class OptionRow: UIControl {
+    private let row = UIStackView()
+    private let chevron = UIImageView(image: UIImage(systemName: "chevron.forward"))
+
     init(symbol: String, title: String, detail: String) {
         super.init(frame: .zero)
-        backgroundColor = Design.Color.surface
-        layer.cornerRadius = Design.Spacing.l
-        layer.cornerCurve = .continuous
+        applyCardSurface(radius: Design.Radius.card)
 
         let tile = UIImageView(image: UIImage(systemName: symbol))
         tile.contentMode = .center
         tile.tintColor = Design.Color.accent
         tile.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .title2)
         tile.backgroundColor = Design.Color.highlight
-        tile.layer.cornerRadius = Design.Spacing.m
+        tile.layer.cornerRadius = Design.Radius.chip
         tile.layer.cornerCurve = .continuous
         tile.translatesAutoresizingMaskIntoConstraints = false
         tile.setContentHuggingPriority(.required, for: .horizontal)
@@ -95,12 +96,10 @@ private final class OptionRow: UIControl {
         text.axis = .vertical
         text.spacing = Design.Spacing.xs
 
-        let chevron = UIImageView(image: UIImage(systemName: "chevron.forward"))
         chevron.tintColor = Design.Color.textSecondary
         chevron.setContentHuggingPriority(.required, for: .horizontal)
 
-        let row = UIStackView(arrangedSubviews: [tile, text, chevron])
-        row.alignment = .center
+        [tile, text, chevron].forEach(row.addArrangedSubview)
         row.spacing = Design.Spacing.m
         row.isUserInteractionEnabled = false
         row.isLayoutMarginsRelativeArrangement = true
@@ -119,6 +118,17 @@ private final class OptionRow: UIControl {
         accessibilityTraits = .button
         accessibilityLabel = title
         accessibilityHint = detail
+        updateAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: OptionRow, _) in
+            view.updateAxis()
+        }
+    }
+
+    private func updateAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        row.axis = isAX ? .vertical : .horizontal
+        row.alignment = isAX ? .leading : .center
+        chevron.isHidden = isAX
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }

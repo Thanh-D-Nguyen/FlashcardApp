@@ -89,6 +89,7 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
         scrollView.addSubview(contentStack)
 
         showAnswerButton.accessibilityIdentifier = "review_show_answer"
+        showAnswerButton.enableAdaptiveCornerStyle()
         showAnswerButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         showAnswerButton.addAction(UIAction { [weak self] _ in self?.presenter.flip() }, for: .primaryActionTriggered)
         configureRatings()
@@ -192,6 +193,7 @@ final class CardReviewViewController: BaseViewController, CardReviewViewInterfac
         text.font = UIFont.preferredFont(forTextStyle: .headline)
         configuration.attributedTitle = text
         let button = PressableButton(configuration: configuration)
+        button.enableAdaptiveCornerStyle()
         button.accessibilityIdentifier = identifier
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         return button
@@ -366,9 +368,11 @@ final class ReviewFailureView: UIStackView {
         warningLabel.textAlignment = .center
         warningLabel.text = NSLocalizedString("The connection broke while sending. This rating may already have been saved.", comment: "")
         retryButton.accessibilityIdentifier = "review_retry"
+        retryButton.enableAdaptiveCornerStyle()
         retryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         retryButton.addAction(UIAction { [weak self] _ in self?.onRetry?() }, for: .primaryActionTriggered)
         skipButton.configuration?.title = NSLocalizedString("Skip this card", comment: "Leave a card that could not be rated; it stays due")
+        skipButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         skipButton.accessibilityIdentifier = "review_skip"
         skipButton.addAction(UIAction { [weak self] _ in self?.onSkip?() }, for: .primaryActionTriggered)
         [messageLabel, warningLabel, retryButton, skipButton].forEach(addArrangedSubview)
@@ -417,9 +421,11 @@ final class ReviewSummaryView: UIView {
         facts.axis = .vertical
         facts.spacing = Design.Spacing.m
         continueButton.accessibilityIdentifier = "review_continue"
+        continueButton.enableAdaptiveCornerStyle()
         continueButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         continueButton.addAction(UIAction { [weak self] _ in self?.onContinue?() }, for: .primaryActionTriggered)
         doneButton.accessibilityIdentifier = "review_done"
+        doneButton.enableAdaptiveCornerStyle()
         doneButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         doneButton.addAction(UIAction { [weak self] _ in self?.onDone?() }, for: .primaryActionTriggered)
 

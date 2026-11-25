@@ -46,6 +46,8 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
     private let typingFeedback = UILabel()
     private let summaryView = StudySummaryView()
     private let controls = UIStackView()
+    private let navButtonsRow = UIStackView()
+    private let navSpacer = UIView()
     private let bottomStack = UIStackView()
     private let ratingView = StudyRatingView()
     private let failureView = StudySaveFailureView()
@@ -116,7 +118,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         header.translatesAutoresizingMaskIntoConstraints = false
 
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceVertical = true
         scrollView.contentInsetAdjustmentBehavior = .never
         contentStack.axis = .vertical
         contentStack.spacing = Design.Spacing.l
@@ -152,7 +154,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: bottomStack.topAnchor, constant: -Design.Spacing.m),
             contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.s),
             contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
             contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter),
             bottomStack.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
@@ -198,24 +200,43 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         updateCardHeight()
     }
 
-    /// A capsule turns into a blob when its title wraps at accessibility sizes; use a rounded rectangle there.
+    /// At accessibility sizes, give the primary button the full width above the prev/next row so
+    /// it never wraps into a tall narrow blob and the study card keeps comfortable room above it.
     private func updatePrimaryShape() {
-        primaryButton.configuration?.cornerStyle = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? .large : .capsule
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        primaryButton.configuration?.cornerStyle = Design.Button.cornerStyle(for: traitCollection)
+        primaryButton.configuration?.titleAlignment = .center
+        controls.arrangedSubviews.forEach { controls.removeArrangedSubview($0); $0.removeFromSuperview() }
+        navButtonsRow.arrangedSubviews.forEach { navButtonsRow.removeArrangedSubview($0); $0.removeFromSuperview() }
+        if isAX {
+            controls.axis = .vertical
+            controls.alignment = .fill
+            controls.spacing = Design.Spacing.s
+            navButtonsRow.axis = .horizontal
+            navButtonsRow.alignment = .center
+            navButtonsRow.spacing = Design.Spacing.m
+            [previousButton, navSpacer, nextButton].forEach(navButtonsRow.addArrangedSubview)
+            [primaryButton, navButtonsRow].forEach(controls.addArrangedSubview)
+            navButtonsRow.isHidden = state?.mode != .flip
+        } else {
+            controls.axis = .horizontal
+            controls.alignment = .center
+            controls.spacing = Design.Spacing.m
+            [previousButton, primaryButton, nextButton].forEach(controls.addArrangedSubview)
+        }
     }
 
     private func updateCardHeight() {
         // Flip cards use most of the free height so the word reads large; quiz cards are as tall as their content.
         // With example sentences below it the card leaves their heading in view, so it is clear there is more to scroll to.
         let free = scrollView.bounds.height
-        let peek = examplesView.isHidden ? Design.Spacing.xs : 200
+        let peek = examplesView.isHidden ? Design.Spacing.s : 200
         cardMinHeight.constant = state?.mode != .flip ? 0 : max(240, free - peek)
     }
 
     private func configureControls() {
-        controls.axis = .horizontal
-        controls.spacing = Design.Spacing.m
-        controls.alignment = .center
         controls.translatesAutoresizingMaskIntoConstraints = false
+        navSpacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         previousButton.configuration?.image = UIImage(systemName: "chevron.left")
         nextButton.configuration?.image = UIImage(systemName: "chevron.right")
         previousButton.accessibilityLabel = NSLocalizedString("Previous card", comment: "")
@@ -229,8 +250,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
             button.heightAnchor.constraint(equalToConstant: 56).isActive = true
             button.setContentHuggingPriority(.required, for: .horizontal)
         }
-        primaryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
-        [previousButton, primaryButton, nextButton].forEach(controls.addArrangedSubview)
+        primaryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 52).isActive = true
         previousButton.addAction(UIAction { [weak self] _ in self?.presenter.previous() }, for: .primaryActionTriggered)
         nextButton.addAction(UIAction { [weak self] _ in self?.presenter.next() }, for: .primaryActionTriggered)
         primaryButton.addAction(UIAction { [weak self] _ in self?.primaryTapped() }, for: .primaryActionTriggered)
@@ -418,6 +438,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         }
         previousButton.isHidden = state.mode != .flip
         nextButton.isHidden = state.mode != .flip
+        navButtonsRow.isHidden = state.mode != .flip
         previousButton.isEnabled = state.canGoBack
         primaryButton.configuration?.title = state.primaryTitle
         primaryButton.isEnabled = state.isPrimaryEnabled
@@ -459,11 +480,12 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
         optionsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         guard let quiz else { return }
         for (index, option) in quiz.options.enumerated() {
-            let button = UIButton(configuration: .gray())
-            var configuration = UIButton.Configuration.gray()
+            let button = UIButton(type: .system)
+            var configuration = UIButton.Configuration.filled()
             configuration.title = option
             configuration.titleAlignment = .leading
             configuration.cornerStyle = .large
+            configuration.background.cornerRadius = Design.Radius.control
             configuration.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: Design.Spacing.l, bottom: Design.Spacing.m, trailing: Design.Spacing.l)
             configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
                 var attributes = attributes
@@ -471,8 +493,8 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
                 return attributes
             }
             configuration.baseForegroundColor = Design.Color.textPrimary
-            configuration.background.backgroundColor = Design.Color.surface
-            configuration.background.strokeColor = Design.Color.separator
+            configuration.baseBackgroundColor = Design.Color.surface
+            configuration.background.strokeColor = Design.Color.border
             configuration.background.strokeWidth = 1
             var announcement = option
             if let selected = quiz.selected {
@@ -493,6 +515,7 @@ final class CardStudyViewController: BaseViewController, CardStudyViewInterface 
                 configuration.imagePadding = Design.Spacing.s
             }
             button.configuration = configuration
+            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             button.contentHorizontalAlignment = .leading
             // Stays enabled after the choice (a disabled button dims its label and hides which answer was right);
             // the presenter ignores a second tap.

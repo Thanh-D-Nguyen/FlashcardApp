@@ -31,6 +31,7 @@ final class StudyRatingView: UIStackView {
         caption.apply(.metadata)
         caption.text = NSLocalizedString("You rate yourself", comment: "")
         skipButton.configuration?.title = NSLocalizedString("Skip", comment: "")
+        skipButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         skipButton.accessibilityIdentifier = "study_skip_rating"
         skipButton.setContentHuggingPriority(.required, for: .horizontal)
         skipButton.addAction(UIAction { [weak self] _ in self?.onSkip?() }, for: .primaryActionTriggered)
@@ -66,6 +67,7 @@ final class StudyRatingView: UIStackView {
         text.font = UIFont.preferredFont(forTextStyle: .headline)
         configuration.attributedTitle = text
         let button = UIButton(configuration: configuration)
+        button.enableAdaptiveCornerStyle()
         button.accessibilityIdentifier = identifier
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         return button
@@ -86,10 +88,12 @@ final class StudySaveFailureView: UIStackView {
         alignment = .fill
         spacing = Design.Spacing.s
         retryButton.accessibilityIdentifier = "study_retry_save"
+        retryButton.enableAdaptiveCornerStyle()
         retryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         retryButton.addAction(UIAction { [weak self] _ in self?.onRetry?() }, for: .primaryActionTriggered)
         leaveButton.configuration?.title = NSLocalizedString("Leave session", comment: "")
         leaveButton.configuration?.baseForegroundColor = Design.Color.error
+        leaveButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         leaveButton.accessibilityIdentifier = "study_leave_unsaved"
         leaveButton.addAction(UIAction { [weak self] _ in self?.onLeave?() }, for: .primaryActionTriggered)
         [retryButton, leaveButton].forEach(addArrangedSubview)
@@ -134,16 +138,16 @@ final class StudySummaryView: UIView {
         reviewHeader.text = NSLocalizedString("Needs review", comment: "")
         reviewHeader.accessibilityTraits = .header
         doneButton.accessibilityIdentifier = "study_done"
+        doneButton.enableAdaptiveCornerStyle()
         doneButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
         restartButton.configuration?.title = NSLocalizedString("Study again", comment: "")
+        restartButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         restartButton.accessibilityIdentifier = "study_restart"
         restartButton.addAction(UIAction { [weak self] _ in self?.onRestart?() }, for: .primaryActionTriggered)
         doneButton.addAction(UIAction { [weak self] _ in self?.onDone?() }, for: .primaryActionTriggered)
 
         for (card, stack) in [(totalsCard, totals), (reviewCard, reviewList)] {
-            card.backgroundColor = Design.Color.surface
-            card.layer.cornerRadius = 20
-            card.layer.cornerCurve = .continuous
+            card.applyCardSurface(radius: Design.Radius.card)
             card.clipsToBounds = true
             stack.axis = .vertical
             stack.translatesAutoresizingMaskIntoConstraints = false

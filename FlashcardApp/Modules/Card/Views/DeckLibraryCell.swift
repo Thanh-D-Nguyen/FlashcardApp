@@ -27,7 +27,7 @@ final class DeckLibraryCell: UITableViewCell {
         }
 
         monogramBox.backgroundColor = Design.Color.highlight
-        monogramBox.layer.cornerRadius = Design.Spacing.m
+        monogramBox.layer.cornerRadius = Design.Radius.chip
         monogramBox.layer.cornerCurve = .continuous
         monogramBox.isAccessibilityElement = false
         monogramBox.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +60,6 @@ final class DeckLibraryCell: UITableViewCell {
         titleLabel.apply(.title)
         detailsLabel.apply(.reading)
         previewLabel.apply(.reading)
-        previewLabel.font = Design.TextRole.headword.font.withSize(UIFont.preferredFont(forTextStyle: .subheadline).pointSize)
         metaLabel.apply(.metadata)
         textStack.axis = .vertical
         textStack.spacing = Design.Spacing.xs

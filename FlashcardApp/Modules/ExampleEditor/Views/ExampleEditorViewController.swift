@@ -79,9 +79,7 @@ final class ExampleEditorViewController: BaseViewController, ExampleEditorViewIn
     /// A field on a surface, so the three read as inputs.
     private func row(_ field: PlaceholderTextView) -> UIView {
         let container = UIView()
-        container.backgroundColor = Design.Color.surface
-        container.layer.cornerRadius = 12
-        container.layer.cornerCurve = .continuous
+        container.applyCardSurface(radius: Design.Radius.control)
         field.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(field)
         NSLayoutConstraint.activate([
