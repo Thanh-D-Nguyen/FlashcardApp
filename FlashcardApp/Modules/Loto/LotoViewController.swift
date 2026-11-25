@@ -8,6 +8,7 @@ final class LotoViewController: BaseVC, LotoViewInterface {
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
     private let stateView = StateView()
+    private let toast = NoticeToastView()
     private let refreshControl = UIRefreshControl()
     private var lastRendered: LotoViewState?
     private var lastAnimatedSlug: String?
@@ -173,13 +174,13 @@ final class LotoViewController: BaseVC, LotoViewInterface {
     }
 
     private func officialButton() -> UIView {
-        var configuration = UIButton.Configuration.bordered()
-        configuration.title = NSLocalizedString("Check the official result", comment: "Loto: open the operator's site")
+        var configuration = Design.Button.secondary(title: NSLocalizedString("Check the official result", comment: "Loto: open the operator's site"), traits: traitCollection)
         configuration.image = UIImage(systemName: "checkmark.seal")
         configuration.imagePadding = Design.Spacing.s
-        configuration.cornerStyle = .capsule
         configuration.buttonSize = .large
         let button = UIButton(configuration: configuration)
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        button.enableAdaptiveCornerStyle()
         button.accessibilityIdentifier = "loto_official"
         button.addAction(UIAction { [weak self] _ in self?.presenter.openOfficialSite() }, for: .touchUpInside)
         return button
@@ -189,40 +190,13 @@ final class LotoViewController: BaseVC, LotoViewInterface {
         guard let text = presenter.copyText(for: set) else { return }
         UIPasteboard.general.string = text
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-        UIAccessibility.post(notification: .announcement, argument: NSLocalizedString("Numbers copied", comment: "VoiceOver: copied"))
-        showToast(NSLocalizedString("Numbers copied", comment: "Loto: confirmation after copy"))
+        toast.show(NSLocalizedString("Numbers copied", comment: "Loto: confirmation after copy"), in: view, duration: 2.0)
     }
 
     private func copyLab(_ numbers: [Int]) {
         guard let text = presenter.labCopyText(for: numbers) else { return }
         UIPasteboard.general.string = text
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-        UIAccessibility.post(notification: .announcement, argument: NSLocalizedString("Numbers copied", comment: "VoiceOver: copied"))
-        showToast(NSLocalizedString("Numbers copied", comment: "Loto: confirmation after copy"))
-    }
-
-    private func showToast(_ text: String) {
-        let label = PaddedToastLabel()
-        label.text = text
-        label.apply(.metadata)
-        label.textColor = .white
-        label.backgroundColor = UIColor.black.withAlphaComponent(0.82)
-        label.textAlignment = .center
-        label.layer.cornerRadius = 18
-        label.layer.masksToBounds = true
-        label.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Design.Spacing.xl)
-        ])
-        UIView.animate(withDuration: 0.2, delay: 1.4, options: [], animations: { label.alpha = 0 }, completion: { _ in label.removeFromSuperview() })
-    }
-}
-
-private final class PaddedToastLabel: UILabel {
-    override var intrinsicContentSize: CGSize {
-        let size = super.intrinsicContentSize
-        return CGSize(width: size.width + Design.Spacing.xl, height: size.height + Design.Spacing.m)
+        toast.show(NSLocalizedString("Numbers copied", comment: "Loto: confirmation after copy"), in: view, duration: 2.0)
     }
 }

@@ -40,7 +40,7 @@ final class MagazineFilterBar: UICollectionReusableView {
         for filter in MagazineFilter.allCases {
             let button = UIButton(type: .system)
             button.addAction(UIAction { [weak self] _ in self?.onSelect?(filter) }, for: .primaryActionTriggered)
-            button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+            button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             // Chips keep their own width and the row scrolls; they are never stretched to fill it.
             button.setContentHuggingPriority(.required, for: .horizontal)
             button.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -49,7 +49,7 @@ final class MagazineFilterBar: UICollectionReusableView {
             stack.addArrangedSubview(button)
         }
         apply()
-        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: MagazineFilterBar, _) in view.apply() }
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self, UITraitUserInterfaceStyle.self]) { (view: MagazineFilterBar, _) in view.apply() }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -67,18 +67,21 @@ final class MagazineFilterBar: UICollectionReusableView {
     }
 
     private func apply() {
+        let cornerStyle = Design.Button.cornerStyle(for: traitCollection)
         for (filter, button) in buttons {
             let isSelected = filter == selected
             var configuration = UIButton.Configuration.filled()
-            configuration.cornerStyle = .capsule
+            configuration.cornerStyle = cornerStyle
             configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 14, bottom: 8, trailing: 14)
             configuration.imagePadding = Design.Spacing.xs
             configuration.image = UIImage(systemName: filter.kind?.symbol ?? "square.grid.2x2.fill")
             configuration.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(textStyle: .footnote, scale: .small)
             configuration.baseBackgroundColor = isSelected ? Design.Color.accent : Design.Color.surface
             configuration.baseForegroundColor = isSelected ? Design.Color.onAccent : Design.Color.textPrimary
+            configuration.background.strokeColor = isSelected ? .clear : Design.Color.border
+            configuration.background.strokeWidth = isSelected ? 0 : 1
             var title = AttributedString(filter.title)
-            title.font = UIFont.preferredFont(forTextStyle: .subheadline).withWeight(isSelected ? .semibold : .regular)
+            title.font = Design.TextRole.weighted(.subheadline, weight: isSelected ? .semibold : .regular)
             configuration.attributedTitle = title
             button.configuration = configuration
             button.accessibilityLabel = filter.title
@@ -131,9 +134,7 @@ final class MagazineLeadCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        card.backgroundColor = Design.Color.surface
-        card.layer.cornerRadius = 24
-        card.layer.cornerCurve = .continuous
+        card.applyCardSurface(radius: Design.Radius.card)
         card.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(card)
 
@@ -143,7 +144,10 @@ final class MagazineLeadCell: UICollectionViewCell {
         subtitleLabel.apply(.meaning)
         subtitleLabel.textColor = Design.Color.textSecondary
         summaryLabel.apply(.reading)
-        summaryLabel.numberOfLines = 3
+        updateSummaryLines()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: MagazineLeadCell, _) in
+            cell.updateSummaryLines()
+        }
         cta.apply(.sectionTitle)
         cta.textColor = Design.Color.accent
         cta.text = NSLocalizedString("Read article", comment: "Magazine lead card call to action")
@@ -185,6 +189,10 @@ final class MagazineLeadCell: UICollectionViewCell {
         didSet { card.backgroundColor = isHighlighted ? Design.Color.highlight.blended(over: Design.Color.surface) : Design.Color.surface }
     }
 
+    private func updateSummaryLines() {
+        summaryLabel.numberOfLines = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? 0 : 3
+    }
+
     func configure(_ row: MagazineRow) {
         tile.configure(symbol: row.kind.symbol, tint: row.kind.tint)
         eyebrow.text = row.meta.uppercased()
@@ -218,6 +226,7 @@ final class MagazineRowCell: UICollectionViewListCell {
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
     private let metaLabel = UILabel()
+    private let row = UIStackView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -228,8 +237,8 @@ final class MagazineRowCell: UICollectionViewListCell {
         let text = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, metaLabel])
         text.axis = .vertical
         text.spacing = 2
-        let row = UIStackView(arrangedSubviews: [tile, text])
-        row.alignment = .top
+        row.addArrangedSubview(tile)
+        row.addArrangedSubview(text)
         row.spacing = Design.Spacing.m
         row.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(row)
@@ -239,9 +248,19 @@ final class MagazineRowCell: UICollectionViewListCell {
             row.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Design.Spacing.l),
             row.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Design.Spacing.s)
         ])
+        updateRowAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (cell: MagazineRowCell, _) in
+            cell.updateRowAxis()
+        }
         accessories = [.disclosureIndicator()]
         isAccessibilityElement = true
         accessibilityTraits = .button
+    }
+
+    private func updateRowAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        row.axis = isAX ? .vertical : .horizontal
+        row.alignment = isAX ? .leading : .top
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -277,7 +296,8 @@ final class MagazineFooterCell: UICollectionViewCell {
         message.apply(.reading)
         message.textAlignment = .center
         retry.addAction(UIAction { [weak self] _ in self?.onRetry?() }, for: .primaryActionTriggered)
-        retry.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+        retry.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        retry.enableAdaptiveCornerStyle()
         let stack = UIStackView(arrangedSubviews: [spinner, message, retry])
         stack.axis = .vertical
         stack.alignment = .center
@@ -310,12 +330,7 @@ final class MagazineFooterCell: UICollectionViewCell {
             spinner.stopAnimating()
             message.text = text
             message.isHidden = false
-            retry.configuration = {
-                var configuration = UIButton.Configuration.tinted()
-                configuration.cornerStyle = .capsule
-                configuration.title = NSLocalizedString("Try again", comment: "")
-                return configuration
-            }()
+            retry.configuration = Design.Button.secondary(title: NSLocalizedString("Try again", comment: ""), traits: traitCollection)
             retry.isHidden = false
         }
     }

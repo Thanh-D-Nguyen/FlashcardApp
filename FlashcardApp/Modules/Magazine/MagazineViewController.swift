@@ -24,6 +24,9 @@ final class MagazineViewController: BaseVC, MagazineViewInterface, UICollectionV
     private var filter: MagazineFilter = .all
     private var filterBar: MagazineFilterBar?
     private var lastContent: MagazineContent?
+    private var isApplyingSnapshot = false
+    private var queuedWillDisplayIndexPaths: [IndexPath] = []
+    private var loadMoreScheduled = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +37,12 @@ final class MagazineViewController: BaseVC, MagazineViewInterface, UICollectionV
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let barHeight = filterBar?.bounds.height ?? 60
+        stateView.topContentInset = barHeight + Design.Spacing.s
     }
 
     #if DEBUG
@@ -78,7 +87,7 @@ final class MagazineViewController: BaseVC, MagazineViewInterface, UICollectionV
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            stateView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 64),
+            stateView.topAnchor.constraint(equalTo: view.topAnchor),
             stateView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             stateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             stateView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -188,15 +197,21 @@ final class MagazineViewController: BaseVC, MagazineViewInterface, UICollectionV
                 snapshot.appendSections([.footer])
                 snapshot.appendItems([.footer(footer)], toSection: .footer)
             }
-            dataSource.apply(snapshot, animatingDifferences: !filterChanged && UIView.areAnimationsEnabled && !UIAccessibility.isReduceMotionEnabled)
+            applySnapshot(snapshot, animatingDifferences: !filterChanged && UIView.areAnimationsEnabled && !UIAccessibility.isReduceMotionEnabled)
             if filterChanged { collectionView.setContentOffset(CGPoint(x: 0, y: -collectionView.adjustedContentInset.top), animated: false) }
         }
+    }
+
+    private func applySnapshot(_ snapshot: NSDiffableDataSourceSnapshot<SectionID, Item>, animatingDifferences: Bool) {
+        isApplyingSnapshot = true
+        defer { isApplyingSnapshot = false }
+        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 
     private func show(_ state: StateView.State, retry: (() -> Void)? = nil) {
         var empty = NSDiffableDataSourceSnapshot<SectionID, Item>()
         empty.appendSections([])
-        dataSource.apply(empty, animatingDifferences: false)
+        applySnapshot(empty, animatingDifferences: false)
         collectionView.isHidden = false
         stateView.isHidden = false
         stateView.configure(state, onRetry: retry)
@@ -217,10 +232,31 @@ final class MagazineViewController: BaseVC, MagazineViewInterface, UICollectionV
     }
 
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        // UIKit may invoke willDisplay synchronously while a diffable snapshot apply is on the stack;
+        // deferring loadMore avoids re-entrant dataSource.apply crashes when the presenter renders a loading footer.
+        queuedWillDisplayIndexPaths.append(indexPath)
+        guard !loadMoreScheduled else { return }
+        loadMoreScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            self?.drainQueuedWillDisplay()
+        }
+    }
+
+    private func drainQueuedWillDisplay() {
+        loadMoreScheduled = false
+        let paths = queuedWillDisplayIndexPaths
+        queuedWillDisplayIndexPaths.removeAll(keepingCapacity: true)
+        guard !isApplyingSnapshot else { return }
         let snapshot = dataSource.snapshot()
-        guard let item = dataSource.itemIdentifier(for: indexPath), case .row = item else { return }
         let rows = snapshot.itemIdentifiers.filter { if case .row = $0 { return true } else { return false } }
-        if let position = rows.firstIndex(of: item), position >= rows.count - 4 { presenter.loadMore() }
+        guard !rows.isEmpty else { return }
+        for indexPath in paths {
+            guard let item = dataSource.itemIdentifier(for: indexPath), case .row = item else { continue }
+            if let position = rows.firstIndex(of: item), position >= rows.count - 4 {
+                presenter.loadMore()
+                return
+            }
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {

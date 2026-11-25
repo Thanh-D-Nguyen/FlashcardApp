@@ -14,9 +14,7 @@ class LotoPanel: UIView {
 
     init(spacing: CGFloat = Design.Spacing.m, fill: UIColor = Design.Color.surface) {
         super.init(frame: .zero)
-        backgroundColor = fill
-        layer.cornerRadius = 24
-        layer.cornerCurve = .continuous
+        applyCardSurface(radius: Design.Radius.card, background: fill)
         content.axis = .vertical
         content.spacing = spacing
         content.translatesAutoresizingMaskIntoConstraints = false
@@ -51,7 +49,6 @@ final class LotoHeroView: UIView {
         layer.cornerRadius = Design.Radius.panel
         layer.cornerCurve = .continuous
         layer.masksToBounds = true
-        gradient.colors = [Design.Color.hero.cgColor, Design.Color.heroDeep.cgColor]
         gradient.startPoint = CGPoint(x: 0, y: 0)
         gradient.endPoint = CGPoint(x: 1, y: 1)
         layer.insertSublayer(gradient, at: 0)
@@ -68,10 +65,8 @@ final class LotoHeroView: UIView {
             lines.append(label(.metadata, text, color: Design.Color.onHeroSecondary))
         }
 
-        countdownStack.axis = .horizontal
-        countdownStack.distribution = .fillEqually
         countdownStack.spacing = Design.Spacing.s
-        tiles.forEach(countdownStack.addArrangedSubview)
+        rebuildCountdownLayout()
         finishedLabel.apply(.title)
         finishedLabel.textColor = Design.Color.onHero
         finishedLabel.text = NSLocalizedString("The draw time has come. Check the official result.", comment: "Loto hero when the draw is due")
@@ -90,10 +85,51 @@ final class LotoHeroView: UIView {
             stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.xl)
         ])
         isAccessibilityElement = false
+        applyGradientColors()
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: LotoHeroView, _) in
+            view.applyGradientColors()
+        }
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: LotoHeroView, _) in
+            view.rebuildCountdownLayout()
+        }
         update()
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    private func applyGradientColors() {
+        gradient.colors = [
+            Design.Color.hero.resolvedColor(with: traitCollection).cgColor,
+            Design.Color.heroDeep.resolvedColor(with: traitCollection).cgColor
+        ]
+    }
+
+    /// Four tiles across at normal text sizes; a 2x2 grid at accessibility sizes so unit captions never truncate.
+    private func rebuildCountdownLayout() {
+        countdownStack.arrangedSubviews.forEach {
+            countdownStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        tiles.forEach { $0.removeFromSuperview() }
+        if traitCollection.preferredContentSizeCategory.isAccessibilityCategory {
+            let topRow = UIStackView(arrangedSubviews: Array(tiles.prefix(2)))
+            topRow.axis = .horizontal
+            topRow.distribution = .fillEqually
+            topRow.spacing = Design.Spacing.s
+            let bottomRow = UIStackView(arrangedSubviews: Array(tiles.suffix(2)))
+            bottomRow.axis = .horizontal
+            bottomRow.distribution = .fillEqually
+            bottomRow.spacing = Design.Spacing.s
+            countdownStack.axis = .vertical
+            countdownStack.distribution = .fillEqually
+            countdownStack.addArrangedSubview(topRow)
+            countdownStack.addArrangedSubview(bottomRow)
+        } else {
+            countdownStack.axis = .horizontal
+            countdownStack.distribution = .fillEqually
+            tiles.forEach(countdownStack.addArrangedSubview)
+        }
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -177,6 +213,8 @@ private final class LotoCountdownTile: UIView {
         captionLabel.textColor = Design.Color.onHeroSecondary
         captionLabel.textAlignment = .center
         captionLabel.numberOfLines = 1
+        captionLabel.adjustsFontSizeToFitWidth = true
+        captionLabel.minimumScaleFactor = 0.75
         let stack = UIStackView(arrangedSubviews: [valueLabel, captionLabel])
         stack.axis = .vertical
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -259,15 +297,13 @@ final class LotoSetCardView: LotoPanel {
         detailsStack.isHidden = true
         for number in set.main.compactMap({ byNumber[$0] }) { detailsStack.addArrangedSubview(Self.detailRow(number)) }
 
-        var copyConfiguration = UIButton.Configuration.filled()
-        copyConfiguration.title = NSLocalizedString("Copy numbers", comment: "Loto: copy a set")
+        var copyConfiguration = Design.Button.primary(title: NSLocalizedString("Copy numbers", comment: "Loto: copy a set"), traits: traitCollection)
         copyConfiguration.image = UIImage(systemName: "doc.on.doc")
         copyConfiguration.imagePadding = Design.Spacing.s
-        copyConfiguration.cornerStyle = .capsule
         copyConfiguration.buttonSize = .large
-        copyConfiguration.baseBackgroundColor = Design.Color.accent
-        copyConfiguration.baseForegroundColor = Design.Color.onAccent
         let copy = UIButton(configuration: copyConfiguration)
+        copy.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        copy.enableAdaptiveCornerStyle()
         copy.accessibilityIdentifier = "loto_copy_\(set.rank)"
         copy.addAction(UIAction { [weak self] _ in
             guard let self else { return }
@@ -275,6 +311,7 @@ final class LotoSetCardView: LotoPanel {
         }, for: .touchUpInside)
 
         if !detailsStack.arrangedSubviews.isEmpty {
+            detailsButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             detailsButton.addAction(UIAction { [weak self] _ in self?.toggleDetails() }, for: .touchUpInside)
             detailsButton.accessibilityIdentifier = "loto_why_\(set.rank)"
             updateDetailsButton()
@@ -340,7 +377,7 @@ final class LotoSetCardView: LotoPanel {
         if let count = number.count { facts.append(String(format: NSLocalizedString("Drawn %d times", comment: "Loto detail"), count)) }
         if let gap = number.gap { facts.append(gap == 0 ? NSLocalizedString("In the latest draw", comment: "Loto detail") : String(format: NSLocalizedString("Last seen %d draws ago", comment: "Loto detail"), gap)) }
         let title = label(.title, tags.isEmpty ? NSLocalizedString("No special signal", comment: "Loto detail") : tags, color: Design.Color.textPrimary)
-        title.font = UIFont.preferredFont(forTextStyle: .subheadline).withWeight(.semibold)
+        title.font = Design.TextRole.weighted(.subheadline, weight: .semibold)
         let detail = label(.metadata, facts.joined(separator: " · "), color: Design.Color.textSecondary)
         let text = UIStackView(arrangedSubviews: [title, detail])
         text.axis = .vertical
@@ -363,8 +400,8 @@ final class LotoChip: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = Design.Color.background
-        layer.cornerRadius = 12
+        backgroundColor = Design.Color.surfaceTint
+        layer.cornerRadius = Design.Radius.chip
         layer.cornerCurve = .continuous
         textLabel.apply(.metadata)
         textLabel.numberOfLines = 1
@@ -434,17 +471,19 @@ final class LotoMethodView: LotoPanel {
 }
 
 private final class LotoWeightBar: UIView {
+    private let header: UIStackView
+    private let nameLabel: UILabel
+    private let percentLabel: UILabel
+
     init(title: String, value: Double, relative: Double) {
+        nameLabel = label(.metadata, title, color: Design.Color.textPrimary)
+        percentLabel = label(.figure, value.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.current.locale)), color: Design.Color.textSecondary)
+        header = UIStackView(arrangedSubviews: [nameLabel, percentLabel])
         super.init(frame: .zero)
-        let name = label(.metadata, title, color: Design.Color.textPrimary)
-        name.numberOfLines = 1
-        let percent = label(.figure, value.formatted(.percent.precision(.fractionLength(0)).locale(AppLanguage.current.locale)), color: Design.Color.textSecondary)
-        percent.textAlignment = .right
-        percent.numberOfLines = 1
-        percent.setContentHuggingPriority(.required, for: .horizontal)
-        let header = UIStackView(arrangedSubviews: [name, percent])
+        percentLabel.numberOfLines = 1
+        percentLabel.setContentHuggingPriority(.required, for: .horizontal)
         let track = UIView()
-        track.backgroundColor = Design.Color.background
+        track.backgroundColor = Design.Color.surfaceTint
         track.layer.cornerRadius = 4
         let fill = UIView()
         fill.backgroundColor = Design.Color.accent
@@ -466,8 +505,21 @@ private final class LotoWeightBar: UIView {
             stack.topAnchor.constraint(equalTo: topAnchor), stack.bottomAnchor.constraint(equalTo: bottomAnchor),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor), stack.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
+        updateHeaderAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: LotoWeightBar, _) in
+            view.updateHeaderAxis()
+        }
         isAccessibilityElement = true
-        accessibilityLabel = "\(title), \(percent.text ?? "")"
+        accessibilityLabel = "\(title), \(percentLabel.text ?? "")"
+    }
+
+    private func updateHeaderAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        header.axis = isAX ? .vertical : .horizontal
+        header.alignment = isAX ? .leading : .firstBaseline
+        header.spacing = isAX ? 2 : Design.Spacing.s
+        nameLabel.numberOfLines = isAX ? 0 : 1
+        percentLabel.textAlignment = isAX ? .left : .right
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }

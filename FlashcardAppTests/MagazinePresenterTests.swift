@@ -236,4 +236,52 @@ final class MagazinePresenterTests: XCTestCase {
         presenter.open(slug: "not-in-the-list")
         XCTAssertEqual(wireframe.opened.count, 1)
     }
+
+    // MARK: View regression
+
+    func test_willDisplayNearEndDefersLoadMoreSoDiffableSnapshotApplyNeverReenters() {
+        final class ReentrantPresenter: MagazinePresenterInterface {
+            weak var view: MagazineViewInterface?
+            var loadMoreCount = 0
+            private let sections: [MagazineSection]
+
+            init(sections: [MagazineSection]) { self.sections = sections }
+            func viewDidLoad() { view?.render(MagazineViewState(filter: .all, content: .list(sections: sections, footer: .none))) }
+            func refresh() {}
+            func select(_ filter: MagazineFilter) {}
+            func loadMore() {
+                loadMoreCount += 1
+                view?.render(MagazineViewState(filter: .all, content: .list(sections: sections, footer: .loading)))
+            }
+            func retry() {}
+            func retryLoadMore() {}
+            func open(slug: String) {}
+        }
+
+        let rows = (0..<6).map { index in
+            MagazineRow(slug: "slug-\(index)", kind: .weather, titleJapanese: "題 \(index)", titleVietnamese: "Bài \(index)", summary: nil, meta: "Weather", words: [], isToday: false)
+        }
+        let sections = [
+            MagazineSection(title: "Today", style: .lead, rows: [rows[0]]),
+            MagazineSection(title: "Earlier", style: .rows, rows: Array(rows.dropFirst()))
+        ]
+        let vc = MagazineViewController()
+        let stubPresenter = ReentrantPresenter(sections: sections)
+        vc.presenter = stubPresenter
+        stubPresenter.view = vc
+
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        window.rootViewController = UINavigationController(rootViewController: vc)
+        window.makeKeyAndVisible()
+        vc.view.layoutIfNeeded()
+
+        // Must not call loadMore synchronously inside the initial diffable apply; it fires on the next main runloop turn.
+        XCTAssertEqual(stubPresenter.loadMoreCount, 0)
+        let exp = expectation(description: "deferred loadMore")
+        DispatchQueue.main.async {
+            if stubPresenter.loadMoreCount >= 1 { exp.fulfill() }
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(stubPresenter.loadMoreCount, 1)
+    }
 }

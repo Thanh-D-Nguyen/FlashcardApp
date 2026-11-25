@@ -17,7 +17,7 @@ enum MagazineArticleViews {
 
     static func sectionTitle(_ text: String, symbol: String? = nil, tint: UIColor = Design.Color.accent) -> UIView {
         let title = label(text, role: .headword, traits: .header)
-        title.font = Design.TextRole.headword.font.withWeight(.semibold)
+        title.font = Design.TextRole.weighted(.title3, weight: .semibold)
         guard let symbol else { return title }
         let tile = MagazineSymbolTile(side: 32)
         tile.configure(symbol: symbol, tint: tint)
@@ -29,9 +29,7 @@ enum MagazineArticleViews {
 
     static func card(_ views: [UIView], spacing: CGFloat = Design.Spacing.s, fill: UIColor = Design.Color.surface) -> UIView {
         let container = UIView()
-        container.backgroundColor = fill
-        container.layer.cornerRadius = 20
-        container.layer.cornerCurve = .continuous
+        container.applyCardSurface(radius: Design.Radius.card, background: fill)
         let inner = UIStackView(arrangedSubviews: views)
         inner.axis = .vertical
         inner.spacing = spacing
@@ -49,12 +47,13 @@ enum MagazineArticleViews {
     /// A short outlined label, such as a JLPT level.
     static func tag(_ text: String, color: UIColor = Design.Color.textSecondary) -> UIView {
         let tagLabel = label(text, role: .metadata, color: color)
-        tagLabel.font = Design.TextRole.metadata.font.withWeight(.semibold)
+        tagLabel.font = Design.TextRole.weighted(.footnote, weight: .semibold)
         tagLabel.numberOfLines = 1
         let box = UIView()
-        box.layer.cornerRadius = 6
+        box.layer.cornerRadius = Design.Radius.badge
+        box.layer.cornerCurve = .continuous
         box.layer.borderWidth = 1
-        box.layer.borderColor = color.cgColor
+        box.observeAdaptiveBorder { color }
         tagLabel.translatesAutoresizingMaskIntoConstraints = false
         box.addSubview(tagLabel)
         NSLayoutConstraint.activate([

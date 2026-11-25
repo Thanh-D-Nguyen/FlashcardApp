@@ -246,6 +246,7 @@ final class LotoLabView: UIView {
     private let drum: LotoDrumView
     private let strip: LotoWeightStripView
     private let slider = UISlider()
+    private let headerStack = UIStackView()
     private let percent = UILabel()
     private let badge = UILabel()
     private let spinButton = UIButton(type: .system)
@@ -279,16 +280,36 @@ final class LotoLabView: UIView {
         layer.cornerRadius = Design.Radius.panel
         layer.cornerCurve = .continuous
         layer.masksToBounds = true
-        gradient.colors = [Design.Color.heroDeep.cgColor, Design.Color.hero.cgColor]
         gradient.startPoint = CGPoint(x: 0.2, y: 0)
         gradient.endPoint = CGPoint(x: 0.8, y: 1)
         layer.insertSublayer(gradient, at: 0)
         accessibilityIdentifier = "loto_lab"
         build()
+        applyGradientColors()
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: LotoLabView, _) in
+            view.applyGradientColors()
+        }
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: LotoLabView, _) in
+            view.updateHeaderAxis()
+        }
         sync(animated: false)
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    private func applyGradientColors() {
+        gradient.colors = [
+            Design.Color.heroDeep.resolvedColor(with: traitCollection).cgColor,
+            Design.Color.hero.resolvedColor(with: traitCollection).cgColor
+        ]
+    }
+
+    private func updateHeaderAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        headerStack.axis = isAX ? .vertical : .horizontal
+        headerStack.alignment = isAX ? .leading : .lastBaseline
+        headerStack.spacing = isAX ? Design.Spacing.xs : Design.Spacing.s
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -328,7 +349,7 @@ final class LotoLabView: UIView {
     private func build() {
         let eyebrow = text(.eyebrow, NSLocalizedString("Randomness lab", comment: "Loto lab eyebrow").uppercased(), color: LotoPalette.gold)
         let title = text(.sectionTitle, NSLocalizedString("Push the randomness to the limit", comment: "Loto lab title"), color: Design.Color.onHero)
-        title.font = .preferredFont(forTextStyle: .title2).withWeight(.bold)
+        title.font = Design.TextRole.weighted(.title2, weight: .bold)
         let intro = text(.metadata, NSLocalizedString("At 100% every number has the same weight. Lower it to lean on the frequent, rare and overdue numbers of this draw.", comment: "Loto lab intro"),
                          color: Design.Color.onHeroSecondary)
 
@@ -337,8 +358,10 @@ final class LotoLabView: UIView {
         percent.textColor = LotoPalette.gold
         percent.setContentHuggingPriority(.required, for: .horizontal)
         percent.accessibilityIdentifier = "loto_lab_percent"
-        let header = UIStackView(arrangedSubviews: [name, UIView(), percent])
-        header.alignment = .lastBaseline
+        headerStack.addArrangedSubview(name)
+        headerStack.addArrangedSubview(UIView())
+        headerStack.addArrangedSubview(percent)
+        updateHeaderAxis()
 
         slider.minimumValue = 0
         slider.maximumValue = 1
@@ -364,10 +387,12 @@ final class LotoLabView: UIView {
         var spin = UIButton.Configuration.filled()
         spin.baseBackgroundColor = LotoPalette.gold
         spin.baseForegroundColor = LotoPalette.rgb(0x2A1D00)
-        spin.cornerStyle = .capsule
+        spin.cornerStyle = Design.Button.cornerStyle(for: traitCollection)
         spin.buttonSize = .large
         spin.imagePadding = Design.Spacing.s
         spinButton.configuration = spin
+        spinButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        spinButton.enableAdaptiveCornerStyle()
         spinButton.accessibilityIdentifier = "loto_lab_spin"
         spinButton.addAction(UIAction { [weak self] _ in self?.spinTapped() }, for: .touchUpInside)
 
@@ -378,7 +403,7 @@ final class LotoLabView: UIView {
         let disclaimer = text(.metadata, String(format: NSLocalizedString("No setting changes your chance: every combination is still 1 in %@. This is for exploring probability, not a way to win.", comment: "Loto lab note"),
                                                game.combinations.formatted(.number.locale(AppLanguage.current.locale))), color: Design.Color.onHeroSecondary)
 
-        let stack = UIStackView(arrangedSubviews: [eyebrow, title, intro, drum, header, slider, ends, strip, badge, spinButton, tray, moreStack, disclaimer])
+        let stack = UIStackView(arrangedSubviews: [eyebrow, title, intro, drum, headerStack, slider, ends, strip, badge, spinButton, tray, moreStack, disclaimer])
         stack.axis = .vertical
         stack.spacing = Design.Spacing.m
         stack.setCustomSpacing(Design.Spacing.xs, after: eyebrow)
@@ -552,14 +577,13 @@ final class LotoLabView: UIView {
     private func showOthers(_ sets: [[Int]]) {
         let copy = UIButton(type: .system)
         copy.configuration = {
-            var configuration = UIButton.Configuration.tinted()
-            configuration.title = NSLocalizedString("Copy these numbers", comment: "Loto lab: copy the main set")
+            var configuration = Design.Button.heroChip(title: NSLocalizedString("Copy these numbers", comment: "Loto lab: copy the main set"), traits: traitCollection)
             configuration.image = UIImage(systemName: "doc.on.doc")
             configuration.imagePadding = Design.Spacing.s
-            configuration.baseForegroundColor = Design.Color.onHero
-            configuration.cornerStyle = .capsule
             return configuration
         }()
+        copy.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        copy.enableAdaptiveCornerStyle()
         copy.accessibilityIdentifier = "loto_lab_copy"
         let main = tray.subviews.compactMap { $0.subviews.compactMap { $0 as? LotoBallView }.first?.number }
         copy.addAction(UIAction { [weak self] _ in self?.copyAction(main) }, for: .touchUpInside)

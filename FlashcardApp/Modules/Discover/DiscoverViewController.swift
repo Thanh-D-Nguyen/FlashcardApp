@@ -132,7 +132,12 @@ final class DiscoverFeatureCard: UIControl {
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
     private let isFeatured: Bool
+    private let isCompact: Bool
     private let restingColor: UIColor
+    private let contentStack = UIStackView()
+    private let compactTopRow = UIStackView()
+    private let compactText = UIStackView()
+    private let compactSpacer = UIView()
     private var spheres: [UIView] = []
     private let countdownLabel = UILabel()
     private var nextDraw: DiscoverNextDraw?
@@ -141,55 +146,65 @@ final class DiscoverFeatureCard: UIControl {
 
     init(feature: DiscoverFeature) {
         isFeatured = feature.isFeatured
+        isCompact = feature.tags.isEmpty
         restingColor = feature.isFeatured ? Design.Color.hero : Design.Color.surface
         super.init(frame: .zero)
-        backgroundColor = restingColor
-        layer.cornerRadius = 24
-        layer.cornerCurve = .continuous
+        if feature.isFeatured {
+            backgroundColor = restingColor
+            layer.cornerRadius = Design.Radius.card
+            layer.cornerCurve = .continuous
+        } else {
+            applyCardSurface(radius: Design.Radius.card, background: restingColor)
+        }
 
         tile.configure(symbol: feature.symbol, tint: Design.Color.accent)
         chevron.tintColor = Design.Color.textSecondary
         chevron.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .subheadline, scale: .medium)
         chevron.setContentHuggingPriority(.required, for: .horizontal)
         titleLabel.apply(.headword)
-        titleLabel.font = Design.TextRole.headword.font.withWeight(.semibold)
+        titleLabel.font = Design.TextRole.weighted(.title3, weight: .semibold)
         titleLabel.text = feature.title
         subtitleLabel.apply(.reading)
         subtitleLabel.text = feature.subtitle
 
-        let content: UIStackView
-        if feature.tags.isEmpty {
+        if isCompact {
             // A plain entry is one compact row (symbol, name and line, chevron): six of them fit a phone screen.
             tile.setContentHuggingPriority(.required, for: .horizontal)
-            let text = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
-            text.axis = .vertical
-            text.spacing = Design.Spacing.xs
-            content = UIStackView(arrangedSubviews: [tile, text, chevron])
-            content.alignment = .center
-            content.spacing = Design.Spacing.m
+            compactText.axis = .vertical
+            compactText.spacing = Design.Spacing.xs
+            compactText.addArrangedSubview(titleLabel)
+            compactText.addArrangedSubview(subtitleLabel)
+            compactTopRow.axis = .horizontal
+            compactTopRow.alignment = .center
+            compactTopRow.spacing = Design.Spacing.m
+            updateCompactLayout()
+            registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (card: DiscoverFeatureCard, _) in
+                card.updateCompactLayout()
+            }
         } else {
             // The featured entry keeps room for what it contains. Tags wrap on a narrow screen or at large text.
-            let tagFlow = DiscoverTagFlow(tags: feature.tags)
+            let tagFlow = DiscoverTagFlow(tags: feature.tags, isOnHero: feature.isFeatured)
             let top = UIStackView(arrangedSubviews: [tile, UIView(), chevron])
             top.alignment = .center
             countdownLabel.apply(.metadata)
             countdownLabel.textColor = LotoPalette.gold
             countdownLabel.font = UIFontMetrics(forTextStyle: .footnote).scaledFont(for: .monospacedDigitSystemFont(ofSize: 14, weight: .bold))
             countdownLabel.isHidden = true
-            content = UIStackView(arrangedSubviews: [top, titleLabel, subtitleLabel, countdownLabel, tagFlow])
-            content.axis = .vertical
-            content.spacing = Design.Spacing.s
-            content.setCustomSpacing(Design.Spacing.m, after: top)
-            content.setCustomSpacing(Design.Spacing.m, after: subtitleLabel)
+            [top, titleLabel, subtitleLabel, countdownLabel, tagFlow].forEach { contentStack.addArrangedSubview($0) }
+            contentStack.axis = .vertical
+            contentStack.spacing = Design.Spacing.s
+            contentStack.setCustomSpacing(Design.Spacing.m, after: top)
+            contentStack.setCustomSpacing(Design.Spacing.m, after: subtitleLabel)
         }
-        content.isUserInteractionEnabled = false
-        content.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(content)
+        contentStack.isUserInteractionEnabled = false
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentStack)
         NSLayoutConstraint.activate([
-            content.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.l),
-            content.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.Spacing.l),
-            content.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.l),
-            content.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.l)
+            heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum),
+            contentStack.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.l),
+            contentStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.Spacing.l),
+            contentStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.l),
+            contentStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.l)
         ])
 
         isAccessibilityElement = true
@@ -198,6 +213,26 @@ final class DiscoverFeatureCard: UIControl {
         accessibilityTraits = .button
         accessibilityIdentifier = feature.accessibilityIdentifier
         if feature.isFeatured { styleAsHero() }
+    }
+
+    private func updateCompactLayout() {
+        guard isCompact else { return }
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        contentStack.arrangedSubviews.forEach { contentStack.removeArrangedSubview($0); $0.removeFromSuperview() }
+        compactTopRow.arrangedSubviews.forEach { compactTopRow.removeArrangedSubview($0); $0.removeFromSuperview() }
+        if isAX {
+            contentStack.axis = .vertical
+            contentStack.alignment = .fill
+            contentStack.spacing = Design.Spacing.m
+            [tile, compactSpacer, chevron].forEach { compactTopRow.addArrangedSubview($0) }
+            contentStack.addArrangedSubview(compactTopRow)
+            contentStack.addArrangedSubview(compactText)
+        } else {
+            contentStack.axis = .horizontal
+            contentStack.alignment = .center
+            contentStack.spacing = Design.Spacing.m
+            [tile, compactText, chevron].forEach { contentStack.addArrangedSubview($0) }
+        }
     }
 
     /// The featured entry sits on the indigo hero block with a row of plain spheres: light, not a promise of any number.
@@ -316,11 +351,11 @@ final class DiscoverTagFlow: UIView {
     private let rowSpacing = Design.Spacing.s
     private let columnSpacing = Design.Spacing.s
 
-    init(tags: [String]) {
+    init(tags: [String], isOnHero: Bool = false) {
         self.tags = tags
         super.init(frame: .zero)
         isUserInteractionEnabled = false
-        labels = tags.map(Self.chip)
+        labels = tags.map { Self.chip($0, isOnHero: isOnHero) }
         labels.forEach(addSubview)
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: DiscoverTagFlow, _) in
             view.invalidateIntrinsicContentSize()
@@ -330,16 +365,17 @@ final class DiscoverTagFlow: UIView {
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
-    private static func chip(_ text: String) -> UIView {
+    private static func chip(_ text: String, isOnHero: Bool) -> UIView {
         let label = UILabel()
         label.apply(.metadata)
         label.numberOfLines = 1
         label.text = text
         label.textAlignment = .center
-        label.layer.cornerRadius = 12
+        label.layer.cornerRadius = Design.Radius.chip
         label.layer.cornerCurve = .continuous
         label.layer.masksToBounds = true
-        label.backgroundColor = Design.Color.background
+        label.backgroundColor = isOnHero ? Design.Color.heroChipFill : Design.Color.surfaceTint
+        label.textColor = isOnHero ? Design.Color.onHero : Design.Color.textSecondary
         return label
     }
 

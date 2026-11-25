@@ -15,9 +15,7 @@ extension MagazineArticleViews {
             rows.addArrangedSubview(view)
         }
         let list = UIView()
-        list.backgroundColor = Design.Color.surface
-        list.layer.cornerRadius = 20
-        list.layer.cornerCurve = .continuous
+        list.applyCardSurface(radius: Design.Radius.card)
         list.clipsToBounds = true
         rows.translatesAutoresizingMaskIntoConstraints = false
         list.addSubview(rows)
@@ -45,6 +43,7 @@ extension MagazineArticleViews {
         let primaryButton = UIButton(configuration: primary)
         primaryButton.isEnabled = vocabulary.primaryEnabled
         primaryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        primaryButton.enableAdaptiveCornerStyle()
         primaryButton.addAction(UIAction { _ in actions.primary() }, for: .primaryActionTriggered)
         primaryButton.accessibilityIdentifier = "magazine_save_words"
 
@@ -135,6 +134,7 @@ extension MagazineArticleViews {
             configuration.buttonSize = .large
             let button = UIButton(configuration: configuration)
             button.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+            button.enableAdaptiveCornerStyle()
             button.addAction(UIAction { _ in actions.next() }, for: .primaryActionTriggered)
             button.accessibilityIdentifier = "magazine_quiz_next"
             views.append(button)
@@ -146,15 +146,14 @@ extension MagazineArticleViews {
 
     private static func resultCard(_ result: MagazineArticleState.QuizResult, actions: QuizActions) -> UIView {
         let score = label(result.score, role: .headword, traits: .header)
-        score.font = Design.TextRole.headword.font.withWeight(.semibold)
+        score.font = Design.TextRole.weighted(.title3, weight: .semibold)
         let message = label(result.message, role: .meaning)
-        var configuration = UIButton.Configuration.tinted()
-        configuration.cornerStyle = .capsule
-        configuration.title = result.actionTitle
+        var configuration = Design.Button.secondary(title: result.actionTitle)
         configuration.image = UIImage(systemName: "arrow.counterclockwise")
         configuration.imagePadding = Design.Spacing.s
         let button = UIButton(configuration: configuration)
-        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        button.enableAdaptiveCornerStyle()
         button.addAction(UIAction { _ in actions.restart() }, for: .primaryActionTriggered)
         button.accessibilityIdentifier = "magazine_quiz_restart"
         return card([score, message, button], spacing: Design.Spacing.m)
@@ -221,19 +220,19 @@ final class QuizOptionControl: UIControl {
         let symbol: String, tint: UIColor, fill: UIColor, border: UIColor
         switch option.mark {
         case .neutral:
-            (symbol, tint, fill, border) = ("circle", Design.Color.textSecondary, Design.Color.background, Design.Color.separator)
+            (symbol, tint, fill, border) = ("circle", Design.Color.textSecondary, Design.Color.background, Design.Color.border)
         case .correct:
-            (symbol, tint, fill, border) = ("checkmark.circle.fill", Design.Color.success, Design.Color.success.withAlphaComponent(0.12), Design.Color.success)
+            (symbol, tint, fill, border) = ("checkmark.circle.fill", Design.Color.success, Design.Color.statusFill(Design.Color.success), Design.Color.success)
         case .wrong:
-            (symbol, tint, fill, border) = ("xmark.circle.fill", Design.Color.error, Design.Color.error.withAlphaComponent(0.12), Design.Color.error)
+            (symbol, tint, fill, border) = ("xmark.circle.fill", Design.Color.error, Design.Color.statusFill(Design.Color.error), Design.Color.error)
         case .dimmed:
-            (symbol, tint, fill, border) = ("circle", Design.Color.textSecondary, Design.Color.background, Design.Color.separator)
+            (symbol, tint, fill, border) = ("circle", Design.Color.textSecondary, Design.Color.background, Design.Color.border)
         }
         backgroundColor = fill
-        layer.cornerRadius = 14
+        layer.cornerRadius = Design.Radius.control
         layer.cornerCurve = .continuous
         layer.borderWidth = 1
-        layer.borderColor = border.cgColor
+        observeAdaptiveBorder { border }
 
         let icon = UIImageView(image: UIImage(systemName: symbol))
         icon.tintColor = tint

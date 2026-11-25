@@ -350,8 +350,8 @@ final class LotoChaosPanelView: LotoPanel {
         stack.isLayoutMarginsRelativeArrangement = true
         stack.directionalLayoutMargins = NSDirectionalEdgeInsets(top: Design.Spacing.m, leading: Design.Spacing.m, bottom: Design.Spacing.m, trailing: Design.Spacing.m)
         let card = UIView()
-        card.backgroundColor = Design.Color.highlight
-        card.layer.cornerRadius = 16
+        card.backgroundColor = Design.Color.surfaceTint
+        card.layer.cornerRadius = Design.Radius.control
         card.layer.cornerCurve = .continuous
         stack.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(stack)
