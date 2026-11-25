@@ -238,6 +238,7 @@ final class CardPresenterUploadTests: XCTestCase {
     private var wireframe: FakeCardWireframe!
     private var publisher: FakePublisher!
     private var presenter: CardPresenter!
+    private var view: SpyCardView!
 
     override func setUp() {
         super.setUp()
@@ -253,7 +254,8 @@ final class CardPresenterUploadTests: XCTestCase {
         desks.decks = [desk]
         presenter = CardPresenter(interactor: CardInteractor(), deskInteractor: desks, wireframe: wireframe, defaults: defaults,
                                   server: FakeServerInteractor(), publisher: publisher)
-        presenter.view = SpyCardView()
+        view = SpyCardView()
+        presenter.view = view
     }
 
     private func waitForMain() {

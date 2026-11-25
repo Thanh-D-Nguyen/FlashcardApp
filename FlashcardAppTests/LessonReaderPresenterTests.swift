@@ -248,13 +248,13 @@ final class LessonReaderPresenterTests: XCTestCase {
         XCTAssertEqual(presenter.practiceStatus, .notStarted)
         let ids = loaded.lessonContent.activities.map(\.id)
         let subject = LessonProgressSubject(slug: slug, lessonId: loaded.id, levelCode: "J5", sortOrder: 1, contentVersion: "", activityIds: ids)
-        try store.recordAnswer(LessonAnswer(activityId: ids[0], optionKey: "A"), for: subject, ownerKey: "u1", at: Date())
-        try store.recordAnswer(LessonAnswer(activityId: ids[1], optionKey: "A"), for: subject, ownerKey: "other", at: Date())
+        _ = try store.recordAnswer(LessonAnswer(activityId: ids[0], optionKey: "A"), for: subject, ownerKey: "u1", at: Date())
+        _ = try store.recordAnswer(LessonAnswer(activityId: ids[1], optionKey: "A"), for: subject, ownerKey: "other", at: Date())
         presenter.viewDidLoad()   // back from practice
         XCTAssertEqual(presenter.practiceStatus, .inProgress(answered: 1, total: 5), "Only this account's answers count")
         XCTAssertEqual(interactor.requested.count, 1, "Coming back does not fetch the lesson again")
-        for id in ids.dropFirst() { try store.recordAnswer(LessonAnswer(activityId: id, optionKey: "A"), for: subject, ownerKey: "u1", at: Date()) }
-        try store.markCompleted(for: subject, ownerKey: "u1", at: Date())
+        for id in ids.dropFirst() { _ = try store.recordAnswer(LessonAnswer(activityId: id, optionKey: "A"), for: subject, ownerKey: "u1", at: Date()) }
+        _ = try store.markCompleted(for: subject, ownerKey: "u1", at: Date())
         presenter.viewDidLoad()
         XCTAssertEqual(presenter.practiceStatus, .completed)
     }

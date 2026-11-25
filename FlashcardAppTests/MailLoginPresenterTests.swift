@@ -326,7 +326,7 @@ final class MailLoginPresenterTests: XCTestCase {
 
     func testDeinitDisposesOwnedRequest() {
         presenter.loginWithEmail(email: "reader@example.com", password: "secret")
-        weak var releasedPresenter = presenter
+        weak let releasedPresenter = presenter
 
         presenter = nil
 

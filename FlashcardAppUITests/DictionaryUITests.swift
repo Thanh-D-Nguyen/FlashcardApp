@@ -260,7 +260,6 @@ final class DictionaryUITests: XCTestCase {
         XCTAssertTrue(element(app, "entry_title").waitForExistence(timeout: 10))
         back(app)
 
-        let field = app.searchFields.firstMatch
         clearSearchField(app)
         let viewed = app.tables["dictionary_results"].cells["dictionary_viewed_1"]
         XCTAssertTrue(viewed.waitForExistence(timeout: 5), "The entry just opened is in Recently viewed")

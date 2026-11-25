@@ -62,7 +62,7 @@ final class CoreLocationPlaceProvider: LifePlaceProviding {
     private final class Job: NSObject, CLLocationManagerDelegate {
         private let observer: (SingleEvent<LifePlace>) -> Void
         private let manager = CLLocationManager()
-        private var geocoder: CLGeocoder?
+        private var reverseRequest: MKReverseGeocodingRequest?
         private var search: MKLocalSearch?
         private var finished = false
         private var retries = 0
@@ -87,7 +87,7 @@ final class CoreLocationPlaceProvider: LifePlaceProviding {
 
         func cancel() {
             finished = true
-            geocoder?.cancelGeocode()
+            reverseRequest?.cancel()
             search?.cancel()
             manager.stopUpdatingLocation()
             selfRetain = nil
@@ -128,22 +128,25 @@ final class CoreLocationPlaceProvider: LifePlaceProviding {
             if (error as? CLError)?.code == .denied { finish(.failure(LifePlaceError.denied)) } else { finish(.failure(LifePlaceError.unavailable)) }
         }
 
-        // CLGeocoder is deprecated in iOS 26 in favour of MKReverseGeocodingRequest; it is still the call that returns the
-        // administrative area and locality as plain Japanese strings, which is all this lesson needs.
         private func resolve(_ location: CLLocation) {
-            let geocoder = CLGeocoder()
-            self.geocoder = geocoder
-            geocoder.reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "ja_JP")) { [weak self] placemarks, error in
+            guard let request = MKReverseGeocodingRequest(location: location) else {
+                return finish(.failure(LifePlaceError.unavailable))
+            }
+            request.preferredLocale = Locale(identifier: "ja_JP")
+            reverseRequest = request
+            request.getMapItems { [weak self] items, error in
                 guard let self, !self.finished else { return }
-                guard let placemark = placemarks?.first, error == nil else {
+                guard let representation = items?.first?.addressRepresentations, error == nil else {
                     logger.error("Naming the place failed: \(error.map { "\(($0 as NSError).domain) \(($0 as NSError).code)" } ?? "no result")")
                     return self.finish(.failure(LifePlaceError.unavailable))
                 }
-                guard placemark.isoCountryCode == "JP" else { return self.finish(.failure(LifePlaceError.outsideJapan)) }
-                let locality = placemark.locality ?? placemark.subAdministrativeArea ?? placemark.subLocality ?? ""
+                guard representation.__regionCode == "JP" else { return self.finish(.failure(LifePlaceError.outsideJapan)) }
+                // MapKit supplies a localized city with its prefecture context as one display name.
+                let placeName = representation.cityWithContext ?? representation.cityName ?? ""
+                guard !placeName.isEmpty else { return self.finish(.failure(LifePlaceError.unavailable)) }
                 self.findNearby(location) { nearby in
                     guard !nearby.isEmpty else { return self.finish(.failure(LifePlaceError.nothingNearby)) }
-                    self.finish(.success(LifePlace(adminArea: placemark.administrativeArea ?? "", locality: locality, nearby: nearby)))
+                    self.finish(.success(LifePlace(adminArea: "", locality: placeName, nearby: nearby)))
                 }
             }
         }
@@ -157,7 +160,7 @@ final class CoreLocationPlaceProvider: LifePlaceProviding {
                 var nearest: [LifePlaceKind: Double] = [:]
                 for item in response?.mapItems ?? [] {
                     guard let category = item.pointOfInterestCategory, let kind = Self.kind(of: category) else { continue }
-                    let distance = location.distance(from: CLLocation(latitude: item.placemark.coordinate.latitude, longitude: item.placemark.coordinate.longitude))
+                    let distance = location.distance(from: item.location)
                     nearest[kind] = min(nearest[kind] ?? .infinity, distance)
                 }
                 let nearby = nearest.map { LifePlace.Nearby(kind: $0.key, meters: Int(($0.value / 100).rounded()) * 100) }

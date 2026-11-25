@@ -47,6 +47,9 @@ final class MailLoginViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (controller: MailLoginViewController, _) in
+            controller.updateAppleButtonAppearance()
+        }
         subscribe()
     }
 
@@ -56,13 +59,6 @@ final class MailLoginViewController: BaseViewController {
         view.endEditing(true)
         passwordField.textField.text = nil
         setPasswordRevealed(false)
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
-            updateAppleButtonAppearance()
-        }
     }
 
     // MARK: - Setup

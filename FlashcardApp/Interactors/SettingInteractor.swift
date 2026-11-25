@@ -144,6 +144,7 @@ enum DailyStudyReminder {
     static let identifier = "com.flashcardapp.study.dailyReminder"
     static let openReviewNotification = Notification.Name("DailyStudyReminder.openReview")
     private static var shouldOpenReview = false
+    private static let requestQueue = DispatchQueue(label: "com.flashcardapp.study.reminderRequests", qos: .utility)
 
     static func requestOpenReview(center: NotificationCenter = .default) {
         shouldOpenReview = true
@@ -177,15 +178,21 @@ enum DailyStudyReminder {
     }
 
     static func schedule(hour: Int, soundEnabled: Bool, completion: @escaping (Error?) -> Void) {
-        UNUserNotificationCenter.current().add(makeRequest(hour: hour, soundEnabled: soundEnabled)) { error in
-            DispatchQueue.main.async { completion(error) }
+        let request = makeRequest(hour: hour, soundEnabled: soundEnabled)
+        requestQueue.async {
+            UNUserNotificationCenter.current().add(request) { error in
+                DispatchQueue.main.async { completion(error) }
+            }
         }
     }
 
     static func cancel() {
-        let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: [identifier])
-        center.removeDeliveredNotifications(withIdentifiers: [identifier])
+        // UserNotifications can block synchronously on XPC during app launch; keep it off the UI thread.
+        requestQueue.async {
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: [identifier])
+            center.removeDeliveredNotifications(withIdentifiers: [identifier])
+        }
     }
 
     static func canSchedule(enabled: Bool, authorization: UNAuthorizationStatus) -> Bool {

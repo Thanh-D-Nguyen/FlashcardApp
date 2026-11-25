@@ -53,7 +53,7 @@ final class LessonProgressStoreTests: XCTestCase {
     }
 
     func test_theFirstAnswerIsFinal() throws {
-        try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "B"), for: lesson, ownerKey: owner, at: day)
+        _ = try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "B"), for: lesson, ownerKey: owner, at: day)
         let again = try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: lesson, ownerKey: owner, at: day.addingTimeInterval(60))
         XCTAssertEqual(again.answers, [LessonAnswer(activityId: "a1", optionKey: "B")])
         XCTAssertEqual(again.startedAt, day)
@@ -67,12 +67,12 @@ final class LessonProgressStoreTests: XCTestCase {
     }
 
     func test_aLessonIsCompletedOnlyWhenEveryActivityIsAnswered() throws {
-        try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: lesson, ownerKey: owner, at: day)
+        _ = try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: lesson, ownerKey: owner, at: day)
         XCTAssertThrowsError(try store.markCompleted(for: lesson, ownerKey: owner, at: day)) {
             XCTAssertEqual($0 as? LessonProgressError, .notFinished)
         }
         XCTAssertTrue(store.completedSlugs(ownerKey: owner).isEmpty)
-        try store.recordAnswer(LessonAnswer(activityId: "a2", optionKey: "C"), for: lesson, ownerKey: owner, at: day)
+        _ = try store.recordAnswer(LessonAnswer(activityId: "a2", optionKey: "C"), for: lesson, ownerKey: owner, at: day)
         let done = try store.markCompleted(for: lesson, ownerKey: owner, at: day.addingTimeInterval(120))
         XCTAssertEqual(done.completedAt, day.addingTimeInterval(120))
         XCTAssertEqual(store.completedSlugs(ownerKey: owner), [lesson.slug])
@@ -84,12 +84,12 @@ final class LessonProgressStoreTests: XCTestCase {
         XCTAssertThrowsError(try store.markServerConfirmed(slug: lesson.slug, ownerKey: owner, at: day)) {
             XCTAssertEqual($0 as? LessonProgressError, .notFound)
         }
-        try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: lesson, ownerKey: owner, at: day)
-        try store.recordAnswer(LessonAnswer(activityId: "a2", optionKey: "A"), for: lesson, ownerKey: owner, at: day)
+        _ = try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: lesson, ownerKey: owner, at: day)
+        _ = try store.recordAnswer(LessonAnswer(activityId: "a2", optionKey: "A"), for: lesson, ownerKey: owner, at: day)
         XCTAssertThrowsError(try store.markServerConfirmed(slug: lesson.slug, ownerKey: owner, at: day), "Not completed yet") {
             XCTAssertEqual($0 as? LessonProgressError, .notFound)
         }
-        try store.markCompleted(for: lesson, ownerKey: owner, at: day)
+        _ = try store.markCompleted(for: lesson, ownerKey: owner, at: day)
         XCTAssertFalse(try XCTUnwrap(store.progress(slug: lesson.slug, ownerKey: owner)).isServerConfirmed, "Done here is not saved to the account")
         try store.markServerConfirmed(slug: lesson.slug, ownerKey: owner, at: day.addingTimeInterval(5))
         let progress = try XCTUnwrap(store.progress(slug: lesson.slug, ownerKey: owner))
@@ -98,8 +98,8 @@ final class LessonProgressStoreTests: XCTestCase {
     }
 
     func test_eachAccountAndTheGuestKeepTheirOwnProgress() throws {
-        try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: lesson, ownerKey: "", at: day)
-        try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "D"), for: lesson, ownerKey: owner, at: day)
+        _ = try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: lesson, ownerKey: "", at: day)
+        _ = try store.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "D"), for: lesson, ownerKey: owner, at: day)
         XCTAssertEqual(store.progress(slug: lesson.slug, ownerKey: "")?.answers.first?.optionKey, "A")
         XCTAssertEqual(store.progress(slug: lesson.slug, ownerKey: owner)?.answers.first?.optionKey, "D")
         XCTAssertNil(store.progress(slug: lesson.slug, ownerKey: other), "Another account sees nothing of it")

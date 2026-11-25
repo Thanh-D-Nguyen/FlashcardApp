@@ -31,13 +31,13 @@ final class TodayLessonSlotTests: XCTestCase {
 
     private func answer(_ slug: String, _ count: Int, order: Int = 1, owner: String? = nil, at date: Date? = nil) throws {
         for index in 1...count {
-            try store.recordAnswer(LessonAnswer(activityId: "\(slug)-\(index)", optionKey: "A"), for: subject(slug, order: order), ownerKey: owner ?? self.owner, at: date ?? day)
+            _ = try store.recordAnswer(LessonAnswer(activityId: "\(slug)-\(index)", optionKey: "A"), for: subject(slug, order: order), ownerKey: owner ?? self.owner, at: date ?? day)
         }
     }
 
     private func complete(_ slug: String, order: Int = 1, owner: String? = nil, at date: Date? = nil) throws {
         try answer(slug, 2, order: order, owner: owner, at: date)
-        try store.markCompleted(for: subject(slug, order: order), ownerKey: owner ?? self.owner, at: date ?? day)
+        _ = try store.markCompleted(for: subject(slug, order: order), ownerKey: owner ?? self.owner, at: date ?? day)
     }
 
     /// Saves a lesson as the device would have it, naming `next` as the lesson after it.

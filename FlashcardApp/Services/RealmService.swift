@@ -27,8 +27,10 @@ final class RealmService {
     }
 
     static func makeConfiguration(fileURL: URL = defaultFileURL) -> Realm.Configuration {
-        Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion, migrationBlock: migrate,
-                            shouldCompactOnLaunch: shouldCompact, objectTypes: storedTypes)
+        Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion,
+                            migrationBlock: { migration, oldVersion in migrate(migration: migration, oldVersion: oldVersion) },
+                            shouldCompactOnLaunch: { total, used in shouldCompact(totalBytes: total, usedBytes: used) },
+                            objectTypes: storedTypes)
     }
 
     func configuration(onComplete: @escaping () -> Void = {}, onError: ((AppError) -> Void)? = nil) {

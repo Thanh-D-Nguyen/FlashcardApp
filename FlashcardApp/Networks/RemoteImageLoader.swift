@@ -69,8 +69,8 @@ final class RemoteImageLoader {
             let limit = Self.maximumBytes
             var headers: HTTPHeaders = ["Accept": Self.acceptedContentTypes.joined(separator: ", ")]
             if isAPIAddress, let authorization { headers.add(name: "Authorization", value: authorization) }
-            var request: DataRequest!
-            request = session.request(url, headers: headers)
+            let request = session.request(url, headers: headers)
+            request
                 // A redirect may only lead to another https address, never to http or a local-network host.
                 .redirect(using: Redirector(behavior: .modify { _, request, _ in Self.allowedRedirect(request) }))
                 .validate(statusCode: 200..<300)

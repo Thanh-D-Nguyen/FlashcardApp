@@ -51,7 +51,7 @@ final class LessonWordSaverTests: XCTestCase {
 
     func test_savingTheSameWordsAgainChangesNothing() throws {
         try makeDeck()
-        try saver.save([hello, colleague], fromLesson: slug, to: .existing(deckID: "deck-1"))
+        _ = try saver.save([hello, colleague], fromLesson: slug, to: .existing(deckID: "deck-1"))
         let again = try saver.save([hello, colleague], fromLesson: slug, to: .existing(deckID: "deck-1"))
         XCTAssertEqual([again.added, again.alreadyThere], [0, 2])
         XCTAssertEqual(cards(in: "deck-1").count, 2)
@@ -106,7 +106,7 @@ final class LessonWordSaverTests: XCTestCase {
     func test_theSameWordCanLiveInAnotherDeck() throws {
         try makeDeck(id: "a")
         try makeDeck(id: "b")
-        try saver.save([hello], fromLesson: slug, to: .existing(deckID: "a"))
+        _ = try saver.save([hello], fromLesson: slug, to: .existing(deckID: "a"))
         let outcome = try saver.save([hello], fromLesson: slug, to: .existing(deckID: "b"))
         XCTAssertEqual(outcome.added, 1)
         XCTAssertEqual(cards(in: "a").count, 1)
