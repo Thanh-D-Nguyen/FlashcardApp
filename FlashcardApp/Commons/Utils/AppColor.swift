@@ -11,12 +11,12 @@ class AppColors {
     
     // Màu chính (Primary Color)
     static var primary: UIColor {
-        return UIColor(named: "Primary")!
+        return UIColor(named: "AppPrimary")!
     }
     
     // Màu phụ (Secondary Color)
     static var secondary: UIColor {
-        return UIColor(named: "Secondary")!
+        return UIColor(named: "AppSecondary")!
     }
     
     // Màu xanh điểm nhấn (Accent Green)
@@ -56,12 +56,12 @@ class AppColors {
     
     // Màu xám nhạt (Light Gray)
     static var lightGray: UIColor {
-        return UIColor(named: "LightGray")!
+        return UIColor(named: "AppLightGray")!
     }
     
     // Màu xám đậm (Dark Gray)
     static var darkGray: UIColor {
-        return UIColor(named: "DarkGray")!
+        return UIColor(named: "AppDarkGray")!
     }
     
     // Màu tím tương tác (Interactive Purple)
@@ -95,7 +95,7 @@ class AppColors {
     }
     
     static var placeholderText: UIColor {
-        return UIColor(named: "PlaceholderText")!
+        return UIColor(named: "AppPlaceholderText")!
     }
     
     static var separatorLine: UIColor {
