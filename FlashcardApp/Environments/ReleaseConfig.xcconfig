@@ -3,6 +3,9 @@ APP_ENVIRONMENT = production
 PRODUCT_DISPLAY_NAME = Flashcard
 PRODUCT_BUNDLE_IDENTIFIER = com.ds.FlashcardApp
 PRODUCT_BASE_URL = https:/$()/kiokoto.com/api
+// Historical AdMob IDs: verify ownership and status in AdMob before distributing.
+ADMOB_APP_ID = ca-app-pub-3369705605881794~7848404031
+ADMOB_BANNER_UNIT_ID = ca-app-pub-3369705605881794/9212235403
 // iOS OAuth client for bundle ID com.ds.FlashcardApp (Google Cloud Console ▸ Credentials). Empty hides the Google button.
 GOOGLE_IOS_CLIENT_ID_PREFIX = 112477118682-7ovgctal79v4boh11vlbr08dlhp6dvfi
 #include? "production.local.xcconfig"

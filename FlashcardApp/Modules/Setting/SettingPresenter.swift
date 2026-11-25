@@ -148,17 +148,22 @@ final class SettingPresenter: SettingPresenterInterface {
     let sectionsRelay = BehaviorRelay<[SettingSection]>(value: [])
 
     private let analytics: AnalyticsService
+    private let adsPrivacyRequired: () -> Bool
+    private var adPrivacyObserver: NSObjectProtocol?
 
     init(interactor: SettingInteractorInterface,
          wireframe: SettingWireframeInterface,
-         analytics: AnalyticsService = .shared) {
+         analytics: AnalyticsService = .shared,
+         adsPrivacyRequired: @escaping () -> Bool = { AdsService.shared.privacyOptionsRequired }) {
         self.interactor = interactor
         self.wireframe = wireframe
         self.analytics = analytics
+        self.adsPrivacyRequired = adsPrivacyRequired
     }
 
     deinit {
         refreshRequest?.dispose()
+        if let adPrivacyObserver { NotificationCenter.default.removeObserver(adPrivacyObserver) }
     }
 }
 
@@ -168,6 +173,9 @@ extension SettingPresenter {
 
     func viewDidLoad() {
         observeAuthState()
+        adPrivacyObserver = NotificationCenter.default.addObserver(forName: AdsService.stateDidChange, object: nil, queue: .main) { [weak self] _ in
+            self?.reloadSections()
+        }
         reloadSections()
     }
 
@@ -407,7 +415,7 @@ extension SettingPresenter {
             wireframe.showPrivacyPolicy()
         case "terms":
             wireframe.showTermsOfService()
-        case "support":
+        case "support", "report_ad":
             wireframe.showContactSupport()
         case "about":
             wireframe.showAbout()
@@ -524,9 +532,7 @@ private extension SettingPresenter {
 
         let preferencesSection = SettingSection(title: NSLocalizedString("Preferences", comment: ""), items: preferencesItems)
 
-        let generalSection = SettingSection(
-            title: NSLocalizedString("General", comment: ""),
-            items: [
+        var generalItems: [SettingItem] = [
                 .choice(ChoiceConfig(
                     id: "language",
                     title: NSLocalizedString("Language", comment: ""),
@@ -555,9 +561,21 @@ private extension SettingPresenter {
                     id: "support",
                     title: NSLocalizedString("Contact Support", comment: ""),
                     iconName: "bubble.left"
+                )),
+                .navigation(NavigationConfig(
+                    id: "report_ad",
+                    title: NSLocalizedString("Report an ad", comment: "Settings: report an inappropriate advertisement"),
+                    iconName: "flag"
                 ))
             ]
-        )
+        if adsPrivacyRequired() {
+            generalItems.insert(.navigation(NavigationConfig(
+                id: "ad_privacy",
+                title: NSLocalizedString("Ad privacy choices", comment: "AdMob UMP privacy options entry point"),
+                iconName: "hand.raised.slash"
+            )), at: 3)
+        }
+        let generalSection = SettingSection(title: NSLocalizedString("General", comment: ""), items: generalItems)
 
         let aboutSection = SettingSection(
             title: NSLocalizedString("About", comment: ""),

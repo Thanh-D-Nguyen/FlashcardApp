@@ -1,6 +1,14 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+      "Ad privacy choices": {
+        "extractionState": "manual",
+        "localizations": {
+          "en": { "stringUnit": { "state": "translated", "value": "Ad privacy choices" } },
+          "vi": { "stringUnit": { "state": "translated", "value": "Tùy chọn quyền riêng tư quảng cáo" } },
+          "ja": { "stringUnit": { "state": "translated", "value": "広告のプライバシー設定" } }
+        }
+      },
       "Account Deleted": {
         "extractionState": "manual",
         "localizations": {
@@ -5690,6 +5698,15 @@
             "value" : "Điều khoản sử dụng"
           }
         }
+      }
+    },
+    "Report an ad" : {
+      "comment" : "Settings: report an inappropriate advertisement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Report an ad" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "広告を報告" } },
+        "vi" : { "stringUnit" : { "state" : "translated", "value" : "Báo cáo quảng cáo" } }
       }
     },
     "Contact Support" : {

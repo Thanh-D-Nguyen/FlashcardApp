@@ -9,6 +9,8 @@ final class HomeViewController: BaseViewController {
     private let lessonsButton = UIButton(configuration: .tinted())
     private let headerView = UIView()
     private var sections: [Section] = []
+    private var tableBottomConstraint: NSLayoutConstraint!
+    private var adBanner: AdsBannerView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +28,17 @@ final class HomeViewController: BaseViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         presenter.cancelLoading()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if !presenter.isContent { AdsService.shared.prepare(from: self) }
+        adBanner?.refresh()
+    }
+
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        updateTableBottom(forBannerHeight: adBanner?.bannerHeight ?? 0)
     }
 
     override func viewDidLayoutSubviews() {
@@ -55,16 +68,34 @@ final class HomeViewController: BaseViewController {
         tableView.accessibilityIdentifier = presenter.isContent ? "level_content" : "home_levels"
         tableView.backgroundView = stateView
         view.addSubview(tableView)
+        tableBottomConstraint = tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableBottomConstraint
         ])
+        if !presenter.isContent {
+            let banner = AdsBannerView(owner: self)
+            adBanner = banner
+            banner.onHeightChange = { [weak self] height in self?.updateTableBottom(forBannerHeight: height) }
+            view.addSubview(banner)
+            NSLayoutConstraint.activate([
+                banner.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                banner.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                banner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            ])
+        }
         if presenter.isContent { buildHeader() }
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: HomeViewController, _) in
             controller.render()
         }
+    }
+
+    private func updateTableBottom(forBannerHeight height: CGFloat) {
+        guard tableBottomConstraint != nil else { return }
+        let bottom = height > 0 ? -(height + view.safeAreaInsets.bottom) : 0
+        if tableBottomConstraint.constant != bottom { tableBottomConstraint.constant = bottom }
     }
 
     func subscribe() {

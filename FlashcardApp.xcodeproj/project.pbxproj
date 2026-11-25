@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CDAD00000000000000000001 /* AdsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAD00000000000000000002 /* AdsServiceTests.swift */; };
+		AADE00000000000000000001 /* AdsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADE00000000000000000002 /* AdsService.swift */; };
+		AADE00000000000000000005 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = AADE00000000000000000004 /* GoogleMobileAds */; };
+		AADE00000000000000000008 /* GoogleUserMessagingPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = AADE00000000000000000007 /* GoogleUserMessagingPlatform */; };
 		04119AE3634CB24D1AED2201 /* BJTFlashcardLibraryAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B460115ED6BF151E00D66FD /* BJTFlashcardLibraryAPITests.swift */; };
 		06B2F221D43E11ABE16D5086 /* BulkDeckImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E77F62AA897954B5B91A027 /* BulkDeckImport.swift */; };
 		06BA7133EC13FDE3A6842D36 /* DiscoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61081B44DD72730753D5C663 /* DiscoverViewController.swift */; };
@@ -471,6 +475,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CDAD00000000000000000002 /* AdsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdsServiceTests.swift; sourceTree = "<group>"; };
+		AADE00000000000000000002 /* AdsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdsService.swift; sourceTree = "<group>"; };
 		0043769D035FE684770AAD71 /* SampleLifeContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SampleLifeContent.swift; sourceTree = "<group>"; };
 		00B68735DD74CA56A4B76FF1 /* CardStylePickerWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStylePickerWireframe.swift; sourceTree = "<group>"; };
 		020D53C37E48A65708DA43B9 /* ScenarioPlayViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScenarioPlayViewController.swift; sourceTree = "<group>"; };
@@ -923,6 +929,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AADE00000000000000000005 /* GoogleMobileAds in Frameworks */,
+				AADE00000000000000000008 /* GoogleUserMessagingPlatform in Frameworks */,
 				76E5D889E45C712266D2A69A /* GoogleSignIn in Frameworks */,
 				92A93EBA29A25A1B00CE7E70 /* RealmSwift in Frameworks */,
 				9251ECF629A1EC62006C1D1C /* Alamofire in Frameworks */,
@@ -1243,6 +1251,7 @@
 				35AEC38C5F3425C8CEAE6989 /* ReviewSyncTests.swift */,
 				167BEA257D1D3BC5F9A3C10E /* DeckSharingTests.swift */,
 				C2FDC5A41462B3833297FC57 /* AnalyticsTests.swift */,
+				CDAD00000000000000000002 /* AdsServiceTests.swift */,
 				843C1BC16BA460BE67B6F458 /* DataExportPresenterTests.swift */,
 				95BA1A74BC9B10016D164608 /* DailyRadarFixtures.swift */,
 				7D2435C62FE776A54F1A4D64 /* DailyRadarTests.swift */,
@@ -1543,6 +1552,7 @@
 		9251EC7A29A1EAA5006C1D1C /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				AADE00000000000000000002 /* AdsService.swift */,
 				1235E8CD5F0FDD150A00D51E /* AuthSession.swift */,
 				733B6F4A9F79724C785D6D5A /* AppLogger.swift */,
 				9251EC7B29A1EAA5006C1D1C /* RealmService.swift */,
@@ -1955,6 +1965,8 @@
 			);
 			name = FlashcardApp;
 			packageProductDependencies = (
+				AADE00000000000000000004 /* GoogleMobileAds */,
+				AADE00000000000000000007 /* GoogleUserMessagingPlatform */,
 				AC8BE8D11FD0E988FF009E22 /* GoogleSignIn */,
 				9251ECEE29A1EC4A006C1D1C /* RxCocoa */,
 				9251ECF029A1EC4A006C1D1C /* RxSwift */,
@@ -2038,6 +2050,8 @@
 			);
 			mainGroup = 9251EBC029A1E9A6006C1D1C;
 			packageReferences = (
+				AADE00000000000000000003 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				AADE00000000000000000006 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */,
 				9251ECEB29A1EC4A006C1D1C /* XCRemoteSwiftPackageReference "RxSwift" */,
 				9251ECF429A1EC62006C1D1C /* XCRemoteSwiftPackageReference "Alamofire" */,
 				92A93EB629A25A1B00CE7E70 /* XCRemoteSwiftPackageReference "realm-swift" */,
@@ -2113,6 +2127,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AADE00000000000000000001 /* AdsService.swift in Sources */,
 				078D61420F3EA187695F28EA /* TextRecognitionService.swift in Sources */,
 				B68AFF6A9F19EB8159544F27 /* SpeechRecognitionService.swift in Sources */,
 				30A03726AC6E235943D669E9 /* HandwritingRecognitionService.swift in Sources */,
@@ -2534,6 +2549,7 @@
 				0D3BFC4145544D2F5F1F1E6B /* ReviewSyncTests.swift in Sources */,
 				A49E87933C00D0A12B6D4715 /* DeckSharingTests.swift in Sources */,
 				85673383A5F90CACD5A52176 /* AnalyticsTests.swift in Sources */,
+				CDAD00000000000000000001 /* AdsServiceTests.swift in Sources */,
 				09D239C734C09D847B9A8A9C /* DataExportPresenterTests.swift in Sources */,
 				DCFA46725C2163496587BD8F /* DailyRadarFixtures.swift in Sources */,
 				E86F8065E7F5789CD3184238 /* DailyRadarTests.swift in Sources */,
@@ -2882,6 +2898,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AADE00000000000000000003 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.12.0;
+			};
+		};
+		AADE00000000000000000006 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-user-messaging-platform";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
 		48164E5FC0B9744D5B231917 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -2925,6 +2957,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AADE00000000000000000004 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AADE00000000000000000003 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		AADE00000000000000000007 /* GoogleUserMessagingPlatform */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AADE00000000000000000006 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */;
+			productName = GoogleUserMessagingPlatform;
+		};
 		9251ECEE29A1EC4A006C1D1C /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9251ECEB29A1EC4A006C1D1C /* XCRemoteSwiftPackageReference "RxSwift" */;

@@ -36,6 +36,11 @@ final class SettingViewController: BaseViewController {
         presenter.viewWillDisappear()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AdsService.shared.prepare(from: self)
+    }
+
     func setupUI() {
         settingTableView.register(AccountCell.self, forCellReuseIdentifier: AccountCell.reuseIdentifier)
         settingTableView.register(SettingsRowCell.self, forCellReuseIdentifier: SettingsRowCell.reuseIdentifier)
@@ -157,7 +162,11 @@ extension SettingViewController: UITableViewDelegate {
 
         switch item {
         case .navigation(let config), .destructive(let config):
-            presenter.handleNavigationTap(config: config)
+            if config.id == "ad_privacy" {
+                AdsService.shared.presentPrivacyOptions(from: self)
+            } else {
+                presenter.handleNavigationTap(config: config)
+            }
         case .account:
             presenter.didSelectItem(at: indexPath)
         case .toggle, .choice:

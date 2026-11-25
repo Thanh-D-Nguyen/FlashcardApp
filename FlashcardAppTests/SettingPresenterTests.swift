@@ -196,6 +196,39 @@ final class SettingPresenterTests: XCTestCase {
         XCTAssertTrue(mockWireframe.supportOpened)
     }
 
+    func test_adPrivacyRowAppearsOnlyWhenRequired() {
+        let makePresenter: (Bool) -> SettingPresenter = { required in
+            SettingPresenter(interactor: self.mockInteractor, wireframe: self.mockWireframe,
+                             analytics: AnalyticsService(api: BJTAnalyticsAPI(baseURL: { "https://invalid.test/api" }), consent: self.analyticsConsent),
+                             adsPrivacyRequired: { required })
+        }
+        let navIDs: (SettingPresenter) -> [String] = { presenter in
+            presenter.viewDidLoad()
+            return presenter.sectionsRelay.value[2].items.compactMap {
+                if case .navigation(let config) = $0 { return config.id }
+                return nil
+            }
+        }
+
+        XCTAssertFalse(navIDs(makePresenter(false)).contains("ad_privacy"))
+        let requiredIDs = navIDs(makePresenter(true))
+        XCTAssertTrue(requiredIDs.contains("ad_privacy"))
+        XCTAssertTrue(requiredIDs.contains("privacy"), "Ad choices must not replace the Privacy Policy")
+    }
+
+    func test_reportAdOpensSupport() {
+        presenter.viewDidLoad()
+        let actions = presenter.sectionsRelay.value[2].items.compactMap { item -> NavigationConfig? in
+            if case .navigation(let config) = item { return config }
+            return nil
+        }
+        guard let report = actions.first(where: { $0.id == "report_ad" }) else {
+            return XCTFail("Missing ad reporting entry")
+        }
+        presenter.handleNavigationTap(config: report)
+        XCTAssertTrue(mockWireframe.supportOpened)
+    }
+
     func test_viewDidLoad_preferencesSectionShowsReminderTimeWhenEnabled() {
         presenter.viewDidLoad()
 

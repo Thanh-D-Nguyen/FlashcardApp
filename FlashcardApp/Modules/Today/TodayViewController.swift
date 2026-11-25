@@ -20,6 +20,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let streakView = TodayStreakView()
     private let radarCard = TodayLessonSlotView()
     private var refreshObservers: [NSObjectProtocol] = []
+    private var adBanner: AdsBannerView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +38,12 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         super.viewWillDisappear(animated)
         refreshObservers.forEach(NotificationCenter.default.removeObserver)
         refreshObservers = []
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AdsService.shared.prepare(from: self)
+        adBanner?.refresh()
     }
 
     /// What is due and what was saved "today" change while the screen stays open: coming back to the app, a new day, a change of
@@ -97,6 +104,19 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Design.Spacing.xl),
             stack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Design.Spacing.gutter),
             stack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Design.Spacing.gutter)
+        ])
+
+        let banner = AdsBannerView(owner: self)
+        adBanner = banner
+        banner.onHeightChange = { [weak self] height in
+            self?.scrollView.contentInset.bottom = height
+            self?.scrollView.verticalScrollIndicatorInsets.bottom = height
+        }
+        view.addSubview(banner)
+        NSLayoutConstraint.activate([
+            banner.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            banner.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            banner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
         heroView.onPrimary = { [weak self] in self?.presenter.primaryAction() }
