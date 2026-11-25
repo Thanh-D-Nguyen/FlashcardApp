@@ -7,7 +7,7 @@ final class TodayScenarioBannerView: UIControl {
     /// The groups named on the card: the ones a learner in Japan meets first.
     private static let shownGroups: [ScenarioCategory] = [.beauty, .health, .admin, .banking, .shopping, .dining, .transport, .housing, .delivery, .emergency]
 
-    private let gradient = CAGradientLayer()
+    private let badgeBox = UIView()
     private let badge = UIImageView(image: UIImage(systemName: "text.bubble.fill"))
     private let eyebrow = UILabel()
     private let titleLabel = UILabel()
@@ -15,31 +15,26 @@ final class TodayScenarioBannerView: UIControl {
     private let detail = UILabel()
     private let chipScroll = UIScrollView()
     private let chipStack = UIStackView()
-    private let cta = UIButton(configuration: .filled())
+    private let cta = UIButton(type: .system)
+    private let header = UIStackView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layer.cornerRadius = Design.Radius.panel
-        layer.cornerCurve = .continuous
-        layer.borderWidth = 1
+        applyCardSurface(radius: Design.Radius.card)
         layer.masksToBounds = true
-        gradient.startPoint = CGPoint(x: 0, y: 0)
-        gradient.endPoint = CGPoint(x: 1, y: 1)
-        layer.insertSublayer(gradient, at: 0)
 
-        let badgeBox = UIView()
-        badgeBox.backgroundColor = Design.Color.accent
-        badgeBox.layer.cornerRadius = 22
+        badgeBox.backgroundColor = Design.Color.highlight
+        badgeBox.layer.cornerRadius = Design.Radius.control
         badgeBox.layer.cornerCurve = .continuous
         badgeBox.isUserInteractionEnabled = false
-        badge.tintColor = Design.Color.onAccent
+        badge.tintColor = Design.Color.accent
         badge.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .title3)
         badge.translatesAutoresizingMaskIntoConstraints = false
         badgeBox.addSubview(badge)
         badgeBox.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            badgeBox.widthAnchor.constraint(equalToConstant: 44),
-            badgeBox.heightAnchor.constraint(equalToConstant: 44),
+            badgeBox.widthAnchor.constraint(equalToConstant: Design.HitTarget.minimum),
+            badgeBox.heightAnchor.constraint(equalToConstant: Design.HitTarget.minimum),
             badge.centerXAnchor.constraint(equalTo: badgeBox.centerXAnchor),
             badge.centerYAnchor.constraint(equalTo: badgeBox.centerYAnchor)
         ])
@@ -48,7 +43,7 @@ final class TodayScenarioBannerView: UIControl {
         eyebrow.textColor = Design.Color.accent
         eyebrow.text = NSLocalizedString("EVERY MOMENT IN JAPAN", comment: "Eyebrow of the situation lessons card on Today")
         titleLabel.apply(.headword)
-        titleLabel.font = Design.TextRole.headword.font.withWeight(.semibold)
+        titleLabel.font = Design.TextRole.weighted(.title2, weight: .semibold)
         titleLabel.text = NSLocalizedString("Daily-life situations", comment: "Name of the situation lessons")
         japanese.apply(.reading)
         japanese.text = "暮らしの場面"
@@ -56,7 +51,8 @@ final class TodayScenarioBannerView: UIControl {
         let titleBlock = UIStackView(arrangedSubviews: [eyebrow, titleLabel, japanese])
         titleBlock.axis = .vertical
         titleBlock.spacing = 2
-        let header = UIStackView(arrangedSubviews: [badgeBox, titleBlock])
+
+        [badgeBox, titleBlock].forEach(header.addArrangedSubview)
         header.spacing = Design.Spacing.m
         header.alignment = .center
 
@@ -80,13 +76,9 @@ final class TodayScenarioBannerView: UIControl {
         ])
         for group in Self.shownGroups { chipStack.addArrangedSubview(chip(group)) }
 
-        var configuration = Design.Button.primary(title: NSLocalizedString("Practise situations", comment: "Opens the situation lessons"))
-        configuration.image = UIImage(systemName: "arrow.right")
-        configuration.imagePlacement = .trailing
-        configuration.imagePadding = Design.Spacing.s
-        cta.configuration = configuration
         cta.isUserInteractionEnabled = false
-        cta.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
+        cta.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        updateCTA()
 
         let column = UIStackView(arrangedSubviews: [header, detail, chipScroll, cta])
         column.axis = .vertical
@@ -108,25 +100,28 @@ final class TodayScenarioBannerView: UIControl {
         accessibilityLabel = [titleLabel.text, detail.text].compactMap { $0 }.joined(separator: ". ")
         accessibilityHint = NSLocalizedString("Practise situations", comment: "Opens the situation lessons")
 
-        updateColors()
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: TodayScenarioBannerView, _) in view.updateColors() }
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: TodayScenarioBannerView, _) in
+            view.updateCTA()
+        }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        gradient.frame = bounds
-    }
 
     override var isHighlighted: Bool {
         didSet { alpha = isHighlighted ? 0.85 : 1 }
     }
 
-    private func updateColors() {
-        gradient.colors = [Design.Color.accent.withAlphaComponent(0.20).resolvedColor(with: traitCollection).cgColor,
-                           Design.Color.surface.resolvedColor(with: traitCollection).cgColor]
-        layer.borderColor = Design.Color.accent.withAlphaComponent(0.35).resolvedColor(with: traitCollection).cgColor
+    private func updateCTA() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        var configuration = Design.Button.secondary(
+            title: NSLocalizedString("Practise situations", comment: "Opens the situation lessons"),
+            systemImage: isAX ? nil : "arrow.right",
+            traits: traitCollection
+        )
+        configuration.imagePlacement = .trailing
+        cta.configuration = configuration
+        header.axis = isAX ? .vertical : .horizontal
+        header.alignment = isAX ? .leading : .center
     }
 
     private func chip(_ group: ScenarioCategory) -> UIView {
@@ -136,11 +131,14 @@ final class TodayScenarioBannerView: UIControl {
         configuration.imagePadding = Design.Spacing.xs
         configuration.image = UIImage(systemName: group.symbol)
         configuration.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(textStyle: .footnote, scale: .small)
-        configuration.baseBackgroundColor = Design.Color.surface
+        configuration.baseBackgroundColor = Design.Color.surfaceTint
         configuration.baseForegroundColor = Design.Color.textPrimary
-        var title = AttributedString(group.title)
-        title.font = UIFont.preferredFont(forTextStyle: .footnote)
-        configuration.attributedTitle = title
+        configuration.title = group.title
+        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = UIFont.preferredFont(forTextStyle: .footnote)
+            return outgoing
+        }
         let pill = UIButton(configuration: configuration)
         pill.isUserInteractionEnabled = false
         pill.setContentHuggingPriority(.required, for: .horizontal)

@@ -125,49 +125,49 @@ final class LifeSceneView: UIView {
             if let temperature {
                 numeral.isHidden = false
                 numeral.format = { "\($0)°" }
-                numeral.font = UIFont.systemFont(ofSize: 44, weight: .semibold).rounded()
-                numeral.textColor = UIColor.label
+                numeral.font = UIFontMetrics(forTextStyle: .largeTitle).scaledFont(for: UIFont.systemFont(ofSize: 44, weight: .semibold).rounded(), maximumPointSize: 52)
+                numeral.textColor = Design.Color.textPrimary
                 numeral.text = "\(temperature)°"
             }
         case .date(let day, let weekday):
             numeral.isHidden = false
             caption.isHidden = false
             numeral.format = { "\($0)" }
-            numeral.font = UIFont(name: "HiraMinProN-W6", size: 54) ?? .systemFont(ofSize: 54, weight: .bold)
-            numeral.textColor = Design.Color.hero
+            numeral.font = Design.TextRole.mincho(size: 52, style: .largeTitle, maximum: 60)
+            numeral.textColor = Design.Color.textPrimary
             numeral.text = "\(day)"
             caption.text = weekday
-            caption.font = UIFont(name: "HiraMinProN-W6", size: 18) ?? .systemFont(ofSize: 18, weight: .semibold)
-            caption.textColor = Design.Color.textSecondary
+            caption.font = Design.TextRole.mincho(size: 18, style: .headline, maximum: 22)
+            caption.textColor = Design.Color.textPrimary.withAlphaComponent(0.75)
             icon.image = symbol("calendar", size: 80)
-            icon.tintColor = Design.Color.hero.withAlphaComponent(0.16)
+            icon.tintColor = Design.Color.textPrimary.withAlphaComponent(0.12)
         case .place:
             icon.image = symbol("mappin.circle.fill", size: 58)
-            icon.tintColor = UIColor(red: 0.12, green: 0.5, blue: 0.4, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0x1E8066, dark: 0x6FD6B8)
         case .transit:
             icon.image = symbol("tram.fill", size: 54)
-            icon.tintColor = UIColor(red: 0.16, green: 0.36, blue: 0.62, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0x295C9E, dark: 0x8FB4F0)
         case .shopping:
             icon.image = symbol("cart.fill", size: 52)
-            icon.tintColor = UIColor(red: 0.74, green: 0.24, blue: 0.34, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0xBD3D57, dark: 0xF598AA)
             secondary.image = symbol("tag.fill", size: 28)
-            secondary.tintColor = UIColor(red: 0.74, green: 0.24, blue: 0.34, alpha: 0.6)
+            secondary.tintColor = Self.adaptiveTint(light: 0xBD3D57, dark: 0xF598AA).withAlphaComponent(0.7)
             secondary.isHidden = false
         case .news:
             icon.image = symbol("newspaper.fill", size: 52)
-            icon.tintColor = UIColor(red: 0.35, green: 0.3, blue: 0.22, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0x594D38, dark: 0xD9CEB8)
         case .food:
             icon.image = symbol("fork.knife.circle.fill", size: 54)
-            icon.tintColor = UIColor(red: 0.78, green: 0.4, blue: 0.1, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0xC7661A, dark: 0xF7B06E)
         case .culture:
             icon.image = symbol("leaf.fill", size: 52)
-            icon.tintColor = UIColor(red: 0.8, green: 0.3, blue: 0.12, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0xCC4D1F, dark: 0xF59A73)
         case .money:
             icon.image = symbol("yensign.circle.fill", size: 56)
-            icon.tintColor = UIColor(red: 0.72, green: 0.55, blue: 0.05, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0x9E7508, dark: 0xF2D16B)
         case .lottery:
             icon.image = symbol("ticket.fill", size: 52)
-            icon.tintColor = UIColor(red: 0.45, green: 0.3, blue: 0.7, alpha: 1)
+            icon.tintColor = Self.adaptiveTint(light: 0x6E4BB3, dark: 0xC6B0F5)
         }
         applyColors()
         setNeedsLayout()
@@ -543,12 +543,21 @@ final class LifeSceneView: UIView {
         }
     }
 
+    private static func adaptiveTint(light: UInt32, dark: UInt32) -> UIColor {
+        func rgb(_ hex: UInt32) -> UIColor {
+            UIColor(red: CGFloat((hex >> 16) & 0xFF) / 255,
+                    green: CGFloat((hex >> 8) & 0xFF) / 255,
+                    blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+        }
+        return UIColor { $0.userInterfaceStyle == .dark ? rgb(dark) : rgb(light) }
+    }
+
     private static func weatherTint(_ kind: LifeWeatherKind) -> UIColor {
         switch kind {
-        case .sunny, .partlyCloudy: return UIColor(red: 0.96, green: 0.62, blue: 0.1, alpha: 1)
-        case .snow: return UIColor(red: 0.35, green: 0.55, blue: 0.8, alpha: 1)
-        case .thunderstorm: return UIColor(red: 0.35, green: 0.35, blue: 0.6, alpha: 1)
-        default: return UIColor(red: 0.3, green: 0.4, blue: 0.55, alpha: 1)
+        case .sunny, .partlyCloudy: return adaptiveTint(light: 0xD9820B, dark: 0xFFD166)
+        case .snow: return adaptiveTint(light: 0x3D6BA6, dark: 0xB8D8FA)
+        case .thunderstorm: return adaptiveTint(light: 0x454580, dark: 0xC2C4F5)
+        default: return adaptiveTint(light: 0x3A5273, dark: 0xB5C8E0)
         }
     }
 

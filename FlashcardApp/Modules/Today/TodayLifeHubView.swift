@@ -10,11 +10,15 @@ final class LifeTopicCardView: UIView {
     private let scene = LifeSceneView()
     private let badge = UILabel()
     private let badgeBox = UIView()
+    private let inlineBadge = UILabel()
+    private let inlineBadgeBox = UIView()
+    private let inlineBadgeRow = UIStackView()
     private let eyebrow = UILabel()
     private let headline = UILabel()
     private let reading = UILabel()
     private let summary = UILabel()
     private let chips = UIStackView()
+    private let bottomSpacer = UIView()
     private let meta = UILabel()
     private let spinner = UIActivityIndicatorView(style: .medium)
     private let sheen = CAGradientLayer()
@@ -25,29 +29,32 @@ final class LifeTopicCardView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = Design.Color.surface
-        layer.cornerRadius = 22
-        layer.cornerCurve = .continuous
+        applyCardSurface(radius: Design.Radius.card)
         clipsToBounds = true
 
         scene.translatesAutoresizingMaskIntoConstraints = false
-        badge.font = Design.TextRole.eyebrow.font
-        badge.adjustsFontForContentSizeCategory = true
-        badge.translatesAutoresizingMaskIntoConstraints = false
-        badgeBox.layer.cornerRadius = 9
-        badgeBox.layer.cornerCurve = .continuous
-        badgeBox.translatesAutoresizingMaskIntoConstraints = false
-        badgeBox.addSubview(badge)
-        NSLayoutConstraint.activate([
-            badge.topAnchor.constraint(equalTo: badgeBox.topAnchor, constant: 3),
-            badge.bottomAnchor.constraint(equalTo: badgeBox.bottomAnchor, constant: -3),
-            badge.leadingAnchor.constraint(equalTo: badgeBox.leadingAnchor, constant: 8),
-            badge.trailingAnchor.constraint(equalTo: badgeBox.trailingAnchor, constant: -8)
-        ])
+        for (lbl, box) in [(badge, badgeBox), (inlineBadge, inlineBadgeBox)] {
+            lbl.apply(.eyebrow)
+            lbl.translatesAutoresizingMaskIntoConstraints = false
+            box.layer.cornerRadius = Design.Radius.badge
+            box.layer.cornerCurve = .continuous
+            box.translatesAutoresizingMaskIntoConstraints = false
+            box.addSubview(lbl)
+            NSLayoutConstraint.activate([
+                lbl.topAnchor.constraint(equalTo: box.topAnchor, constant: 4),
+                lbl.bottomAnchor.constraint(equalTo: box.bottomAnchor, constant: -4),
+                lbl.leadingAnchor.constraint(equalTo: box.leadingAnchor, constant: Design.Spacing.s),
+                lbl.trailingAnchor.constraint(equalTo: box.trailingAnchor, constant: -Design.Spacing.s)
+            ])
+        }
+        inlineBadgeRow.axis = .horizontal
+        inlineBadgeRow.addArrangedSubview(inlineBadgeBox)
+        inlineBadgeRow.addArrangedSubview(UIView())
+        inlineBadgeRow.isHidden = true
 
         eyebrow.apply(.eyebrow)
         headline.apply(.headword)
-        headline.font = Design.TextRole.headword.font.withWeight(.semibold)
+        headline.font = Design.TextRole.weighted(.title2, weight: .semibold)
         reading.apply(.reading)
         summary.apply(.meaning)
         summary.numberOfLines = 2
@@ -58,6 +65,8 @@ final class LifeTopicCardView: UIView {
         chips.distribution = .fillProportionally
         chips.alignment = .top
         chips.spacing = Design.Spacing.m
+        bottomSpacer.setContentHuggingPriority(.defaultLow, for: .vertical)
+        bottomSpacer.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         spinner.hidesWhenStopped = true
         sheen.colors = [UIColor.clear.cgColor, UIColor.white.withAlphaComponent(0.55).cgColor, UIColor.clear.cgColor]
         sheen.startPoint = CGPoint(x: 0, y: 0.5)
@@ -65,7 +74,8 @@ final class LifeTopicCardView: UIView {
         sheen.isHidden = true
         layer.addSublayer(sheen)
 
-        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        button.enableAdaptiveCornerStyle()
         button.addAction(UIAction { [weak self] _ in self?.fire() }, for: .primaryActionTriggered)
         let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped))
         addGestureRecognizer(tap)
@@ -73,8 +83,9 @@ final class LifeTopicCardView: UIView {
         content.axis = .vertical
         content.spacing = Design.Spacing.xs
         content.isLayoutMarginsRelativeArrangement = true
-        content.layoutMargins = UIEdgeInsets(top: Design.Spacing.s, left: Design.Spacing.m, bottom: Design.Spacing.m, right: Design.Spacing.m)
-        [eyebrow, headline, reading, summary, chips, spinner, meta, button].forEach(content.addArrangedSubview)
+        content.layoutMargins = UIEdgeInsets(top: Design.Spacing.m, left: Design.Spacing.l, bottom: Design.Spacing.l, right: Design.Spacing.l)
+        [inlineBadgeRow, eyebrow, headline, reading, summary, chips, spinner, bottomSpacer, meta, button].forEach(content.addArrangedSubview)
+        content.setCustomSpacing(Design.Spacing.s, after: inlineBadgeRow)
         content.setCustomSpacing(Design.Spacing.s, after: summary)
         content.setCustomSpacing(Design.Spacing.s, after: meta)
         let column = UIStackView(arrangedSubviews: [scene, content])
@@ -85,12 +96,13 @@ final class LifeTopicCardView: UIView {
         sceneHeightConstraint = scene.heightAnchor.constraint(equalToConstant: 120)
         NSLayoutConstraint.activate([
             column.topAnchor.constraint(equalTo: topAnchor),
-            column.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
+            column.bottomAnchor.constraint(equalTo: bottomAnchor),
             column.leadingAnchor.constraint(equalTo: leadingAnchor),
             column.trailingAnchor.constraint(equalTo: trailingAnchor),
             sceneHeightConstraint,
             badgeBox.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
-            badgeBox.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.m)
+            badgeBox.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.m),
+            badgeBox.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -Design.Spacing.m)
         ])
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: LifeTopicCardView, _) in
             view.updateDensity()
@@ -115,10 +127,14 @@ final class LifeTopicCardView: UIView {
         self.card = card
         cardID = card.id
         scene.configure(scene: card.scene, topic: card.topic)
-        badge.text = Self.badgeText(card.provenance)
+        let badgeCopy = Self.badgeText(card.provenance)
         let tint = card.provenance == .sample ? Design.Color.warning : card.provenance == .live ? Design.Color.success : Design.Color.accent
+        badge.text = badgeCopy
         badge.textColor = tint
-        badgeBox.backgroundColor = Design.Color.surface.withAlphaComponent(0.88)
+        badgeBox.backgroundColor = Design.Color.surface.withAlphaComponent(0.92)
+        inlineBadge.text = badgeCopy
+        inlineBadge.textColor = tint
+        inlineBadgeBox.backgroundColor = Design.Color.statusFill(tint)
         updateDensity()
         eyebrow.text = card.eyebrow
         headline.text = card.headlineJapanese
@@ -147,20 +163,15 @@ final class LifeTopicCardView: UIView {
         var configuration: UIButton.Configuration
         switch card.status {
         case .ready:
-            configuration = Design.Button.primary(title: card.ctaTitle)
+            configuration = Design.Button.primary(title: card.ctaTitle, traits: traitCollection)
             configuration.image = UIImage(systemName: "arrow.right")
         case .needsLocation:
-            configuration = Design.Button.primary(title: card.ctaTitle)
+            configuration = Design.Button.primary(title: card.ctaTitle, traits: traitCollection)
             configuration.image = UIImage(systemName: "location.fill")
         case .failed, .locationDenied:
-            configuration = UIButton.Configuration.tinted()
-            configuration.title = card.ctaTitle
-            configuration.cornerStyle = .capsule
-            configuration.buttonSize = .large
-            configuration.baseForegroundColor = Design.Color.accent
-            configuration.baseBackgroundColor = Design.Color.accent
+            configuration = Design.Button.secondary(title: card.ctaTitle, traits: traitCollection)
         case .loading, .locating:
-            configuration = Design.Button.primary(title: " ")
+            configuration = Design.Button.primary(title: " ", traits: traitCollection)
         }
         configuration.imagePlacement = .trailing
         configuration.imagePadding = Design.Spacing.s
@@ -171,7 +182,7 @@ final class LifeTopicCardView: UIView {
 
         let facts = card.chips.map(\.text).joined(separator: ", ")
         headline.accessibilityLabel = [card.eyebrow.capitalized, card.headlineJapanese, card.summary, facts, card.meta].filter { !$0.isEmpty }.joined(separator: ". ")
-        [eyebrow, reading, summary, meta, chips, badgeBox].forEach { $0.isAccessibilityElement = false }
+        [eyebrow, reading, summary, meta, chips, badgeBox, inlineBadgeRow].forEach { $0.isAccessibilityElement = false }
         headline.isAccessibilityElement = true
         headline.accessibilityTraits = card.status == .ready ? .button : .staticText
         headline.accessibilityHint = card.status == .ready ? card.ctaTitle : nil
@@ -193,13 +204,13 @@ final class LifeTopicCardView: UIView {
         chips.axis = accessibilityText ? .vertical : .horizontal
         chips.distribution = accessibilityText ? .fill : .fillProportionally
         chips.spacing = accessibilityText ? Design.Spacing.xs : Design.Spacing.m
+        badgeBox.isHidden = accessibilityText
+        inlineBadgeRow.isHidden = !accessibilityText
         updateActions()
         summary.numberOfLines = accessibilityText ? 0 : 2
         meta.numberOfLines = accessibilityText ? 0 : 1
         meta.lineBreakMode = accessibilityText ? .byWordWrapping : .byTruncatingTail
-
-        // Every card has a scene now, and the provenance badge is laid over it.
-        content.layoutMargins.top = Design.Spacing.s
+        content.layoutMargins.top = Design.Spacing.m
     }
 
     private func chipRow(_ chip: LifeChip) -> UIView {
@@ -237,22 +248,26 @@ final class TodayDateHeaderView: UIView {
     private let greetingReading = UILabel()
     private let dateLabel = UILabel()
     private let partOfDay = UIImageView()
+    private let row = UIStackView()
+    private let texts = UIStackView()
+    private let compactHeader = UIStackView()
+    private let compactSpacer = UIView()
     private var shownDay = 0
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        tile.backgroundColor = Design.Color.surface
-        tile.layer.cornerRadius = 16
-        tile.layer.cornerCurve = .continuous
+        tile.applyCardSurface(radius: Design.Radius.control)
         tile.translatesAutoresizingMaskIntoConstraints = false
         let strip = UIView()
         strip.backgroundColor = Design.Color.hero
         strip.translatesAutoresizingMaskIntoConstraints = false
-        month.font = UIFont.systemFont(ofSize: 11, weight: .bold)
+        month.font = Design.TextRole.weighted(.caption2, weight: .bold, maximum: 16)
+        month.adjustsFontForContentSizeCategory = true
         month.textColor = Design.Color.onHero
         month.textAlignment = .center
         month.translatesAutoresizingMaskIntoConstraints = false
-        day.font = UIFont(name: "HiraMinProN-W6", size: 32) ?? .systemFont(ofSize: 32, weight: .bold)
+        day.font = Design.TextRole.mincho(size: 30, style: .title1, maximum: 40)
+        day.adjustsFontForContentSizeCategory = true
         day.textColor = Design.Color.textPrimary
         day.textAlignment = .center
         day.adjustsFontSizeToFitWidth = true
@@ -267,8 +282,8 @@ final class TodayDateHeaderView: UIView {
             strip.trailingAnchor.constraint(equalTo: tile.trailingAnchor),
             strip.heightAnchor.constraint(equalToConstant: 20),
             month.centerYAnchor.constraint(equalTo: strip.centerYAnchor),
-            month.leadingAnchor.constraint(equalTo: tile.leadingAnchor),
-            month.trailingAnchor.constraint(equalTo: tile.trailingAnchor),
+            month.leadingAnchor.constraint(equalTo: tile.leadingAnchor, constant: 2),
+            month.trailingAnchor.constraint(equalTo: tile.trailingAnchor, constant: -2),
             day.topAnchor.constraint(equalTo: strip.bottomAnchor, constant: 2),
             day.bottomAnchor.constraint(equalTo: tile.bottomAnchor, constant: -4),
             day.leadingAnchor.constraint(equalTo: tile.leadingAnchor, constant: 4),
@@ -277,18 +292,22 @@ final class TodayDateHeaderView: UIView {
         tile.clipsToBounds = true
 
         greeting.apply(.headword)
-        greeting.font = Design.TextRole.headword.font.withWeight(.semibold)
+        greeting.font = Design.TextRole.weighted(.title2, weight: .semibold)
         greetingReading.apply(.reading)
         dateLabel.apply(.meaning)
         partOfDay.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 26, weight: .semibold)
         partOfDay.tintColor = Design.Color.warning
         partOfDay.setContentHuggingPriority(.required, for: .horizontal)
         partOfDay.isAccessibilityElement = false
-        let texts = UIStackView(arrangedSubviews: [greeting, greetingReading, dateLabel])
+
         texts.axis = .vertical
         texts.spacing = 2
-        let row = UIStackView(arrangedSubviews: [tile, texts, partOfDay])
-        row.alignment = .center
+        [greeting, greetingReading, dateLabel].forEach(texts.addArrangedSubview)
+
+        compactHeader.axis = .horizontal
+        compactHeader.alignment = .center
+        compactHeader.spacing = Design.Spacing.m
+
         row.spacing = Design.Spacing.m
         row.translatesAutoresizingMaskIntoConstraints = false
         addSubview(row)
@@ -301,6 +320,26 @@ final class TodayDateHeaderView: UIView {
         isAccessibilityElement = true
         accessibilityTraits = .header
         accessibilityIdentifier = "today_date_header"
+        applyLayout()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: TodayDateHeaderView, _) in
+            view.applyLayout()
+        }
+    }
+
+    private func applyLayout() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        row.arrangedSubviews.forEach { row.removeArrangedSubview($0); $0.removeFromSuperview() }
+        compactHeader.arrangedSubviews.forEach { compactHeader.removeArrangedSubview($0); $0.removeFromSuperview() }
+        if isAX {
+            row.axis = .vertical
+            row.alignment = .fill
+            [tile, compactSpacer, partOfDay].forEach(compactHeader.addArrangedSubview)
+            [compactHeader, texts].forEach(row.addArrangedSubview)
+        } else {
+            row.axis = .horizontal
+            row.alignment = .center
+            [tile, texts, partOfDay].forEach(row.addArrangedSubview)
+        }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -342,6 +381,7 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
 
     private let titleLabel = UILabel()
     private let cityButton = UIButton(type: .system)
+    private let headerBar = UIStackView()
     private let scroll = UIScrollView()
     private let strip = UIStackView()
     private let pages = UIPageControl()
@@ -359,13 +399,16 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
         var city = UIButton.Configuration.plain()
         city.image = UIImage(systemName: "mappin.and.ellipse")
         city.imagePadding = Design.Spacing.xs
-        city.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 0)
+        city.contentInsets = NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: Design.Spacing.s, bottom: Design.Spacing.s, trailing: 0)
         cityButton.configuration = city
+        cityButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         cityButton.accessibilityIdentifier = "today_life_city"
         cityButton.addAction(UIAction { [weak self] _ in self?.onChangeCity?() }, for: .primaryActionTriggered)
         cityButton.setContentHuggingPriority(.required, for: .horizontal)
-        let bar = UIStackView(arrangedSubviews: [titleLabel, cityButton])
-        bar.alignment = .center
+        cityButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        [titleLabel, cityButton].forEach(headerBar.addArrangedSubview)
+        headerBar.spacing = Design.Spacing.xs
+        updateHeaderBarLayout()
 
         scroll.showsHorizontalScrollIndicator = false
         scroll.delegate = self
@@ -383,7 +426,7 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
         pages.isUserInteractionEnabled = false
         pages.isAccessibilityElement = false
 
-        let column = UIStackView(arrangedSubviews: [bar, scroll, pages])
+        let column = UIStackView(arrangedSubviews: [headerBar, scroll, pages])
         column.axis = .vertical
         column.spacing = Design.Spacing.s
         column.translatesAutoresizingMaskIntoConstraints = false
@@ -399,6 +442,20 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
             strip.trailingAnchor.constraint(equalTo: scroll.contentLayoutGuide.trailingAnchor),
             scroll.heightAnchor.constraint(equalTo: strip.heightAnchor)
         ])
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: TodayLifeHubView, _) in
+            view.updateHeaderBarLayout()
+        }
+    }
+
+    private func updateHeaderBarLayout() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        headerBar.axis = isAX ? .vertical : .horizontal
+        headerBar.alignment = isAX ? .leading : .center
+        var config = cityButton.configuration
+        config?.contentInsets = isAX
+            ? NSDirectionalEdgeInsets(top: Design.Spacing.xs, leading: 0, bottom: Design.Spacing.xs, trailing: Design.Spacing.s)
+            : NSDirectionalEdgeInsets(top: Design.Spacing.s, leading: Design.Spacing.s, bottom: Design.Spacing.s, trailing: 0)
+        cityButton.configuration = config
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }

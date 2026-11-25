@@ -98,7 +98,7 @@ final class TodayStreakView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        icon.tintColor = .systemOrange
+        icon.tintColor = Design.Color.warning
         icon.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .body)
         icon.setContentHuggingPriority(.required, for: .horizontal)
         icon.isAccessibilityElement = false

@@ -11,11 +11,7 @@ final class TodayLessonSlotView: UIControl {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = Design.Color.surface
-        layer.cornerRadius = Design.Radius.panel
-        layer.cornerCurve = .continuous
-        layer.borderWidth = 1
-        layer.borderColor = Design.Color.separator.cgColor
+        applyCardSurface(radius: Design.Radius.card)
 
         eyebrow.apply(.eyebrow)
         eyebrow.textColor = Design.Color.accent

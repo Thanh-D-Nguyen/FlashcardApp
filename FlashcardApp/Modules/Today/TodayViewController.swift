@@ -221,8 +221,10 @@ final class TodayHeroView: UIView {
         titleRow.translatesAutoresizingMaskIntoConstraints = false
         titleControl.addSubview(titleRow)
         NSLayoutConstraint.activate([
-            titleRow.topAnchor.constraint(equalTo: titleControl.topAnchor),
-            titleRow.bottomAnchor.constraint(equalTo: titleControl.bottomAnchor),
+            titleControl.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum),
+            titleRow.topAnchor.constraint(greaterThanOrEqualTo: titleControl.topAnchor),
+            titleRow.bottomAnchor.constraint(lessThanOrEqualTo: titleControl.bottomAnchor),
+            titleRow.centerYAnchor.constraint(equalTo: titleControl.centerYAnchor),
             titleRow.leadingAnchor.constraint(equalTo: titleControl.leadingAnchor),
             titleRow.trailingAnchor.constraint(equalTo: titleControl.trailingAnchor)
         ])
@@ -297,19 +299,12 @@ final class TodayHeroView: UIView {
         figureSpacer.isHidden = figureRow.axis == .vertical
     }
 
-    /// A capsule with an arrow turns into a blob that breaks words at accessibility sizes; there the arrow (decoration) goes and
-    /// the corners are those of a rounded rectangle, so the label keeps whole words.
     private func updateButton() {
-        var configuration = Design.Button.hero(title: buttonTitle)
-        if traitCollection.preferredContentSizeCategory.isAccessibilityCategory {
-            configuration.image = nil
-            configuration.cornerStyle = .large
-        }
-        button.configuration = configuration
+        button.configuration = Design.Button.hero(title: buttonTitle, traits: traitCollection)
     }
 
     private func updateSessionButton() {
-        sessionButton.configuration = Design.Button.heroChip(title: sessionTitle)
+        sessionButton.configuration = Design.Button.heroChip(title: sessionTitle, traits: traitCollection)
     }
 
     func configure(_ hero: TodayHero, rows: TodayRows?) {
@@ -368,6 +363,7 @@ final class TodayHeroView: UIView {
 final class TodayRowView: UIControl {
     private let titleLabel = UILabel()
     private let valueLabel = UILabel()
+    private let textStack = UIStackView()
     private let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
     private let separator = UIView()
 
@@ -376,13 +372,17 @@ final class TodayRowView: UIControl {
         titleLabel.apply(.meaning)
         titleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         valueLabel.apply(.reading)
-        valueLabel.textAlignment = .right
         valueLabel.isUserInteractionEnabled = false
         chevron.tintColor = Design.Color.textSecondary
         chevron.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .footnote)
         chevron.setContentHuggingPriority(.required, for: .horizontal)
         separator.backgroundColor = Design.Color.separator
-        let row = UIStackView(arrangedSubviews: [titleLabel, valueLabel, chevron])
+
+        [titleLabel, valueLabel].forEach(textStack.addArrangedSubview)
+        textStack.spacing = Design.Spacing.xs
+        textStack.isUserInteractionEnabled = false
+
+        let row = UIStackView(arrangedSubviews: [textStack, chevron])
         row.alignment = .center
         row.spacing = Design.Spacing.s
         row.isUserInteractionEnabled = false
@@ -391,11 +391,11 @@ final class TodayRowView: UIControl {
         addSubview(row)
         addSubview(separator)
         NSLayoutConstraint.activate([
+            heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum),
             row.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
             row.bottomAnchor.constraint(equalTo: separator.topAnchor, constant: -Design.Spacing.m),
             row.leadingAnchor.constraint(equalTo: leadingAnchor),
             row.trailingAnchor.constraint(equalTo: trailingAnchor),
-            row.heightAnchor.constraint(greaterThanOrEqualToConstant: 28),
             separator.leadingAnchor.constraint(equalTo: leadingAnchor),
             separator.trailingAnchor.constraint(equalTo: trailingAnchor),
             separator.bottomAnchor.constraint(equalTo: bottomAnchor),
@@ -403,9 +403,17 @@ final class TodayRowView: UIControl {
         ])
         isAccessibilityElement = true
         accessibilityTraits = .button
+        updateAxis()
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: TodayRowView, _) in
-            view.valueLabel.textAlignment = view.traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? .left : .right
+            view.updateAxis()
         }
+    }
+
+    private func updateAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        textStack.axis = isAX ? .vertical : .horizontal
+        textStack.alignment = isAX ? .leading : .center
+        valueLabel.textAlignment = isAX ? .left : .right
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
@@ -433,9 +441,7 @@ final class TodayFailureView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = Design.Color.surface
-        layer.cornerRadius = 20
-        layer.cornerCurve = .continuous
+        applyCardSurface(radius: Design.Radius.card)
         icon.tintColor = Design.Color.warning
         icon.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .title1)
         icon.isAccessibilityElement = false
@@ -445,6 +451,7 @@ final class TodayFailureView: UIView {
         messageLabel.apply(.reading)
         messageLabel.textAlignment = .center
         retryButton.accessibilityIdentifier = "today_retry"
+        retryButton.enableAdaptiveCornerStyle()
         retryButton.addAction(UIAction { [weak self] _ in self?.onRetry?() }, for: .primaryActionTriggered)
         let stack = UIStackView(arrangedSubviews: [icon, titleLabel, messageLabel, retryButton])
         stack.axis = .vertical
