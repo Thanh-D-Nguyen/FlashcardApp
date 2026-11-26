@@ -63,6 +63,7 @@
 		E1A261126000000000000008 /* TodayStreakStripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000007 /* TodayStreakStripTests.swift */; };
 		E1A261126000000000000004 /* TodayQuestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000003 /* TodayQuestView.swift */; };
 		E1A26112600000000000000A /* TodayRadarCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000009 /* TodayRadarCardView.swift */; };
+		E1A26112600000000000000C /* TodayResumeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A26112600000000000000B /* TodayResumeCardView.swift */; };
 		E1A261126000000000000002 /* TodayQuest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000001 /* TodayQuest.swift */; };
 		108606380C5B1A7FE42EF73F /* TodayRadar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B088AC8047B4BFA9DDE9A2B9 /* TodayRadar.swift */; };
 		1DE7FCD7E8DC628822638F35 /* TodayStreak.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEACDBB1320B3147865A6F8 /* TodayStreak.swift */; };
@@ -862,6 +863,7 @@
 		E1A261126000000000000007 /* TodayStreakStripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStreakStripTests.swift; sourceTree = "<group>"; };
 		E1A261126000000000000003 /* TodayQuestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayQuestView.swift; sourceTree = "<group>"; };
 		E1A261126000000000000009 /* TodayRadarCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayRadarCardView.swift; sourceTree = "<group>"; };
+		E1A26112600000000000000B /* TodayResumeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayResumeCardView.swift; sourceTree = "<group>"; };
 		E1A261126000000000000001 /* TodayQuest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayQuest.swift; sourceTree = "<group>"; };
 		B088AC8047B4BFA9DDE9A2B9 /* TodayRadar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayRadar.swift; sourceTree = "<group>"; };
 		ACEACDBB1320B3147865A6F8 /* TodayStreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStreak.swift; sourceTree = "<group>"; };
@@ -1023,6 +1025,7 @@
 				E1A261126000000000000001 /* TodayQuest.swift */,
 				E1A261126000000000000003 /* TodayQuestView.swift */,
 				E1A261126000000000000009 /* TodayRadarCardView.swift */,
+				E1A26112600000000000000B /* TodayResumeCardView.swift */,
 				FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */,
 			);
 			path = Today;
@@ -2364,6 +2367,7 @@
 				E1A261126000000000000002 /* TodayQuest.swift in Sources */,
 				E1A261126000000000000004 /* TodayQuestView.swift in Sources */,
 				E1A26112600000000000000A /* TodayRadarCardView.swift in Sources */,
+				E1A26112600000000000000C /* TodayResumeCardView.swift in Sources */,
 				82AB31DD4A9E08CD1177E116 /* CardStudyWireframe.swift in Sources */,
 				F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */,
 				E9CE2A4F18C297D0D9817B1E /* CardStudyViewController.swift in Sources */,

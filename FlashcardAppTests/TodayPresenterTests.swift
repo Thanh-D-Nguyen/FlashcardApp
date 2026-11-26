@@ -520,6 +520,29 @@ extension TodayPresenterTests {
         presenter.openLessonSlot()
         XCTAssertEqual(wireframe.lessonsOpened.map(\.slug), ["j5-01"])
         XCTAssertEqual(wireframe.lessonsOpened.map(\.title), ["Chào hỏi"])
+
+        let resume = view.renders.last?.resumeCard
+        XCTAssertEqual(resume?.title, "Chào hỏi")
+        XCTAssertEqual(resume?.levelCode, "J5")
+        XCTAssertEqual(resume?.percent, 60)
+        XCTAssertEqual(resume?.progressFraction ?? 0, 0.6, accuracy: 0.001)
+        presenter.openResume()
+        XCTAssertEqual(wireframe.lessonsOpened.map(\.slug), ["j5-01", "j5-01"], "Tapping the pinned resume card resumes the exact in-progress lesson")
+    }
+
+    func test_resumeCardIsHiddenWhenNothingIsInProgress() {
+        let slots = FakeLessonSlots()
+        slots.slot = .start
+        let (_, _, startView) = startWithLessons(slots, plan: duePlan())
+        XCTAssertNil(startView.renders.last?.resumeCard, "No placeholder when nothing is in progress")
+
+        slots.slot = .next(slug: "j5-02", title: "Hai", levelCode: "J5")
+        let (_, _, nextView) = startWithLessons(slots, plan: duePlan())
+        XCTAssertNil(nextView.renders.last?.resumeCard)
+
+        slots.slot = .finishedOpened(completed: 2)
+        let (_, _, finishedView) = startWithLessons(slots, plan: duePlan())
+        XCTAssertNil(finishedView.renders.last?.resumeCard)
     }
 
     func test_theNextLessonIsOfferedWithItsTitleAndLevel() {

@@ -115,6 +115,8 @@ struct TodayViewState: Equatable {
     var radar: TodayRadarCard?
     /// "Today's quest": max 3 real checklist items assembled from review due state, lesson slot, and Daily Radar.
     var quest: TodayQuestState?
+    /// Pinned "Học tiếp" card at the top of Today when a structured lesson is genuinely in progress. `nil` hides it (no placeholder).
+    var resumeCard: TodayResumeCard?
 }
 
 protocol TodayViewInterface: AnyObject {
@@ -138,6 +140,8 @@ protocol TodayPresenterInterface: AnyObject {
     func openScenarios()
     /// The lesson slot's button: continues or starts a lesson, or opens the levels.
     func openLessonSlot()
+    /// Tapping the pinned Resume card opens the exact in-progress lesson where the learner left off.
+    func openResume()
     /// The Daily Radar card was tapped.
     func openRadar()
     /// Speaks the Daily Radar card's Japanese expression aloud.
@@ -256,6 +260,7 @@ final class TodayPresenter {
         let studiedDays = interactor.studiedDaysInCurrentWeek(ownerKey: owner, now: date)
         state.life = life?.section
         state.lessonCard = lessonSlot.map(Self.lessonCard)
+        state.resumeCard = lessonSlot.flatMap { Self.resumeCard(from: $0, locale: language().locale) }
         state.streak = streak?.streak.map { Self.streakText($0, studiedDaysInWeek: studiedDays, now: date, calendar: cal) }
         state.radar = radarItem.flatMap { Self.radarCard($0, on: date, calendar: cal) }
         state.quest = TodayQuestAssembler.make(
@@ -364,6 +369,32 @@ final class TodayPresenter {
         )
     }
 
+    static func resumeCard(from slot: TodayLessonSlot, locale: Locale = AppLanguage.current.locale) -> TodayResumeCard? {
+        guard case .continueLesson(let slug, let title, let levelCode, let answered, let total) = slot,
+              total > 0, answered > 0 else { return nil }
+        let clampedAnswered = min(answered, total)
+        let fraction = Double(clampedAnswered) / Double(total)
+        let percent = Int((fraction * 100.0).rounded())
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .percent
+        formatter.locale = locale
+        formatter.maximumFractionDigits = 0
+        let percentText = formatter.string(from: NSNumber(value: Double(percent) / 100.0)) ?? "\(percent)%"
+        let resolvedTitle = title ?? String(format: text("%@ lesson"), levelCode)
+        return TodayResumeCard(
+            eyebrow: text("CONTINUE LESSON"),
+            levelCode: levelCode,
+            title: resolvedTitle,
+            detail: String(format: text("%lld of %lld answered"), clampedAnswered, total),
+            percent: percent,
+            percentText: percentText,
+            progressFraction: fraction,
+            ctaTitle: text("Continue"),
+            slug: slug,
+            lessonTitle: title ?? slug
+        )
+    }
+
     static func lessonCard(_ slot: TodayLessonSlot) -> TodayLessonCard {
         switch slot {
         case .start:
@@ -439,6 +470,11 @@ extension TodayPresenter: TodayPresenterInterface {
         case .chooseLevel: wireframe.showLevels()
         case .openLesson(let slug, let title): wireframe.showLesson(slug: slug, title: title)
         }
+    }
+
+    func openResume() {
+        guard let resume = state?.resumeCard else { return }
+        wireframe.showLesson(slug: resume.slug, title: resume.lessonTitle)
     }
 
     func openRadar() {

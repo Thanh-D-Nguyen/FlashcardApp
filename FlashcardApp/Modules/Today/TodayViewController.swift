@@ -8,6 +8,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
     private let dateHeader = TodayDateHeaderView()
+    private let resumeCard = TodayResumeCardView()
     private let questView = TodayQuestCardView()
     private let progressGroup = UIStackView()
     private let progressTitle = UILabel()
@@ -87,11 +88,13 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         levelsRow.accessibilityIdentifier = "today_levels_row"
 
         dateHeader.isHidden = true
+        resumeCard.isHidden = true
         questView.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, streakView, questView, progressGroup, hubView, scenarioBanner, heroView, failureView, lessonSlot, radarCard, levelsRow].forEach(stack.addArrangedSubview)
+        [dateHeader, streakView, resumeCard, questView, progressGroup, hubView, scenarioBanner, heroView, failureView, lessonSlot, radarCard, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.m, after: streakView)
+        stack.setCustomSpacing(Design.Spacing.m, after: resumeCard)
         stack.setCustomSpacing(Design.Spacing.m, after: questView)
         stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
         streakView.isHidden = true
@@ -123,6 +126,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             banner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
+        resumeCard.addAction(UIAction { [weak self] _ in self?.presenter.openResume() }, for: .touchUpInside)
         questView.onSelectItem = { [weak self] action in self?.presenter.openQuestItem(action) }
         heroView.onPrimary = { [weak self] in self?.presenter.primaryAction() }
         heroView.onChangeDeck = { [weak self] in self?.presenter.changeDeck() }
@@ -164,6 +168,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         }
         streakView.isHidden = state.streak == nil
         if let streak = state.streak { streakView.configure(streak) }
+        resumeCard.isHidden = state.resumeCard == nil
+        if let resume = state.resumeCard { resumeCard.configure(resume) }
         questView.isHidden = state.quest == nil
         if let quest = state.quest { questView.configure(quest) }
         progressGroup.isHidden = state.progress == nil
