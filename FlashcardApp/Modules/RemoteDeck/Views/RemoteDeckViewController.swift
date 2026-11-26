@@ -147,18 +147,15 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
         footnoteLabel.isHidden = newState.isOnDevice || newState.cards.isEmpty
         noticeLabel.text = newState.notice
         noticeLabel.isHidden = newState.notice == nil
-        menuItem.menu = makeMenu(for: newState)
+        let menu = makeMenu(for: newState)
+        menuItem.menu = menu
         menuItem.isEnabled = busy == nil
+        navigationItem.rightBarButtonItem = menu.children.isEmpty ? nil : menuItem
         if newState.notice != nil { UIAccessibility.post(notification: .announcement, argument: newState.notice) }
     }
 
     private func makeMenu(for state: RemoteDeckState) -> UIMenu {
         var children: [UIMenuElement] = []
-        if !state.isOnDevice {
-            children.append(UIAction(title: NSLocalizedString("Save to this device", comment: ""), image: UIImage(systemName: "arrow.down.circle")) { [weak self] _ in
-                self?.presenter.saveToDevice()
-            })
-        }
         if state.deviceRatingsToSend > 0 {
             let title = String.localizedStringWithFormat(NSLocalizedString("Send %lld ratings from this device", comment: "Remote deck menu: sync device self-ratings"),
                                                          state.deviceRatingsToSend)
