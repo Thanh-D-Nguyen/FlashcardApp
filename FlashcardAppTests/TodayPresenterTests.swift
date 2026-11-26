@@ -1,3 +1,5 @@
+import RxSwift
+import UIKit
 import XCTest
 @testable import FlashcardApp
 
@@ -520,6 +522,29 @@ extension TodayPresenterTests {
         presenter.openLessonSlot()
         XCTAssertEqual(wireframe.lessonsOpened.map(\.slug), ["j5-01"])
         XCTAssertEqual(wireframe.lessonsOpened.map(\.title), ["Chào hỏi"])
+
+        let resume = view.renders.last?.resumeCard
+        XCTAssertEqual(resume?.title, "Chào hỏi")
+        XCTAssertEqual(resume?.levelCode, "J5")
+        XCTAssertEqual(resume?.percent, 60)
+        XCTAssertEqual(resume?.progressFraction ?? 0, 0.6, accuracy: 0.001)
+        presenter.openResume()
+        XCTAssertEqual(wireframe.lessonsOpened.map(\.slug), ["j5-01", "j5-01"], "Tapping the pinned resume card resumes the exact in-progress lesson")
+    }
+
+    func test_resumeCardIsHiddenWhenNothingIsInProgress() {
+        let slots = FakeLessonSlots()
+        slots.slot = .start
+        let (_, _, startView) = startWithLessons(slots, plan: duePlan())
+        XCTAssertNil(startView.renders.last?.resumeCard, "No placeholder when nothing is in progress")
+
+        slots.slot = .next(slug: "j5-02", title: "Hai", levelCode: "J5")
+        let (_, _, nextView) = startWithLessons(slots, plan: duePlan())
+        XCTAssertNil(nextView.renders.last?.resumeCard)
+
+        slots.slot = .finishedOpened(completed: 2)
+        let (_, _, finishedView) = startWithLessons(slots, plan: duePlan())
+        XCTAssertNil(finishedView.renders.last?.resumeCard)
     }
 
     func test_theNextLessonIsOfferedWithItsTitleAndLevel() {
@@ -642,4 +667,183 @@ final class TodayPresenterRadarTests: XCTestCase {
         presenter.openRadar()
         XCTAssertEqual(wireframe.radarOpened, [item])
     }
+
+    func test_radarSpeakSaveAndStudyNowDeepLinkWork() {
+        let scenarioItem = DailyRadarItem(
+            id: "2", slug: "email-j2", moduleKey: "workplace_mission", moduleTitle: "Tình huống công việc",
+            moduleType: "scenario_link", targetRoute: "/vi/story/arcs", title: "催促メール",
+            summary: "Trả lời email", expressions: [.init(japanese: "進捗はいかがでしょうか", reading: nil)],
+            usageNote: nil, reason: nil, minutes: 5, level: "BJT J2"
+        )
+        let interactor = FakeTodayInteractor()
+        let radar = FakeRadar()
+        radar.item = scenarioItem
+        let speech = SpySpeechService()
+        let saver = SpyWordSaver()
+        let wireframe = InteractiveRadarWireframe()
+        let view = SpyNoticeView()
+        let presenter = TodayPresenter(
+            interactor: interactor,
+            wireframe: wireframe,
+            ownerKey: { "u1" },
+            radar: radar,
+            speech: speech,
+            wordSaver: saver
+        )
+        presenter.view = view
+        presenter.viewWillAppear()
+
+        XCTAssertEqual(view.lastState?.radar?.hasDeepLink, true)
+        presenter.speakRadar()
+        XCTAssertEqual(speech.spoken.map(\.0), ["進捗はいかがでしょうか"])
+        XCTAssertEqual(speech.spoken.map(\.1), ["ja-JP"])
+
+        presenter.saveRadarToDeck()
+        XCTAssertEqual(wireframe.saveChoosers.count, 1)
+        wireframe.saveChoosers[0].select(.newDictionaryDeck)
+        XCTAssertEqual(saver.savedWords.first?.first?.japanese, "進捗はいかがでしょうか")
+        XCTAssertEqual(view.notices.count, 1)
+
+        presenter.studyRadarNow()
+        XCTAssertEqual(wireframe.scenariosOpened, 1, "scenario_link deep-links to Scenarios")
+    }
+
+    func test_savingWordsFromRadarOrLifeCardReloadsTodaySoNewDeckAppearsImmediately() throws {
+        let interactor = FakeTodayInteractor()
+        interactor.result = .success(TodayPlan(kind: .noDeck))
+        let radar = FakeRadar()
+        radar.item = item
+        let hub = FakeHub()
+        let lifeLesson = try LifeLessonFixtures.lesson()
+        let lifeCard = LifeFeedMapper.card(for: lifeLesson, language: .vietnamese)
+        hub.section = TodayHubSection(
+            header: TodayLifeHubLoader.header(now: LifeLessonFixtures.morning, calendar: LifeLessonFixtures.japanCalendar),
+            cityName: "Tokyo",
+            cards: [lifeCard]
+        )
+        hub.lessons[lifeCard.id] = lifeLesson
+        let saver = SpyWordSaver()
+        let lifeSaver = SpyLifeSaver()
+        let wireframe = InteractiveRadarWireframe()
+        let view = SpyNoticeView()
+        let presenter = TodayPresenter(
+            interactor: interactor,
+            wireframe: wireframe,
+            ownerKey: { "u1" },
+            life: hub,
+            radar: radar,
+            wordSaver: saver,
+            lifeSaver: lifeSaver
+        )
+        presenter.view = view
+        presenter.viewWillAppear()
+        XCTAssertEqual(view.lastState?.hero?.action, .createDeck)
+
+        var practicePlan = TodayPlan(kind: .practice, deckID: "lesson-words", deckName: "Saved from lessons", cardCount: 1, skill: .selfRecall)
+        practicePlan.sessionCardIDs = ["c1"]
+        practicePlan.estimatedMinutes = 1
+        interactor.result = .success(practicePlan)
+
+        presenter.saveRadarToDeck()
+        wireframe.saveChoosers[0].select(.newDictionaryDeck)
+        XCTAssertEqual(view.lastState?.hero?.title, "Saved from lessons", "Creating a deck via Radar save must refresh Today's hero immediately")
+        XCTAssertEqual(view.lastState?.quest?.items.first?.action, .review, "Quest must immediately reflect the newly created deck")
+
+        var lifePlan = TodayPlan(kind: .practice, deckID: "life-learning", deckName: "Learn from Life", cardCount: 2, skill: .selfRecall)
+        lifePlan.sessionCardIDs = ["l1", "l2"]
+        lifePlan.estimatedMinutes = 1
+        interactor.result = .success(lifePlan)
+
+        presenter.saveLifeCardToDeck(id: lifeCard.id)
+        wireframe.saveChoosers[1].select(.newDictionaryDeck)
+        XCTAssertEqual(view.lastState?.hero?.title, "Learn from Life", "Creating a deck via Life save must refresh Today's hero immediately")
+    }
+
+    func test_radarCardAndDetailScreenExposeCleanAccessibilityAndAdaptiveActionLayout() {
+        let cardView = TodayRadarCardView(frame: CGRect(x: 0, y: 0, width: 320, height: 320))
+        let radarModel = TodayRadarCard(
+            eyebrow: "Tình huống công việc",
+            title: "催促メールが来た",
+            expression: "進捗はいかがでしょうか",
+            detail: "BJT J2 · 5 phút",
+            scene: .transit,
+            topic: .transit,
+            canSave: true,
+            hasDeepLink: true
+        )
+        cardView.configure(radarModel)
+        cardView.layoutIfNeeded()
+        XCTAssertEqual(cardView.accessibilityElements?.count, 4, "Headline + Listen + Save + Study without duplicate child labels")
+
+        let detail = DailyRadarCardViewController(item: item)
+        detail.traitOverrides.preferredContentSizeCategory = .extraExtraExtraLarge
+        detail.loadViewIfNeeded()
+        detail.view.frame = CGRect(x: 0, y: 0, width: 375, height: 812)
+        detail.view.setNeedsLayout()
+        detail.view.layoutIfNeeded()
+        func allStacks(in root: UIView) -> [UIStackView] {
+            var stacks: [UIStackView] = []
+            for sub in root.subviews {
+                if let stack = sub as? UIStackView { stacks.append(stack) }
+                stacks.append(contentsOf: allStacks(in: sub))
+            }
+            return stacks
+        }
+        let buttonStacks = allStacks(in: detail.view).filter { stack in
+            stack.arrangedSubviews.count == 2 && stack.arrangedSubviews.allSatisfy { $0 is UIButton }
+        }
+        XCTAssertEqual(buttonStacks.first?.axis, .vertical, "Listen + Save row must stack vertically at xxxLarge to avoid wrapping")
+    }
+}
+
+private final class SpyLifeSaver: LifeLessonInteractorInterface {
+    func loadWeather(cityID: String) -> Single<LifeLesson> { .never() }
+    func selectedCityID(ownerKey: String) -> String { "tokyo" }
+    func setSelectedCityID(_ id: String, ownerKey: String) {}
+    func deckChoices() -> [TodayDeckChoice] { [] }
+    func lifeDeckExists() -> Bool { false }
+    func saveVocabulary(_ words: [LifeLesson.Vocabulary], target: LifeSaveTarget, language: AppLanguage) throws -> LifeSaveOutcome {
+        LifeSaveOutcome(deckID: "life-learning", deckName: "Learn from Life", added: words.map(\.id), alreadyPresent: [], cardIDs: words.map(\.id))
+    }
+}
+
+private final class SpySpeechService: SpeechServiceInterface {
+    var spoken: [(String, String)] = []
+    func speak(_ text: String, languageCode: String) { spoken.append((text, languageCode)) }
+    func stop() {}
+}
+
+private final class SpyWordSaver: LessonWordSaverInterface {
+    var savedWords: [[LessonWord]] = []
+    func choices() -> [TodayDeckChoice] { [] }
+    func save(_ words: [LessonWord], fromLesson slug: String, to target: DictionaryDeckTarget) throws -> LessonWordSaveOutcome {
+        savedWords.append(words)
+        return LessonWordSaveOutcome(deckID: "lesson-words", deckName: "Saved from lessons", added: words.count, alreadyThere: 0, skipped: 0)
+    }
+}
+
+private final class InteractiveRadarWireframe: TodayWireframeInterface {
+    var scenariosOpened = 0
+    var saveChoosers: [(choices: [TodayDeckChoice], newDeckTitle: String?, select: (DictionaryDeckTarget) -> Void)] = []
+    func showStudy(deckId: String, cardIDs: [String]?) {}
+    func showCreateDeck(onFinish: @escaping () -> Void) {}
+    func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void) {}
+    func showBudgetChooser(current: Int, onSelect: @escaping (Int) -> Void) {}
+    func showLevels() {}
+    func showScenarios() { scenariosOpened += 1 }
+    func showLesson(slug: String, title: String) {}
+    func showRadarCard(_ item: DailyRadarItem) {}
+    func showSaveDeckChooser(_ choices: [TodayDeckChoice], newDeckTitle: String?, onSelect: @escaping (DictionaryDeckTarget) -> Void) {
+        saveChoosers.append((choices, newDeckTitle, onSelect))
+    }
+    func showLifeLesson(cityID: String, lesson: LifeLesson) {}
+    func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void) {}
+    func openAppSettings() {}
+}
+
+private final class SpyNoticeView: TodayViewInterface {
+    var lastState: TodayViewState?
+    var notices: [String] = []
+    func render(_ state: TodayViewState) { lastState = state }
+    func showNotice(_ text: String) { notices.append(text) }
 }

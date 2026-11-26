@@ -1,10 +1,19 @@
 import Foundation
 
+/// An existing in-app destination a Daily Radar card maps to (never an unbuilt website route).
+enum DailyRadarDeepLink: Equatable {
+    case scenarios
+    case levels
+}
+
 /// What Today shows of a Daily Radar card, and what its detail screen shows. Every text is the server's own; nothing is added.
 struct DailyRadarItem: Equatable {
     let id: String
     let slug: String
+    let moduleKey: String
     let moduleTitle: String
+    let moduleType: String?
+    let targetRoute: String?
     let title: String
     let summary: String?
     let expressions: [BJTRadarCardDTO.Expression]
@@ -12,6 +21,58 @@ struct DailyRadarItem: Equatable {
     let reason: String?
     let minutes: Int?
     let level: String?
+
+    init(id: String, slug: String, moduleKey: String = "", moduleTitle: String,
+         moduleType: String? = nil, targetRoute: String? = nil,
+         title: String, summary: String?, expressions: [BJTRadarCardDTO.Expression],
+         usageNote: String?, reason: String?, minutes: Int?, level: String?) {
+        self.id = id
+        self.slug = slug
+        self.moduleKey = moduleKey
+        self.moduleTitle = moduleTitle
+        self.moduleType = moduleType
+        self.targetRoute = targetRoute
+        self.title = title
+        self.summary = summary
+        self.expressions = expressions
+        self.usageNote = usageNote
+        self.reason = reason
+        self.minutes = minutes
+        self.level = level
+    }
+
+    /// Deep-link into an existing in-app screen when the server's `moduleType` / `targetRoute` maps to one; `nil` otherwise.
+    var deepLink: DailyRadarDeepLink? {
+        if moduleType == "scenario_link" || targetRoute?.contains("/story/arcs") == true {
+            return .scenarios
+        }
+        if targetRoute?.contains("/lessons") == true || targetRoute?.contains("/levels") == true {
+            return .levels
+        }
+        return nil
+    }
+
+    /// Maps the card's real `moduleKey` to an existing `LifeScene` illustration (never an empty placeholder block).
+    func visualScene(on date: Date = Date(), calendar: Calendar = .autoupdatingCurrent) -> (scene: LifeScene, topic: LifeTopic) {
+        switch moduleKey {
+        case "weather_japanese":
+            return (.weather(.partlyCloudy, temperatureC: nil), .weather)
+        case "japan_today":
+            let day = calendar.component(.day, from: date)
+            let weekday = JapaneseCalendar.weekday(calendar.component(.weekday, from: date))?.japanese ?? ""
+            return (.date(day: day, weekday: String(weekday.prefix(1))), .date)
+        case "news_bjt", "market_watch":
+            return (.news, .news)
+        case "workplace_mission":
+            return (.transit, .transit)
+        case "life_hack":
+            return (.place, .nearby)
+        case "honne_tatemae":
+            return (.culture, .culture)
+        default:
+            return (.culture, .culture)
+        }
+    }
 }
 
 /// Chooses the one Radar card of the day. Production cards are all seeded editorial content, so cards of modules that read as
@@ -29,7 +90,9 @@ enum DailyRadarPicker {
         let title = (language == .japanese ? card.titleJa.nonEmpty : nil) ?? card.titleVi.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !expressions.isEmpty, !title.isEmpty, !card.slug.isEmpty else { return nil }
         let moduleTitle = (language == .japanese ? card.module.titleJa.nonEmpty : nil) ?? card.module.titleVi.nonEmpty ?? ""
-        return DailyRadarItem(id: card.id, slug: card.slug, moduleTitle: moduleTitle, title: title, summary: card.descriptionVi.nonEmpty,
+        return DailyRadarItem(id: card.id, slug: card.slug, moduleKey: card.module.moduleKey, moduleTitle: moduleTitle,
+                              moduleType: card.moduleType.nonEmpty, targetRoute: card.targetRoute.nonEmpty,
+                              title: title, summary: card.descriptionVi.nonEmpty,
                               expressions: expressions, usageNote: metadata?.usageNote.nonEmpty, reason: card.recommendationReasonVi.nonEmpty,
                               minutes: card.estimatedMinutes.flatMap { $0 > 0 ? $0 : nil }, level: card.levelLabel.nonEmpty)
     }

@@ -12,10 +12,16 @@ protocol TodayWireframeInterface: AnyObject {
     func showLesson(slug: String, title: String)
     /// One Daily Radar card, read in the app.
     func showRadarCard(_ item: DailyRadarItem)
+    /// Deck chooser for saving words/expressions from a Radar or Life card.
+    func showSaveDeckChooser(_ choices: [TodayDeckChoice], newDeckTitle: String?, onSelect: @escaping (DictionaryDeckTarget) -> Void)
     func showLifeLesson(cityID: String, lesson: LifeLesson)
     func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void)
     /// The system page of this app's settings, where the learner can allow the location again.
     func openAppSettings()
+}
+
+extension TodayWireframeInterface {
+    func showSaveDeckChooser(_ choices: [TodayDeckChoice], newDeckTitle: String?, onSelect: @escaping (DictionaryDeckTarget) -> Void) {}
 }
 
 final class TodayWireframe: BaseWireframe<TodayViewController> {
@@ -34,7 +40,26 @@ final class TodayWireframe: BaseWireframe<TodayViewController> {
 
 extension TodayWireframe: TodayWireframeInterface {
     func showRadarCard(_ item: DailyRadarItem) {
-        navigationController?.pushViewController(DailyRadarCardViewController(item: item), animated: true)
+        let detail = DailyRadarCardViewController(item: item) { [weak self] destination in
+            switch destination {
+            case .scenarios: self?.showScenarios()
+            case .levels: self?.showLevels()
+            }
+        }
+        navigationController?.pushViewController(detail, animated: true)
+    }
+
+    func showSaveDeckChooser(_ choices: [TodayDeckChoice], newDeckTitle: String?, onSelect: @escaping (DictionaryDeckTarget) -> Void) {
+        let sheet = UIAlertController(title: NSLocalizedString("Save words to", comment: "Deck chooser title"), message: nil, preferredStyle: .actionSheet)
+        if let newDeckTitle {
+            sheet.addAction(UIAlertAction(title: newDeckTitle, style: .default) { _ in onSelect(.newDictionaryDeck) })
+        }
+        for choice in choices {
+            let cards = String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), choice.cardCount)
+            sheet.addAction(UIAlertAction(title: "\(choice.name) · \(cards)", style: .default) { _ in onSelect(.existing(deckID: choice.id)) })
+        }
+        sheet.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel))
+        present(sheet)
     }
 
     func showStudy(deckId: String, cardIDs: [String]?) {

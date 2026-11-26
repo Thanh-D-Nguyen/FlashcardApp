@@ -83,6 +83,19 @@ final class DailyRadarPickerTests: XCTestCase {
         XCTAssertNotEqual(morning?.slug, tomorrow?.slug, "Two usable cards alternate by day")
         XCTAssertNil(DailyRadarPicker.pick([cards[1]], on: noon, calendar: calendar, language: .vietnamese))
     }
+
+    func test_radarItemMapsRealDeepLinksAndLifeSceneVisuals() throws {
+        let cards = try sampleCards()
+        let scenarioItem = try XCTUnwrap(DailyRadarPicker.item(from: cards[0], language: .vietnamese))
+        XCTAssertEqual(scenarioItem.moduleKey, "workplace_mission")
+        XCTAssertEqual(scenarioItem.deepLink, .scenarios)
+        XCTAssertEqual(scenarioItem.visualScene(on: noon, calendar: gregorian()).topic, .transit)
+
+        let nuanceItem = try XCTUnwrap(DailyRadarPicker.item(from: cards[2], language: .vietnamese))
+        XCTAssertEqual(nuanceItem.moduleKey, "honne_tatemae")
+        XCTAssertNil(nuanceItem.deepLink, "Website-only routes do not pretend to deep-link")
+        XCTAssertEqual(nuanceItem.visualScene(on: noon, calendar: gregorian()).topic, .culture)
+    }
 }
 
 private final class FakeRadarAPI: BJTDailyRadarAPIInterface {

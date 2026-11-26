@@ -8,6 +8,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
     private let dateHeader = TodayDateHeaderView()
+    private let resumeCard = TodayResumeCardView()
+    private let questView = TodayQuestCardView()
     private let progressGroup = UIStackView()
     private let progressTitle = UILabel()
     private let progressDetail = UILabel()
@@ -18,7 +20,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let levelsRow = TodayRowView()
     private let lessonSlot = TodayLessonSlotView()
     private let streakView = TodayStreakView()
-    private let radarCard = TodayLessonSlotView()
+    private let radarCard = TodayRadarCardView()
+    private let toast = NoticeToastView()
     private var refreshObservers: [NSObjectProtocol] = []
     private var adBanner: AdsBannerView?
 
@@ -85,11 +88,15 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         levelsRow.accessibilityIdentifier = "today_levels_row"
 
         dateHeader.isHidden = true
+        resumeCard.isHidden = true
+        questView.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, progressGroup, streakView, hubView, scenarioBanner, heroView, failureView, lessonSlot, radarCard, levelsRow].forEach(stack.addArrangedSubview)
-        stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
+        [dateHeader, streakView, resumeCard, questView, progressGroup, hubView, scenarioBanner, heroView, failureView, lessonSlot, radarCard, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.m, after: streakView)
+        stack.setCustomSpacing(Design.Spacing.m, after: resumeCard)
+        stack.setCustomSpacing(Design.Spacing.m, after: questView)
+        stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
         streakView.isHidden = true
         stack.setCustomSpacing(Design.Spacing.m, after: hubView)
         stack.setCustomSpacing(Design.Spacing.l, after: scenarioBanner)
@@ -119,19 +126,25 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             banner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
+        resumeCard.addAction(UIAction { [weak self] _ in self?.presenter.openResume() }, for: .touchUpInside)
+        questView.onSelectItem = { [weak self] action in self?.presenter.openQuestItem(action) }
         heroView.onPrimary = { [weak self] in self?.presenter.primaryAction() }
         heroView.onChangeDeck = { [weak self] in self?.presenter.changeDeck() }
         heroView.onChangeBudget = { [weak self] in self?.presenter.changeBudget() }
         failureView.onRetry = { [weak self] in self?.presenter.retry() }
         hubView.onCardAction = { [weak self] id in self?.presenter.openLifeCard(id: id) }
+        hubView.onCardSpeak = { [weak self] id in self?.presenter.speakLifeCard(id: id) }
+        hubView.onCardSaveToDeck = { [weak self] id in self?.presenter.saveLifeCardToDeck(id: id) }
         hubView.onChangeCity = { [weak self] in self?.presenter.changeLifeCity() }
         scenarioBanner.addAction(UIAction { [weak self] _ in self?.presenter.openScenarios() }, for: .touchUpInside)
         levelsRow.addAction(UIAction { [weak self] _ in self?.presenter.openLevels() }, for: .touchUpInside)
         lessonSlot.isHidden = true
         lessonSlot.addAction(UIAction { [weak self] _ in self?.presenter.openLessonSlot() }, for: .touchUpInside)
         radarCard.isHidden = true
-        radarCard.accessibilityIdentifier = "today_radar_card"
-        radarCard.addAction(UIAction { [weak self] _ in self?.presenter.openRadar() }, for: .touchUpInside)
+        radarCard.onOpenCard = { [weak self] in self?.presenter.openRadar() }
+        radarCard.onSpeak = { [weak self] in self?.presenter.speakRadar() }
+        radarCard.onSaveToDeck = { [weak self] in self?.presenter.saveRadarToDeck() }
+        radarCard.onStudyNow = { [weak self] in self?.presenter.studyRadarNow() }
     }
 
     // MARK: TodayViewInterface
@@ -151,12 +164,14 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         if let card = state.lessonCard { lessonSlot.configure(card) }
         radarCard.isHidden = state.radar == nil
         if let radar = state.radar {
-            radarCard.configure(eyebrow: radar.eyebrow.isEmpty ? NSLocalizedString("DAILY RADAR", comment: "Today: eyebrow of the Daily Radar card") : radar.eyebrow.uppercased(),
-                                title: radar.expression, detail: [radar.title, radar.detail].compactMap { $0 }.joined(separator: "\n"),
-                                cta: NSLocalizedString("Read the card", comment: "Today: opens the Daily Radar card"))
+            radarCard.configure(radar)
         }
         streakView.isHidden = state.streak == nil
         if let streak = state.streak { streakView.configure(streak) }
+        resumeCard.isHidden = state.resumeCard == nil
+        if let resume = state.resumeCard { resumeCard.configure(resume) }
+        questView.isHidden = state.quest == nil
+        if let quest = state.quest { questView.configure(quest) }
         progressGroup.isHidden = state.progress == nil
         if let progress = state.progress {
             progressTitle.text = progress.title
@@ -169,6 +184,10 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             dateHeader.configure(life.header, monthNumber: life.header.month)
             hubView.configure(life)
         }
+    }
+
+    func showNotice(_ text: String) {
+        toast.show(text, in: view)
     }
 }
 

@@ -59,6 +59,12 @@
 		37A4A9BA45F170831063CD50 /* TodayScenarioBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E06C3D7F6DAFFAAF086CF9 /* TodayScenarioBanner.swift */; };
 		0FEF10914A5D934A01D31FB5 /* TodayLessonSlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F071BFD3EE9CFE5689EF8CFE /* TodayLessonSlotView.swift */; };
 		C7693B2C3DA585584F27DFC6 /* DailyRadarCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6901C87581CF9913988F2A41 /* DailyRadarCardViewController.swift */; };
+		E1A261126000000000000006 /* TodayQuestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000005 /* TodayQuestTests.swift */; };
+		E1A261126000000000000008 /* TodayStreakStripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000007 /* TodayStreakStripTests.swift */; };
+		E1A261126000000000000004 /* TodayQuestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000003 /* TodayQuestView.swift */; };
+		E1A26112600000000000000A /* TodayRadarCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000009 /* TodayRadarCardView.swift */; };
+		E1A26112600000000000000C /* TodayResumeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A26112600000000000000B /* TodayResumeCardView.swift */; };
+		E1A261126000000000000002 /* TodayQuest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A261126000000000000001 /* TodayQuest.swift */; };
 		108606380C5B1A7FE42EF73F /* TodayRadar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B088AC8047B4BFA9DDE9A2B9 /* TodayRadar.swift */; };
 		1DE7FCD7E8DC628822638F35 /* TodayStreak.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEACDBB1320B3147865A6F8 /* TodayStreak.swift */; };
 		3809A6AD49199CB7D07DBA0F /* SettingPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9CAB3FBED0EBD7CB069327 /* SettingPresenterTests.swift */; };
@@ -841,6 +847,12 @@
 		C5E06C3D7F6DAFFAAF086CF9 /* TodayScenarioBanner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayScenarioBanner.swift; sourceTree = "<group>"; };
 		F071BFD3EE9CFE5689EF8CFE /* TodayLessonSlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayLessonSlotView.swift; sourceTree = "<group>"; };
 		6901C87581CF9913988F2A41 /* DailyRadarCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyRadarCardViewController.swift; sourceTree = "<group>"; };
+		E1A261126000000000000005 /* TodayQuestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayQuestTests.swift; sourceTree = "<group>"; };
+		E1A261126000000000000007 /* TodayStreakStripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStreakStripTests.swift; sourceTree = "<group>"; };
+		E1A261126000000000000003 /* TodayQuestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayQuestView.swift; sourceTree = "<group>"; };
+		E1A261126000000000000009 /* TodayRadarCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayRadarCardView.swift; sourceTree = "<group>"; };
+		E1A26112600000000000000B /* TodayResumeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayResumeCardView.swift; sourceTree = "<group>"; };
+		E1A261126000000000000001 /* TodayQuest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayQuest.swift; sourceTree = "<group>"; };
 		B088AC8047B4BFA9DDE9A2B9 /* TodayRadar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayRadar.swift; sourceTree = "<group>"; };
 		ACEACDBB1320B3147865A6F8 /* TodayStreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStreak.swift; sourceTree = "<group>"; };
 		C687E522554B3AB10583238A /* DictionarySavedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionarySavedViewController.swift; sourceTree = "<group>"; };
@@ -998,6 +1010,10 @@
 				362D14002E5CD688453CAFD5 /* TodayLifeHubView.swift */,
 				75B811EAE70B681B9C15B7C6 /* TodayLifeHub.swift */,
 				1BA758F99D144FA683A582CF /* TodayViewController.swift */,
+				E1A261126000000000000001 /* TodayQuest.swift */,
+				E1A261126000000000000003 /* TodayQuestView.swift */,
+				E1A261126000000000000009 /* TodayRadarCardView.swift */,
+				E1A26112600000000000000B /* TodayResumeCardView.swift */,
 				FB8030FB904C4B0DAFA10DCD /* TodayWireframe.swift */,
 			);
 			path = Today;
@@ -1217,6 +1233,8 @@
 				5795D8F87F0A8DEE3CB41777 /* CardStylePickerTests.swift */,
 				F888F48F47E6D0386F90FCFB /* CardExampleStoreTests.swift */,
 				3013332AF3A84AF1A334EC97 /* TodayPresenterTests.swift */,
+				E1A261126000000000000005 /* TodayQuestTests.swift */,
+				E1A261126000000000000007 /* TodayStreakStripTests.swift */,
 				50EFE07F713C11937D77FC33 /* TodayLifeCardTests.swift */,
 				89FA48EF5D63147D0CB215D3 /* LifeLessonPresenterTests.swift */,
 				0CE869BFC0B47685F93E484B /* LifeLessonInteractorTests.swift */,
@@ -2321,6 +2339,10 @@
 				142AC2DEE74F228CFE2E4564 /* TodayLifeHubView.swift in Sources */,
 				563150A86FC99EA38B24B334 /* TodayLifeHub.swift in Sources */,
 				CF89FB6725724760B3861841 /* TodayViewController.swift in Sources */,
+				E1A261126000000000000002 /* TodayQuest.swift in Sources */,
+				E1A261126000000000000004 /* TodayQuestView.swift in Sources */,
+				E1A26112600000000000000A /* TodayRadarCardView.swift in Sources */,
+				E1A26112600000000000000C /* TodayResumeCardView.swift in Sources */,
 				82AB31DD4A9E08CD1177E116 /* CardStudyWireframe.swift in Sources */,
 				F99A9EA3D03845858A9754B3 /* TodayWireframe.swift in Sources */,
 				E9CE2A4F18C297D0D9817B1E /* CardStudyViewController.swift in Sources */,
@@ -2502,6 +2524,8 @@
 				C57477F2F30312E057961B0C /* CardStylePickerTests.swift in Sources */,
 				823788C02A6614E5980E5F07 /* CardExampleStoreTests.swift in Sources */,
 				43A5E88DAED44EB6B50458E6 /* TodayPresenterTests.swift in Sources */,
+				E1A261126000000000000006 /* TodayQuestTests.swift in Sources */,
+				E1A261126000000000000008 /* TodayStreakStripTests.swift in Sources */,
 				CF7FD29A1A4960144F0DAB59 /* TodayLifeCardTests.swift in Sources */,
 				BC0DC8D74F4731D6344B3D0A /* LifeLessonPresenterTests.swift in Sources */,
 				12E04490B4F4D648D44066FD /* LifeLessonInteractorTests.swift in Sources */,

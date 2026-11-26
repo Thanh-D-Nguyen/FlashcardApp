@@ -1,8 +1,10 @@
 import UIKit
 
-/// One card of the life hub: the animated scene, what the lesson is, a few facts, where they come from, and one action.
+/// One card of the life hub: the animated scene, what the lesson is, a few facts, where they come from, and real interactive actions.
 final class LifeTopicCardView: UIView {
     var onAction: ((String) -> Void)?
+    var onSpeak: ((String) -> Void)?
+    var onSaveToDeck: ((String) -> Void)?
     private(set) var cardID = ""
     /// The width the hub gives the card; it follows the screen width.
     var widthConstraint: NSLayoutConstraint?
@@ -23,6 +25,11 @@ final class LifeTopicCardView: UIView {
     private let spinner = UIActivityIndicatorView(style: .medium)
     private let sheen = CAGradientLayer()
     private let button = UIButton(configuration: Design.Button.primary(title: " "))
+    private let listenButton = UIButton(type: .system)
+    private let saveButton = UIButton(type: .system)
+    private let studyButton = UIButton(type: .system)
+    private let quickChipRow = UIStackView()
+    private let quickActionsStack = UIStackView()
     private let content = UIStackView()
     private var sceneHeightConstraint: NSLayoutConstraint!
     private var card: LifeFeedCard?
@@ -77,14 +84,37 @@ final class LifeTopicCardView: UIView {
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
         button.enableAdaptiveCornerStyle()
         button.addAction(UIAction { [weak self] _ in self?.fire() }, for: .primaryActionTriggered)
+
+        listenButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        listenButton.enableAdaptiveCornerStyle()
+        listenButton.addAction(UIAction { [weak self] _ in guard let self else { return }; self.onSpeak?(self.cardID) }, for: .primaryActionTriggered)
+
+        saveButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        saveButton.enableAdaptiveCornerStyle()
+        saveButton.addAction(UIAction { [weak self] _ in guard let self else { return }; self.onSaveToDeck?(self.cardID) }, for: .primaryActionTriggered)
+
+        studyButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
+        studyButton.enableAdaptiveCornerStyle()
+        studyButton.addAction(UIAction { [weak self] _ in self?.fire() }, for: .primaryActionTriggered)
+
+        quickChipRow.spacing = Design.Spacing.s
+        quickChipRow.distribution = .fillEqually
+        [listenButton, saveButton].forEach(quickChipRow.addArrangedSubview)
+
+        quickActionsStack.axis = .vertical
+        quickActionsStack.spacing = Design.Spacing.s
+        quickActionsStack.isHidden = true
+        [quickChipRow, studyButton].forEach(quickActionsStack.addArrangedSubview)
+
         let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped))
+        tap.cancelsTouchesInView = false
         addGestureRecognizer(tap)
 
         content.axis = .vertical
         content.spacing = Design.Spacing.xs
         content.isLayoutMarginsRelativeArrangement = true
         content.layoutMargins = UIEdgeInsets(top: Design.Spacing.m, left: Design.Spacing.l, bottom: Design.Spacing.l, right: Design.Spacing.l)
-        [inlineBadgeRow, eyebrow, headline, reading, summary, chips, spinner, bottomSpacer, meta, button].forEach(content.addArrangedSubview)
+        [inlineBadgeRow, eyebrow, headline, reading, summary, chips, spinner, bottomSpacer, meta, quickActionsStack, button].forEach(content.addArrangedSubview)
         content.setCustomSpacing(Design.Spacing.s, after: inlineBadgeRow)
         content.setCustomSpacing(Design.Spacing.s, after: summary)
         content.setCustomSpacing(Design.Spacing.s, after: meta)
@@ -116,8 +146,12 @@ final class LifeTopicCardView: UIView {
         sheen.frame = CGRect(x: 0, y: scene.frame.maxY, width: bounds.width, height: bounds.height - scene.frame.height)
     }
 
-    @objc private func cardTapped() {
+    @objc private func cardTapped(_ recognizer: UITapGestureRecognizer) {
         guard card?.status == .ready else { return }
+        let point = recognizer.location(in: self)
+        for control in [listenButton, saveButton, studyButton, button] where !control.isHidden {
+            if control.convert(control.bounds, to: self).contains(point) { return }
+        }
         fire()
     }
 
@@ -189,13 +223,52 @@ final class LifeTopicCardView: UIView {
         updateActions()
     }
 
-    /// A ready lesson is opened by a tap on the whole card, so it needs no button of its own (VoiceOver: the headline, with the action as
-    /// its hint). A card that waits for its data or a location shows a labelled button, which is hidden while the card is busy.
+    /// A ready lesson offers quick actions (Listen, Save to deck when it carries vocabulary, and Study now).
+    /// Cards waiting for data or location keep their single status action button.
     private func updateActions() {
         guard let card else { return }
         let busy = card.status == .loading || card.status == .locating
-        button.isHidden = busy || card.status == .ready || card.ctaTitle.isEmpty
-        accessibilityElements = [headline] + (button.isHidden ? [] : [button])
+        let isReady = card.status == .ready
+        button.isHidden = busy || isReady || card.ctaTitle.isEmpty
+        quickActionsStack.isHidden = !isReady
+        if isReady {
+            let category = traitCollection.preferredContentSizeCategory
+            let isAX = category.isAccessibilityCategory
+            let stackChips = category >= .extraExtraLarge
+            let hasVocab = !(card.lesson?.vocabulary.isEmpty ?? true)
+            listenButton.isHidden = card.headlineJapanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            saveButton.isHidden = !hasVocab
+            listenButton.configuration = Design.Button.surfaceChip(
+                title: NSLocalizedString("Listen", comment: ""),
+                systemImage: "speaker.wave.2.fill",
+                traits: traitCollection
+            )
+            saveButton.configuration = Design.Button.surfaceChip(
+                title: NSLocalizedString("Save to deck", comment: ""),
+                systemImage: "plus.rectangle.on.folder",
+                traits: traitCollection
+            )
+            var studyConfig = Design.Button.primary(
+                title: NSLocalizedString("Study now", comment: ""),
+                systemImage: isAX ? nil : "arrow.right",
+                traits: traitCollection
+            )
+            studyConfig.imagePlacement = .trailing
+            studyButton.configuration = studyConfig
+            quickChipRow.isHidden = listenButton.isHidden && saveButton.isHidden
+            quickChipRow.axis = stackChips ? .vertical : .horizontal
+            quickChipRow.distribution = stackChips ? .fill : .fillProportionally
+            listenButton.accessibilityIdentifier = "life_card_listen_\(card.id)"
+            saveButton.accessibilityIdentifier = "life_card_save_\(card.id)"
+            studyButton.accessibilityIdentifier = "life_card_study_\(card.id)"
+            var elements: [Any] = [headline]
+            if !listenButton.isHidden { elements.append(listenButton) }
+            if !saveButton.isHidden { elements.append(saveButton) }
+            elements.append(studyButton)
+            accessibilityElements = elements
+        } else {
+            accessibilityElements = [headline] + (button.isHidden ? [] : [button])
+        }
     }
 
     /// Keep the default card compact, but never trade away readable content at accessibility text sizes.
@@ -377,6 +450,8 @@ final class TodayDateHeaderView: UIView {
 /// The life hub: the city and cards in a paged strip the learner scrolls by hand (never on its own).
 final class TodayLifeHubView: UIView, UIScrollViewDelegate {
     var onCardAction: ((String) -> Void)?
+    var onCardSpeak: ((String) -> Void)?
+    var onCardSaveToDeck: ((String) -> Void)?
     var onChangeCity: (() -> Void)?
 
     private let titleLabel = UILabel()
@@ -484,6 +559,8 @@ final class TodayLifeHubView: UIView, UIScrollViewDelegate {
             for card in section.cards where views[card.id] == nil {
                 let view = LifeTopicCardView()
                 view.onAction = { [weak self] id in self?.onCardAction?(id) }
+                view.onSpeak = { [weak self] id in self?.onCardSpeak?(id) }
+                view.onSaveToDeck = { [weak self] id in self?.onCardSaveToDeck?(id) }
                 let width = view.widthAnchor.constraint(equalToConstant: cardWidth)
                 width.isActive = true
                 view.widthConstraint = width
