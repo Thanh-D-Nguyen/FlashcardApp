@@ -20,7 +20,7 @@ final class CardPresenterTests: XCTestCase {
     }
 
     private func makePresenter() -> CardPresenter {
-        let result = CardPresenter(interactor: CardInteractor(), deskInteractor: interactor, wireframe: wireframe, defaults: defaults,
+        let result = CardPresenter(deskInteractor: interactor, wireframe: wireframe, defaults: defaults,
                                    sharing: FakeDeckSharing())
         result.view = view
         return result

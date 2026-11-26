@@ -21,7 +21,7 @@ final class CardLibraryScopesTests: XCTestCase {
         desks = FakeDeskInteractor()
         wireframe = FakeCardWireframe()
         view = SpyCardView()
-        presenter = CardPresenter(interactor: CardInteractor(), deskInteractor: desks, wireframe: wireframe, defaults: defaults,
+        presenter = CardPresenter(deskInteractor: desks, wireframe: wireframe, defaults: defaults,
                                   server: server, now: { [unowned self] in clock })
         presenter.view = view
     }

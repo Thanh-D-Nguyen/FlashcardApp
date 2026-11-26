@@ -243,7 +243,6 @@
 		9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */; };
 		9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3129A212E9006C1D1C /* CardPresenter.swift */; };
 		9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3229A212E9006C1D1C /* CardViewController.swift */; };
-		9251ED3829A212E9006C1D1C /* CardInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3329A212E9006C1D1C /* CardInteractor.swift */; };
 		9251ED3929A212E9006C1D1C /* CardWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3429A212E9006C1D1C /* CardWireframe.swift */; };
 		9251ED4329A2133A006C1D1C /* DictionaryPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3E29A2133A006C1D1C /* DictionaryPresenter.swift */; };
 		9251ED4429A2133A006C1D1C /* DictionaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */; };
@@ -260,8 +259,6 @@
 		92B3A16F2C01B71600013599 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B3A16E2C01B71600013599 /* Image.swift */; };
 		92C5B44929F3C17000EE3377 /* AppErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C5B44829F3C17000EE3377 /* AppErrors.swift */; };
 		92D3B750B5056792110D5D7A /* DictionaryVoicePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2270FBA073314470B743EA4 /* DictionaryVoicePresenter.swift */; };
-		92D411922AD3D652005A15DC /* VersionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D411912AD3D652005A15DC /* VersionFooterView.swift */; };
-		92D411942AD3D673005A15DC /* VersionFooterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92D411932AD3D673005A15DC /* VersionFooterView.xib */; };
 		92F3A0042B4E1A0000REPOS3 /* DeskRepositoryInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0022B4E1A0000REPOS1 /* DeskRepositoryInterface.swift */; };
 		92F3A0052B4E1A0000REPOS4 /* CardRepositoryInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0032B4E1A0000REPOS2 /* CardRepositoryInterface.swift */; };
 		92F3A0062B4E1B0000AUTH01 /* AuthTokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F3A0072B4E1B0000AUTH02 /* AuthTokenManager.swift */; };
@@ -741,7 +738,6 @@
 		9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImageView.swift; sourceTree = "<group>"; };
 		9251ED3129A212E9006C1D1C /* CardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPresenter.swift; sourceTree = "<group>"; };
 		9251ED3229A212E9006C1D1C /* CardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewController.swift; sourceTree = "<group>"; };
-		9251ED3329A212E9006C1D1C /* CardInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardInteractor.swift; sourceTree = "<group>"; };
 		9251ED3429A212E9006C1D1C /* CardWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardWireframe.swift; sourceTree = "<group>"; };
 		9251ED3E29A2133A006C1D1C /* DictionaryPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryPresenter.swift; sourceTree = "<group>"; };
 		9251ED3F29A2133A006C1D1C /* DictionaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryViewController.swift; sourceTree = "<group>"; };
@@ -754,8 +750,6 @@
 		929C4DD929A7646F007651E9 /* DeskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskEntity.swift; sourceTree = "<group>"; };
 		92B3A16E2C01B71600013599 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		92C5B44829F3C17000EE3377 /* AppErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrors.swift; sourceTree = "<group>"; };
-		92D411912AD3D652005A15DC /* VersionFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionFooterView.swift; sourceTree = "<group>"; };
-		92D411932AD3D673005A15DC /* VersionFooterView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VersionFooterView.xib; sourceTree = "<group>"; };
 		92F3A0022B4E1A0000REPOS1 /* DeskRepositoryInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskRepositoryInterface.swift; sourceTree = "<group>"; };
 		92F3A0032B4E1A0000REPOS2 /* CardRepositoryInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRepositoryInterface.swift; sourceTree = "<group>"; };
 		92F3A0072B4E1B0000AUTH02 /* AuthTokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTokenManager.swift; sourceTree = "<group>"; };
@@ -1366,7 +1360,6 @@
 				9251EC0B29A1EAA5006C1D1C /* MainInteractor.swift */,
 				9251EC1029A1EAA5006C1D1C /* MailLoginInteractor.swift */,
 				929C4DD229A76442007651E9 /* DeskInteractor.swift */,
-				9251ED3329A212E9006C1D1C /* CardInteractor.swift */,
 				9251ED4029A2133A006C1D1C /* DictionaryInteractor.swift */,
 				9251ED1329A20040006C1D1C /* SettingInteractor.swift */,
 				924052DC29AB398C00B47E09 /* CreateDeskInteractor.swift */,
@@ -1638,8 +1631,6 @@
 			children = (
 				9251ED1B29A20341006C1D1C /* AccountCell.swift */,
 				9251ED1F29A2074D006C1D1C /* SettingsRowCell.swift */,
-				92D411912AD3D652005A15DC /* VersionFooterView.swift */,
-				92D411932AD3D673005A15DC /* VersionFooterView.xib */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2085,7 +2076,6 @@
 			files = (
 				78807FA17E6D1DE19830C2F0 /* HandwritingTemplates.bin in Resources */,
 				9251EBD929A1E9A7006C1D1C /* LaunchScreen.storyboard in Resources */,
-				92D411942AD3D673005A15DC /* VersionFooterView.xib in Resources */,
 				9251EBD629A1E9A7006C1D1C /* Assets.xcassets in Resources */,
 				9251ECE029A1EAA5006C1D1C /* Localizable.xcstrings in Resources */,
 				D7D0B66BCDB114A908A9EE22 /* PrivacyInfo.xcprivacy in Resources */,
@@ -2307,12 +2297,10 @@
 				9251EBCF29A1E9A6006C1D1C /* SceneDelegate.swift in Sources */,
 				9251ECB229A1EAA5006C1D1C /* HomePresenter.swift in Sources */,
 				9251EC8229A1EAA5006C1D1C /* SocialUserEntity.swift in Sources */,
-				92D411922AD3D652005A15DC /* VersionFooterView.swift in Sources */,
 				9251ECBF29A1EAA5006C1D1C /* MailLoginViewController.swift in Sources */,
 				924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */,
 				9251ECE629A1EAA5006C1D1C /* RealmService.swift in Sources */,
 				9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */,
-				9251ED3829A212E9006C1D1C /* CardInteractor.swift in Sources */,
 				924052E229AB398C00B47E09 /* CreateDeskWireframe.swift in Sources */,
 				9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */,
 				9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */,

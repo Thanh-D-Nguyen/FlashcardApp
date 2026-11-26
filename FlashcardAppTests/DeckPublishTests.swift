@@ -252,7 +252,7 @@ final class CardPresenterUploadTests: XCTestCase {
         desk.name = "N5"
         desk.cards = [CardEntity(), CardEntity()]
         desks.decks = [desk]
-        presenter = CardPresenter(interactor: CardInteractor(), deskInteractor: desks, wireframe: wireframe, defaults: defaults,
+        presenter = CardPresenter(deskInteractor: desks, wireframe: wireframe, defaults: defaults,
                                   server: FakeServerInteractor(), publisher: publisher)
         view = SpyCardView()
         presenter.view = view

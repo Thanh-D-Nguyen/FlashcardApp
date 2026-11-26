@@ -168,7 +168,6 @@ class CardPresenter {
         }
     }
 
-    private let interactor: CardInteractorInterface
     private let deskInteractor: DeskInteractorInterface
     private let server: CardLibraryServerInteractorInterface
     private let publisher: DeckPublishInteractorInterface
@@ -193,8 +192,7 @@ class CardPresenter {
     private let sharing: DeckSharingInteractorInterface
     private let uploadRequest = SerialDisposable()
 
-    init(interactor: CardInteractorInterface,
-         deskInteractor: DeskInteractorInterface,
+    init(deskInteractor: DeskInteractorInterface,
          wireframe: CardWireframeInterface,
          defaults: UserDefaults = .standard,
          server: CardLibraryServerInteractorInterface = CardLibraryServerInteractor(),
@@ -202,7 +200,6 @@ class CardPresenter {
          now: @escaping () -> Date = Date.init,
          sharing: DeckSharingInteractorInterface = DeckSharingInteractor()) {
         self.sharing = sharing
-        self.interactor = interactor
         self.deskInteractor = deskInteractor
         self.wireframe = wireframe
         self.defaults = defaults
