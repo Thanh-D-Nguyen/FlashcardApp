@@ -642,4 +642,85 @@ final class TodayPresenterRadarTests: XCTestCase {
         presenter.openRadar()
         XCTAssertEqual(wireframe.radarOpened, [item])
     }
+
+    func test_radarSpeakSaveAndStudyNowDeepLinkWork() {
+        let scenarioItem = DailyRadarItem(
+            id: "2", slug: "email-j2", moduleKey: "workplace_mission", moduleTitle: "Tình huống công việc",
+            moduleType: "scenario_link", targetRoute: "/vi/story/arcs", title: "催促メール",
+            summary: "Trả lời email", expressions: [.init(japanese: "進捗はいかがでしょうか", reading: nil)],
+            usageNote: nil, reason: nil, minutes: 5, level: "BJT J2"
+        )
+        let interactor = FakeTodayInteractor()
+        let radar = FakeRadar()
+        radar.item = scenarioItem
+        let speech = SpySpeechService()
+        let saver = SpyWordSaver()
+        let wireframe = InteractiveRadarWireframe()
+        let view = SpyNoticeView()
+        let presenter = TodayPresenter(
+            interactor: interactor,
+            wireframe: wireframe,
+            ownerKey: { "u1" },
+            radar: radar,
+            speech: speech,
+            wordSaver: saver
+        )
+        presenter.view = view
+        presenter.viewWillAppear()
+
+        XCTAssertEqual(view.lastState?.radar?.hasDeepLink, true)
+        presenter.speakRadar()
+        XCTAssertEqual(speech.spoken.map(\.0), ["進捗はいかがでしょうか"])
+        XCTAssertEqual(speech.spoken.map(\.1), ["ja-JP"])
+
+        presenter.saveRadarToDeck()
+        XCTAssertEqual(wireframe.saveChoosers.count, 1)
+        wireframe.saveChoosers[0].select(.newDictionaryDeck)
+        XCTAssertEqual(saver.savedWords.first?.first?.japanese, "進捗はいかがでしょうか")
+        XCTAssertEqual(view.notices.count, 1)
+
+        presenter.studyRadarNow()
+        XCTAssertEqual(wireframe.scenariosOpened, 1, "scenario_link deep-links to Scenarios")
+    }
+}
+
+private final class SpySpeechService: SpeechServiceInterface {
+    var spoken: [(String, String)] = []
+    func speak(_ text: String, languageCode: String) { spoken.append((text, languageCode)) }
+    func stop() {}
+}
+
+private final class SpyWordSaver: LessonWordSaverInterface {
+    var savedWords: [[LessonWord]] = []
+    func choices() -> [TodayDeckChoice] { [] }
+    func save(_ words: [LessonWord], fromLesson slug: String, to target: DictionaryDeckTarget) throws -> LessonWordSaveOutcome {
+        savedWords.append(words)
+        return LessonWordSaveOutcome(deckID: "lesson-words", deckName: "Saved from lessons", added: words.count, alreadyThere: 0, skipped: 0)
+    }
+}
+
+private final class InteractiveRadarWireframe: TodayWireframeInterface {
+    var scenariosOpened = 0
+    var saveChoosers: [(choices: [TodayDeckChoice], newDeckTitle: String?, select: (DictionaryDeckTarget) -> Void)] = []
+    func showStudy(deckId: String, cardIDs: [String]?) {}
+    func showCreateDeck(onFinish: @escaping () -> Void) {}
+    func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void) {}
+    func showBudgetChooser(current: Int, onSelect: @escaping (Int) -> Void) {}
+    func showLevels() {}
+    func showScenarios() { scenariosOpened += 1 }
+    func showLesson(slug: String, title: String) {}
+    func showRadarCard(_ item: DailyRadarItem) {}
+    func showSaveDeckChooser(_ choices: [TodayDeckChoice], newDeckTitle: String?, onSelect: @escaping (DictionaryDeckTarget) -> Void) {
+        saveChoosers.append((choices, newDeckTitle, onSelect))
+    }
+    func showLifeLesson(cityID: String, lesson: LifeLesson) {}
+    func showCityChooser(selectedID: String, onSelect: @escaping (String) -> Void) {}
+    func openAppSettings() {}
+}
+
+private final class SpyNoticeView: TodayViewInterface {
+    var lastState: TodayViewState?
+    var notices: [String] = []
+    func render(_ state: TodayViewState) { lastState = state }
+    func showNotice(_ text: String) { notices.append(text) }
 }

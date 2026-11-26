@@ -44,13 +44,30 @@ struct TodayProgressText: Equatable {
     let detail: String?
 }
 
-/// The Daily Radar card of Today: the server's texts only.
+/// The Daily Radar card of Today: the server's texts, its mapped visual scene, and real interactive capabilities.
 struct TodayRadarCard: Equatable {
     let eyebrow: String
     let title: String
     /// The first Japanese expression of the card, the thing to learn.
     let expression: String
     let detail: String?
+    let scene: LifeScene
+    let topic: LifeTopic
+    let canSave: Bool
+    let hasDeepLink: Bool
+
+    init(eyebrow: String, title: String, expression: String, detail: String?,
+         scene: LifeScene = .culture, topic: LifeTopic = .culture,
+         canSave: Bool = true, hasDeepLink: Bool = false) {
+        self.eyebrow = eyebrow
+        self.title = title
+        self.expression = expression
+        self.detail = detail
+        self.scene = scene
+        self.topic = topic
+        self.canSave = canSave
+        self.hasDeepLink = hasDeepLink
+    }
 }
 
 /// The account streak strip, from the server's own count and optional real per-day local history.
@@ -102,6 +119,11 @@ struct TodayViewState: Equatable {
 
 protocol TodayViewInterface: AnyObject {
     func render(_ state: TodayViewState)
+    func showNotice(_ text: String)
+}
+
+extension TodayViewInterface {
+    func showNotice(_ text: String) {}
 }
 
 protocol TodayPresenterInterface: AnyObject {
@@ -118,11 +140,21 @@ protocol TodayPresenterInterface: AnyObject {
     func openLessonSlot()
     /// The Daily Radar card was tapped.
     func openRadar()
+    /// Speaks the Daily Radar card's Japanese expression aloud.
+    func speakRadar()
+    /// Opens the deck chooser to save the Daily Radar card's expression(s).
+    func saveRadarToDeck()
+    /// Opens the Daily Radar card's mapped in-app screen, or opens the full card when no deep link applies.
+    func studyRadarNow()
     /// A checklist item in Today's Quest was tapped.
     func openQuestItem(_ action: TodayQuestAction)
     func retry()
     /// A card of the life hub was tapped (or its button): opens its lesson, asks for the location, or retries, by what the card is.
     func openLifeCard(id: String)
+    /// Speaks a ready life card's Japanese headline aloud.
+    func speakLifeCard(id: String)
+    /// Opens the deck chooser to save a ready life card's vocabulary.
+    func saveLifeCardToDeck(id: String)
     func changeLifeCity()
     func retryLife()
 }
@@ -139,6 +171,10 @@ final class TodayPresenter {
     private let streak: TodayStreakLoading?
     private let radar: TodayRadarLoading?
     private let questStore: TodayQuestCompletionStoreInterface
+    private let speech: SpeechServiceInterface
+    private let wordSaver: LessonWordSaverInterface
+    private let lifeSaver: LifeLessonInteractorInterface
+    private let language: () -> AppLanguage
     private let calendar: () -> Calendar
 
     private var plan: TodayPlan?
@@ -153,11 +189,19 @@ final class TodayPresenter {
          streak: TodayStreakLoading? = nil,
          radar: TodayRadarLoading? = nil,
          questStore: TodayQuestCompletionStoreInterface = UserDefaultsTodayQuestCompletionStore.shared,
+         speech: SpeechServiceInterface = SystemSpeechService.shared,
+         wordSaver: LessonWordSaverInterface = LessonWordSaver(),
+         lifeSaver: LifeLessonInteractorInterface = LifeLessonInteractor(),
+         language: @escaping () -> AppLanguage = { .current },
          calendar: @escaping () -> Calendar = { .autoupdatingCurrent }) {
         self.lessons = lessons
         self.streak = streak
         self.radar = radar
         self.questStore = questStore
+        self.speech = speech
+        self.wordSaver = wordSaver
+        self.lifeSaver = lifeSaver
+        self.language = language
         self.calendar = calendar
         self.interactor = interactor
         self.wireframe = wireframe
@@ -213,7 +257,7 @@ final class TodayPresenter {
         state.life = life?.section
         state.lessonCard = lessonSlot.map(Self.lessonCard)
         state.streak = streak?.streak.map { Self.streakText($0, studiedDaysInWeek: studiedDays, now: date, calendar: cal) }
-        state.radar = radarItem.flatMap(Self.radarCard)
+        state.radar = radarItem.flatMap { Self.radarCard($0, on: date, calendar: cal) }
         state.quest = TodayQuestAssembler.make(
             plan: plan,
             lessonSlot: lessonSlot,
@@ -284,10 +328,20 @@ final class TodayPresenter {
         return state
     }
 
-    static func radarCard(_ item: DailyRadarItem) -> TodayRadarCard? {
+    static func radarCard(_ item: DailyRadarItem, on date: Date = Date(), calendar: Calendar = .autoupdatingCurrent) -> TodayRadarCard? {
         guard let expression = item.expressions.first?.japanese else { return nil }
         let detail = [item.level, item.minutes.map(minutesText)].compactMap { $0 }.joined(separator: " · ")
-        return TodayRadarCard(eyebrow: item.moduleTitle, title: item.title, expression: expression, detail: detail.isEmpty ? nil : detail)
+        let visual = item.visualScene(on: date, calendar: calendar)
+        return TodayRadarCard(
+            eyebrow: item.moduleTitle,
+            title: item.title,
+            expression: expression,
+            detail: detail.isEmpty ? nil : detail,
+            scene: visual.scene,
+            topic: visual.topic,
+            canSave: !item.expressions.isEmpty,
+            hasDeepLink: item.deepLink != nil
+        )
     }
 
     static func streakText(_ streak: AccountStreak, studiedDaysInWeek: Set<Date> = [],
@@ -394,6 +448,51 @@ extension TodayPresenter: TodayPresenterInterface {
         wireframe.showRadarCard(item)
     }
 
+    func speakRadar() {
+        guard let text = radar?.item?.expressions.first?.japanese else { return }
+        speech.speak(text, languageCode: "ja-JP")
+    }
+
+    func saveRadarToDeck() {
+        guard let item = radar?.item, !item.expressions.isEmpty else { return }
+        let words = item.expressions.map { expr in
+            LessonWord(japanese: expr.japanese, reading: expr.reading ?? "", meaning: expr.meaning ?? item.summary ?? item.title)
+        }
+        let choices = wordSaver.choices()
+        let showNewDeck = !choices.contains { $0.id == LessonWordSaver.lessonDeckID }
+        wireframe.showSaveDeckChooser(
+            choices,
+            newDeckTitle: showNewDeck ? Self.text("Saved from lessons") : nil
+        ) { [weak self] target in
+            guard let self else { return }
+            do {
+                let outcome = try self.wordSaver.save(words, fromLesson: "radar-\(item.slug)", to: target)
+                if outcome.added > 0 {
+                    self.view?.showNotice(String.localizedStringWithFormat(Self.text("Saved %lld new words to “%@”."), outcome.added, outcome.deckName))
+                } else {
+                    self.view?.showNotice(String(format: Self.text("Already in “%@”. Nothing was added twice."), outcome.deckName))
+                }
+            } catch {
+                logger.error("Saving radar expressions failed: \(error.localizedDescription)")
+                self.view?.showNotice(Self.text("Couldn't save the words"))
+            }
+        }
+    }
+
+    func studyRadarNow() {
+        guard let item = radar?.item else { return }
+        questStore.markRadarCompleted(slug: item.slug, ownerKey: ownerKey(), on: now(), calendar: calendar())
+        if let current = state { publish(current) }
+        if let destination = item.deepLink {
+            switch destination {
+            case .scenarios: wireframe.showScenarios()
+            case .levels: wireframe.showLevels()
+            }
+        } else {
+            wireframe.showRadarCard(item)
+        }
+    }
+
     func openQuestItem(_ action: TodayQuestAction) {
         switch action {
         case .review: primaryAction()
@@ -414,6 +513,41 @@ extension TodayPresenter: TodayPresenterInterface {
         case .locationDenied: wireframe.openAppSettings()
         case .failed: life.retry()
         case .loading, .locating: break
+        }
+    }
+
+    func speakLifeCard(id: String) {
+        guard let card = state?.life?.cards.first(where: { $0.id == id }), card.status == .ready else { return }
+        let japanese = card.headlineJapanese.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !japanese.isEmpty else { return }
+        speech.speak(japanese, languageCode: "ja-JP")
+    }
+
+    func saveLifeCardToDeck(id: String) {
+        guard let lesson = life?.lesson(forCard: id), !lesson.vocabulary.isEmpty else { return }
+        let choices = lifeSaver.deckChoices()
+        let showNewDeck = !lifeSaver.lifeDeckExists()
+        wireframe.showSaveDeckChooser(
+            choices,
+            newDeckTitle: showNewDeck ? Self.text("Learn from Life (new deck)") : nil
+        ) { [weak self] target in
+            guard let self else { return }
+            let lifeTarget: LifeSaveTarget
+            switch target {
+            case .existing(let deckID): lifeTarget = .existing(deckID: deckID)
+            case .newDictionaryDeck: lifeTarget = .newLifeDeck
+            }
+            do {
+                let outcome = try self.lifeSaver.saveVocabulary(lesson.vocabulary, target: lifeTarget, language: self.language())
+                if outcome.added.isEmpty {
+                    self.view?.showNotice(String(format: Self.text("Already in “%@”. Nothing was added twice."), outcome.deckName))
+                } else {
+                    self.view?.showNotice(String.localizedStringWithFormat(Self.text("Saved %lld new words to “%@”."), outcome.added.count, outcome.deckName))
+                }
+            } catch {
+                logger.error("Saving life card words failed: \(error.localizedDescription)")
+                self.view?.showNotice(Self.text("Couldn't save the words"))
+            }
         }
     }
 

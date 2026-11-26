@@ -19,7 +19,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let levelsRow = TodayRowView()
     private let lessonSlot = TodayLessonSlotView()
     private let streakView = TodayStreakView()
-    private let radarCard = TodayLessonSlotView()
+    private let radarCard = TodayRadarCardView()
+    private let toast = NoticeToastView()
     private var refreshObservers: [NSObjectProtocol] = []
     private var adBanner: AdsBannerView?
 
@@ -128,14 +129,18 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         heroView.onChangeBudget = { [weak self] in self?.presenter.changeBudget() }
         failureView.onRetry = { [weak self] in self?.presenter.retry() }
         hubView.onCardAction = { [weak self] id in self?.presenter.openLifeCard(id: id) }
+        hubView.onCardSpeak = { [weak self] id in self?.presenter.speakLifeCard(id: id) }
+        hubView.onCardSaveToDeck = { [weak self] id in self?.presenter.saveLifeCardToDeck(id: id) }
         hubView.onChangeCity = { [weak self] in self?.presenter.changeLifeCity() }
         scenarioBanner.addAction(UIAction { [weak self] _ in self?.presenter.openScenarios() }, for: .touchUpInside)
         levelsRow.addAction(UIAction { [weak self] _ in self?.presenter.openLevels() }, for: .touchUpInside)
         lessonSlot.isHidden = true
         lessonSlot.addAction(UIAction { [weak self] _ in self?.presenter.openLessonSlot() }, for: .touchUpInside)
         radarCard.isHidden = true
-        radarCard.accessibilityIdentifier = "today_radar_card"
-        radarCard.addAction(UIAction { [weak self] _ in self?.presenter.openRadar() }, for: .touchUpInside)
+        radarCard.onOpenCard = { [weak self] in self?.presenter.openRadar() }
+        radarCard.onSpeak = { [weak self] in self?.presenter.speakRadar() }
+        radarCard.onSaveToDeck = { [weak self] in self?.presenter.saveRadarToDeck() }
+        radarCard.onStudyNow = { [weak self] in self?.presenter.studyRadarNow() }
     }
 
     // MARK: TodayViewInterface
@@ -155,9 +160,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         if let card = state.lessonCard { lessonSlot.configure(card) }
         radarCard.isHidden = state.radar == nil
         if let radar = state.radar {
-            radarCard.configure(eyebrow: radar.eyebrow.isEmpty ? NSLocalizedString("DAILY RADAR", comment: "Today: eyebrow of the Daily Radar card") : radar.eyebrow.uppercased(),
-                                title: radar.expression, detail: [radar.title, radar.detail].compactMap { $0 }.joined(separator: "\n"),
-                                cta: NSLocalizedString("Read the card", comment: "Today: opens the Daily Radar card"))
+            radarCard.configure(radar)
         }
         streakView.isHidden = state.streak == nil
         if let streak = state.streak { streakView.configure(streak) }
@@ -175,6 +178,10 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             dateHeader.configure(life.header, monthNumber: life.header.month)
             hubView.configure(life)
         }
+    }
+
+    func showNotice(_ text: String) {
+        toast.show(text, in: view)
     }
 }
 
