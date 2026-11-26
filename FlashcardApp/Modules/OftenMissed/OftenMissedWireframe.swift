@@ -12,7 +12,7 @@ final class OftenMissedWireframe: BaseWireframe<OftenMissedViewController> {
 }
 
 extension OftenMissedWireframe: OftenMissedWireframeInterface {
-    func showStudy(deckId: String) {
-        navigationController?.pushWireframe(CardStudyWireframe(deckId: deckId))
+    func showStudy(deckId: String, cardIDs: [String]) {
+        navigationController?.pushWireframe(CardStudyWireframe(deckId: deckId, cardIDs: cardIDs))
     }
 }

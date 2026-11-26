@@ -173,8 +173,8 @@ private final class FakeMissedInteractor: OftenMissedInteractorInterface {
 }
 
 private final class FakeMissedWireframe: OftenMissedWireframeInterface {
-    private(set) var studied: [String] = []
-    func showStudy(deckId: String) { studied.append(deckId) }
+    private(set) var studied: [(deckId: String, cardIDs: [String])] = []
+    func showStudy(deckId: String, cardIDs: [String]) { studied.append((deckId, cardIDs)) }
 }
 
 final class OftenMissedPresenterTests: XCTestCase {
@@ -239,13 +239,24 @@ final class OftenMissedPresenterTests: XCTestCase {
         XCTAssertEqual(presenter.state, .empty)
     }
 
-    func test_selectingARowOpensItsDeckForStudyAndNothingElse() {
-        interactor.result = .success([missed("a", deck: "deck-1"), missed("b", deck: "deck-2")])
+    func test_selectingARowOpensTargetedMissedCardsOfThatDeckWithTappedCardFirst() {
+        interactor.result = .success([
+            missed("a", deck: "deck-1"),
+            missed("b", deck: "deck-2"),
+            missed("c", deck: "deck-1")
+        ])
         presenter.viewWillAppear()
+        presenter.selectRow(at: 2)
+        XCTAssertEqual(wireframe.studied.count, 1)
+        XCTAssertEqual(wireframe.studied.first?.deckId, "deck-1")
+        XCTAssertEqual(wireframe.studied.first?.cardIDs, ["c", "a"])
+
         presenter.selectRow(at: 1)
-        XCTAssertEqual(wireframe.studied, ["deck-2"])
+        XCTAssertEqual(wireframe.studied.last?.deckId, "deck-2")
+        XCTAssertEqual(wireframe.studied.last?.cardIDs, ["b"])
+
         presenter.selectRow(at: 5)
         presenter.selectRow(at: -1)
-        XCTAssertEqual(wireframe.studied, ["deck-2"])
+        XCTAssertEqual(wireframe.studied.count, 2)
     }
 }

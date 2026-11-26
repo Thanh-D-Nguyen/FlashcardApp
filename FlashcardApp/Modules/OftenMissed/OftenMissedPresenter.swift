@@ -28,7 +28,7 @@ protocol OftenMissedPresenterInterface: AnyObject {
 }
 
 protocol OftenMissedWireframeInterface: AnyObject {
-    func showStudy(deckId: String)
+    func showStudy(deckId: String, cardIDs: [String])
 }
 
 final class OftenMissedPresenter: OftenMissedPresenterInterface {
@@ -52,7 +52,11 @@ final class OftenMissedPresenter: OftenMissedPresenterInterface {
 
     func selectRow(at index: Int) {
         guard case .rows(let rows) = state, rows.indices.contains(index) else { return }
-        wireframe?.showStudy(deckId: rows[index].deckID)
+        let selected = rows[index]
+        let deckCards = [selected.cardID] + rows
+            .filter { $0.deckID == selected.deckID && $0.cardID != selected.cardID }
+            .map(\.cardID)
+        wireframe?.showStudy(deckId: selected.deckID, cardIDs: deckCards)
     }
 
     private func load() {
