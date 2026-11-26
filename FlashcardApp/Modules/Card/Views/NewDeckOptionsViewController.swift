@@ -5,6 +5,49 @@ enum NewDeckMethod: Equatable {
     case manual, automatic
 }
 
+/// Shared presentation flow for creating a new deck (sheet chooser, manual editor, or auto-generator).
+/// Reused by `CardWireframe` and `TodayWireframe` so both entry points stay identical.
+enum NewDeckFlow {
+    static func presentOptions(from presenter: UIViewController, onChoose: @escaping (NewDeckMethod) -> Void) {
+        let options = NewDeckOptionsViewController(onChoose: onChoose)
+        options.modalPresentationStyle = .pageSheet
+        if let sheet = options.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+        presenter.present(options, animated: true)
+    }
+
+    static func presentEditor(from presenter: UIViewController, deckId: String?, onFinish: @escaping () -> Void) {
+        let editor = CreateDeskWireframe(deckId: deckId, onFinish: onFinish)
+        presenter.present(UINavigationController(rootViewController: editor.viewController), animated: true)
+    }
+
+    static func presentGenerator(from presenter: UIViewController, onImported: @escaping (String) -> Void) {
+        let generator = DeckGeneratorWireframe(onImported: onImported)
+        let navigation = UINavigationController(rootViewController: generator.viewController)
+        navigation.modalPresentationStyle = .pageSheet
+        navigation.sheetPresentationController?.detents = [.large()]
+        presenter.present(navigation, animated: true)
+    }
+
+    static func presentCompleteFlow(from presenter: UIViewController, onFinish: @escaping () -> Void) {
+        presentOptions(from: presenter) { [weak presenter] method in
+            guard let presenter else { return }
+            switch method {
+            case .manual:
+                presentEditor(from: presenter, deckId: nil, onFinish: onFinish)
+            case .automatic:
+                presentGenerator(from: presenter) { [weak presenter] deckId in
+                    onFinish()
+                    guard let presenter else { return }
+                    presentEditor(from: presenter, deckId: deckId, onFinish: onFinish)
+                }
+            }
+        }
+    }
+}
+
 /// The two ways to start a deck, side by side in a short sheet: type the cards yourself, or let the dictionary
 /// fill a deck for a JLPT level. Each row says what it needs, so the choice is made before any screen is opened.
 final class NewDeckOptionsViewController: UIViewController {

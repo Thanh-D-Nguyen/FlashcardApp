@@ -54,27 +54,15 @@ final class CardWireframe: BaseWireframe<CardViewController> {
 extension CardWireframe: CardWireframeInterface {
 
     func showEditor(deckId: String?, onFinish: @escaping () -> Void) {
-        let editor = CreateDeskWireframe(deckId: deckId, onFinish: onFinish)
-        let navigation = UINavigationController(rootViewController: editor.viewController)
-        viewController.present(navigation, animated: true)
+        NewDeckFlow.presentEditor(from: viewController, deckId: deckId, onFinish: onFinish)
     }
 
     func showNewDeckOptions(onChoose: @escaping (NewDeckMethod) -> Void) {
-        let options = NewDeckOptionsViewController(onChoose: onChoose)
-        options.modalPresentationStyle = .pageSheet
-        if let sheet = options.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]
-            sheet.prefersGrabberVisible = true
-        }
-        viewController.present(options, animated: true)
+        NewDeckFlow.presentOptions(from: viewController, onChoose: onChoose)
     }
 
     func showDeckGenerator(onImported: @escaping (String) -> Void) {
-        let generator = DeckGeneratorWireframe(onImported: onImported)
-        let navigation = UINavigationController(rootViewController: generator.viewController)
-        navigation.modalPresentationStyle = .pageSheet
-        navigation.sheetPresentationController?.detents = [.large()]
-        viewController.present(navigation, animated: true)
+        NewDeckFlow.presentGenerator(from: viewController, onImported: onImported)
     }
 
     func showStudy(deckId: String) {

@@ -42,34 +42,7 @@ extension TodayWireframe: TodayWireframeInterface {
     }
 
     func showCreateDeck(onFinish: @escaping () -> Void) {
-        let options = NewDeckOptionsViewController { [weak self] method in
-            guard let self else { return }
-            switch method {
-            case .manual:
-                self.presentEditor(deckId: nil, onFinish: onFinish)
-            case .automatic:
-                let generator = DeckGeneratorWireframe { [weak self] deckId in
-                    // The deck is already stored on the device: open it for review and editing, then come back here.
-                    onFinish()
-                    self?.presentEditor(deckId: deckId, onFinish: onFinish)
-                }
-                let navigation = UINavigationController(rootViewController: generator.viewController)
-                navigation.modalPresentationStyle = .pageSheet
-                navigation.sheetPresentationController?.detents = [.large()]
-                self.viewController.present(navigation, animated: true)
-            }
-        }
-        options.modalPresentationStyle = .pageSheet
-        if let sheet = options.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]
-            sheet.prefersGrabberVisible = true
-        }
-        viewController.present(options, animated: true)
-    }
-
-    private func presentEditor(deckId: String?, onFinish: @escaping () -> Void) {
-        let editor = CreateDeskWireframe(deckId: deckId, onFinish: onFinish)
-        viewController.present(UINavigationController(rootViewController: editor.viewController), animated: true)
+        NewDeckFlow.presentCompleteFlow(from: viewController, onFinish: onFinish)
     }
 
     func showDeckChooser(_ choices: [TodayDeckChoice], selectedID: String?, onSelect: @escaping (String) -> Void) {
