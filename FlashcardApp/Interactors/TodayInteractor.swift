@@ -14,22 +14,31 @@ protocol TodayInteractorInterface: AnyObject {
     func selectDeck(id: String, ownerKey: String)
     func budgetMinutes(ownerKey: String) -> Int
     func setBudgetMinutes(_ minutes: Int, ownerKey: String)
+    /// Calendar day starts in the learner's current week (Monday–Sunday) that have real recorded study activity on this device.
+    func studiedDaysInCurrentWeek(ownerKey: String, now: Date) -> Set<Date>
+}
+
+extension TodayInteractorInterface {
+    func studiedDaysInCurrentWeek(ownerKey: String, now: Date) -> Set<Date> { [] }
 }
 
 final class TodayInteractor: TodayInteractorInterface {
     private let decks: DeskRepositoryInterface
     private let schedules: ReviewScheduleStoreInterface
+    private let lessonProgress: LessonProgressStoreInterface
     private let studyPreferences: StudyPreferencesInterface
     private let preferences: TodayPreferencesInterface
     private let calendar: Calendar
 
     init(decks: DeskRepositoryInterface = DeskManagement.shared,
          schedules: ReviewScheduleStoreInterface = RealmReviewHistoryStore(),
+         lessonProgress: LessonProgressStoreInterface = RealmLessonProgressStore.shared,
          studyPreferences: StudyPreferencesInterface = UserDefaultsStudyPreferences.shared,
          preferences: TodayPreferencesInterface = UserDefaultsTodayPreferences.shared,
          calendar: Calendar = .autoupdatingCurrent) {
         self.decks = decks
         self.schedules = schedules
+        self.lessonProgress = lessonProgress
         self.studyPreferences = studyPreferences
         self.preferences = preferences
         self.calendar = calendar
@@ -67,6 +76,24 @@ final class TodayInteractor: TodayInteractorInterface {
 
     func setBudgetMinutes(_ minutes: Int, ownerKey: String) {
         preferences.setBudgetMinutes(minutes, ownerKey: ownerKey)
+    }
+
+    func studiedDaysInCurrentWeek(ownerKey: String, now: Date) -> Set<Date> {
+        let weekStart = TodayStreakStripBuilder.currentWeekStart(for: now, calendar: calendar)
+        let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) ?? weekStart.addingTimeInterval(7 * 86_400)
+        let todayEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)) ?? weekEnd
+        let upperBound = min(weekEnd, todayEnd)
+
+        var days: Set<Date> = []
+        for attempt in schedules.attempts(ownerKey: ownerKey, answeredSince: weekStart) where attempt.answeredAt < upperBound {
+            days.insert(calendar.startOfDay(for: attempt.answeredAt))
+        }
+        for lesson in lessonProgress.allProgress(ownerKey: ownerKey) {
+            if let done = lesson.completedAt, done >= weekStart, done < upperBound {
+                days.insert(calendar.startOfDay(for: done))
+            }
+        }
+        return days
     }
 
     private static func todayDeck(from entity: DeskEntity) -> TodayDeck {

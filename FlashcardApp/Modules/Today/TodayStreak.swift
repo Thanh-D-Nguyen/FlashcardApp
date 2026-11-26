@@ -1,6 +1,64 @@
 import RxSwift
 import UIKit
 
+/// One day in the 7-day streak strip (Monday–Sunday on the learner's calendar), built strictly from real recorded study days.
+struct TodayWeekDayDot: Equatable {
+    let dayStart: Date
+    let shortLabel: String
+    let accessibilityDayName: String
+    let isStudied: Bool
+    let isToday: Bool
+    let isFuture: Bool
+}
+
+enum TodayStreakStripBuilder {
+    /// Monday 00:00 of the calendar week containing `date`, in `calendar.timeZone`.
+    static func currentWeekStart(for date: Date, calendar: Calendar) -> Date {
+        let startOfDay = calendar.startOfDay(for: date)
+        let weekday = calendar.component(.weekday, from: startOfDay) // 1 = Sun, 2 = Mon, ... 7 = Sat
+        let offsetFromMonday = (weekday + 5) % 7
+        return calendar.date(byAdding: .day, value: -offsetFromMonday, to: startOfDay) ?? startOfDay
+    }
+
+    /// Builds the 7 dots for the current week ONLY when real per-day history exists on this device.
+    /// Returns `nil` when there is no per-day history so the UI never displays fake dots.
+    static func weekDots(streak: AccountStreak, studiedDaysInWeek: Set<Date>, now: Date,
+                         calendar: Calendar, locale: Locale = AppLanguage.current.locale) -> [TodayWeekDayDot]? {
+        guard !studiedDaysInWeek.isEmpty else { return nil }
+        let weekStart = currentWeekStart(for: now, calendar: calendar)
+        let todayStart = calendar.startOfDay(for: now)
+        let normalizedStudied = Set(studiedDaysInWeek.map { calendar.startOfDay(for: $0) })
+
+        let shortFormatter = DateFormatter()
+        shortFormatter.locale = locale
+        shortFormatter.calendar = calendar
+        shortFormatter.timeZone = calendar.timeZone
+        shortFormatter.setLocalizedDateFormatFromTemplate("EEEEE")
+
+        let fullFormatter = DateFormatter()
+        fullFormatter.locale = locale
+        fullFormatter.calendar = calendar
+        fullFormatter.timeZone = calendar.timeZone
+        fullFormatter.setLocalizedDateFormatFromTemplate("EEEE")
+
+        return (0..<7).compactMap { offset in
+            guard let day = calendar.date(byAdding: .day, value: offset, to: weekStart) else { return nil }
+            let dayStart = calendar.startOfDay(for: day)
+            let isToday = dayStart == todayStart
+            let isFuture = dayStart > todayStart
+            let isStudied = !isFuture && (normalizedStudied.contains(dayStart) || (isToday && streak.countsToday))
+            return TodayWeekDayDot(
+                dayStart: dayStart,
+                shortLabel: shortFormatter.string(from: dayStart),
+                accessibilityDayName: fullFormatter.string(from: dayStart),
+                isStudied: isStudied,
+                isToday: isToday,
+                isFuture: isFuture
+            )
+        }
+    }
+}
+
 /// The account streak line of Today. Hidden for guests, while loading, on any failure and when there is no current streak: it never
 /// blocks or replaces anything else on Today.
 protocol TodayStreakLoading: AnyObject {
@@ -90,45 +148,188 @@ final class TodayStreakLoader: TodayStreakLoading {
     }
 }
 
-/// One quiet line under the day's progress: a flame, the server's count and whether today already counts.
+/// Streak strip placed directly under the "Hôm nay" header: flame icon, real streak count, studied/not-studied today badge,
+/// and 7 dots for the current week when real per-day history is available on this device (otherwise no fake dots).
 final class TodayStreakView: UIView {
+    private let flameBox = UIView()
     private let icon = UIImageView(image: UIImage(systemName: "flame.fill"))
     private let titleLabel = UILabel()
+    private let statusBadge = UIView()
+    private let statusLabel = UILabel()
+    private let headerRow = UIStackView()
+    private let topStack = UIStackView()
     private let detailLabel = UILabel()
+    private let dotsRow = UIStackView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        applyCardSurface(radius: Design.Radius.card)
+
+        flameBox.backgroundColor = Design.Color.statusFill(Design.Color.warning)
+        flameBox.layer.cornerRadius = Design.Radius.chip
+        flameBox.layer.cornerCurve = .continuous
+        flameBox.translatesAutoresizingMaskIntoConstraints = false
         icon.tintColor = Design.Color.warning
-        icon.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .body)
-        icon.setContentHuggingPriority(.required, for: .horizontal)
-        icon.isAccessibilityElement = false
-        titleLabel.apply(.meaning)
-        titleLabel.numberOfLines = 0
-        detailLabel.apply(.metadata)
-        detailLabel.numberOfLines = 0
-        let text = UIStackView(arrangedSubviews: [titleLabel, detailLabel])
-        text.axis = .vertical
-        text.spacing = Design.Spacing.xs
-        let row = UIStackView(arrangedSubviews: [icon, text])
-        row.alignment = .firstBaseline
-        row.spacing = Design.Spacing.s
-        row.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(row)
+        icon.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .title3)
+        icon.translatesAutoresizingMaskIntoConstraints = false
+        flameBox.addSubview(icon)
         NSLayoutConstraint.activate([
-            row.topAnchor.constraint(equalTo: topAnchor),
-            row.bottomAnchor.constraint(equalTo: bottomAnchor),
-            row.leadingAnchor.constraint(equalTo: leadingAnchor),
-            row.trailingAnchor.constraint(equalTo: trailingAnchor)
+            flameBox.widthAnchor.constraint(equalToConstant: 36),
+            flameBox.heightAnchor.constraint(equalToConstant: 36),
+            icon.centerXAnchor.constraint(equalTo: flameBox.centerXAnchor),
+            icon.centerYAnchor.constraint(equalTo: flameBox.centerYAnchor)
         ])
+
+        titleLabel.apply(.title)
+        titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+
+        statusBadge.layer.cornerRadius = Design.Radius.badge
+        statusBadge.layer.cornerCurve = .continuous
+        statusLabel.apply(.eyebrow)
+        statusLabel.translatesAutoresizingMaskIntoConstraints = false
+        statusBadge.addSubview(statusLabel)
+        NSLayoutConstraint.activate([
+            statusLabel.topAnchor.constraint(equalTo: statusBadge.topAnchor, constant: Design.Spacing.xs),
+            statusLabel.bottomAnchor.constraint(equalTo: statusBadge.bottomAnchor, constant: -Design.Spacing.xs),
+            statusLabel.leadingAnchor.constraint(equalTo: statusBadge.leadingAnchor, constant: Design.Spacing.s),
+            statusLabel.trailingAnchor.constraint(equalTo: statusBadge.trailingAnchor, constant: -Design.Spacing.s)
+        ])
+        statusBadge.setContentHuggingPriority(.required, for: .horizontal)
+
+        let titleAndIcon = UIStackView(arrangedSubviews: [flameBox, titleLabel])
+        titleAndIcon.alignment = .center
+        titleAndIcon.spacing = Design.Spacing.m
+
+        headerRow.spacing = Design.Spacing.s
+        [titleAndIcon, statusBadge].forEach(headerRow.addArrangedSubview)
+
+        detailLabel.apply(.metadata)
+
+        dotsRow.axis = .horizontal
+        dotsRow.distribution = .fillEqually
+        dotsRow.alignment = .center
+        dotsRow.spacing = Design.Spacing.xs
+        dotsRow.isHidden = true
+
+        topStack.axis = .vertical
+        topStack.spacing = Design.Spacing.m
+        [headerRow, detailLabel, dotsRow].forEach(topStack.addArrangedSubview)
+        topStack.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(topStack)
+        NSLayoutConstraint.activate([
+            topStack.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.m),
+            topStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.Spacing.m),
+            topStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.Spacing.l),
+            topStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Design.Spacing.l)
+        ])
+
         isAccessibilityElement = true
         accessibilityIdentifier = "today_account_streak"
+        updateAxis()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: TodayStreakView, _) in
+            view.updateAxis()
+        }
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
+    private func updateAxis() {
+        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        headerRow.axis = isAX ? .vertical : .horizontal
+        headerRow.alignment = isAX ? .leading : .center
+    }
+
     func configure(_ streak: TodayStreakText) {
         titleLabel.text = streak.title
-        detailLabel.text = streak.detail
-        accessibilityLabel = streak.title + ". " + streak.detail
+        let statusTint = streak.countsToday ? Design.Color.success : Design.Color.warning
+        statusLabel.text = streak.todayStatusText
+        statusLabel.textColor = statusTint
+        statusBadge.backgroundColor = Design.Color.statusFill(statusTint)
+
+        if let dots = streak.weekDots, !dots.isEmpty {
+            detailLabel.isHidden = true
+            dotsRow.isHidden = false
+            dotsRow.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            for dot in dots {
+                dotsRow.addArrangedSubview(TodayStreakDotView(dot: dot))
+            }
+            let studiedNames = dots.filter(\.isStudied).map(\.accessibilityDayName).joined(separator: ", ")
+            accessibilityLabel = [streak.title, streak.todayStatusText, studiedNames].filter { !$0.isEmpty }.joined(separator: ". ")
+        } else {
+            dotsRow.isHidden = true
+            detailLabel.isHidden = false
+            detailLabel.text = streak.detail
+            accessibilityLabel = [streak.title, streak.todayStatusText, streak.detail].filter { !$0.isEmpty }.joined(separator: ". ")
+        }
+    }
+}
+
+private final class TodayStreakDotView: UIView {
+    private let circle = UIView()
+    private let check = UIImageView(image: UIImage(systemName: "checkmark"))
+    private let dayLabel = UILabel()
+    private let dot: TodayWeekDayDot
+
+    init(dot: TodayWeekDayDot) {
+        self.dot = dot
+        super.init(frame: .zero)
+        isAccessibilityElement = false
+
+        circle.layer.cornerRadius = 12
+        circle.translatesAutoresizingMaskIntoConstraints = false
+        check.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 10, weight: .bold)
+        check.tintColor = Design.Color.onAccent
+        check.translatesAutoresizingMaskIntoConstraints = false
+        circle.addSubview(check)
+
+        dayLabel.apply(.metadata)
+        dayLabel.textAlignment = .center
+        dayLabel.text = dot.shortLabel
+        dayLabel.textColor = dot.isToday ? Design.Color.accent : Design.Color.textSecondary
+
+        let column = UIStackView(arrangedSubviews: [circle, dayLabel])
+        column.axis = .vertical
+        column.alignment = .center
+        column.spacing = Design.Spacing.xs
+        column.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(column)
+
+        NSLayoutConstraint.activate([
+            circle.widthAnchor.constraint(equalToConstant: 24),
+            circle.heightAnchor.constraint(equalToConstant: 24),
+            check.centerXAnchor.constraint(equalTo: circle.centerXAnchor),
+            check.centerYAnchor.constraint(equalTo: circle.centerYAnchor),
+            column.topAnchor.constraint(equalTo: topAnchor),
+            column.bottomAnchor.constraint(equalTo: bottomAnchor),
+            column.leadingAnchor.constraint(equalTo: leadingAnchor),
+            column.trailingAnchor.constraint(equalTo: trailingAnchor)
+        ])
+
+        applyStyle()
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: TodayStreakDotView, _) in
+            view.applyStyle()
+        }
+    }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    private func applyStyle() {
+        if dot.isStudied {
+            circle.backgroundColor = Design.Color.warning
+            circle.layer.borderWidth = 0
+            circle.layer.borderColor = nil
+            check.isHidden = false
+            check.tintColor = .white
+        } else if dot.isToday {
+            circle.backgroundColor = .clear
+            circle.layer.borderWidth = 2
+            circle.layer.borderColor = Design.Color.accent.resolvedColor(with: traitCollection).cgColor
+            check.isHidden = true
+        } else {
+            circle.backgroundColor = Design.Color.surfaceTint
+            circle.layer.borderWidth = 0
+            circle.layer.borderColor = nil
+            check.isHidden = true
+        }
     }
 }

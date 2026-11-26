@@ -53,10 +53,25 @@ struct TodayRadarCard: Equatable {
     let detail: String?
 }
 
-/// The account streak line, from the server's own count.
+/// The account streak strip, from the server's own count and optional real per-day local history.
 struct TodayStreakText: Equatable {
     let title: String
     let detail: String
+    let days: Int
+    let countsToday: Bool
+    let todayStatusText: String
+    /// Real 7-day dots for the current week when per-day history exists on this device; `nil` otherwise (no fake dots).
+    let weekDots: [TodayWeekDayDot]?
+
+    init(title: String, detail: String, days: Int = 0, countsToday: Bool = false,
+         todayStatusText: String = "", weekDots: [TodayWeekDayDot]? = nil) {
+        self.title = title
+        self.detail = detail
+        self.days = days
+        self.countsToday = countsToday
+        self.todayStatusText = todayStatusText
+        self.weekDots = weekDots
+    }
 }
 
 struct TodayViewState: Equatable {
@@ -194,9 +209,10 @@ final class TodayPresenter {
         let radarCompletedToday = radarItem.map {
             questStore.isRadarCompleted(slug: $0.slug, ownerKey: owner, on: date, calendar: cal)
         } ?? false
+        let studiedDays = interactor.studiedDaysInCurrentWeek(ownerKey: owner, now: date)
         state.life = life?.section
         state.lessonCard = lessonSlot.map(Self.lessonCard)
-        state.streak = streak?.streak.map(Self.streakText)
+        state.streak = streak?.streak.map { Self.streakText($0, studiedDaysInWeek: studiedDays, now: date, calendar: cal) }
         state.radar = radarItem.flatMap(Self.radarCard)
         state.quest = TodayQuestAssembler.make(
             plan: plan,
@@ -274,9 +290,24 @@ final class TodayPresenter {
         return TodayRadarCard(eyebrow: item.moduleTitle, title: item.title, expression: expression, detail: detail.isEmpty ? nil : detail)
     }
 
-    static func streakText(_ streak: AccountStreak) -> TodayStreakText {
-        TodayStreakText(title: String.localizedStringWithFormat(text("%lld-day study streak"), streak.days),
-                        detail: streak.countsToday ? text("Today is counted on your account.") : text("Review an account card today to keep it going."))
+    static func streakText(_ streak: AccountStreak, studiedDaysInWeek: Set<Date> = [],
+                           now: Date = Date(), calendar: Calendar = .autoupdatingCurrent,
+                           locale: Locale = AppLanguage.current.locale) -> TodayStreakText {
+        let dots = TodayStreakStripBuilder.weekDots(
+            streak: streak,
+            studiedDaysInWeek: studiedDaysInWeek,
+            now: now,
+            calendar: calendar,
+            locale: locale
+        )
+        return TodayStreakText(
+            title: String.localizedStringWithFormat(text("%lld-day study streak"), streak.days),
+            detail: streak.countsToday ? text("Today is counted on your account.") : text("Review an account card today to keep it going."),
+            days: streak.days,
+            countsToday: streak.countsToday,
+            todayStatusText: streak.countsToday ? text("Studied today") : text("Not studied today"),
+            weekDots: dots
+        )
     }
 
     static func lessonCard(_ slot: TodayLessonSlot) -> TodayLessonCard {
