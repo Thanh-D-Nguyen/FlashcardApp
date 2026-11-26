@@ -43,6 +43,10 @@ struct HomeRow {
     var meaning: String?
     /// A single kanji: shown as a large glyph beside its meaning and readings.
     var isGlyph = false
+    /// Structured fields preserved from the level DTO for the pushed entry detail screen.
+    var onyomi: String? = nil
+    var kunyomi: String? = nil
+    var explanations: [String] = []
 }
 
 protocol HomePresenterInterface: AnyObject {
@@ -132,10 +136,28 @@ final class HomePresenter: HomePresenterInterface {
         if level == nil {
             guard levels.indices.contains(index) else { return }
             wireframe.showLevel(levels[index], kind: kind)
-        } else {
+        } else if let level {
             let row = rows[index]
-            wireframe.showMeaning(title: row.title,
-                                  message: row.detail.isEmpty ? NSLocalizedString("No meaning available yet.", comment: "") : row.detail)
+            let fallbackExplanations: [String]
+            if row.explanations.isEmpty, row.meaning == nil, !row.detail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                fallbackExplanations = [row.detail]
+            } else {
+                fallbackExplanations = row.explanations
+            }
+            let entry = LevelEntry(
+                id: row.id,
+                kind: self.kind,
+                levelCode: level.code,
+                levelName: level.localizedName(for: .current),
+                title: row.title,
+                reading: row.reading,
+                onyomi: row.onyomi,
+                kunyomi: row.kunyomi,
+                shortMeaning: row.meaning,
+                explanations: fallbackExplanations,
+                hasLessons: canShowLessons
+            )
+            wireframe.showEntry(entry, level: level)
         }
     }
 

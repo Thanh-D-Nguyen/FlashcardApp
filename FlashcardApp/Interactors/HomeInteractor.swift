@@ -25,7 +25,8 @@ final class HomeInteractor: HomeInteractorInterface {
                     return HomeRow(id: item.id, title: item.headword,
                                    subtitle: [item.reading, summary].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "),
                                    detail: detail,
-                                   reading: item.reading.flatMap { $0.isEmpty ? nil : $0 }, meaning: summary)
+                                   reading: item.reading.flatMap { $0.isEmpty ? nil : $0 }, meaning: summary,
+                                   explanations: meanings.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
                 }
             }
         case .kanji:
@@ -37,16 +38,21 @@ final class HomeInteractor: HomeInteractorInterface {
                                    detail: ([item.meaningVi].compactMap { $0 } + readings).joined(separator: "\n"),
                                    reading: readings.isEmpty ? nil : readings.joined(separator: " · "),
                                    meaning: item.meaningVi.flatMap { $0.isEmpty ? nil : $0 },
-                                   isGlyph: true)
+                                   isGlyph: true,
+                                   onyomi: item.onyomi.flatMap { $0.isEmpty ? nil : $0 },
+                                   kunyomi: item.kunyomi.flatMap { $0.isEmpty ? nil : $0 })
                 }
             }
         case .grammar:
             return api.grammar(code: code, offset: offset).map { items in
                 items.map { item in
-                    HomeRow(id: item.id, title: item.pattern, subtitle: item.meaningVi ?? "",
-                            detail: ([item.meaningVi].compactMap { $0 } + item.details.compactMap(\.explanationVi))
-                                .filter { !$0.isEmpty }.joined(separator: "\n"),
-                            meaning: item.meaningVi.flatMap { $0.isEmpty ? nil : $0 })
+                    let explanations = item.details.compactMap(\.explanationVi)
+                        .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+                    return HomeRow(id: item.id, title: item.pattern, subtitle: item.meaningVi ?? "",
+                                   detail: ([item.meaningVi].compactMap { $0 } + explanations)
+                                       .filter { !$0.isEmpty }.joined(separator: "\n"),
+                                   meaning: item.meaningVi.flatMap { $0.isEmpty ? nil : $0 },
+                                   explanations: explanations)
                 }
             }
         }

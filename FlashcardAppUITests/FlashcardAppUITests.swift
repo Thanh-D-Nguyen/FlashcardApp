@@ -37,7 +37,8 @@ final class FlashcardAppUITests: XCTestCase {
         let firstContent = content.cells.matching(NSPredicate(format: "identifier BEGINSWITH %@", "home_row_")).firstMatch
         XCTAssertTrue(firstContent.waitForExistence(timeout: 15))
         firstContent.tap()
-        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.scrollViews["level_entry_detail"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.alerts.firstMatch.exists)
     }
 
     func testLiveDictionarySearchDisplaysJapaneseAndVietnamese() {

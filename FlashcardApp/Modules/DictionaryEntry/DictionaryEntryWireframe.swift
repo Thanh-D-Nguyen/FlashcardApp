@@ -1,4 +1,3 @@
-import SafariServices
 import UIKit
 
 protocol DictionaryEntryWireframeInterface: AnyObject {
@@ -14,11 +13,14 @@ protocol DictionaryEntryWireframeInterface: AnyObject {
 
 final class DictionaryEntryWireframe: BaseWireframe<DictionaryEntryViewController> {
     private let lookUp: (String) -> Void
+    private let popsToRootOnLookUp: Bool
 
     /// `lookUp` runs the dictionary search for a text the learner selected inside an entry.
     init(item: DictionaryItem, lookUp: @escaping (String) -> Void,
+         popsToRootOnLookUp: Bool = true,
          interactor: DictionaryEntryInteractorInterface = DictionaryEntryInteractor()) {
         self.lookUp = lookUp
+        self.popsToRootOnLookUp = popsToRootOnLookUp
         let controller = DictionaryEntryViewController()
         super.init(viewController: controller)
         let presenter = DictionaryEntryPresenter(item: item, interactor: interactor, wireframe: self)
@@ -28,7 +30,7 @@ final class DictionaryEntryWireframe: BaseWireframe<DictionaryEntryViewControlle
 
 extension DictionaryEntryWireframe: DictionaryEntryWireframeInterface {
     func showEntry(_ item: DictionaryItem) {
-        navigationController?.pushWireframe(DictionaryEntryWireframe(item: item, lookUp: lookUp))
+        navigationController?.pushWireframe(DictionaryEntryWireframe(item: item, lookUp: lookUp, popsToRootOnLookUp: popsToRootOnLookUp))
     }
 
     func showDeckChooser(_ choices: [TodayDeckChoice], dictionaryDeckExists: Bool, onSelect: @escaping (DictionaryDeckTarget) -> Void) {
@@ -66,7 +68,9 @@ extension DictionaryEntryWireframe: DictionaryEntryWireframeInterface {
     }
 
     func showSearch(for text: String) {
-        navigationController?.popToRootViewController(animated: true)
+        if popsToRootOnLookUp {
+            navigationController?.popToRootViewController(animated: true)
+        }
         lookUp(text)
     }
 

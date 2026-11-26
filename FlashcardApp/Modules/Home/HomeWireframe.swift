@@ -2,7 +2,7 @@ import UIKit
 
 protocol HomeWireframeInterface: AnyObject {
     func showLevel(_ level: BJTLevelDTO, kind: HomeContentKind)
-    func showMeaning(title: String, message: String)
+    func showEntry(_ entry: LevelEntry, level: BJTLevelDTO)
     func showLessons(level: BJTLevelDTO)
 }
 
@@ -32,8 +32,8 @@ final class HomeWireframe: BaseWireframe<HomeViewController>, HomeWireframeInter
         }
     }
 
-    func showMeaning(title: String, message: String) {
-        showAlert(with: title, message: message)
+    func showEntry(_ entry: LevelEntry, level: BJTLevelDTO) {
+        navigationController?.pushWireframe(LevelEntryDetailWireframe(entry: entry, level: level))
     }
 
     func showLessons(level: BJTLevelDTO) {

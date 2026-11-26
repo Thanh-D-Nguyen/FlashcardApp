@@ -108,6 +108,10 @@
 		5F6F88F8E49DFDCCEA57D0FA /* TextRecognitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105A6EAEA0BE34090FE75AB7 /* TextRecognitionTests.swift */; };
 		6063624B7DF0681442A51E07 /* DictionaryScanPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8D815773D6D8675E9575CB /* DictionaryScanPresenter.swift */; };
 		60ED6A921E261C7B283249CE /* HomePresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFA59B81BB08C36B46B31F5 /* HomePresenterTests.swift */; };
+		C4A2056A58FD4CF6A82CA34E /* LevelEntryDetailPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5724794E55F40DA8E399BC6 /* LevelEntryDetailPresenter.swift */; };
+		6298DF11F3DC48B69B9309AC /* LevelEntryDetailWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE91F2E5E6A4DF0952F68FF /* LevelEntryDetailWireframe.swift */; };
+		142DACEFC6D741BC856ECFCE /* LevelEntryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358A14752B534E6CB3A6F78A /* LevelEntryDetailViewController.swift */; };
+		442935CA258D4CD9BBB4D136 /* LevelEntryDetailPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5389EAFBDDB7409DB2764920 /* LevelEntryDetailPresenterTests.swift */; };
 		645D1F36C8B6CD35C452D9C9 /* LotoInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E229324CCABA943BF5F3CF /* LotoInteractor.swift */; };
 		6613C63C18F8C7C0BFDA7012 /* DictionaryEntryWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42CA6B593DE7A8F09BC8B4A /* DictionaryEntryWireframe.swift */; };
 		66E62599F6024379833D481D /* TodayPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46CB83943214D0890DE16BE /* TodayPresenter.swift */; };
@@ -577,6 +581,10 @@
 		4E71F582831F4E79A91A94FB /* ReviewScheduler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReviewScheduler.swift; sourceTree = "<group>"; };
 		4FDC53D737822B61CF2AB85E /* CardReviewWireframe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardReviewWireframe.swift; sourceTree = "<group>"; };
 		4FFA59B81BB08C36B46B31F5 /* HomePresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePresenterTests.swift; sourceTree = "<group>"; };
+		B5724794E55F40DA8E399BC6 /* LevelEntryDetailPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelEntryDetailPresenter.swift; sourceTree = "<group>"; };
+		5BE91F2E5E6A4DF0952F68FF /* LevelEntryDetailWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelEntryDetailWireframe.swift; sourceTree = "<group>"; };
+		358A14752B534E6CB3A6F78A /* LevelEntryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelEntryDetailViewController.swift; sourceTree = "<group>"; };
+		5389EAFBDDB7409DB2764920 /* LevelEntryDetailPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelEntryDetailPresenterTests.swift; sourceTree = "<group>"; };
 		50EFE07F713C11937D77FC33 /* TodayLifeCardTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayLifeCardTests.swift; sourceTree = "<group>"; };
 		50FDA61F512574210B0E0CA6 /* LifeNearbyStory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeNearbyStory.swift; sourceTree = "<group>"; };
 		51B17A65BB69549CF236CA48 /* DictionaryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryEntry.swift; sourceTree = "<group>"; };
@@ -1185,6 +1193,7 @@
 			isa = PBXGroup;
 			children = (
 				4FFA59B81BB08C36B46B31F5 /* HomePresenterTests.swift */,
+				5389EAFBDDB7409DB2764920 /* LevelEntryDetailPresenterTests.swift */,
 				6A11C0DE00000000000000C2 /* LocalizationTests.swift */,
 				D2346A32827E8018BA6C793F /* LevelAPITests.swift */,
 				9321F46D68635E10E86F8D4A /* MailLoginPresenterTests.swift */,
@@ -1454,6 +1463,7 @@
 				9251ED3B29A212FC006C1D1C /* Card */,
 				9251ED0F29A2001E006C1D1C /* Setting */,
 				9251EC2F29A1EAA5006C1D1C /* Home */,
+				019CFDE3FE914D45936B58CC /* LevelEntryDetail */,
 				9251EC4629A1EAA5006C1D1C /* MailLogin */,
 				9251EC5529A1EAA5006C1D1C /* StartUp */,
 				9251EC5B29A1EAA5006C1D1C /* Main */,
@@ -1491,6 +1501,16 @@
 				ED58ED9FED4F2232282E30FB /* Cells */,
 			);
 			path = Home;
+			sourceTree = "<group>";
+		};
+		019CFDE3FE914D45936B58CC /* LevelEntryDetail */ = {
+			isa = PBXGroup;
+			children = (
+				B5724794E55F40DA8E399BC6 /* LevelEntryDetailPresenter.swift */,
+				5BE91F2E5E6A4DF0952F68FF /* LevelEntryDetailWireframe.swift */,
+				358A14752B534E6CB3A6F78A /* LevelEntryDetailViewController.swift */,
+			);
+			path = LevelEntryDetail;
 			sourceTree = "<group>";
 		};
 		9251EC4629A1EAA5006C1D1C /* MailLogin */ = {
@@ -2270,6 +2290,9 @@
 				9251EC9129A1EAA5006C1D1C /* MailLoginInteractor.swift in Sources */,
 				9251ECC829A1EAA5006C1D1C /* StartUpInteractor.swift in Sources */,
 				9251ECB129A1EAA5006C1D1C /* HomeWireframe.swift in Sources */,
+				C4A2056A58FD4CF6A82CA34E /* LevelEntryDetailPresenter.swift in Sources */,
+				6298DF11F3DC48B69B9309AC /* LevelEntryDetailWireframe.swift in Sources */,
+				142DACEFC6D741BC856ECFCE /* LevelEntryDetailViewController.swift in Sources */,
 				9251ECA829A1EAA5006C1D1C /* RoundCornerButton.swift in Sources */,
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
 				929C4DC529A74806007651E9 /* AppColor.swift in Sources */,
@@ -2483,6 +2506,7 @@
 				B29C3FBE6D78268B7CDFD89C /* BJTDictionaryAPITests.swift in Sources */,
 				1B750BB6A699B4A43DF7CF21 /* BJTBookmarkAPITests.swift in Sources */,
 				60ED6A921E261C7B283249CE /* HomePresenterTests.swift in Sources */,
+				442935CA258D4CD9BBB4D136 /* LevelEntryDetailPresenterTests.swift in Sources */,
 				6A11C0DE00000000000000C1 /* LocalizationTests.swift in Sources */,
 				5636E5D7C2043B99B3A911BF /* LevelAPITests.swift in Sources */,
 				87941E1FA68F7D98F1400D0C /* MailLoginPresenterTests.swift in Sources */,

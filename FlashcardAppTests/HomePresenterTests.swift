@@ -200,15 +200,39 @@ final class HomePresenterTests: XCTestCase {
         XCTAssertEqual(interactor.offsets, [0, 0])
     }
 
-    func testContentSelectionShowsAvailableMeaning() {
+    func testContentSelectionRoutesToLevelEntryDetailForAllKindsWithoutAlert() {
         let interactor = LevelHomeInteractorStub()
         let wireframe = LevelHomeWireframeSpy()
-        let presenter = HomePresenter(interactor: interactor, wireframe: wireframe, level: level)
+        let presenter = HomePresenter(interactor: interactor, wireframe: wireframe, level: level, kind: .vocabulary)
         presenter.viewDidLoad()
-        interactor.pages[0].onNext(makeRows(1))
+        interactor.pages[0].onNext([
+            HomeRow(id: "d5e13c40-fad5-4042-a364-b22e66b8b9b9", title: "語", subtitle: "ご · Nghĩa", detail: "Nghĩa đầy đủ",
+                    reading: "ご", meaning: "Nghĩa", explanations: ["Nghĩa đầy đủ"])
+        ])
         interactor.pages[0].onCompleted()
+
         presenter.selectRow(at: 0)
-        XCTAssertEqual(wireframe.detail, "Nghĩa đầy đủ")
+
+        XCTAssertEqual(wireframe.openedEntry?.id, "d5e13c40-fad5-4042-a364-b22e66b8b9b9")
+        XCTAssertEqual(wireframe.openedEntry?.kind, .vocabulary)
+        XCTAssertEqual(wireframe.openedEntry?.levelCode, "J5")
+        XCTAssertEqual(wireframe.openedEntry?.title, "語")
+        XCTAssertEqual(wireframe.openedEntry?.reading, "ご")
+        XCTAssertEqual(wireframe.openedEntry?.shortMeaning, "Nghĩa")
+        XCTAssertEqual(wireframe.openedEntry?.explanations, ["Nghĩa đầy đủ"])
+        XCTAssertEqual(wireframe.openedEntry?.hasLessons, true)
+        XCTAssertEqual(wireframe.openedEntryLevel?.code, "J5")
+
+        presenter.selectKind(.kanji)
+        interactor.pages[1].onNext([
+            HomeRow(id: "e40805a8-02cd-4fde-a535-8aafc5236067", title: "会", subtitle: "hội", detail: "hội",
+                    reading: "カイ · あう", meaning: "hội", isGlyph: true, onyomi: "カイ", kunyomi: "あう")
+        ])
+        interactor.pages[1].onCompleted()
+        presenter.selectRow(at: 0)
+        XCTAssertEqual(wireframe.openedEntry?.kind, .kanji)
+        XCTAssertEqual(wireframe.openedEntry?.onyomi, "カイ")
+        XCTAssertEqual(wireframe.openedEntry?.kunyomi, "あう")
     }
 
     func testLessonsAreOfferedOnlyOnALevelScreenWhoseLevelHasLessons() {
@@ -254,10 +278,11 @@ private final class LevelHomeInteractorStub: HomeInteractorInterface {
 
 private final class LevelHomeWireframeSpy: HomeWireframeInterface {
     var openedLevel: BJTLevelDTO?
-    var detail: String?
+    var openedEntry: LevelEntry?
+    var openedEntryLevel: BJTLevelDTO?
     var openedKind: HomeContentKind?
     var lessonsLevel: BJTLevelDTO?
     func showLevel(_ level: BJTLevelDTO, kind: HomeContentKind) { openedLevel = level; openedKind = kind }
-    func showMeaning(title: String, message: String) { detail = message }
+    func showEntry(_ entry: LevelEntry, level: BJTLevelDTO) { openedEntry = entry; openedEntryLevel = level }
     func showLessons(level: BJTLevelDTO) { lessonsLevel = level }
 }
