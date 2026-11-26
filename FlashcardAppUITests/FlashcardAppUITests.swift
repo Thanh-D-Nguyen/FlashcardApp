@@ -38,6 +38,9 @@ final class FlashcardAppUITests: XCTestCase {
         XCTAssertTrue(firstContent.waitForExistence(timeout: 15))
         firstContent.tap()
         XCTAssertTrue(app.scrollViews["level_entry_detail"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["level_entry_title"].exists)
+        XCTAssertTrue(app.buttons["level_entry_listen"].exists)
+        XCTAssertTrue(app.buttons["level_entry_open_dictionary"].exists)
         XCTAssertFalse(app.alerts.firstMatch.exists)
     }
 

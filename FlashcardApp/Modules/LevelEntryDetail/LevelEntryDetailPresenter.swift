@@ -71,14 +71,21 @@ struct LevelEntry: Equatable {
     }
 
     /// Text sent to Japanese TTS when the learner taps Listen.
+    /// Matches `DictionaryEntry`: vocabulary prefers its kana reading, kanji speaks its first reading,
+    /// and grammar formulas (`… いぜん`, `N + について`) disable TTS instead of reading meta-notation aloud.
     var spokenText: String? {
         switch kind {
-        case .vocabulary, .grammar:
+        case .vocabulary:
+            if let reading = Self.clean(reading), let token = Self.firstSpokenToken(reading) {
+                return token
+            }
             return Self.clean(title)
         case .kanji:
             if let kun = Self.clean(kunyomi) { return Self.firstSpokenToken(kun) }
             if let on = Self.clean(onyomi) { return Self.firstSpokenToken(on) }
             return Self.clean(title)
+        case .grammar:
+            return nil
         }
     }
 
@@ -88,8 +95,8 @@ struct LevelEntry: Equatable {
     }
 
     private static func firstSpokenToken(_ readings: String) -> String? {
-        let token = readings.split(whereSeparator: { $0 == " " || $0 == "、" || $0 == "·" || $0 == "," }).first.map(String.init) ?? readings
-        let stripped = token.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: "-", with: "")
+        let token = readings.split(whereSeparator: { $0.isWhitespace || $0 == "、" || $0 == "·" || $0 == "・" || $0 == "," || $0 == ";" }).first.map(String.init) ?? readings
+        let stripped = token.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: "-", with: "").replacingOccurrences(of: "・", with: "")
         return clean(stripped)
     }
 }

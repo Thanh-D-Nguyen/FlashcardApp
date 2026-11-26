@@ -1,3 +1,5 @@
+import RxSwift
+import UIKit
 import XCTest
 @testable import FlashcardApp
 
@@ -166,6 +168,116 @@ final class LevelEntryDetailPresenterTests: XCTestCase {
         presenter.share()
         XCTAssertEqual(wireframe.sharedText, copied)
     }
+
+    func testVocabularySpeaksFirstReadingTokenAndGrammarDisablesListenForMetaPatterns() {
+        let vocab = LevelEntry(
+            id: validUUID,
+            kind: .vocabulary,
+            levelCode: "J5",
+            levelName: "J5",
+            title: "一日",
+            reading: "ついたち いちにち",
+            onyomi: nil,
+            kunyomi: nil,
+            shortMeaning: "mùng một",
+            explanations: [],
+            hasLessons: false
+        )
+        let speech = SpeechStub()
+        let vocabPresenter = LevelEntryDetailPresenter(entry: vocab, wireframe: LevelEntryDetailWireframeSpy(),
+                                                       speech: speech, hasJapaneseVoice: { true })
+        vocabPresenter.speak()
+        XCTAssertEqual(speech.spokenText, "ついたち", "Vocabulary TTS must speak the entry's first kana reading rather than an ambiguous kanji headword")
+
+        let grammar = LevelEntry(
+            id: validUUID,
+            kind: .grammar,
+            levelCode: "J4",
+            levelName: "J4",
+            title: "… いぜん",
+            reading: nil,
+            onyomi: nil,
+            kunyomi: nil,
+            shortMeaning: "Trước khi nói tới ...",
+            explanations: ["Diễn tả tình trạng chưa đạt tới giai đoạn."],
+            hasLessons: true
+        )
+        let grammarView = LevelEntryDetailViewSpy()
+        let grammarSpeech = SpeechStub()
+        let grammarPresenter = LevelEntryDetailPresenter(entry: grammar, wireframe: LevelEntryDetailWireframeSpy(),
+                                                         speech: grammarSpeech, hasJapaneseVoice: { true })
+        grammarPresenter.view = grammarView
+        grammarPresenter.viewDidLoad()
+        grammarPresenter.speak()
+
+        XCTAssertEqual(grammarView.rendered?.canSpeak, false, "Grammar meta-patterns like '… いぜん' must not offer TTS")
+        XCTAssertNil(grammarSpeech.spokenText)
+    }
+
+    func testCrossTabLookUpLoadsColdDictionaryTabBeforeEmittingQuery() throws {
+        let entry = LevelEntry(
+            id: validUUID,
+            kind: .vocabulary,
+            levelCode: "J4",
+            levelName: "J4 — Sơ trung cấp",
+            title: "あっ",
+            reading: "あっ",
+            onyomi: nil,
+            kunyomi: nil,
+            shortMeaning: "a!; ôi",
+            explanations: [],
+            hasLessons: false
+        )
+        let detailWireframe = LevelEntryDetailWireframe(entry: entry, level: nil)
+        let detailVC = detailWireframe.viewController
+        let todayNav = UINavigationController(rootViewController: detailVC)
+
+        let dictInteractor = ColdDictionaryInteractorSpy()
+        let dictVC = DictionaryViewController()
+        let dictPresenter = DictionaryPresenter(interactor: dictInteractor, wireframe: DummyDictionaryWireframe(), debounce: .milliseconds(0))
+        dictVC.presenter = dictPresenter
+        let dictNav = UINavigationController(rootViewController: dictVC)
+
+        let tabs = UITabBarController()
+        tabs.viewControllers = [todayNav, dictNav]
+        tabs.selectedIndex = MainTab.today.rawValue
+        XCTAssertFalse(dictVC.isViewLoaded, "Precondition: Dictionary tab view has not loaded before first visit")
+
+        detailVC.presenter.openDictionaryEntry()
+        let pushedEntryVC = try XCTUnwrap(todayNav.viewControllers.last as? DictionaryEntryViewController)
+        pushedEntryVC.presenter.lookUp("会議")
+        RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+
+        XCTAssertEqual(tabs.selectedIndex, MainTab.dictionary.rawValue)
+        XCTAssertEqual(todayNav.viewControllers.count, 2, "Cross-tab lookup must preserve the source tab's navigation stack")
+        XCTAssertTrue(dictVC.isViewLoaded, "DictionaryViewController must load its view before PublishRelay query emission")
+        XCTAssertEqual(dictInteractor.searchedQueries, ["会議"])
+        XCTAssertEqual(dictInteractor.recordedQueries, ["会議"])
+    }
+}
+
+private final class ColdDictionaryInteractorSpy: DictionaryInteractorInterface {
+    var searchedQueries: [String] = []
+    var recordedQueries: [String] = []
+    var recentQueries: [String] { recordedQueries }
+    var recentItems: [DictionaryItem] { [] }
+    func search(_ query: String, type: DictionarySearchType, offset: Int) -> Single<[BJTSearchResultDTO]> {
+        searchedQueries.append(query)
+        return .just([])
+    }
+    func recordQuery(_ query: String) { recordedQueries.append(query) }
+    func removeQuery(_ query: String) {}
+    func clearQueries() {}
+    func removeItem(_ item: DictionaryItem) {}
+    func clearItems() {}
+}
+
+private final class DummyDictionaryWireframe: DictionaryWireframeInterface {
+    func showEntry(_ item: DictionaryItem) {}
+    func showSaved() {}
+    func showScanner() {}
+    func showVoice() {}
+    func showHandwriting() {}
 }
 
 private final class LevelEntryDetailViewSpy: LevelEntryDetailViewInterface {

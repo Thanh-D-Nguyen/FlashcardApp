@@ -52,9 +52,13 @@ final class LevelEntryDetailWireframe: BaseWireframe<LevelEntryDetailViewControl
         tabs.selectedIndex = MainTab.dictionary.rawValue
         let target = controllers[MainTab.dictionary.rawValue]
         let nav = target as? UINavigationController
+        if nav?.presentedViewController != nil {
+            nav?.dismiss(animated: false)
+        }
         nav?.popToRootViewController(animated: false)
         let root = nav?.viewControllers.first ?? target
         if let dictionary = root as? DictionaryViewController {
+            dictionary.loadViewIfNeeded()
             dictionary.presenter.beginSearch(text)
         }
     }
