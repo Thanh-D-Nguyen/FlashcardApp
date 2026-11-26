@@ -22,6 +22,15 @@ final class KanjiWritingQuestionsTests: XCTestCase {
         XCTAssertFalse(KanjiWritingQuestions.isRight(target: "末", candidates: ["一", "二", "三", "四", "五", "末"]))
         XCTAssertFalse(KanjiWritingQuestions.isRight(target: "末", candidates: []))
     }
+
+    func test_reversedDirectionCardsWithKanjiOnBackAreIncluded() {
+        let reversed = [StudyCard(id: "r1", front: "cuộc họp", back: "会議", reading: "かいぎ")]
+        let questions = KanjiWritingQuestions.make(from: reversed, canCheck: { _ in true })
+        XCTAssertEqual(questions.map(\.target), ["会", "議"])
+        XCTAssertEqual(questions.map(\.maskedWord), ["□議", "会□"])
+        XCTAssertEqual(questions.first?.meaning, "cuộc họp")
+        XCTAssertEqual(questions.first?.reading, "かいぎ")
+    }
 }
 
 private final class FakeRecognizer: HandwritingRecognizing {
@@ -67,6 +76,13 @@ final class KanjiWritingPresenterTests: XCTestCase {
         presenter.next()
         XCTAssertEqual(view.states.last?.phase, .finished)
         XCTAssertEqual(view.states.last?.correct, 1)
+
+        presenter.restart()
+        XCTAssertEqual(view.states.last?.phase, .writing)
+        XCTAssertEqual(view.states.last?.position, 0)
+        XCTAssertEqual(view.states.last?.correct, 0)
+        XCTAssertEqual(view.states.last?.question?.target, "会")
+        XCTAssertEqual(view.states.last?.hasInk, false)
     }
 
     func test_aRecognizerFailureLetsTheLearnerTryAgainAndADeckWithoutKanjiSaysSo() {

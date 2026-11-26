@@ -18,19 +18,26 @@ enum KanjiWritingQuestions {
         }
     }
 
-    /// Every kanji of every card whose front is Japanese, once per card and character, in deck order. Words longer than six
-    /// characters are left out: the cue would be too long to read while writing. A character the recognizer has no template for
-    /// cannot be checked and is left out too.
+    /// Every kanji of every card, once per card and character, in deck order. Checks `card.front` first; when the card is
+    /// reversed (Vietnamese on front, Japanese kanji on back), checks `card.back` with `card.front` as the meaning cue.
+    /// Words longer than six characters are left out: the cue would be too long to read while writing. A character the
+    /// recognizer has no template for cannot be checked and is left out too.
     static func make(from cards: [StudyCard], canCheck: (String) -> Bool) -> [KanjiWritingQuestion] {
-        cards.flatMap { card -> [KanjiWritingQuestion] in
-            let word = card.front.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard (1...6).contains(word.count), !card.back.isEmpty else { return [] }
+        func extract(word rawWord: String, meaning rawMeaning: String, card: StudyCard) -> [KanjiWritingQuestion] {
+            let word = rawWord.trimmingCharacters(in: .whitespacesAndNewlines)
+            let meaning = rawMeaning.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard (1...6).contains(word.count), !meaning.isEmpty else { return [] }
             var seen = Set<Character>()
             return word.enumerated().compactMap { index, character in
                 guard isKanji(character), seen.insert(character).inserted, canCheck(String(character)) else { return nil }
                 let masked = String(word.enumerated().map { $0.offset == index ? "□" : $0.element })
-                return KanjiWritingQuestion(cardID: card.id, target: String(character), maskedWord: masked, reading: card.reading, meaning: card.back)
+                return KanjiWritingQuestion(cardID: card.id, target: String(character), maskedWord: masked, reading: card.reading, meaning: meaning)
             }
+        }
+        return cards.flatMap { card -> [KanjiWritingQuestion] in
+            let frontQuestions = extract(word: card.front, meaning: card.back, card: card)
+            if !frontQuestions.isEmpty { return frontQuestions }
+            return extract(word: card.back, meaning: card.front, card: card)
         }
     }
 
@@ -71,6 +78,7 @@ protocol KanjiWritingPresenterInterface: AnyObject {
     func check()
     func next()
     func clear()
+    func restart()
 }
 
 /// Write each kanji of a deck from its reading and meaning; the app checks the drawing with the same stroke templates as the
@@ -150,6 +158,22 @@ final class KanjiWritingPresenter: KanjiWritingPresenterInterface {
             state.phase = .finished
             state.question = nil
         }
+        publish()
+    }
+
+    func restart() {
+        request.disposable = Disposables.create()
+        ink = HandwritingInk()
+        state = KanjiWritingState(
+            phase: questions.isEmpty ? .empty : .writing,
+            question: questions.first,
+            position: 0,
+            total: questions.count,
+            correct: 0,
+            hasInk: false,
+            notice: nil
+        )
+        view?.clearCanvas()
         publish()
     }
 }

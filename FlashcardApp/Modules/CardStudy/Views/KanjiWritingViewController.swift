@@ -163,7 +163,10 @@ final class KanjiWritingViewController: BaseViewController, KanjiWritingViewInte
         case .finished:
             let message = String(format: NSLocalizedString("Done: %1$lld of %2$lld recognised.", comment: "Kanji writing practice"), state.correct, state.total)
             resultLabel.text = message
-            stateView.configure(.empty(title: message, message: nil))
+            stateView.configure(.call(symbol: "checkmark.circle", title: message, message: nil,
+                                      actionTitle: NSLocalizedString("Practise again", comment: ""))) { [weak self] in
+                self?.presenter.restart()
+            }
             stateView.isHidden = false
             scrollView.isHidden = true
         }
