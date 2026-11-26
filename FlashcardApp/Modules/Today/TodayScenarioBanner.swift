@@ -55,8 +55,10 @@ final class TodayScenarioBannerView: UIControl {
         [badgeBox, titleBlock].forEach(header.addArrangedSubview)
         header.spacing = Design.Spacing.m
         header.alignment = .center
+        header.isUserInteractionEnabled = false
 
         detail.apply(.meaning)
+        detail.isUserInteractionEnabled = false
         detail.text = NSLocalizedString("A haircut, a clinic visit, the ward office, the bank… Choose what you would say and hear whether it sounds natural.",
                                         comment: "Description of the situation lessons card on Today")
 
@@ -67,6 +69,9 @@ final class TodayScenarioBannerView: UIControl {
         chipScroll.alwaysBounceHorizontal = true
         chipScroll.translatesAutoresizingMaskIntoConstraints = false
         chipScroll.addSubview(chipStack)
+        let chipTap = UITapGestureRecognizer(target: self, action: #selector(handleChipAreaTap))
+        chipTap.cancelsTouchesInView = false
+        chipScroll.addGestureRecognizer(chipTap)
         NSLayoutConstraint.activate([
             chipStack.topAnchor.constraint(equalTo: chipScroll.contentLayoutGuide.topAnchor),
             chipStack.bottomAnchor.constraint(equalTo: chipScroll.contentLayoutGuide.bottomAnchor),
@@ -83,7 +88,6 @@ final class TodayScenarioBannerView: UIControl {
         let column = UIStackView(arrangedSubviews: [header, detail, chipScroll, cta])
         column.axis = .vertical
         column.spacing = Design.Spacing.m
-        column.isUserInteractionEnabled = false
         column.translatesAutoresizingMaskIntoConstraints = false
         addSubview(column)
         NSLayoutConstraint.activate([
@@ -109,6 +113,19 @@ final class TodayScenarioBannerView: UIControl {
 
     override var isHighlighted: Bool {
         didSet { alpha = isHighlighted ? 0.85 : 1 }
+    }
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard !isHidden, isUserInteractionEnabled, alpha > 0.01, self.point(inside: point, with: event) else { return nil }
+        let chipPoint = convert(point, to: chipScroll)
+        if chipScroll.point(inside: chipPoint, with: event) {
+            return chipScroll
+        }
+        return self
+    }
+
+    @objc private func handleChipAreaTap() {
+        sendActions(for: .touchUpInside)
     }
 
     private func updateCTA() {
