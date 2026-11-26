@@ -253,8 +253,9 @@ final class StudySummaryView: UIView {
         back.text = card.back
         let tag = UILabel()
         tag.apply(.metadata)
-        tag.textColor = card.result == .incorrect ? Design.Color.warning : Design.Color.accent
-        tag.text = card.result == .incorrect ? NSLocalizedString("Incorrect", comment: "") : NSLocalizedString("Self-rating", comment: "")
+        let isIncorrect = card.result == .incorrect || card.result == .typedIncorrect
+        tag.textColor = isIncorrect ? Design.Color.warning : Design.Color.accent
+        tag.text = isIncorrect ? NSLocalizedString("Incorrect", comment: "") : NSLocalizedString("Self-rating", comment: "")
         tag.setContentHuggingPriority(.required, for: .horizontal)
         let texts = UIStackView(arrangedSubviews: [front, back, tag])
         texts.axis = .vertical
