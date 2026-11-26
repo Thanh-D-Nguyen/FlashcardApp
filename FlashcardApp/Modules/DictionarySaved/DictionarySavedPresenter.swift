@@ -46,6 +46,8 @@ final class DictionarySavedPresenter: DictionarySavedPresenterInterface {
     private var loadBag = DisposeBag()
     private var removeBag = DisposeBag()
     private var hasLoaded = false
+    /// Auth state captured on the last load; returning after signing out/in elsewhere must refresh.
+    private var signedInWhenLoaded: Bool?
     /// An entry was opened from the list: its bookmark may have changed, so the list is read again on return.
     private var needsRefresh = false
     /// Entries being removed (kind|id): a second swipe must not send a second toggle.
@@ -57,6 +59,8 @@ final class DictionarySavedPresenter: DictionarySavedPresenterInterface {
     }
 
     func viewWillAppear() {
+        let authChanged = signedInWhenLoaded != nil && signedInWhenLoaded != interactor.isSignedIn
+        if authChanged { hasLoaded = false }
         // Back from an entry the learner may have removed a bookmark there: reload the list, quietly when it is already shown.
         // Otherwise leave it as it is, so a list scrolled to page three does not collapse every time the screen reappears.
         guard !hasLoaded || needsRefresh else { return }
@@ -78,7 +82,11 @@ final class DictionarySavedPresenter: DictionarySavedPresenterInterface {
 
     private func load(showSpinner: Bool) {
         loadBag = DisposeBag()
-        guard interactor.isSignedIn else { return state.accept(.signedOut) }
+        signedInWhenLoaded = interactor.isSignedIn
+        guard interactor.isSignedIn else {
+            hasLoaded = false
+            return state.accept(.signedOut)
+        }
         if showSpinner { state.accept(.loading) }
         let kind = kind
         interactor.savedIDs(kind)

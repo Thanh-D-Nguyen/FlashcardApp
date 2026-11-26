@@ -135,6 +135,22 @@ final class DictionarySavedPresenterTests: XCTestCase {
         XCTAssertEqual(presenter.state.value, .signedOut)
     }
 
+    func testSigningOutOffScreenClearsStaleListOnReturn() {
+        interactor.ids = ["id1"]
+        presenter.viewWillAppear()
+        pump()
+        guard case .loaded = presenter.state.value else { return XCTFail("expected loaded list") }
+
+        interactor.signedIn = false
+        presenter.viewWillAppear()
+        XCTAssertEqual(presenter.state.value, .signedOut)
+
+        interactor.signedIn = true
+        presenter.viewWillAppear()
+        pump()
+        guard case .loaded = presenter.state.value else { return XCTFail("expected list to reload after signing back in") }
+    }
+
     func testRemovingTakesTheRowOutAndTheLastRowMakesItEmpty() {
         interactor.ids = ["id1", "id2"]
         presenter.viewWillAppear()

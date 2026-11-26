@@ -65,6 +65,7 @@ final class DictionarySavedViewController: BaseVC, UITableViewDataSource, UITabl
         switch state {
         case .signedOut:
             list = SavedList(items: [], pendingIDs: [], missing: 0)
+            tableView.tableFooterView = nil
             tableView.reloadData()
             stateView.isHidden = false
             stateView.configure(.call(symbol: "bookmark", title: NSLocalizedString("Sign in to see your saved entries", comment: ""),
@@ -72,17 +73,20 @@ final class DictionarySavedViewController: BaseVC, UITableViewDataSource, UITabl
                                       actionTitle: NSLocalizedString("Sign in", comment: ""))) { [weak self] in self?.presenter.signIn() }
         case .loading:
             list = SavedList(items: [], pendingIDs: [], missing: 0)
+            tableView.tableFooterView = nil
             tableView.reloadData()
             stateView.isHidden = false
             stateView.configure(.loading(NSLocalizedString("Loading…", comment: "")))
         case .empty:
             list = SavedList(items: [], pendingIDs: [], missing: 0)
+            tableView.tableFooterView = nil
             tableView.reloadData()
             stateView.isHidden = false
             stateView.configure(.empty(title: NSLocalizedString("Nothing saved yet", comment: ""),
                                        message: NSLocalizedString("Tap Save on an entry to keep it here.", comment: "")))
         case .error(let message):
             list = SavedList(items: [], pendingIDs: [], missing: 0)
+            tableView.tableFooterView = nil
             tableView.reloadData()
             stateView.isHidden = false
             stateView.configure(.error(message: message, retryTitle: NSLocalizedString("Try again", comment: ""))) { [weak self] in self?.presenter.retry() }
