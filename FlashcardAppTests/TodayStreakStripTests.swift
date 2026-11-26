@@ -1,4 +1,5 @@
 import RealmSwift
+import UIKit
 import XCTest
 @testable import FlashcardApp
 
@@ -106,5 +107,93 @@ final class TodayStreakStripTests: XCTestCase {
 
         let studied = interactor.studiedDaysInCurrentWeek(ownerKey: "u1", now: thursday)
         XCTAssertEqual(studied, Set([dayOffset(0), dayOffset(1)]))
+    }
+
+    func test_weekDotsIncludeAllServerStreakDaysAndNeverMarkTodayStudiedWhenAccountCountsTodayIsFalse() throws {
+        // Case 1: 5-day consecutive account streak including today (Thu) -> Sat..Thu were active on account,
+        // so Mon, Tue, Wed, Thu in this week must ALL be marked studied even if local device only recorded Mon.
+        let fiveDayDone = TodayPresenter.streakText(
+            AccountStreak(days: 5, countsToday: true),
+            studiedDaysInWeek: [dayOffset(0)],
+            now: thursday,
+            calendar: calendar,
+            locale: Locale(identifier: "vi_VN")
+        )
+        let doneDots = try XCTUnwrap(fiveDayDone.weekDots)
+        XCTAssertEqual(doneDots.map(\.isStudied), [true, true, true, true, false, false, false])
+
+        // Case 2: 3-day consecutive account streak ending yesterday (Mon, Tue, Wed), NOT studied on account today (Thu),
+        // even though learner answered an offline local card on Thursday. Today's dot must NOT be checked while badge says "Not studied today".
+        let threeDayAtRisk = TodayPresenter.streakText(
+            AccountStreak(days: 3, countsToday: false),
+            studiedDaysInWeek: [dayOffset(3)],
+            now: thursday,
+            calendar: calendar,
+            locale: Locale(identifier: "vi_VN")
+        )
+        let riskDots = try XCTUnwrap(threeDayAtRisk.weekDots)
+        XCTAssertEqual(riskDots.map(\.isStudied), [true, true, true, false, false, false, false])
+
+        let streakView = TodayStreakView(frame: CGRect(x: 0, y: 0, width: 343, height: 140))
+        streakView.configure(threeDayAtRisk)
+        streakView.layoutIfNeeded()
+        XCTAssertTrue(streakView.accessibilityLabel?.contains(threeDayAtRisk.detail) == true,
+                      "When today is not yet counted on the account, the reminder to review an account card must remain exposed")
+    }
+
+    func test_streakViewDotLabelsStaySingleLineWithoutVerticalWrappingAtAccessibilityXXL() throws {
+        let model = TodayPresenter.streakText(
+            AccountStreak(days: 4, countsToday: true),
+            studiedDaysInWeek: [dayOffset(0)],
+            now: thursday,
+            calendar: calendar,
+            locale: Locale(identifier: "vi_VN")
+        )
+        let window = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first
+            .map(UIWindow.init(windowScene:))
+        let host = UIViewController()
+        host.traitOverrides.preferredContentSizeCategory = .accessibilityExtraExtraLarge
+        window?.rootViewController = host
+        window?.frame = CGRect(x: 0, y: 0, width: 375, height: 600)
+        window?.makeKeyAndVisible()
+        defer { window?.isHidden = true; window?.rootViewController = nil }
+        host.loadViewIfNeeded()
+        host.view.frame = CGRect(x: 0, y: 0, width: 375, height: 600)
+        let streakView = TodayStreakView()
+        let resumeView = TodayResumeCardView()
+        streakView.translatesAutoresizingMaskIntoConstraints = false
+        resumeView.translatesAutoresizingMaskIntoConstraints = false
+        host.view.addSubview(streakView)
+        host.view.addSubview(resumeView)
+        NSLayoutConstraint.activate([
+            streakView.topAnchor.constraint(equalTo: host.view.topAnchor),
+            streakView.leadingAnchor.constraint(equalTo: host.view.leadingAnchor, constant: 16),
+            streakView.trailingAnchor.constraint(equalTo: host.view.trailingAnchor, constant: -16),
+            resumeView.topAnchor.constraint(equalTo: streakView.bottomAnchor, constant: 12),
+            resumeView.leadingAnchor.constraint(equalTo: host.view.leadingAnchor, constant: 16),
+            resumeView.trailingAnchor.constraint(equalTo: host.view.trailingAnchor, constant: -16)
+        ])
+        streakView.configure(model)
+        if let resume = TodayPresenter.resumeCard(from: .continueLesson(slug: "j5-01", title: "Chào hỏi", levelCode: "J5", answered: 3, total: 5)) {
+            resumeView.configure(resume)
+        }
+        host.view.setNeedsLayout()
+        host.view.layoutIfNeeded()
+
+        func allLabels(in root: UIView) -> [UILabel] {
+            var result: [UILabel] = []
+            for sub in root.subviews {
+                if let label = sub as? UILabel { result.append(label) }
+                result.append(contentsOf: allLabels(in: sub))
+            }
+            return result
+        }
+        let dayLabels = allLabels(in: streakView).filter { ["T2", "T3", "T4", "T5", "T6", "T7", "CN"].contains($0.text ?? "") }
+        XCTAssertEqual(dayLabels.count, 7)
+        for label in dayLabels {
+            XCTAssertLessThanOrEqual(label.bounds.height, 26, "Day label '\(label.text ?? "")' wrapped vertically at AX-XXL")
+        }
     }
 }

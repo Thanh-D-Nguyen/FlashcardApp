@@ -10,6 +10,8 @@ final class DailyRadarCardViewController: BaseViewController {
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
     private let toast = NoticeToastView()
+    private var expressionActionRows: [(row: UIStackView, listen: UIButton, save: UIButton)] = []
+    private var studyNowButton: UIButton?
 
     init(item: DailyRadarItem,
          speech: SpeechServiceInterface = SystemSpeechService.shared,
@@ -124,8 +126,7 @@ final class DailyRadarCardViewController: BaseViewController {
 
             let actionRow = UIStackView(arrangedSubviews: [listenButton, saveButton])
             actionRow.spacing = Design.Spacing.s
-            actionRow.axis = traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? .vertical : .horizontal
-            actionRow.distribution = actionRow.axis == .vertical ? .fill : .fillEqually
+            expressionActionRows.append((actionRow, listenButton, saveButton))
             column.addArrangedSubview(actionRow)
             column.setCustomSpacing(Design.Spacing.m, after: column.arrangedSubviews[column.arrangedSubviews.count - 2])
 
@@ -138,17 +139,46 @@ final class DailyRadarCardViewController: BaseViewController {
         }
         if let reason = item.reason { stack.addArrangedSubview(label(reason, style: .metadata)) }
         if let destination = item.deepLink, let onDeepLink {
-            let studyNow = UIButton(configuration: Design.Button.primary(
-                title: NSLocalizedString("Study now", comment: ""),
-                systemImage: traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? nil : "arrow.right",
-                traits: traitCollection
-            ))
-            studyNow.configuration?.imagePlacement = .trailing
+            let studyNow = UIButton(type: .system)
             studyNow.heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum).isActive = true
             studyNow.enableAdaptiveCornerStyle()
             studyNow.accessibilityIdentifier = "radar_card_study_now"
             studyNow.addAction(UIAction { _ in onDeepLink(destination) }, for: .primaryActionTriggered)
+            studyNowButton = studyNow
             stack.addArrangedSubview(studyNow)
+        }
+        updateAdaptiveActionLayout()
+        registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: DailyRadarCardViewController, _) in
+            controller.updateAdaptiveActionLayout()
+        }
+    }
+
+    private func updateAdaptiveActionLayout() {
+        let category = traitCollection.preferredContentSizeCategory
+        let isAX = category.isAccessibilityCategory
+        let stackChips = category >= .extraExtraLarge
+        for entry in expressionActionRows {
+            entry.row.axis = stackChips ? .vertical : .horizontal
+            entry.row.distribution = stackChips ? .fill : .fillProportionally
+            entry.listen.configuration = Design.Button.surfaceChip(
+                title: NSLocalizedString("Listen", comment: ""),
+                systemImage: "speaker.wave.2.fill",
+                traits: traitCollection
+            )
+            entry.save.configuration = Design.Button.surfaceChip(
+                title: NSLocalizedString("Save to deck", comment: ""),
+                systemImage: "plus.rectangle.on.folder",
+                traits: traitCollection
+            )
+        }
+        if let studyNowButton {
+            var config = Design.Button.primary(
+                title: NSLocalizedString("Study now", comment: ""),
+                systemImage: isAX ? nil : "arrow.right",
+                traits: traitCollection
+            )
+            config.imagePlacement = .trailing
+            studyNowButton.configuration = config
         }
     }
 

@@ -1,3 +1,5 @@
+import RxSwift
+import UIKit
 import XCTest
 @testable import FlashcardApp
 
@@ -704,6 +706,104 @@ final class TodayPresenterRadarTests: XCTestCase {
 
         presenter.studyRadarNow()
         XCTAssertEqual(wireframe.scenariosOpened, 1, "scenario_link deep-links to Scenarios")
+    }
+
+    func test_savingWordsFromRadarOrLifeCardReloadsTodaySoNewDeckAppearsImmediately() throws {
+        let interactor = FakeTodayInteractor()
+        interactor.result = .success(TodayPlan(kind: .noDeck))
+        let radar = FakeRadar()
+        radar.item = item
+        let hub = FakeHub()
+        let lifeLesson = try LifeLessonFixtures.lesson()
+        let lifeCard = LifeFeedMapper.card(for: lifeLesson, language: .vietnamese)
+        hub.section = TodayHubSection(
+            header: TodayLifeHubLoader.header(now: LifeLessonFixtures.morning, calendar: LifeLessonFixtures.japanCalendar),
+            cityName: "Tokyo",
+            cards: [lifeCard]
+        )
+        hub.lessons[lifeCard.id] = lifeLesson
+        let saver = SpyWordSaver()
+        let lifeSaver = SpyLifeSaver()
+        let wireframe = InteractiveRadarWireframe()
+        let view = SpyNoticeView()
+        let presenter = TodayPresenter(
+            interactor: interactor,
+            wireframe: wireframe,
+            ownerKey: { "u1" },
+            life: hub,
+            radar: radar,
+            wordSaver: saver,
+            lifeSaver: lifeSaver
+        )
+        presenter.view = view
+        presenter.viewWillAppear()
+        XCTAssertEqual(view.lastState?.hero?.action, .createDeck)
+
+        var practicePlan = TodayPlan(kind: .practice, deckID: "lesson-words", deckName: "Saved from lessons", cardCount: 1, skill: .selfRecall)
+        practicePlan.sessionCardIDs = ["c1"]
+        practicePlan.estimatedMinutes = 1
+        interactor.result = .success(practicePlan)
+
+        presenter.saveRadarToDeck()
+        wireframe.saveChoosers[0].select(.newDictionaryDeck)
+        XCTAssertEqual(view.lastState?.hero?.title, "Saved from lessons", "Creating a deck via Radar save must refresh Today's hero immediately")
+        XCTAssertEqual(view.lastState?.quest?.items.first?.action, .review, "Quest must immediately reflect the newly created deck")
+
+        var lifePlan = TodayPlan(kind: .practice, deckID: "life-learning", deckName: "Learn from Life", cardCount: 2, skill: .selfRecall)
+        lifePlan.sessionCardIDs = ["l1", "l2"]
+        lifePlan.estimatedMinutes = 1
+        interactor.result = .success(lifePlan)
+
+        presenter.saveLifeCardToDeck(id: lifeCard.id)
+        wireframe.saveChoosers[1].select(.newDictionaryDeck)
+        XCTAssertEqual(view.lastState?.hero?.title, "Learn from Life", "Creating a deck via Life save must refresh Today's hero immediately")
+    }
+
+    func test_radarCardAndDetailScreenExposeCleanAccessibilityAndAdaptiveActionLayout() {
+        let cardView = TodayRadarCardView(frame: CGRect(x: 0, y: 0, width: 320, height: 320))
+        let radarModel = TodayRadarCard(
+            eyebrow: "Tình huống công việc",
+            title: "催促メールが来た",
+            expression: "進捗はいかがでしょうか",
+            detail: "BJT J2 · 5 phút",
+            scene: .transit,
+            topic: .transit,
+            canSave: true,
+            hasDeepLink: true
+        )
+        cardView.configure(radarModel)
+        cardView.layoutIfNeeded()
+        XCTAssertEqual(cardView.accessibilityElements?.count, 4, "Headline + Listen + Save + Study without duplicate child labels")
+
+        let detail = DailyRadarCardViewController(item: item)
+        detail.traitOverrides.preferredContentSizeCategory = .extraExtraExtraLarge
+        detail.loadViewIfNeeded()
+        detail.view.frame = CGRect(x: 0, y: 0, width: 375, height: 812)
+        detail.view.setNeedsLayout()
+        detail.view.layoutIfNeeded()
+        func allStacks(in root: UIView) -> [UIStackView] {
+            var stacks: [UIStackView] = []
+            for sub in root.subviews {
+                if let stack = sub as? UIStackView { stacks.append(stack) }
+                stacks.append(contentsOf: allStacks(in: sub))
+            }
+            return stacks
+        }
+        let buttonStacks = allStacks(in: detail.view).filter { stack in
+            stack.arrangedSubviews.count == 2 && stack.arrangedSubviews.allSatisfy { $0 is UIButton }
+        }
+        XCTAssertEqual(buttonStacks.first?.axis, .vertical, "Listen + Save row must stack vertically at xxxLarge to avoid wrapping")
+    }
+}
+
+private final class SpyLifeSaver: LifeLessonInteractorInterface {
+    func loadWeather(cityID: String) -> Single<LifeLesson> { .never() }
+    func selectedCityID(ownerKey: String) -> String { "tokyo" }
+    func setSelectedCityID(_ id: String, ownerKey: String) {}
+    func deckChoices() -> [TodayDeckChoice] { [] }
+    func lifeDeckExists() -> Bool { false }
+    func saveVocabulary(_ words: [LifeLesson.Vocabulary], target: LifeSaveTarget, language: AppLanguage) throws -> LifeSaveOutcome {
+        LifeSaveOutcome(deckID: "life-learning", deckName: "Learn from Life", added: words.map(\.id), alreadyPresent: [], cardIDs: words.map(\.id))
     }
 }
 

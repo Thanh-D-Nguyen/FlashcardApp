@@ -95,7 +95,7 @@ enum TodayQuestAssembler {
         let isAllDone = completed == total
         let summary = isAllDone
             ? text("Done for today")
-            : String(format: text("%1$lld of %2$lld done"), completed, total)
+            : String.localizedStringWithFormat(text("%1$lld of %2$lld done"), completed, total)
 
         return TodayQuestState(
             title: text("Today's quest"),
@@ -112,7 +112,11 @@ enum TodayQuestAssembler {
         switch plan.kind {
         case .due, .returning:
             guard plan.dueCount > 0 else { return nil }
-            let detail = [cardsText(plan.dueCount), plan.estimatedMinutes.map(estimateText)]
+            let sessionCount = plan.sessionCardIDs.isEmpty ? plan.dueCount : plan.sessionCardIDs.count
+            let waiting = plan.backlog > 0
+                ? String.localizedStringWithFormat(text("%lld more are waiting"), plan.backlog)
+                : nil
+            let detail = [cardsText(sessionCount), plan.estimatedMinutes.map(estimateText), waiting]
                 .compactMap { $0 }
                 .joined(separator: " · ")
             return TodayQuestItem(id: "review", action: .review, title: text("Review due cards"),
@@ -142,7 +146,8 @@ enum TodayQuestAssembler {
         switch slot {
         case .continueLesson(_, let title, let levelCode, let answered, let total):
             let resolvedTitle = title ?? String(format: text("%@ lesson"), levelCode)
-            let detail = String(format: text("%lld of %lld answered"), answered, total)
+            let clampedAnswered = total > 0 ? min(answered, total) : answered
+            let detail = String.localizedStringWithFormat(text("%lld of %lld answered"), clampedAnswered, total)
             return TodayQuestItem(id: "lesson", action: .lesson, title: resolvedTitle,
                                   detail: detail, estimatedMinutes: nil, isDone: false)
         case .next(_, let title, let levelCode):
@@ -153,7 +158,7 @@ enum TodayQuestAssembler {
                                   detail: nil, estimatedMinutes: nil, isDone: false)
         case .finishedOpened(let completed):
             return TodayQuestItem(id: "lesson", action: .lesson, title: text("Pick your next lesson"),
-                                  detail: String(format: text("Lessons finished: %lld"), completed),
+                                  detail: String.localizedStringWithFormat(text("Lessons finished: %lld"), completed),
                                   estimatedMinutes: nil, isDone: false)
         }
     }

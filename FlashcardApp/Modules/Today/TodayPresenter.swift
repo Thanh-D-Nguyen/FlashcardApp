@@ -393,7 +393,7 @@ final class TodayPresenter {
             eyebrow: text("CONTINUE LESSON"),
             levelCode: levelCode,
             title: resolvedTitle,
-            detail: String(format: text("%lld of %lld answered"), clampedAnswered, total),
+            detail: String.localizedStringWithFormat(text("%lld of %lld answered"), clampedAnswered, total),
             percent: percent,
             percentText: percentText,
             progressFraction: fraction,
@@ -409,15 +409,16 @@ final class TodayPresenter {
             return TodayLessonCard(eyebrow: text("LESSONS"), title: text("Learn Japanese for work"), detail: text("Short structured lessons with practice."),
                                    ctaTitle: text("Choose a level"), action: .chooseLevel)
         case .continueLesson(let slug, let title, let levelCode, let answered, let total):
+            let clampedAnswered = total > 0 ? min(answered, total) : answered
             return TodayLessonCard(eyebrow: text("CONTINUE LESSON"), title: title ?? String(format: text("%@ lesson"), levelCode),
-                                   detail: String(format: text("%lld of %lld answered"), answered, total),
+                                   detail: String.localizedStringWithFormat(text("%lld of %lld answered"), clampedAnswered, total),
                                    ctaTitle: text("Continue"), action: .openLesson(slug: slug, title: title ?? slug))
         case .next(let slug, let title, let levelCode):
             return TodayLessonCard(eyebrow: text("NEXT LESSON"), title: title, detail: levelCode, ctaTitle: text("Start lesson"),
                                    action: .openLesson(slug: slug, title: title))
         case .finishedOpened(let completed):
             return TodayLessonCard(eyebrow: text("LESSONS"), title: text("Pick your next lesson"),
-                                   detail: String(format: text("Lessons finished: %lld"), completed), ctaTitle: text("Choose a lesson"), action: .chooseLevel)
+                                   detail: String.localizedStringWithFormat(text("Lessons finished: %lld"), completed), ctaTitle: text("Choose a lesson"), action: .chooseLevel)
         }
     }
 
@@ -512,6 +513,7 @@ extension TodayPresenter: TodayPresenterInterface {
             do {
                 let outcome = try self.wordSaver.save(words, fromLesson: "radar-\(item.slug)", to: target)
                 if outcome.added > 0 {
+                    self.reload()
                     self.view?.showNotice(String.localizedStringWithFormat(Self.text("Saved %lld new words to “%@”."), outcome.added, outcome.deckName))
                 } else {
                     self.view?.showNotice(String(format: Self.text("Already in “%@”. Nothing was added twice."), outcome.deckName))
@@ -586,6 +588,7 @@ extension TodayPresenter: TodayPresenterInterface {
                 if outcome.added.isEmpty {
                     self.view?.showNotice(String(format: Self.text("Already in “%@”. Nothing was added twice."), outcome.deckName))
                 } else {
+                    self.reload()
                     self.view?.showNotice(String.localizedStringWithFormat(Self.text("Saved %lld new words to “%@”."), outcome.added.count, outcome.deckName))
                 }
             } catch {

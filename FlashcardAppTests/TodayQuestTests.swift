@@ -1,4 +1,5 @@
 import RealmSwift
+import UIKit
 import XCTest
 @testable import FlashcardApp
 
@@ -190,6 +191,126 @@ final class TodayQuestTests: XCTestCase {
         XCTAssertEqual(view.last?.quest?.completedCount, 1)
         XCTAssertEqual(view.last?.quest?.items.last?.isDone, true)
     }
+
+    func test_reviewQuestItemWithBacklogShowsSessionCountMatchingEstimatedMinutesAndWaitingBacklog() throws {
+        var backlogPlan = TodayPlan(kind: .due, deckID: "d1", deckName: "N5", cardCount: 100, skill: .selfRecall)
+        backlogPlan.dueCount = 87
+        backlogPlan.sessionCardIDs = (1...15).map { "c\($0)" }
+        backlogPlan.estimatedMinutes = 5 // 15 cards * 20s = 5 min
+
+        let state = TodayQuestAssembler.make(
+            plan: backlogPlan,
+            lessonSlot: nil,
+            lessonCompletedToday: false,
+            radar: nil,
+            radarCompletedToday: false
+        )
+        let item = try XCTUnwrap(state?.items.first)
+        let sessionCards = String.localizedStringWithFormat(NSLocalizedString("%lld cards", comment: ""), 15)
+        let estimate = String.localizedStringWithFormat(NSLocalizedString("About %lld minutes", comment: ""), 5)
+        let waiting = String.localizedStringWithFormat(NSLocalizedString("%lld more are waiting", comment: ""), 72)
+        XCTAssertEqual(item.detail, [sessionCards, estimate, waiting].joined(separator: " · "))
+    }
+
+    func test_questCompletionResetsAcrossMidnightIntoNewCalendarDayInPresenter() throws {
+        let previousRealm = RealmService.shared.realm
+        RealmService.shared.realm = try Realm(configuration: Realm.Configuration(inMemoryIdentifier: UUID().uuidString, objectTypes: RealmService.storedTypes))
+        defer { RealmService.shared.realm = previousRealm }
+
+        let progressStore = RealmLessonProgressStore()
+        let lessonProvider = TodayLessonSlotProvider(store: progressStore, cache: SlugCacheStub())
+        let subject = LessonProgressSubject(slug: "l1", lessonId: "id-1", levelCode: "J5", sortOrder: 1, contentVersion: "v1", activityIds: ["a1"])
+        _ = try progressStore.recordAnswer(LessonAnswer(activityId: "a1", optionKey: "A"), for: subject, ownerKey: "u1", at: day)
+        _ = try progressStore.markCompleted(for: subject, ownerKey: "u1", at: day)
+
+        var donePlan = TodayPlan(kind: .doneToday, deckID: "d1", deckName: "N5", cardCount: 10, skill: .selfRecall)
+        donePlan.progress = TodayProgress(saved: 5, quizCorrect: 5, quizIncorrect: 0, selfRated: 0)
+        let interactor = MutableQuestInteractor(plan: donePlan)
+        let radar = QuestFakeRadar(item: sampleRadar(slug: "kentou", minutes: 3))
+        let view = QuestSpyView()
+        var currentNow = day
+
+        let presenter = TodayPresenter(
+            interactor: interactor,
+            wireframe: QuestFakeWireframe(),
+            ownerKey: { "u1" },
+            now: { currentNow },
+            lessons: lessonProvider,
+            radar: radar,
+            questStore: store,
+            calendar: { [unowned self] in calendar }
+        )
+        presenter.view = view
+        presenter.viewWillAppear()
+        presenter.openRadar()
+
+        XCTAssertEqual(view.last?.quest?.completedCount, 3)
+        XCTAssertEqual(view.last?.quest?.isAllDone, true)
+
+        // Advance past midnight into the next local calendar day
+        currentNow = calendar.startOfDay(for: day).addingTimeInterval(24 * 3600 + 60)
+        interactor.result = duePlan(due: 4, minutes: 2)
+        presenter.refresh()
+
+        XCTAssertEqual(view.last?.quest?.completedCount, 0, "All date-stamped quest completions must reset on the new day")
+        XCTAssertEqual(view.last?.quest?.items.map(\.isDone), [false, false, false])
+    }
+
+    func test_questRowTitlesNeverClipVerticallyAtAccessibilityXXL() throws {
+        let state = try XCTUnwrap(TodayQuestAssembler.make(
+            plan: TodayPlan(kind: .noDeck),
+            lessonSlot: .start,
+            lessonCompletedToday: false,
+            radar: sampleRadar(slug: "kentou", minutes: 4),
+            radarCompletedToday: false
+        ))
+        let window = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first
+            .map(UIWindow.init(windowScene:))
+        let host = UIViewController()
+        host.traitOverrides.preferredContentSizeCategory = .accessibilityExtraExtraLarge
+        window?.rootViewController = host
+        window?.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
+        window?.makeKeyAndVisible()
+        defer { window?.isHidden = true; window?.rootViewController = nil }
+
+        host.loadViewIfNeeded()
+        host.view.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
+        let card = TodayQuestCardView()
+        card.translatesAutoresizingMaskIntoConstraints = false
+        host.view.addSubview(card)
+        NSLayoutConstraint.activate([
+            card.topAnchor.constraint(equalTo: host.view.topAnchor),
+            card.leadingAnchor.constraint(equalTo: host.view.leadingAnchor, constant: 16),
+            card.trailingAnchor.constraint(equalTo: host.view.trailingAnchor, constant: -16)
+        ])
+        card.configure(state)
+        host.view.setNeedsLayout()
+        host.view.layoutIfNeeded()
+
+        func allLabels(in root: UIView) -> [UILabel] {
+            var found: [UILabel] = []
+            for sub in root.subviews {
+                if let label = sub as? UILabel { found.append(label) }
+                found.append(contentsOf: allLabels(in: sub))
+            }
+            return found
+        }
+        let lessonTitle = try XCTUnwrap(allLabels(in: card).first { $0.text == state.items[0].title })
+        let needed = lessonTitle.sizeThatFits(CGSize(width: lessonTitle.bounds.width, height: .greatestFiniteMagnitude))
+        XCTAssertGreaterThanOrEqual(lessonTitle.bounds.height + 1, needed.height, "Quest row title clipped vertically at AX-XXL")
+    }
+}
+
+private final class MutableQuestInteractor: TodayInteractorInterface {
+    var result: TodayPlan
+    init(plan: TodayPlan) { self.result = plan }
+    func plan(ownerKey: String, now: Date) throws -> TodayPlan { result }
+    func deckChoices() -> [TodayDeckChoice] { [] }
+    func selectDeck(id: String, ownerKey: String) {}
+    func budgetMinutes(ownerKey: String) -> Int { 5 }
+    func setBudgetMinutes(_ minutes: Int, ownerKey: String) {}
 }
 
 private final class QuestFakeInteractor: TodayInteractorInterface {

@@ -150,11 +150,13 @@ final class TodayRadarCardView: UIView {
     }
 
     private func updateLayoutForTextSize() {
-        let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        let category = traitCollection.preferredContentSizeCategory
+        let isAX = category.isAccessibilityCategory
+        let stackChips = category >= .extraExtraLarge
         badgeBox.isHidden = isAX
         inlineBadgeRow.isHidden = !isAX
-        secondaryActionsRow.axis = isAX ? .vertical : .horizontal
-        secondaryActionsRow.distribution = isAX ? .fill : .fillProportionally
+        secondaryActionsRow.axis = stackChips ? .vertical : .horizontal
+        secondaryActionsRow.distribution = stackChips ? .fill : .fillProportionally
     }
 
     func configure(_ card: TodayRadarCard) {
@@ -174,6 +176,16 @@ final class TodayRadarCardView: UIView {
             : NSLocalizedString("Read the card", comment: "Today: opens the Daily Radar card")
         updateButtonConfigs()
         updateLayoutForTextSize()
+        [sceneView, badgeBox, inlineBadgeRow, badgeLabel, inlineBadgeLabel, titleLabel, detailLabel].forEach {
+            $0.isAccessibilityElement = false
+        }
+        expressionLabel.isAccessibilityElement = true
+        expressionLabel.accessibilityTraits = .button
         expressionLabel.accessibilityLabel = [eyebrowText, card.expression, card.title, card.detail].compactMap { $0 }.joined(separator: ". ")
+        expressionLabel.accessibilityHint = studyButtonTitle
+        var elements: [Any] = [expressionLabel, listenButton]
+        if !saveButton.isHidden { elements.append(saveButton) }
+        elements.append(studyButton)
+        accessibilityElements = elements
     }
 }

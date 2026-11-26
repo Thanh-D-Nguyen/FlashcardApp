@@ -17,6 +17,7 @@ struct TodayResumeCard: Equatable {
 /// Compact pinned resume card with a real progress bar, real percentage, and direct resume action.
 final class TodayResumeCardView: UIControl {
     private let eyebrowLabel = UILabel()
+    private let topSpacer = UIView()
     private let levelBadge = UIView()
     private let levelLabel = UILabel()
     private let topRow = UIStackView()
@@ -25,6 +26,7 @@ final class TodayResumeCardView: UIControl {
     private let progressFill = UIView()
     private var progressWidthConstraint: NSLayoutConstraint?
     private let detailLabel = UILabel()
+    private let metaSpacer = UIView()
     private let percentLabel = UILabel()
     private let progressMetaRow = UIStackView()
     private let ctaLabel = UILabel()
@@ -56,7 +58,7 @@ final class TodayResumeCardView: UIControl {
 
         topRow.spacing = Design.Spacing.s
         topRow.isUserInteractionEnabled = false
-        [eyebrowLabel, UIView(), levelBadge].forEach(topRow.addArrangedSubview)
+        [eyebrowLabel, topSpacer, levelBadge].forEach(topRow.addArrangedSubview)
 
         titleLabel.apply(.headword)
         titleLabel.font = Design.TextRole.weighted(.title3, weight: .semibold)
@@ -85,7 +87,7 @@ final class TodayResumeCardView: UIControl {
 
         progressMetaRow.spacing = Design.Spacing.s
         progressMetaRow.isUserInteractionEnabled = false
-        [detailLabel, UIView(), percentLabel].forEach(progressMetaRow.addArrangedSubview)
+        [detailLabel, metaSpacer, percentLabel].forEach(progressMetaRow.addArrangedSubview)
 
         ctaLabel.apply(.title)
         ctaLabel.textColor = Design.Color.accent
@@ -130,8 +132,10 @@ final class TodayResumeCardView: UIControl {
         let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
         topRow.axis = isAX ? .vertical : .horizontal
         topRow.alignment = isAX ? .leading : .center
+        topSpacer.isHidden = isAX
         progressMetaRow.axis = isAX ? .vertical : .horizontal
         progressMetaRow.alignment = isAX ? .leading : .center
+        metaSpacer.isHidden = isAX
     }
 
     func configure(_ card: TodayResumeCard) {

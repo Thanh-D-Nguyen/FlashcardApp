@@ -28,6 +28,12 @@ enum TodayStreakStripBuilder {
         let weekStart = currentWeekStart(for: now, calendar: calendar)
         let todayStart = calendar.startOfDay(for: now)
         let normalizedStudied = Set(studiedDaysInWeek.map { calendar.startOfDay(for: $0) })
+        let streakEnd = streak.countsToday
+            ? todayStart
+            : (calendar.date(byAdding: .day, value: -1, to: todayStart) ?? todayStart)
+        let streakStart = streak.days > 0
+            ? (calendar.date(byAdding: .day, value: -(streak.days - 1), to: streakEnd) ?? streakEnd)
+            : nil
 
         let shortFormatter = DateFormatter()
         shortFormatter.locale = locale
@@ -46,7 +52,15 @@ enum TodayStreakStripBuilder {
             let dayStart = calendar.startOfDay(for: day)
             let isToday = dayStart == todayStart
             let isFuture = dayStart > todayStart
-            let isStudied = !isFuture && (normalizedStudied.contains(dayStart) || (isToday && streak.countsToday))
+            let inServerStreak = streakStart.map { dayStart >= $0 && dayStart <= streakEnd } ?? false
+            let isStudied: Bool
+            if isFuture {
+                isStudied = false
+            } else if isToday {
+                isStudied = streak.countsToday
+            } else {
+                isStudied = inServerStreak || normalizedStudied.contains(dayStart)
+            }
             return TodayWeekDayDot(
                 dayStart: dayStart,
                 shortLabel: shortFormatter.string(from: dayStart),
@@ -195,6 +209,7 @@ final class TodayStreakView: UIView {
             statusLabel.trailingAnchor.constraint(equalTo: statusBadge.trailingAnchor, constant: -Design.Spacing.s)
         ])
         statusBadge.setContentHuggingPriority(.required, for: .horizontal)
+        statusBadge.setContentCompressionResistancePriority(.required, for: .horizontal)
 
         let titleAndIcon = UIStackView(arrangedSubviews: [flameBox, titleLabel])
         titleAndIcon.alignment = .center
@@ -247,14 +262,16 @@ final class TodayStreakView: UIView {
         statusBadge.backgroundColor = Design.Color.statusFill(statusTint)
 
         if let dots = streak.weekDots, !dots.isEmpty {
-            detailLabel.isHidden = true
+            detailLabel.text = streak.detail
+            detailLabel.isHidden = streak.countsToday
             dotsRow.isHidden = false
             dotsRow.arrangedSubviews.forEach { $0.removeFromSuperview() }
             for dot in dots {
                 dotsRow.addArrangedSubview(TodayStreakDotView(dot: dot))
             }
             let studiedNames = dots.filter(\.isStudied).map(\.accessibilityDayName).joined(separator: ", ")
-            accessibilityLabel = [streak.title, streak.todayStatusText, studiedNames].filter { !$0.isEmpty }.joined(separator: ". ")
+            let reminder = streak.countsToday ? "" : streak.detail
+            accessibilityLabel = [streak.title, streak.todayStatusText, reminder, studiedNames].filter { !$0.isEmpty }.joined(separator: ". ")
         } else {
             dotsRow.isHidden = true
             detailLabel.isHidden = false
@@ -282,7 +299,12 @@ private final class TodayStreakDotView: UIView {
         check.translatesAutoresizingMaskIntoConstraints = false
         circle.addSubview(check)
 
-        dayLabel.apply(.metadata)
+        dayLabel.font = UIFontMetrics(forTextStyle: .footnote)
+            .scaledFont(for: .systemFont(ofSize: 12, weight: .medium), maximumPointSize: 18)
+        dayLabel.adjustsFontForContentSizeCategory = true
+        dayLabel.numberOfLines = 1
+        dayLabel.adjustsFontSizeToFitWidth = true
+        dayLabel.minimumScaleFactor = 0.7
         dayLabel.textAlignment = .center
         dayLabel.text = dot.shortLabel
         dayLabel.textColor = dot.isToday ? Design.Color.accent : Design.Color.textSecondary

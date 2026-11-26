@@ -245,11 +245,14 @@ private final class TodayQuestRowControl: UIControl {
         iconView.isAccessibilityElement = false
 
         titleLabel.apply(.meaning)
+        titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         detailLabel.apply(.metadata)
+        detailLabel.setContentCompressionResistancePriority(.required, for: .vertical)
 
         chevron.tintColor = Design.Color.textSecondary
         chevron.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .footnote)
         chevron.setContentHuggingPriority(.required, for: .horizontal)
+        chevron.setContentCompressionResistancePriority(.required, for: .horizontal)
         chevron.isAccessibilityElement = false
 
         separator.backgroundColor = Design.Color.separator
@@ -258,6 +261,7 @@ private final class TodayQuestRowControl: UIControl {
         let textStack = UIStackView(arrangedSubviews: [titleLabel, detailLabel])
         textStack.axis = .vertical
         textStack.spacing = 2
+        textStack.setContentCompressionResistancePriority(.required, for: .vertical)
         textStack.isUserInteractionEnabled = false
 
         let row = UIStackView(arrangedSubviews: [iconView, textStack, chevron])
@@ -270,6 +274,7 @@ private final class TodayQuestRowControl: UIControl {
         addSubview(separator)
         NSLayoutConstraint.activate([
             heightAnchor.constraint(greaterThanOrEqualToConstant: Design.HitTarget.minimum),
+            row.heightAnchor.constraint(greaterThanOrEqualTo: textStack.heightAnchor),
             row.topAnchor.constraint(equalTo: topAnchor, constant: Design.Spacing.s + 2),
             row.bottomAnchor.constraint(equalTo: separator.topAnchor, constant: -(Design.Spacing.s + 2)),
             row.leadingAnchor.constraint(equalTo: leadingAnchor),

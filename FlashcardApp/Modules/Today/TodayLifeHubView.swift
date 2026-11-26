@@ -232,7 +232,9 @@ final class LifeTopicCardView: UIView {
         button.isHidden = busy || isReady || card.ctaTitle.isEmpty
         quickActionsStack.isHidden = !isReady
         if isReady {
-            let isAX = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+            let category = traitCollection.preferredContentSizeCategory
+            let isAX = category.isAccessibilityCategory
+            let stackChips = category >= .extraExtraLarge
             let hasVocab = !(card.lesson?.vocabulary.isEmpty ?? true)
             listenButton.isHidden = card.headlineJapanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             saveButton.isHidden = !hasVocab
@@ -254,8 +256,8 @@ final class LifeTopicCardView: UIView {
             studyConfig.imagePlacement = .trailing
             studyButton.configuration = studyConfig
             quickChipRow.isHidden = listenButton.isHidden && saveButton.isHidden
-            quickChipRow.axis = isAX ? .vertical : .horizontal
-            quickChipRow.distribution = isAX ? .fill : .fillProportionally
+            quickChipRow.axis = stackChips ? .vertical : .horizontal
+            quickChipRow.distribution = stackChips ? .fill : .fillProportionally
             listenButton.accessibilityIdentifier = "life_card_listen_\(card.id)"
             saveButton.accessibilityIdentifier = "life_card_save_\(card.id)"
             studyButton.accessibilityIdentifier = "life_card_study_\(card.id)"
