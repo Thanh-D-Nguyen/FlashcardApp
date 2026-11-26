@@ -178,7 +178,6 @@
 		9209760F29A7887800ECF29C /* RCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209760E29A7887800ECF29C /* RCard.swift */; };
 		9209761129A7AC4C00ECF29C /* DeskManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761029A7AC4C00ECF29C /* DeskManagement.swift */; };
 		9209761329A7B2AC00ECF29C /* CardManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9209761229A7B2AC00ECF29C /* CardManagement.swift */; };
-		9226D80929D00C1B0042F6DA /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D80829D00C1B0042F6DA /* PlaceholderView.swift */; };
 		9226D80B29D00C520042F6DA /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9226D80A29D00C520042F6DA /* Atomic.swift */; };
 		924052DF29AB398C00B47E09 /* CreateDeskPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */; };
 		924052E029AB398C00B47E09 /* CreateDeskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924052DB29AB398C00B47E09 /* CreateDeskViewController.swift */; };
@@ -203,10 +202,7 @@
 		9251EC9A29A1EAA5006C1D1C /* StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC1D29A1EAA5006C1D1C /* StackView.swift */; };
 		9251EC9B29A1EAA5006C1D1C /* Storyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC1E29A1EAA5006C1D1C /* Storyboard.swift */; };
 		9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC1F29A1EAA5006C1D1C /* Font.swift */; };
-		9251EC9D29A1EAA5006C1D1C /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC2029A1EAA5006C1D1C /* Color.swift */; };
 		9251EC9E29A1EAA5006C1D1C /* BaseNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC2129A1EAA5006C1D1C /* BaseNavigationController.swift */; };
-		9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC2C29A1EAA5006C1D1C /* RoundCornerView.swift */; };
-		9251ECA829A1EAA5006C1D1C /* RoundCornerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC2D29A1EAA5006C1D1C /* RoundCornerButton.swift */; };
 		9251ECB029A1EAA5006C1D1C /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC3829A1EAA5006C1D1C /* HomeViewController.swift */; };
 		9251ECB129A1EAA5006C1D1C /* HomeWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC3929A1EAA5006C1D1C /* HomeWireframe.swift */; };
 		9251ECB229A1EAA5006C1D1C /* HomePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251EC3A29A1EAA5006C1D1C /* HomePresenter.swift */; };
@@ -240,7 +236,6 @@
 		9251ED1929A20040006C1D1C /* SettingWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1429A20040006C1D1C /* SettingWireframe.swift */; };
 		9251ED1D29A20341006C1D1C /* AccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1B29A20341006C1D1C /* AccountCell.swift */; };
 		9251ED2129A2074D006C1D1C /* SettingsRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED1F29A2074D006C1D1C /* SettingsRowCell.swift */; };
-		9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */; };
 		9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3129A212E9006C1D1C /* CardPresenter.swift */; };
 		9251ED3729A212E9006C1D1C /* CardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3229A212E9006C1D1C /* CardViewController.swift */; };
 		9251ED3929A212E9006C1D1C /* CardWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED3429A212E9006C1D1C /* CardWireframe.swift */; };
@@ -250,7 +245,6 @@
 		9251ED4629A2133A006C1D1C /* DictionaryWireframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */; };
 		9291705A29AB672800894551 /* AppImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291705929AB672800894551 /* AppImages.swift */; };
 		929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DBC29A733A2007651E9 /* CardEntity.swift */; };
-		929C4DC529A74806007651E9 /* AppColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DC429A74806007651E9 /* AppColor.swift */; };
 		929C4DC829A74CAE007651E9 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 929C4DC729A74CAE007651E9 /* Kingfisher */; };
 		929C4DD729A76442007651E9 /* DeskInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD229A76442007651E9 /* DeskInteractor.swift */; };
 		929C4DDA29A7646F007651E9 /* DeskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929C4DD929A7646F007651E9 /* DeskEntity.swift */; };
@@ -667,7 +661,6 @@
 		9209760E29A7887800ECF29C /* RCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCard.swift; sourceTree = "<group>"; };
 		9209761029A7AC4C00ECF29C /* DeskManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskManagement.swift; sourceTree = "<group>"; };
 		9209761229A7B2AC00ECF29C /* CardManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardManagement.swift; sourceTree = "<group>"; };
-		9226D80829D00C1B0042F6DA /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		9226D80A29D00C520042F6DA /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
 		922D9700525ED459F6B57BF3 /* MagazineArticleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagazineArticleViewController.swift; sourceTree = "<group>"; };
 		924052DA29AB398C00B47E09 /* CreateDeskPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateDeskPresenter.swift; sourceTree = "<group>"; };
@@ -697,10 +690,7 @@
 		9251EC1D29A1EAA5006C1D1C /* StackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackView.swift; sourceTree = "<group>"; };
 		9251EC1E29A1EAA5006C1D1C /* Storyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storyboard.swift; sourceTree = "<group>"; };
 		9251EC1F29A1EAA5006C1D1C /* Font.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
-		9251EC2029A1EAA5006C1D1C /* Color.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		9251EC2129A1EAA5006C1D1C /* BaseNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseNavigationController.swift; sourceTree = "<group>"; };
-		9251EC2C29A1EAA5006C1D1C /* RoundCornerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundCornerView.swift; sourceTree = "<group>"; };
-		9251EC2D29A1EAA5006C1D1C /* RoundCornerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundCornerButton.swift; sourceTree = "<group>"; };
 		9251EC3829A1EAA5006C1D1C /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		9251EC3929A1EAA5006C1D1C /* HomeWireframe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeWireframe.swift; sourceTree = "<group>"; };
 		9251EC3A29A1EAA5006C1D1C /* HomePresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomePresenter.swift; sourceTree = "<group>"; };
@@ -735,7 +725,6 @@
 		9251ED1429A20040006C1D1C /* SettingWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingWireframe.swift; sourceTree = "<group>"; };
 		9251ED1B29A20341006C1D1C /* AccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCell.swift; sourceTree = "<group>"; };
 		9251ED1F29A2074D006C1D1C /* SettingsRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowCell.swift; sourceTree = "<group>"; };
-		9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedImageView.swift; sourceTree = "<group>"; };
 		9251ED3129A212E9006C1D1C /* CardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPresenter.swift; sourceTree = "<group>"; };
 		9251ED3229A212E9006C1D1C /* CardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewController.swift; sourceTree = "<group>"; };
 		9251ED3429A212E9006C1D1C /* CardWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardWireframe.swift; sourceTree = "<group>"; };
@@ -745,7 +734,6 @@
 		9251ED4129A2133A006C1D1C /* DictionaryWireframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryWireframe.swift; sourceTree = "<group>"; };
 		9291705929AB672800894551 /* AppImages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppImages.swift; sourceTree = "<group>"; };
 		929C4DBC29A733A2007651E9 /* CardEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardEntity.swift; sourceTree = "<group>"; };
-		929C4DC429A74806007651E9 /* AppColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColor.swift; sourceTree = "<group>"; };
 		929C4DD229A76442007651E9 /* DeskInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskInteractor.swift; sourceTree = "<group>"; };
 		929C4DD929A7646F007651E9 /* DeskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskEntity.swift; sourceTree = "<group>"; };
 		92B3A16E2C01B71600013599 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
@@ -1424,7 +1412,6 @@
 				9251EC1D29A1EAA5006C1D1C /* StackView.swift */,
 				9251EC1E29A1EAA5006C1D1C /* Storyboard.swift */,
 				9251EC1F29A1EAA5006C1D1C /* Font.swift */,
-				9251EC2029A1EAA5006C1D1C /* Color.swift */,
 				92B3A16E2C01B71600013599 /* Image.swift */,
 			);
 			path = Extensions;
@@ -1433,10 +1420,6 @@
 		9251EC2229A1EAA5006C1D1C /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9251EC2C29A1EAA5006C1D1C /* RoundCornerView.swift */,
-				9251EC2D29A1EAA5006C1D1C /* RoundCornerButton.swift */,
-				9251ED2329A20DBD006C1D1C /* RoundedImageView.swift */,
-				9226D80829D00C1B0042F6DA /* PlaceholderView.swift */,
 				55AFC78D9266C6D8BE5ABCAE /* StateView.swift */,
 				555DF104B67AC6EAD8F3542B /* LifeSceneView.swift */,
 				B1575B578C6A276BCF1B2746 /* CardImageView.swift */,
@@ -1598,7 +1581,6 @@
 			children = (
 				9251EC7F29A1EAA5006C1D1C /* Constants.swift */,
 				9251EC8029A1EAA5006C1D1C /* Enums.swift */,
-				929C4DC429A74806007651E9 /* AppColor.swift */,
 				D5A0000200000000000000A1 /* DesignSystem.swift */,
 				6A11C0DE00000000000000B2 /* AppLanguage.swift */,
 				9291705929AB672800894551 /* AppImages.swift */,
@@ -2254,7 +2236,6 @@
 				BE42BB9A8F00D8A1DB58165F /* DataExportViewController.swift in Sources */,
 				A84E39FF67691D3D40C30CDD /* DataExportPresenter.swift in Sources */,
 				9251ED1929A20040006C1D1C /* SettingWireframe.swift in Sources */,
-				9251EC9D29A1EAA5006C1D1C /* Color.swift in Sources */,
 				9251ECEA29A1EAA5006C1D1C /* Enums.swift in Sources */,
 				929C4DBD29A733A2007651E9 /* CardEntity.swift in Sources */,
 				9251ED1829A20040006C1D1C /* SettingInteractor.swift in Sources */,
@@ -2272,9 +2253,7 @@
 				C4A2056A58FD4CF6A82CA34E /* LevelEntryDetailPresenter.swift in Sources */,
 				6298DF11F3DC48B69B9309AC /* LevelEntryDetailWireframe.swift in Sources */,
 				142DACEFC6D741BC856ECFCE /* LevelEntryDetailViewController.swift in Sources */,
-				9251ECA829A1EAA5006C1D1C /* RoundCornerButton.swift in Sources */,
 				9251ECD029A1EAA5006C1D1C /* MainTabbarController.swift in Sources */,
-				929C4DC529A74806007651E9 /* AppColor.swift in Sources */,
 				D5A0000100000000000000A1 /* DesignSystem.swift in Sources */,
 				6A11C0DE00000000000000B1 /* AppLanguage.swift in Sources */,
 				9251ED3629A212E9006C1D1C /* CardPresenter.swift in Sources */,
@@ -2302,12 +2281,9 @@
 				9251ECE629A1EAA5006C1D1C /* RealmService.swift in Sources */,
 				9251EC9C29A1EAA5006C1D1C /* Font.swift in Sources */,
 				924052E229AB398C00B47E09 /* CreateDeskWireframe.swift in Sources */,
-				9251ED2429A20DBD006C1D1C /* RoundedImageView.swift in Sources */,
-				9251ECA729A1EAA5006C1D1C /* RoundCornerView.swift in Sources */,
 				9251EC9E29A1EAA5006C1D1C /* BaseNavigationController.swift in Sources */,
 				9251ED3929A212E9006C1D1C /* CardWireframe.swift in Sources */,
 				9251EC9429A1EAA5006C1D1C /* BaseViewControler.swift in Sources */,
-				9226D80929D00C1B0042F6DA /* PlaceholderView.swift in Sources */,
 				72796A297CC9F326ADC45E12 /* UserPreferences.swift in Sources */,
 				862184A154A58EB864D04742 /* StateView.swift in Sources */,
 				6B9CF3EBCDA467DC17D545BD /* LifeSceneView.swift in Sources */,
