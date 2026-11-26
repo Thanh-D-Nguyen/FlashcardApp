@@ -154,7 +154,7 @@ final class TodayRadarCardView: UIView {
         badgeBox.isHidden = isAX
         inlineBadgeRow.isHidden = !isAX
         secondaryActionsRow.axis = isAX ? .vertical : .horizontal
-        secondaryActionsRow.distribution = isAX ? .fill : .fillEqually
+        secondaryActionsRow.distribution = isAX ? .fill : .fillProportionally
     }
 
     func configure(_ card: TodayRadarCard) {

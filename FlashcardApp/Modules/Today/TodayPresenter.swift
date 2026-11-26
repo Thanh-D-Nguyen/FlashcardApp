@@ -183,6 +183,9 @@ final class TodayPresenter {
 
     private var plan: TodayPlan?
     private var state: TodayViewState?
+    private var cachedLessonSlot: TodayLessonSlot?
+    private var cachedLessonCompletedToday = false
+    private var cachedStudiedDays: Set<Date> = []
 
     /// `life` is optional so that the review block can be exercised alone: without it Today shows no lesson offer.
     init(interactor: TodayInteractorInterface, wireframe: TodayWireframeInterface,
@@ -227,8 +230,13 @@ final class TodayPresenter {
 
     private func reload() {
         let owner = ownerKey()
+        let date = now()
+        let cal = calendar()
+        cachedLessonSlot = lessons?.slot(ownerKey: owner)
+        cachedLessonCompletedToday = lessons?.completedToday(ownerKey: owner, now: date, calendar: cal) ?? false
+        cachedStudiedDays = interactor.studiedDaysInCurrentWeek(ownerKey: owner, now: date)
         do {
-            let plan = try interactor.plan(ownerKey: owner, now: now())
+            let plan = try interactor.plan(ownerKey: owner, now: date)
             self.plan = plan
             publish(Self.makeState(plan))
             life?.refresh()
@@ -251,13 +259,13 @@ final class TodayPresenter {
         let owner = ownerKey()
         let date = now()
         let cal = calendar()
-        let lessonSlot = lessons?.slot(ownerKey: owner)
-        let lessonCompletedToday = lessons?.completedToday(ownerKey: owner, now: date, calendar: cal) ?? false
+        let lessonSlot = cachedLessonSlot
+        let lessonCompletedToday = cachedLessonCompletedToday
         let radarItem = radar?.item
         let radarCompletedToday = radarItem.map {
             questStore.isRadarCompleted(slug: $0.slug, ownerKey: owner, on: date, calendar: cal)
         } ?? false
-        let studiedDays = interactor.studiedDaysInCurrentWeek(ownerKey: owner, now: date)
+        let studiedDays = cachedStudiedDays
         state.life = life?.section
         state.lessonCard = lessonSlot.map(Self.lessonCard)
         state.resumeCard = lessonSlot.flatMap { Self.resumeCard(from: $0, locale: language().locale) }

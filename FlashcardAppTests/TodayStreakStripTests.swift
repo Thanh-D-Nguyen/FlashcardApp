@@ -74,9 +74,10 @@ final class TodayStreakStripTests: XCTestCase {
     }
 
     func test_interactorReadsRealStudiedDaysInCurrentWeekFromRealmAttemptsAndLessons() throws {
+        let previousRealm = RealmService.shared.realm
         let realm = try Realm(configuration: Realm.Configuration(inMemoryIdentifier: "streak-\(UUID().uuidString)", objectTypes: RealmService.storedTypes))
         RealmService.shared.realm = realm
-        defer { RealmService.shared.realm = nil }
+        defer { RealmService.shared.realm = previousRealm }
 
         let decks = DeskManagement()
         let history = RealmReviewHistoryStore()

@@ -132,8 +132,9 @@ final class TodayQuestTests: XCTestCase {
     // MARK: Lesson completed today from real Realm progress
 
     func test_lessonCompletedTodayChecksRealLocalCalendarDay() throws {
+        let previousRealm = RealmService.shared.realm
         RealmService.shared.realm = try Realm(configuration: Realm.Configuration(inMemoryIdentifier: UUID().uuidString, objectTypes: RealmService.storedTypes))
-        defer { RealmService.shared.realm = nil }
+        defer { RealmService.shared.realm = previousRealm }
         let progressStore = RealmLessonProgressStore()
         let provider = TodayLessonSlotProvider(store: progressStore, cache: SlugCacheStub())
         let subject = LessonProgressSubject(slug: "l1", lessonId: "id-1", levelCode: "J5", sortOrder: 1, contentVersion: "v1", activityIds: ["a1"])

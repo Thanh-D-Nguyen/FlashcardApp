@@ -255,7 +255,7 @@ final class LifeTopicCardView: UIView {
             studyButton.configuration = studyConfig
             quickChipRow.isHidden = listenButton.isHidden && saveButton.isHidden
             quickChipRow.axis = isAX ? .vertical : .horizontal
-            quickChipRow.distribution = isAX ? .fill : .fillEqually
+            quickChipRow.distribution = isAX ? .fill : .fillProportionally
             listenButton.accessibilityIdentifier = "life_card_listen_\(card.id)"
             saveButton.accessibilityIdentifier = "life_card_save_\(card.id)"
             studyButton.accessibilityIdentifier = "life_card_study_\(card.id)"

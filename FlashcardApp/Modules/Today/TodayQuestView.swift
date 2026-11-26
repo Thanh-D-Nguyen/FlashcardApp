@@ -21,7 +21,11 @@ final class TodayQuestProgressRingView: UIView {
         layer.addSublayer(trackLayer)
         layer.addSublayer(progressLayer)
 
-        countLabel.apply(.figure)
+        countLabel.font = UIFontMetrics(forTextStyle: .footnote)
+            .scaledFont(for: .monospacedDigitSystemFont(ofSize: 13, weight: .semibold), maximumPointSize: 16)
+        countLabel.textColor = Design.Color.textPrimary
+        countLabel.adjustsFontForContentSizeCategory = true
+        countLabel.numberOfLines = 1
         countLabel.textAlignment = .center
         countLabel.adjustsFontSizeToFitWidth = true
         countLabel.minimumScaleFactor = 0.7
@@ -35,8 +39,8 @@ final class TodayQuestProgressRingView: UIView {
         addSubview(doneCheck)
 
         NSLayoutConstraint.activate([
-            widthAnchor.constraint(equalToConstant: 48),
-            heightAnchor.constraint(equalToConstant: 48),
+            widthAnchor.constraint(equalToConstant: 52),
+            heightAnchor.constraint(equalToConstant: 52),
             countLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             countLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
             countLabel.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 6),
@@ -113,6 +117,7 @@ final class TodayQuestCardView: UIView {
     private let titleLabel = UILabel()
     private let summaryLabel = UILabel()
     private let doneBadge = UIView()
+    private let doneBadgeHolder = UIStackView()
     private let doneBadgeIcon = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
     private let doneBadgeLabel = UILabel()
     private let ringView = TodayQuestProgressRingView()
@@ -152,9 +157,11 @@ final class TodayQuestCardView: UIView {
             badgeRow.trailingAnchor.constraint(equalTo: doneBadge.trailingAnchor, constant: -Design.Spacing.s)
         ])
 
-        let badgeHolder = UIStackView(arrangedSubviews: [doneBadge, UIView()])
-        badgeHolder.axis = .horizontal
-        let titleColumn = UIStackView(arrangedSubviews: [titleLabel, summaryLabel, badgeHolder])
+        doneBadgeHolder.axis = .horizontal
+        doneBadgeHolder.addArrangedSubview(doneBadge)
+        doneBadgeHolder.addArrangedSubview(UIView())
+        doneBadgeHolder.isHidden = true
+        let titleColumn = UIStackView(arrangedSubviews: [titleLabel, summaryLabel, doneBadgeHolder])
         titleColumn.axis = .vertical
         titleColumn.spacing = Design.Spacing.xs
 
@@ -199,6 +206,7 @@ final class TodayQuestCardView: UIView {
         summaryLabel.text = state.summary
         summaryLabel.textColor = state.isAllDone ? Design.Color.success : Design.Color.textPrimary
         doneBadge.isHidden = !state.isAllDone
+        doneBadgeHolder.isHidden = !state.isAllDone
         doneBadgeLabel.text = state.completionTitle
         ringView.configure(completed: state.completedCount, total: state.totalCount, fraction: state.progressFraction, animated: true)
 
