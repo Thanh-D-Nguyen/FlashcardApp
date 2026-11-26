@@ -172,7 +172,7 @@ final class RemoteDeckViewController: BaseViewController, RemoteDeckViewInterfac
                 self?.presenter.shareLink()
             })
             if state.isShared {
-                children.append(UIAction(title: NSLocalizedString("Stop sharing", comment: ""), image: UIImage(systemName: "link.badge.plus")) { [weak self] _ in
+                children.append(UIAction(title: NSLocalizedString("Stop sharing", comment: ""), image: UIImage(systemName: "xmark.circle")) { [weak self] _ in
                     self?.presenter.stopSharing()
                 })
             }

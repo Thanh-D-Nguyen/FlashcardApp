@@ -584,7 +584,8 @@ private extension SettingPresenter {
                     id: "about",
                     title: NSLocalizedString("About Flashcard", comment: ""),
                     iconName: "info.circle",
-                    subText: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+                    subText: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0",
+                    disclosure: false
                 ))
             ]
         )

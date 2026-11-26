@@ -206,7 +206,7 @@ final class CardViewController: BaseViewController, CardViewInterface {
         }
         // Attached once in setupUI (changing the bar's height after the list was laid out left the first row under it);
         // with nothing to search it is simply inactive.
-        let searchable = state.scope != .review && (state.scope == .mine ? state.deckCount > 0 : true)
+        let searchable = state.scope != .review && (state.scope == .mine ? (state.deckCount > 0 || hasAccountRows) : true)
         searchController.searchBar.isUserInteractionEnabled = searchable
         searchController.searchBar.alpha = searchable ? 1 : 0.4
     }

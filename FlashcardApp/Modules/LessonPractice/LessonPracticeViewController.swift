@@ -56,6 +56,7 @@ final class LessonPracticeViewController: BaseVC {
     }
 
     private func render() {
+        if !presenter.title.isEmpty { title = presenter.title }
         sections = presenter.errorMessage.map { [Section(title: nil, rows: [.error($0)])] } ?? []
         switch presenter.screen {
         case .question(let state): sections += questionSections(state)
