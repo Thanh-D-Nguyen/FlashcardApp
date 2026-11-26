@@ -20,6 +20,11 @@ final class ExampleEditorViewController: BaseViewController, ExampleEditorViewIn
         presenter.viewDidLoad()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.presentationController?.delegate = self
+    }
+
     func subscribe() {}
 
     func setupUI() {
@@ -34,7 +39,6 @@ final class ExampleEditorViewController: BaseViewController, ExampleEditorViewIn
         })
         saveButton.accessibilityIdentifier = "example_editor_save"
         navigationItem.rightBarButtonItem = saveButton
-        navigationController?.presentationController?.delegate = self
 
         japanese.placeholder = NSLocalizedString("Sentence", comment: "Example sentence field")
         japanese.accessibilityIdentifier = "example_editor_japanese"
@@ -102,8 +106,7 @@ final class ExampleEditorViewController: BaseViewController, ExampleEditorViewIn
         if reading.text != state.draft.reading { reading.text = state.draft.reading }
         if translation.text != state.draft.translation { translation.text = state.draft.translation }
         saveButton.isEnabled = state.canSave
-        problemLabel.text = state.problem
-        problemLabel.isHidden = state.problem == nil
+        problemLabel.show(state.problem)
         // Typing is not thrown away by a swipe; Cancel asks first.
         isModalInPresentation = state.isDirty
         if state.problem != nil { UIAccessibility.post(notification: .announcement, argument: state.problem) }
