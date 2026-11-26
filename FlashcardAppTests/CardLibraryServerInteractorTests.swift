@@ -262,6 +262,30 @@ final class CardLibraryServerInteractorTests: XCTestCase {
         XCTAssertEqual(repository.getAll().count, 1)
     }
 
+    func test_savingAnUploadedDeckReusesTheLinkedLocalDeckInsteadOfDuplicating() throws {
+        let suite = "links-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let links = DeckAccountLinks(defaults: defaults, accountId: { "user-1" })
+        let localDeck = DeskEntity()
+        localDeck.id = "local-deck-1"
+        localDeck.name = "Local N5"
+        try repository.add(localDeck)
+        links.link(device: "local-deck-1", account: deckId)
+
+        let linkedInteractor = CardLibraryServerInteractor(
+            api: api, repository: repository,
+            auth: AuthSession(tokens: SignedOutTokens(), api: UnusedNativeAuth()),
+            language: { .english }, links: links, streaks: streaks
+        )
+        api.deckResult = .just(remote())
+        let detail = try value(linkedInteractor.detail(deckId: deckId))
+
+        XCTAssertTrue(linkedInteractor.hasDeviceCopy(deckId: deckId))
+        XCTAssertEqual(try linkedInteractor.saveToDevice(detail), .alreadyPresent(deckId: "local-deck-1"))
+        XCTAssertEqual(repository.getAll().count, 1, "Studying an uploaded account deck must not duplicate the local deck")
+    }
+
     func test_picturesOfASavedCopyAreStoredLinkedAndCredited() throws {
         PictureURLProtocol.missing = []
         PictureURLProtocol.requested = []

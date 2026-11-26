@@ -123,6 +123,9 @@ final class CardLibraryServerInteractor: CardLibraryServerInteractorInterface {
 
     func saveToDevice(_ detail: ServerDeckDetail) throws -> DeckImportOutcome {
         if repository.desk(withId: detail.deck.id) != nil { return .alreadyPresent(deckId: detail.deck.id) }
+        if let linkedDeviceId = links.deviceDeckId(forAccount: detail.deck.id), repository.desk(withId: linkedDeviceId) != nil {
+            return .alreadyPresent(deckId: linkedDeviceId)
+        }
         let deck = GeneratedDeck(id: detail.deck.id, name: detail.deck.title, direction: Self.direction(of: detail.cards),
                                  cards: detail.cards.map { GeneratedDeck.Card(id: $0.id, front: $0.front, back: $0.back, reading: $0.reading) })
         do {
