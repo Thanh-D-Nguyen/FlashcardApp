@@ -11,6 +11,8 @@ struct DiscoverNextDraw: Equatable {
 struct DiscoverFind: Equatable {
     let word: String
     let articleJapanese: String
+    let slug: String
+    let day: MagazineDay?
 }
 
 protocol DiscoverViewInterface: AnyObject {
@@ -22,6 +24,7 @@ protocol DiscoverPresenterInterface: AnyObject {
     var features: [DiscoverFeature] { get }
     func viewDidLoad()
     func select(_ feature: DiscoverFeature)
+    func openFind()
 }
 
 final class DiscoverPresenter: DiscoverPresenterInterface {
@@ -31,6 +34,7 @@ final class DiscoverPresenter: DiscoverPresenterInterface {
     private let scheduler: ImmediateSchedulerType
     private let now: () -> Date
     private let disposeBag = DisposeBag()
+    private var currentFind: DiscoverFind?
     let features: [DiscoverFeature]
     weak var view: DiscoverViewInterface?
 
@@ -56,7 +60,9 @@ final class DiscoverPresenter: DiscoverPresenterInterface {
         if features.contains(.magazine) {
             magazine.loadPage(kind: nil, page: 1).observe(on: scheduler).subscribe(onSuccess: { [weak self] page in
                 guard let self else { return }
-                self.view?.showFind(Self.find(in: page, now: self.now()))
+                let find = Self.find(in: page, now: self.now())
+                self.currentFind = find
+                self.view?.showFind(find)
             }).disposed(by: disposeBag)
         }
     }
@@ -64,6 +70,11 @@ final class DiscoverPresenter: DiscoverPresenterInterface {
     func select(_ feature: DiscoverFeature) {
         guard features.contains(feature) else { return }
         wireframe.show(feature)
+    }
+
+    func openFind() {
+        guard let find = currentFind, !find.slug.isEmpty else { return }
+        wireframe.showMagazineArticle(slug: find.slug, day: find.day)
     }
 
     /// The draw that comes first and has not happened yet.
@@ -76,7 +87,11 @@ final class DiscoverPresenter: DiscoverPresenterInterface {
     /// One headword of the latest articles. The pick depends only on the Japanese calendar day, so it is the same all day
     /// and changes at midnight in Japan.
     static func find(in page: MagazinePage, now: Date) -> DiscoverFind? {
-        let candidates = page.items.flatMap { item in item.words.filter { !$0.isEmpty }.map { DiscoverFind(word: $0, articleJapanese: item.titleJapanese) } }
+        let candidates = page.items.flatMap { item in
+            item.words.filter { !$0.isEmpty }.map {
+                DiscoverFind(word: $0, articleJapanese: item.titleJapanese, slug: item.slug, day: item.day)
+            }
+        }
         guard !candidates.isEmpty else { return nil }
         let day = MagazineDay.today(now: now)
         var hash: UInt64 = 14_695_981_039_346_656_037

@@ -2,6 +2,7 @@ import UIKit
 
 protocol DiscoverWireframeInterface: AnyObject {
     func show(_ feature: DiscoverFeature)
+    func showMagazineArticle(slug: String, day: MagazineDay?)
 }
 
 final class DiscoverWireframe: BaseWireframe<DiscoverViewController> {
@@ -23,5 +24,9 @@ extension DiscoverWireframe: DiscoverWireframeInterface {
         case .magazine: navigationController?.pushWireframe(MagazineWireframe())
         case .levels: navigationController?.pushWireframe(HomeWireframe())
         }
+    }
+
+    func showMagazineArticle(slug: String, day: MagazineDay?) {
+        navigationController?.pushWireframe(MagazineArticleWireframe(slug: slug, day: day))
     }
 }

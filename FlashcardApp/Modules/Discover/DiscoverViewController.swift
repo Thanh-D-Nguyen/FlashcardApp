@@ -12,6 +12,7 @@ final class DiscoverViewController: BaseVC, DiscoverViewInterface {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        hero.findCard.onOpen = { [weak self] in self?.presenter.openFind() }
         stack.addArrangedSubview(hero)
         for section in DiscoverFeature.Section.allCases {
             let features = presenter.features.filter { $0.section == section }

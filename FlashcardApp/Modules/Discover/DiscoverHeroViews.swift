@@ -69,6 +69,7 @@ final class DiscoverFindCard: UIControl {
     private let articleLabel = UILabel()
     private let shimmer = CAGradientLayer()
     private(set) var isRevealed = false
+    var onOpen: (() -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -189,9 +190,26 @@ final class DiscoverFindCard: UIControl {
         articleLabel.apply(.reading)
         articleLabel.textColor = Design.Color.hero.withAlphaComponent(0.75)
         articleLabel.numberOfLines = 2
-        let stack = UIStackView(arrangedSubviews: [wordLabel, articleLabel])
+
+        let openPrompt = UILabel()
+        openPrompt.apply(.metadata)
+        openPrompt.font = Design.TextRole.weighted(.footnote, weight: .semibold)
+        openPrompt.textColor = Design.Color.hero
+        openPrompt.text = NSLocalizedString("Read article", comment: "Discover: CTA on revealed daily find card")
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
+        chevron.tintColor = Design.Color.hero
+        chevron.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .footnote, scale: .small)
+        chevron.setContentHuggingPriority(.required, for: .horizontal)
+        chevron.setContentCompressionResistancePriority(.required, for: .horizontal)
+        let actionRow = UIStackView(arrangedSubviews: [openPrompt, UIView(), chevron])
+        actionRow.axis = .horizontal
+        actionRow.alignment = .center
+        actionRow.spacing = Design.Spacing.s
+
+        let stack = UIStackView(arrangedSubviews: [wordLabel, articleLabel, actionRow])
         stack.axis = .vertical
         stack.spacing = Design.Spacing.xs
+        stack.setCustomSpacing(Design.Spacing.s, after: articleLabel)
         stack.translatesAutoresizingMaskIntoConstraints = false
         openFace.addSubview(stack)
         pin(stack, in: openFace)
@@ -223,7 +241,11 @@ final class DiscoverFindCard: UIControl {
     }
 
     private func tapped() {
-        reveal()
+        if isRevealed {
+            onOpen?()
+        } else {
+            reveal()
+        }
     }
 
     /// Breaks the seal. Public so the launch argument and tests can open it without a touch.
@@ -233,8 +255,8 @@ final class DiscoverFindCard: UIControl {
         shimmer.removeAllAnimations()
         accessibilityLabel = wordLabel.text
         accessibilityValue = articleLabel.text
-        accessibilityHint = nil
-        accessibilityTraits = .staticText
+        accessibilityHint = NSLocalizedString("Tap to open the article", comment: "Discover: hint on the revealed daily find card")
+        accessibilityTraits = .button
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         let swap = { [self] in sealedFace.isHidden = true; openFace.isHidden = false }
         guard !UIAccessibility.isReduceMotionEnabled else { swap(); return }

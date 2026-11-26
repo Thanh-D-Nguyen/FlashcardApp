@@ -1,3 +1,4 @@
+import RxSwift
 import XCTest
 @testable import FlashcardApp
 
@@ -5,7 +6,9 @@ import XCTest
 final class DiscoverPresenterTests: XCTestCase {
     private final class FakeWireframe: DiscoverWireframeInterface {
         var shown: [DiscoverFeature] = []
+        var openedArticles: [(slug: String, day: MagazineDay?)] = []
         func show(_ feature: DiscoverFeature) { shown.append(feature) }
+        func showMagazineArticle(slug: String, day: MagazineDay?) { openedArticles.append((slug, day)) }
     }
 
     func test_theHubOffersEveryBuiltFeatureAndEachIsComplete() {
@@ -73,5 +76,38 @@ final class DiscoverPresenterTests: XCTestCase {
 
     func test_noDrawMeansNoCountdown() {
         XCTAssertNil(DiscoverPresenter.nextDraw(in: LotoOverview(draws: []), now: Date()))
+    }
+
+    func test_openingRevealedFindRoutesToItsMagazineArticle() {
+        let wireframe = FakeWireframe()
+        let day = MagazineDay(key: "2026-11-26")
+        let item = MagazineSummary(id: "id0", slug: "rainy-day", kind: .vocabulary, titleJapanese: "梅雨の言葉",
+                                   titleVietnamese: "Từ vựng mùa mưa", summary: nil, level: "N3", day: day, words: ["梅雨"])
+        let magazine = DiscoverMagazineStub(page: MagazinePage(items: [item], page: 1, hasMore: false))
+        let presenter = DiscoverPresenter(wireframe: wireframe, features: [.magazine],
+                                          magazine: magazine, scheduler: CurrentThreadScheduler.instance,
+                                          now: { Date(timeIntervalSince1970: 1_793_000_000) })
+
+        presenter.openFind()
+        XCTAssertTrue(wireframe.openedArticles.isEmpty, "Opening before any find is loaded must be a no-op")
+
+        presenter.viewDidLoad()
+        presenter.openFind()
+
+        XCTAssertEqual(wireframe.openedArticles.count, 1)
+        XCTAssertEqual(wireframe.openedArticles.first?.slug, "rainy-day")
+        XCTAssertEqual(wireframe.openedArticles.first?.day, day)
+    }
+}
+
+private final class DiscoverMagazineStub: MagazineInteractorInterface {
+    let page: MagazinePage
+    init(page: MagazinePage) { self.page = page }
+    func loadPage(kind: MagazineKind?, page: Int) -> Single<MagazinePage> { .just(self.page) }
+    func loadArticle(slug: String) -> Single<MagazineArticle> { .error(URLError(.unknown)) }
+    func deckChoices() -> [TodayDeckChoice] { [] }
+    func magazineDeckExists() -> Bool { false }
+    func saveVocabulary(_ words: [MagazineArticle.Vocabulary], target: MagazineSaveTarget) throws -> MagazineSaveOutcome {
+        MagazineSaveOutcome(deckID: "", deckName: "", added: [], alreadyPresent: [], cardIDs: [])
     }
 }
