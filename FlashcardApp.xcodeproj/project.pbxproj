@@ -361,7 +361,6 @@
 		B6E1EA5E329D8218A372092F /* NoticeToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A28EC0D989511B7F733297 /* NoticeToastView.swift */; };
 		B6E88469A0B6F11A7D082E25 /* BJTMagazineDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419759F1DD716FA545408C34 /* BJTMagazineDTO.swift */; };
 		B79BF51CC3AAFB7445C57B4C /* DeckDirectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1349716F3450468B69CADAE0 /* DeckDirectionCell.swift */; };
-		B7D044161C7EB7E739C30D8C /* SettingsPrototypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4479E6D17205D798B73B194A /* SettingsPrototypes.swift */; };
 		BB8A1A04B5119F08EF8E22DD /* PitchPattern.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB42CE711A02A5742139886D /* PitchPattern.swift */; };
 		BC0DC8D74F4731D6344B3D0A /* LifeLessonPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA48EF5D63147D0CB215D3 /* LifeLessonPresenterTests.swift */; };
 		BC925BBD0FFDB154EFB35618 /* ScenarioUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78C2F59D586ECC173D18844 /* ScenarioUITests.swift */; };
@@ -556,7 +555,6 @@
 		42CEC9DF9A87C1BC680114F8 /* ServerDeck.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ServerDeck.swift; sourceTree = "<group>"; };
 		446F8A2005FAB54DE84E09A2 /* DictionaryScanInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryScanInteractor.swift; sourceTree = "<group>"; };
 		44710A56521BF795C31F0972 /* DictionaryDeckWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryDeckWriterTests.swift; sourceTree = "<group>"; };
-		4479E6D17205D798B73B194A /* SettingsPrototypes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsPrototypes.swift; sourceTree = "<group>"; };
 		450A8E8864106604935B3A8E /* CardStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStyleTests.swift; sourceTree = "<group>"; };
 		4854D3DCB09788B20FC0709F /* DictionaryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryItem.swift; sourceTree = "<group>"; };
 		4920F1B2BD0AB6FF7D632B53 /* LifeDateStory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeDateStory.swift; sourceTree = "<group>"; };
@@ -1631,7 +1629,6 @@
 				22D4E008F0AFC2396F9F981B /* DataExportPresenter.swift */,
 				9251ED1229A20040006C1D1C /* SettingViewController.swift */,
 				9251ED1429A20040006C1D1C /* SettingWireframe.swift */,
-				B19CEBC8428E45CC1F952F10 /* Prototypes */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -1815,14 +1812,6 @@
 				CA6A9D567840130445FBC412 /* Views */,
 			);
 			path = DeckGenerator;
-			sourceTree = "<group>";
-		};
-		B19CEBC8428E45CC1F952F10 /* Prototypes */ = {
-			isa = PBXGroup;
-			children = (
-				4479E6D17205D798B73B194A /* SettingsPrototypes.swift */,
-			);
-			path = Prototypes;
 			sourceTree = "<group>";
 		};
 		BFFF899A29A2AFC752A900E7 /* DictionaryEntry */ = {
@@ -2332,7 +2321,6 @@
 				9251EC9429A1EAA5006C1D1C /* BaseViewControler.swift in Sources */,
 				9226D80929D00C1B0042F6DA /* PlaceholderView.swift in Sources */,
 				72796A297CC9F326ADC45E12 /* UserPreferences.swift in Sources */,
-				B7D044161C7EB7E739C30D8C /* SettingsPrototypes.swift in Sources */,
 				862184A154A58EB864D04742 /* StateView.swift in Sources */,
 				6B9CF3EBCDA467DC17D545BD /* LifeSceneView.swift in Sources */,
 				1BE087530645B7FBA386BAC7 /* HomeCells.swift in Sources */,
