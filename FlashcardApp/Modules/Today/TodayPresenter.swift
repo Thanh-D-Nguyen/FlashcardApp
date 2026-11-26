@@ -81,6 +81,8 @@ struct TodayViewState: Equatable {
     var streak: TodayStreakText?
     /// One Daily Radar card. `nil` hides it (loading, failed with no recent copy, nothing usable).
     var radar: TodayRadarCard?
+    /// "Today's quest": max 3 real checklist items assembled from review due state, lesson slot, and Daily Radar.
+    var quest: TodayQuestState?
 }
 
 protocol TodayViewInterface: AnyObject {
@@ -101,6 +103,8 @@ protocol TodayPresenterInterface: AnyObject {
     func openLessonSlot()
     /// The Daily Radar card was tapped.
     func openRadar()
+    /// A checklist item in Today's Quest was tapped.
+    func openQuestItem(_ action: TodayQuestAction)
     func retry()
     /// A card of the life hub was tapped (or its button): opens its lesson, asks for the location, or retries, by what the card is.
     func openLifeCard(id: String)
@@ -119,6 +123,8 @@ final class TodayPresenter {
     private let lessons: TodayLessonSlotProviding?
     private let streak: TodayStreakLoading?
     private let radar: TodayRadarLoading?
+    private let questStore: TodayQuestCompletionStoreInterface
+    private let calendar: () -> Calendar
 
     private var plan: TodayPlan?
     private var state: TodayViewState?
@@ -130,10 +136,14 @@ final class TodayPresenter {
          life: TodayLifeHubLoading? = nil,
          lessons: TodayLessonSlotProviding? = nil,
          streak: TodayStreakLoading? = nil,
-         radar: TodayRadarLoading? = nil) {
+         radar: TodayRadarLoading? = nil,
+         questStore: TodayQuestCompletionStoreInterface = UserDefaultsTodayQuestCompletionStore.shared,
+         calendar: @escaping () -> Calendar = { .autoupdatingCurrent }) {
         self.lessons = lessons
         self.streak = streak
         self.radar = radar
+        self.questStore = questStore
+        self.calendar = calendar
         self.interactor = interactor
         self.wireframe = wireframe
         self.ownerKey = ownerKey
@@ -175,10 +185,26 @@ final class TodayPresenter {
 
     private func publish(_ state: TodayViewState) {
         var state = state
+        let owner = ownerKey()
+        let date = now()
+        let cal = calendar()
+        let lessonSlot = lessons?.slot(ownerKey: owner)
+        let lessonCompletedToday = lessons?.completedToday(ownerKey: owner, now: date, calendar: cal) ?? false
+        let radarItem = radar?.item
+        let radarCompletedToday = radarItem.map {
+            questStore.isRadarCompleted(slug: $0.slug, ownerKey: owner, on: date, calendar: cal)
+        } ?? false
         state.life = life?.section
-        state.lessonCard = lessons.map { Self.lessonCard($0.slot(ownerKey: ownerKey())) }
+        state.lessonCard = lessonSlot.map(Self.lessonCard)
         state.streak = streak?.streak.map(Self.streakText)
-        state.radar = radar?.item.flatMap(Self.radarCard)
+        state.radar = radarItem.flatMap(Self.radarCard)
+        state.quest = TodayQuestAssembler.make(
+            plan: plan,
+            lessonSlot: lessonSlot,
+            lessonCompletedToday: lessonCompletedToday,
+            radar: radarItem,
+            radarCompletedToday: radarCompletedToday
+        )
         self.state = state
         view?.render(state)
     }
@@ -332,7 +358,17 @@ extension TodayPresenter: TodayPresenterInterface {
 
     func openRadar() {
         guard state?.radar != nil, let item = radar?.item else { return }
+        questStore.markRadarCompleted(slug: item.slug, ownerKey: ownerKey(), on: now(), calendar: calendar())
+        if let current = state { publish(current) }
         wireframe.showRadarCard(item)
+    }
+
+    func openQuestItem(_ action: TodayQuestAction) {
+        switch action {
+        case .review: primaryAction()
+        case .lesson: openLessonSlot()
+        case .radar: openRadar()
+        }
     }
 
     func retry() { reload() }

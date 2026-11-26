@@ -8,6 +8,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
     private let dateHeader = TodayDateHeaderView()
+    private let questView = TodayQuestCardView()
     private let progressGroup = UIStackView()
     private let progressTitle = UILabel()
     private let progressDetail = UILabel()
@@ -85,11 +86,13 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         levelsRow.accessibilityIdentifier = "today_levels_row"
 
         dateHeader.isHidden = true
+        questView.isHidden = true
         hubView.isHidden = true
         hubView.accessibilityIdentifier = "today_life_hub"
-        [dateHeader, progressGroup, streakView, hubView, scenarioBanner, heroView, failureView, lessonSlot, radarCard, levelsRow].forEach(stack.addArrangedSubview)
-        stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
+        [dateHeader, streakView, questView, progressGroup, hubView, scenarioBanner, heroView, failureView, lessonSlot, radarCard, levelsRow].forEach(stack.addArrangedSubview)
         stack.setCustomSpacing(Design.Spacing.m, after: streakView)
+        stack.setCustomSpacing(Design.Spacing.m, after: questView)
+        stack.setCustomSpacing(Design.Spacing.m, after: progressGroup)
         streakView.isHidden = true
         stack.setCustomSpacing(Design.Spacing.m, after: hubView)
         stack.setCustomSpacing(Design.Spacing.l, after: scenarioBanner)
@@ -119,6 +122,7 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
             banner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
+        questView.onSelectItem = { [weak self] action in self?.presenter.openQuestItem(action) }
         heroView.onPrimary = { [weak self] in self?.presenter.primaryAction() }
         heroView.onChangeDeck = { [weak self] in self?.presenter.changeDeck() }
         heroView.onChangeBudget = { [weak self] in self?.presenter.changeBudget() }
@@ -157,6 +161,8 @@ final class TodayViewController: BaseViewController, TodayViewInterface {
         }
         streakView.isHidden = state.streak == nil
         if let streak = state.streak { streakView.configure(streak) }
+        questView.isHidden = state.quest == nil
+        if let quest = state.quest { questView.configure(quest) }
         progressGroup.isHidden = state.progress == nil
         if let progress = state.progress {
             progressTitle.text = progress.title

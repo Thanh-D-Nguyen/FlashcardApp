@@ -14,6 +14,11 @@ enum TodayLessonSlot: Equatable {
 
 protocol TodayLessonSlotProviding: AnyObject {
     func slot(ownerKey: String) -> TodayLessonSlot
+    func completedToday(ownerKey: String, now: Date, calendar: Calendar) -> Bool
+}
+
+extension TodayLessonSlotProviding {
+    func completedToday(ownerKey: String, now: Date, calendar: Calendar) -> Bool { false }
 }
 
 final class TodayLessonSlotProvider: TodayLessonSlotProviding {
@@ -46,6 +51,15 @@ final class TodayLessonSlotProvider: TodayLessonSlotProviding {
             }
         }
         return .finishedOpened(completed: finished.count)
+    }
+
+    func completedToday(ownerKey: String, now: Date, calendar: Calendar) -> Bool {
+        let start = calendar.startOfDay(for: now)
+        let end = calendar.date(byAdding: .day, value: 1, to: start) ?? start.addingTimeInterval(86_400)
+        return store.allProgress(ownerKey: ownerKey).contains { lesson in
+            guard let done = lesson.completedAt else { return false }
+            return done >= start && done < end
+        }
     }
 
     private func title(of lesson: BJTLessonDetailDTO?) -> String? {
